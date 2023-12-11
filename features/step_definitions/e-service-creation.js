@@ -1,5 +1,8 @@
 const assert = require('assert');
 const { Given, When, Then } = require('@cucumber/cucumber');
+const { setDefaultTimeout } = require('@cucumber/cucumber');
+
+setDefaultTimeout(10 * 1000);
 
 const API_ROOT_URL = 'https://selfcare.dev.interop.pagopa.it/backend-for-frontend/0.0'
 
@@ -24,23 +27,23 @@ async function sleep(time) {
   return new Promise((resolve) => { setTimeout(resolve, time) })
 }
 
-Given("l'utente ha creato un e-service {string}", async function (eserviceName) {
+async function createEservice(token, givenEserviceName) {
+  const eserviceName = givenEserviceName || `e-service-${Math.random()}`
+  const eservice = packEservice(eserviceName, token)  
+  const response = await fetch(`${API_ROOT_URL}/eservices`, eservice)
+  return { eserviceName, response }
+}
+
+Given("l'utente crea un e-service con lo stesso nome", async function () {
   await sleep(3000)
-  const eservice = packEservice(eserviceName, this.token)  
-  this.response = await fetch(`${API_ROOT_URL}/eservices`, eservice)
+  const { response } = await createEservice(this.token, this.eserviceName)
+  this.response = response
 });
 
 When("l'utente crea un e-service", async function () {
-  await sleep(3000)
-  const eserviceName = `e-service-${Math.random()}`
-  const eservice = packEservice(eserviceName, this.token)  
-  this.response = await fetch(`${API_ROOT_URL}/eservices`, eservice)
-});
-
-When("l'utente crea un e-service {string}", async function (eserviceName) {
-  await sleep(3000)
-  const eservice = packEservice(eserviceName, this.token)  
-  this.response = await fetch(`${API_ROOT_URL}/eservices`, eservice)
+  const { eserviceName, response } = await createEservice(this.token)
+  this.eserviceName = eserviceName
+  this.response = response
 });
 
 Then("la creazione restituisce errore - {string}", function (statusCode) {
