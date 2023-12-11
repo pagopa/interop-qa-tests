@@ -1,20 +1,26 @@
 Feature: Creazione e-service
   Gli admin e gli operatori API di enti PA e GSP possono creare e-service
 
-  Scenario: Un admin di PagoPA S.p.A. crea un nuovo e-service
-    Given l'utente è un "admin" di "PagoPA S.p.A."
-    When l'utente crea un e-service
-    Then l'e-service viene creato correttamente
+  Scenario Outline: Un utente con sufficienti permessi di un ente autorizzato crea un e-service
+    Given l'utente è un "<ruolo>" di "<ente>"
+    When creo un e-service
+    Then si ottiene status code "<risultato>"
 
-  Scenario: Un admin di Sogecap crea un nuovo e-service
-    Given l'utente è un "admin" di "Sogecap"
-    When l'utente crea un e-service
-    Then la creazione restituisce errore - "403"
+  Examples:
+    | ente               | ruolo      | risultato |
+    | PagoPA             | admin      | 200       |
+    | PagoPA             | api        | 200       |
+    | PagoPA             | security   | 403       |
+    | PagoPA             | support    | 403       |
+    | Sogecap            | admin      | 403       |
+    | Sogecap            | api        | 403       |
+    | Sogecap            | security   | 403       |
+    | Sogecap            | support    | 403       |
+    | Comune di Milano   | admin      | 200       |
+    | Comune di Milano   | api        | 200       |
+    | Comune di Milano   | security   | 403       |
+    | Comune di Milano   | support    | 403       |
 
-  Scenario: Un operatore di sicurezza di Comune di Milano crea un nuovo e-service
-    Given l'utente è un "security" di "Comune di Milano"
-    When l'utente crea un e-service
-    Then la creazione restituisce errore - "403"
 
   # Si usa l'admin di PagoPA ma va bene qualsiasi utente autorizzato a creare un e-service
   Scenario: Un utente autorizzato vuole creare due e-service con lo stesso nome

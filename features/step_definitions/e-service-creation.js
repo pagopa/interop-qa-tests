@@ -43,10 +43,10 @@ When("l'utente crea un e-service {string}", async function (eserviceName) {
   this.response = await fetch(`${API_ROOT_URL}/eservices`, eservice)
 });
 
-Then("l'e-service viene creato correttamente", function () {
-  assert.equal(this.response.status, 200)
+Then("la creazione restituisce errore - {string}", function (statusCode) {
+  assert.equal(this.response.status, Number(statusCode))
 });
 
-Then("la creazione restituisce errore - {string}", function (statusCode) {
+Then("si ottiene status code {string}", function (statusCode) {
   assert.equal(this.response.status, Number(statusCode))
 });
