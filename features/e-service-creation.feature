@@ -28,6 +28,6 @@ Feature: Creazione e-service
   # Si usa l'admin di PagoPA ma va bene qualsiasi utente autorizzato a creare un e-service
   Scenario: Un utente autorizzato vuole creare due e-service con lo stesso nome
     Given l'utente è un "admin" di "GSP"
-    Given l'utente crea un e-service
+    Given l'utente ha già creato un e-service
     When l'utente crea un e-service con lo stesso nome
     Then la creazione restituisce errore - "409"

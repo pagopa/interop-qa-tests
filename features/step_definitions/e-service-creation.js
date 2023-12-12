@@ -23,25 +23,60 @@ function packEservice(name, token) {
   }
 }
 
+function optinsForGetEServicesById(token) {
+  return {
+    method: 'GET',
+    headers: {
+      Authorization: 'Bearer ' + token,
+      'X-Correlation-Id': 'abc',
+      "Content-Type": 'application/json'
+    }
+  }
+}
+
+
 async function sleep(time) {
   return new Promise((resolve) => { setTimeout(resolve, time) })
 }
 
-async function createEservice(token, givenEserviceName) {
-  const eserviceName = givenEserviceName || `e-service-${Math.random()}`
-  const eservice = packEservice(eserviceName, token)  
-  const response = await fetch(`${API_ROOT_URL}/eservices`, eservice)
-  return { eserviceName, response }
+async function polling(path, options) {
+  for (i = 0; i < 4; i++) {
+    const result = await fetch(`${API_ROOT_URL}/${path}`, options)
+    if (result.status !== 404) {
+      return result
+    }
+    await sleep(Math.min(1000 * 2 ** i, 30 * 1000))
+  }
+  throw Error("Eventual consistency error")
 }
 
-Given("l'utente crea un e-service con lo stesso nome", async function () {
-  await sleep(3000)
-  const { response } = await createEservice(this.token, this.eserviceName)
+
+async function createEservice(token, { givenEserviceName = null , withPolling = false }) {
+  const eserviceName = givenEserviceName || `e-service-${Math.random()}`
+  const postEService = packEservice(eserviceName, token)  
+  const response = await fetch(`${API_ROOT_URL}/eservices`, postEService)
+  if (withPolling) {
+    const eserviceId = (await response.json()).id
+    await polling(`producers/eservices/${eserviceId}`, optinsForGetEServicesById(token))
+  }
+  
+  return { eserviceName, response }
+  
+}
+
+When("l'utente crea un e-service con lo stesso nome", async function () {
+  const { response } = await createEservice(this.token, { givenEserviceName: this.eserviceName, withPolling: false })
+  this.response = response
+});
+
+Given("l'utente ha già creato un e-service", async function () {
+  const { eserviceName, response } = await createEservice(this.token, { withPolling: true })
+  this.eserviceName = eserviceName
   this.response = response
 });
 
 When("l'utente crea un e-service", async function () {
-  const { eserviceName, response } = await createEservice(this.token)
+  const { eserviceName, response } = await createEservice(this.token, {})
   this.eserviceName = eserviceName
   this.response = response
 });
