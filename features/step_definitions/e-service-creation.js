@@ -24,7 +24,7 @@ function packEservice(name, token) {
   };
 }
 
-function optionsForGetEServicesById(token) {
+function optionsForGetRoute(token) {
   return {
     method: "GET",
     headers: {
@@ -59,15 +59,14 @@ async function createEservice(
   const eserviceName = givenEserviceName || `e-service-${Math.random()}`;
   const postEService = packEservice(eserviceName, token);
   const response = await fetch(`${API_ROOT_URL}/eservices`, postEService);
+  const eserviceId = (await response.json()).id;
   if (withPolling) {
-    const eserviceId = (await response.json()).id;
     await polling(
       `producers/eservices/${eserviceId}`,
-      optionsForGetEServicesById(token)
+      optionsForGetRoute(token)
     );
   }
-
-  return { eserviceName, response };
+  return { eserviceName, response, eserviceId };
 }
 
 When("l'utente crea un e-service con lo stesso nome", async function () {
@@ -79,11 +78,12 @@ When("l'utente crea un e-service con lo stesso nome", async function () {
 });
 
 Given("l'utente ha già creato un e-service", async function () {
-  const { eserviceName, response } = await createEservice(this.token, {
+  const { eserviceName, response, eserviceId } = await createEservice(this.token, {
     withPolling: true,
   });
   this.eserviceName = eserviceName;
   this.response = response;
+  this.eserviceId = eserviceId
 });
 
 When("l'utente crea un e-service", async function () {
@@ -99,3 +99,8 @@ Then("la creazione restituisce errore - {string}", function (statusCode) {
 Then("si ottiene status code {string}", function (statusCode) {
   assert.equal(this.response.status, Number(statusCode));
 });
+
+
+module.exports = {
+  createEservice, polling, optionsForGetRoute
+}
