@@ -1,13 +1,14 @@
 const { Given } = require('@cucumber/cucumber');
 
 const TOKEN = {
-  'PagoPA S.p.A.': {
+  GSP: {
     admin: '',
   },
-  'Comune di Milano': {
-    security: ''
+  PA1: {
+    security: '',
+    "api,security": ''
   },
-  Sogecap: {
+  Privato: {
     admin: ''
   }
 }
