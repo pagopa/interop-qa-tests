@@ -9,7 +9,12 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "dependencies": {
+    "@cucumber/cucumber": "^10.0.1",
+    "ts-node": "^10.9.2"
+  },
   "devDependencies": {
-    "@cucumber/cucumber": "^10.0.1"
+    "@types/node": "^20.10.4",
+    "typescript": "^5.3.3"
   }
 }

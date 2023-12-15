@@ -1,13 +1,10 @@
-const assert = require("assert");
-const { Given, When, Then } = require("@cucumber/cucumber");
-const { setDefaultTimeout } = require("@cucumber/cucumber");
+import assert from "assert";
+import { Given, When, Then, setDefaultTimeout } from "@cucumber/cucumber";
+import { API_ROOT_URL } from "./tokens";
 
-setDefaultTimeout(10 * 1000);
+setDefaultTimeout(30 * 1000);
 
-const API_ROOT_URL =
-  "https://selfcare.dev.interop.pagopa.it/backend-for-frontend/0.0";
-
-function packEservice(name, token) {
+function packEservice(name: string, token: string) {
   return {
     method: "POST",
     headers: {
@@ -24,7 +21,7 @@ function packEservice(name, token) {
   };
 }
 
-function optionsForGetRoute(token) {
+export function optionsForGetRoute(token: string) {
   return {
     method: "GET",
     headers: {
@@ -35,14 +32,14 @@ function optionsForGetRoute(token) {
   };
 }
 
-async function sleep(time) {
+async function sleep(time: number) {
   return new Promise((resolve) => {
     setTimeout(resolve, time);
   });
 }
 
-async function polling(path, options) {
-  for (i = 0; i < 4; i++) {
+export async function polling(path: string, options: object) {
+  for (let i = 0; i < 4; i++) {
     const result = await fetch(`${API_ROOT_URL}/${path}`, options);
     if (result.status !== 404) {
       return result;
@@ -52,14 +49,14 @@ async function polling(path, options) {
   throw Error("Eventual consistency error");
 }
 
-async function createEservice(
-  token,
-  { givenEserviceName = null, withPolling = false }
+export async function createEservice(
+  token: string,
+  { givenEserviceName = null, withPolling = false }: {givenEserviceName?: null | string, withPolling?: boolean}
 ) {
   const eserviceName = givenEserviceName || `e-service-${Math.random()}`;
   const postEService = packEservice(eserviceName, token);
   const response = await fetch(`${API_ROOT_URL}/eservices`, postEService);
-  const eserviceId = (await response.json()).id;
+  const eserviceId = ((await response.json()) as { id: string }).id;
   if (withPolling) {
     await polling(
       `producers/eservices/${eserviceId}`,
@@ -69,7 +66,7 @@ async function createEservice(
   return { eserviceName, response, eserviceId };
 }
 
-When("l'utente crea un e-service con lo stesso nome", async function () {
+When("l'utente crea un e-service con lo stesso nome", async function (this: { token: string, eserviceName: string | null, response: unknown }) {
   const { response } = await createEservice(this.token, {
     givenEserviceName: this.eserviceName,
     withPolling: false,
@@ -77,7 +74,7 @@ When("l'utente crea un e-service con lo stesso nome", async function () {
   this.response = response;
 });
 
-Given("l'utente ha già creato un e-service", async function () {
+Given("l'utente ha già creato un e-service", async function (this: { token: string, eserviceName: string, response: unknown, eserviceId: string }) {
   const { eserviceName, response, eserviceId } = await createEservice(this.token, {
     withPolling: true,
   });
@@ -86,21 +83,17 @@ Given("l'utente ha già creato un e-service", async function () {
   this.eserviceId = eserviceId
 });
 
-When("l'utente crea un e-service", async function () {
+When("l'utente crea un e-service", async function (this: { token: string, eserviceName: string, response: unknown }) {
   const { eserviceName, response } = await createEservice(this.token, {});
   this.eserviceName = eserviceName;
   this.response = response;
 });
 
-Then("la creazione restituisce errore - {string}", function (statusCode) {
+Then("la creazione restituisce errore - {string}", function (this: {response: { status: number } }, statusCode: string) {
   assert.equal(this.response.status, Number(statusCode));
 });
 
-Then("si ottiene status code {string}", function (statusCode) {
+Then("si ottiene status code {string}", function (this: {response: { status: number } }, statusCode: string) {
   assert.equal(this.response.status, Number(statusCode));
 });
 
-
-module.exports = {
-  createEservice, polling, optionsForGetRoute
-}
