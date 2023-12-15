@@ -51,7 +51,10 @@ export async function polling(path: string, options: object) {
 
 export async function createEservice(
   token: string,
-  { givenEserviceName = null, withPolling = false }: {givenEserviceName?: null | string, withPolling?: boolean}
+  {
+    givenEserviceName = null,
+    withPolling = false,
+  }: { givenEserviceName?: null | string; withPolling?: boolean }
 ) {
   const eserviceName = givenEserviceName || `e-service-${Math.random()}`;
   const postEService = packEservice(eserviceName, token);
@@ -66,34 +69,64 @@ export async function createEservice(
   return { eserviceName, response, eserviceId };
 }
 
-When("l'utente crea un e-service con lo stesso nome", async function (this: { token: string, eserviceName: string | null, response: unknown }) {
-  const { response } = await createEservice(this.token, {
-    givenEserviceName: this.eserviceName,
-    withPolling: false,
-  });
-  this.response = response;
-});
+When(
+  "l'utente crea un e-service con lo stesso nome",
+  async function (this: {
+    token: string;
+    eserviceName: string | null;
+    response: unknown;
+  }) {
+    const { response } = await createEservice(this.token, {
+      givenEserviceName: this.eserviceName,
+      withPolling: false,
+    });
+    this.response = response;
+  }
+);
 
-Given("l'utente ha già creato un e-service", async function (this: { token: string, eserviceName: string, response: unknown, eserviceId: string }) {
-  const { eserviceName, response, eserviceId } = await createEservice(this.token, {
-    withPolling: true,
-  });
-  this.eserviceName = eserviceName;
-  this.response = response;
-  this.eserviceId = eserviceId
-});
+Given(
+  "l'utente ha già creato un e-service",
+  async function (this: {
+    token: string;
+    eserviceName: string;
+    response: unknown;
+    eserviceId: string;
+  }) {
+    const { eserviceName, response, eserviceId } = await createEservice(
+      this.token,
+      {
+        withPolling: true,
+      }
+    );
+    this.eserviceName = eserviceName;
+    this.response = response;
+    this.eserviceId = eserviceId;
+  }
+);
 
-When("l'utente crea un e-service", async function (this: { token: string, eserviceName: string, response: unknown }) {
-  const { eserviceName, response } = await createEservice(this.token, {});
-  this.eserviceName = eserviceName;
-  this.response = response;
-});
+When(
+  "l'utente crea un e-service",
+  async function (this: {
+    token: string;
+    eserviceName: string;
+    response: unknown;
+  }) {
+    const { eserviceName, response } = await createEservice(this.token, {});
+    this.eserviceName = eserviceName;
+    this.response = response;
+  }
+);
 
-Then("la creazione restituisce errore - {string}", function (this: {response: { status: number } }, statusCode: string) {
-  assert.equal(this.response.status, Number(statusCode));
-});
+Then(
+  "la creazione restituisce errore - {string}",
+  function (this: { response: { status: number } }, statusCode: string) {
+    assert.equal(this.response.status, Number(statusCode));
+  }
+);
 
-Then("si ottiene status code {string}", function (this: {response: { status: number } }, statusCode: string) {
-  assert.equal(this.response.status, Number(statusCode));
-});
-
+Then(
+  "si ottiene status code {string}",
+  function (this: { response: { status: number } }, statusCode: string) {
+    assert.equal(this.response.status, Number(statusCode));
+  }
+);

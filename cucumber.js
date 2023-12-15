@@ -1,4 +1,4 @@
-let common = [
+const common = [
   'features/**/*.feature',
   '--require-module ts-node/register', //typescript cucumber
   '--require ./features/step_definitions/**/*.ts',
