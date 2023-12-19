@@ -10,3 +10,25 @@ SESSION_TOKENS_DURATION_SECONDS=1800
 TENANT_IDS_FILE_PATH="./data/dev/tenants-ids.json"
 ```
 
+## Session tokens module
+
+The module exports `async generateSessionTokens(string)` which takes the tenants ids file path as input and
+returns a JSON object containing a valid session token for each tenant kind/role combination.
+
+Usage example:
+
+```javascript
+ import { generateSessionTokens } from "./utils/index.js";
+
+const sessionTokens = await generateSessionTokens(process.env.TENANT_IDS_FILE_PATH);
+```
+
+Output example:
+```json
+{
+  "gsp": {
+    "admin": "jwt...",
+    "api": "jwt..."
+  }
+}
+```
