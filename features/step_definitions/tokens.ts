@@ -1,8 +1,5 @@
 import { Given } from "@cucumber/cucumber";
 
-export const API_ROOT_URL =
-  "https://selfcare.dev.interop.pagopa.it/backend-for-frontend/0.0";
-
 const TOKEN = {
   GSP: {
     admin: "",

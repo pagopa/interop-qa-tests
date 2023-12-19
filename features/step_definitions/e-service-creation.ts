@@ -1,53 +1,10 @@
 import assert from "assert";
 import { Given, When, Then, setDefaultTimeout } from "@cucumber/cucumber";
-import { API_ROOT_URL } from "./tokens";
+import { makePolling } from "../../utils/commons";
+import { apiClient } from "../../api";
+import { getAuthorizationHeader } from "../../api/client";
 
 setDefaultTimeout(30 * 1000);
-
-function packEservice(name: string, token: string) {
-  return {
-    method: "POST",
-    headers: {
-      Authorization: "Bearer " + token,
-      "X-Correlation-Id": "abc",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      name,
-      description: "Questo è un e-service di test",
-      technology: "REST",
-      mode: "DELIVER",
-    }),
-  };
-}
-
-export function optionsForGetRoute(token: string) {
-  return {
-    method: "GET",
-    headers: {
-      Authorization: "Bearer " + token,
-      "X-Correlation-Id": "abc",
-      "Content-Type": "application/json",
-    },
-  };
-}
-
-async function sleep(time: number) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, time);
-  });
-}
-
-export async function polling(path: string, options: object) {
-  for (let i = 0; i < 4; i++) {
-    const result = await fetch(`${API_ROOT_URL}/${path}`, options);
-    if (result.status !== 404) {
-      return result;
-    }
-    await sleep(Math.min(1000 * 2 ** i, 30 * 1000));
-  }
-  throw Error("Eventual consistency error");
-}
 
 export async function createEservice(
   token: string,
@@ -57,13 +14,26 @@ export async function createEservice(
   }: { givenEserviceName?: null | string; withPolling?: boolean }
 ) {
   const eserviceName = givenEserviceName || `e-service-${Math.random()}`;
-  const postEService = packEservice(eserviceName, token);
-  const response = await fetch(`${API_ROOT_URL}/eservices`, postEService);
-  const eserviceId = ((await response.json()) as { id: string }).id;
+  const response = await apiClient.eservices.createEService(
+    {
+      name: eserviceName,
+      description: "Questo è un e-service di test",
+      technology: "REST",
+      mode: "DELIVER",
+    },
+    getAuthorizationHeader(token)
+  );
+
+  const eserviceId = response.data.id;
+
   if (withPolling) {
-    await polling(
-      `producers/eservices/${eserviceId}`,
-      optionsForGetRoute(token)
+    await makePolling(
+      () =>
+        apiClient.producers.getProducerEServiceDetails(
+          eserviceId,
+          getAuthorizationHeader(token)
+        ),
+      (res) => res.status !== 404
     );
   }
   return { eserviceName, response, eserviceId };
