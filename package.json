@@ -11,7 +11,11 @@
   "license": "ISC",
   "dependencies": {
     "@cucumber/cucumber": "^10.0.1",
-    "ts-node": "^10.9.2"
+    "@aws-sdk/client-kms": "^3.474.0",
+    "ts-node": "^10.9.2",
+    "dotenv": "^16.3.1",
+    "lodash": "^4.17.21",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@pagopa/eslint-config": "^3.0.0",
