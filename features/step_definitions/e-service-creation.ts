@@ -1,8 +1,7 @@
 import assert from "assert";
 import { Given, When, Then, setDefaultTimeout } from "@cucumber/cucumber";
-import { makePolling } from "../../utils/commons";
+import { getAuthorizationHeader, makePolling } from "../../utils/commons";
 import { apiClient } from "../../api";
-import { getAuthorizationHeader } from "../../api/client";
 
 setDefaultTimeout(30 * 1000);
 
