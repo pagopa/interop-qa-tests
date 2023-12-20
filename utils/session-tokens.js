@@ -4,8 +4,7 @@ import * as https from "https";
 import fs from "fs";
 import { v4 as uuidv4 } from "uuid";
 import _ from "lodash";
-import clientKms, { VerifyCommand } from "@aws-sdk/client-kms";
-const { KMSClient, SignCommand } = clientKms;
+import { VerifyCommand, KMSClient, SignCommand } from "@aws-sdk/client-kms";
 
 const verboseMode =
   typeof process.env.ST_VERBOSE_MODE != "undefined" &&
