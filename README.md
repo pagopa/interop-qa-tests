@@ -18,7 +18,7 @@ returns a JSON object containing a valid session token for each tenant kind/role
 Usage example:
 
 ```javascript
- import { generateSessionTokens } from "./utils/index.js";
+ import { generateSessionTokens } from "./utils/session-tokens.js";
 
 const sessionTokens = await generateSessionTokens(process.env.TENANT_IDS_FILE_PATH);
 ```
