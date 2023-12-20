@@ -9,7 +9,7 @@ const { KMSClient, SignCommand } = clientKms;
 
 const verboseMode =
   typeof process.env.ST_VERBOSE_MODE != "undefined" &&
-  process.env.ST_VERBOSE_MODE == "1";
+  process.env.ST_VERBOSE_MODE === "1";
 
 const sessionTokenHeaderTemplate = {
   typ: "at+jwt",
@@ -39,10 +39,10 @@ logInfo(process.env);
 const kmsClient = new KMSClient();
 
 const config = {
-    kms: {
-        kid: null,
-        alg: "RSASSA_PKCS1_V1_5_SHA_256"
-    }
+  kms: {
+    kid: null,
+    alg: "RSASSA_PKCS1_V1_5_SHA_256",
+  },
 };
 
 /**
@@ -70,15 +70,15 @@ async function generateSessionTokens(stPayloadValuesFilePath) {
     return;
   }
   config.kms.kid = kid;
-  logInfo(`\tGot kid ${kid} and alg ${alg}`);;
+  logInfo(`\tGot kid ${kid} and alg ${alg}`);
 
   // Step 3. Generate STs header - Populate Session Token header from template
   logInfo(
     "## Step 3. Generate STs header - Populate Session Token header from template ##"
   );
   const stHeaderCompiled = Object.assign({}, sessionTokenHeaderTemplate, {
-    kid: kid,
-    alg: alg,
+    kid,
+    alg,
   });
   logInfo(`\tST Header Compiled: ${JSON.stringify(stHeaderCompiled)}`);
 
@@ -90,15 +90,14 @@ async function generateSessionTokens(stPayloadValuesFilePath) {
 
   logInfo("\tDefine token expiration time in seconds");
   const epochTimeExpSeconds =
-    epochTimeSeconds +
-    Number.parseInt(process.env.SESSION_TOKENS_DURATION_SECONDS);
+    epochTimeSeconds + Number(process.env.SESSION_TOKENS_DURATION_SECONDS);
   logInfo(`\tExpiration Time in seconds: ${epochTimeExpSeconds}`);
 
   logInfo("\tDefine random UUID");
   const randomUUID = uuidv4();
   logInfo(`\tRandom UUID:: ${randomUUID}`);
 
-  logInfo(`Populate Session Token payload from template`);;
+  logInfo(`Populate Session Token payload from template`);
   let stPayloadCompiled = Object.assign({}, sessionTokenPayloadTemplate, {
     nbf: epochTimeSeconds,
     iat: epochTimeSeconds,
@@ -125,7 +124,7 @@ async function generateSessionTokens(stPayloadValuesFilePath) {
   const stOutputTokens = await signedStsGeneration(unsignedSTs);
 
   logInfo(
-    `Session Token generation completed: ${JSON.stringify(stOutputTokens)}`;
+    `Session Token generation completed: ${JSON.stringify(stOutputTokens)}`
   );
   return stOutputTokens;
 }
@@ -171,25 +170,22 @@ async function fetchWellKnown(isSecure, wellKnownUrl) {
           rawData += chunk;
         });
         res.on("end", () => {
-                try {
-                    const parsedData = JSON.parse(rawData);
-                    resolve(parsedData);
-                    
-                } catch (e) {
-                    console.error(e.message);
-                    reject(e);
-                    return;
-                }
-            });
+          try {
+            const parsedData = JSON.parse(rawData);
+            resolve(parsedData);
+          } catch (e) {
+            console.error(e.message);
+            reject(e);
+          }
+        });
       })
       .on("error", (e) => {
-                reject(e);
-                
-            });
+        reject(e);
+      });
   });
 
-  if (typeof jwksObj != "undefined" && jwksObj["keys"] && jwksObj["keys"][0]) {
-    return _.pick(jwksObj["keys"][0], ["kid", "alg"]);
+  if (typeof jwksObj != "undefined" && jwksObj.keys && jwksObj.keys[0]) {
+    return _.pick(jwksObj.keys[0], ["kid", "alg"]);
   }
 
   return null;
@@ -258,7 +254,7 @@ function unsignedStsGeneration(
       `unsignedStsGeneration::Phase2:START: Build base64 header and body for each tenant/role`
     );
     const base64Header = b64UrlEncode(JSON.stringify(stHeaderCompiled));
-    logInfo("\tunsignedStsGeneration::Phase2: Build base64 header done");;
+    logInfo("\tunsignedStsGeneration::Phase2: Build base64 header done");
 
     const stOutputIntermediate = {};
     for (const tenant of Object.keys(stsSubOutput)) {
@@ -271,7 +267,7 @@ function unsignedStsGeneration(
         logInfo(
           `\tunsignedStsGeneration::Phase2: Build partial JWT for tenant ${tenant} role ${interopRole}`
         );
-        let base64Role = b64UrlEncode(
+        const base64Role = b64UrlEncode(
           JSON.stringify(stsSubOutput[tenant][interopRole])
         );
         const poJwtForRole = `${base64Header}.${base64Role}`;
@@ -301,14 +297,15 @@ async function kmsSign(serializedToken) {
     KeyId: config.kms.kid,
     Message: new TextEncoder().encode(serializedToken),
     SigningAlgorithm: config.kms.alg,
-  };;
+  };
 
-  const signCommand = new SignCommand(signCommandParams);;
-  const response = await kmsClient.send(signCommand);;
+  const signCommand = new SignCommand(signCommandParams);
+  const response = await kmsClient.send(signCommand);
   const responseSignature = response.Signature;
 
-  if (!responseSignature)
-    {throw Error("JWT Signature failed. Empty signature returned");}
+  if (!responseSignature) {
+    throw Error("JWT Signature failed. Empty signature returned");
+  }
 
   const kmsSignature = b64ByteUrlEncode(responseSignature);
 
@@ -329,11 +326,13 @@ async function kmsVerify(unsignedToken, signature) {
     Message: new TextEncoder().encode(unsignedToken),
     SigningAlgorithm: config.kms.alg,
     Signature: signature,
-  };;
-  const verifyCommand = new VerifyCommand(commandParams);;
+  };
+  const verifyCommand = new VerifyCommand(commandParams);
   const response = await kmsClient.send(verifyCommand);
 
-  if (!response.SignatureValid) {throw Error("JWT Verify Signature failed");}
+  if (!response.SignatureValid) {
+    throw Error("JWT Verify Signature failed");
+  }
 
   return response.SignatureValid;
 }
