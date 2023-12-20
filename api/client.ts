@@ -6,6 +6,6 @@ export const apiClient = new Api({
   headers: {
     "X-Correlation-Id": "test",
   },
-  // Make axios accept all response statuses withou
+  // Make axios accept all response statuses without throwing errors
   validateStatus: () => true,
 });
