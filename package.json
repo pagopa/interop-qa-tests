@@ -4,18 +4,23 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "cucumber-js"
+    "test": "cucumber-js",
+    "generate-model": "node ./scripts/generate-api-models.mjs"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@cucumber/cucumber": "^10.0.1",
+    "axios": "^1.6.2",
+    "dotenv": "^16.3.1",
+    "openapi-fetch": "^0.8.2",
     "ts-node": "^10.9.2"
   },
   "devDependencies": {
     "@pagopa/eslint-config": "^3.0.0",
     "@types/node": "^20.10.4",
+    "openapi-typescript": "^6.7.3",
     "prettier": "^3.1.1",
     "typescript": "^5.3.3"
   }

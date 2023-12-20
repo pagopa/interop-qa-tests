@@ -18,10 +18,12 @@ module.exports = {
     "functional/immutable-data": "off",
     "no-invalid-this": "off",
     "@typescript-eslint/explicit-function-return-type": "off",
-    "functional/no-let": "off"
+    "functional/no-let": "off",
+    "no-console": "off"
   },
   ignorePatterns: [
     ".eslintrc.cjs",
     "cucumber.js",
+    "scripts/**/*"
   ],
 };
