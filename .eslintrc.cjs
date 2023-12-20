@@ -1,5 +1,8 @@
 module.exports = {
   extends: ["@pagopa/eslint-config/strong"],
+  "env": {
+    node: true
+  },
   rules: {
     // Any project level custom rule
     "@typescript-eslint/switch-exhaustiveness-check": "error",
@@ -18,10 +21,10 @@ module.exports = {
     "functional/immutable-data": "off",
     "no-invalid-this": "off",
     "@typescript-eslint/explicit-function-return-type": "off",
-    "functional/no-let": "off"
+    "functional/no-let": "off",
+    "no-console": "off"
   },
   ignorePatterns: [
     ".eslintrc.cjs",
-    "cucumber.js",
   ],
 };
