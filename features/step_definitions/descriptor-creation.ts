@@ -1,10 +1,7 @@
 import { When, Given } from "@cucumber/cucumber";
-import {
-  polling,
-  optionsForGetRoute,
-  createEservice,
-} from "./e-service-creation";
-import { API_ROOT_URL } from "./tokens";
+import { getAuthorizationHeader, makePolling } from "../../utils/commons";
+import { apiClient } from "../../api";
+import { createEservice } from "./e-service-creation";
 
 When(
   "l'utente crea una versione di un e-service",
@@ -18,15 +15,14 @@ When(
   }
 );
 
-function postDescriptor(token: string) {
-  return {
-    method: "POST",
-    headers: {
-      Authorization: "Bearer " + token,
-      "X-Correlation-Id": "abc",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
+async function createDescriptor(
+  token: string,
+  eserviceId: string,
+  withPolling = false
+) {
+  const response = await apiClient.eservices.createDescriptor(
+    eserviceId,
+    {
       description: "Questo è un e-service di test",
       audience: ["api/v1"],
       voucherLifespan: 60,
@@ -38,24 +34,21 @@ function postDescriptor(token: string) {
         declared: [],
         verified: [],
       },
-    }),
-  };
-}
-
-async function createDescriptor(
-  token: string,
-  eserviceId: string,
-  withPolling = false
-) {
-  const response = await fetch(
-    `${API_ROOT_URL}/eservices/${eserviceId}/descriptors`,
-    postDescriptor(token)
+    },
+    getAuthorizationHeader(token)
   );
-  const descriptorId = ((await response.json()) as { id: string }).id;
+
+  const descriptorId = response.data.id;
+
   if (withPolling) {
-    await polling(
-      `producers/eservices/${eserviceId}/descriptors/${descriptorId}`,
-      optionsForGetRoute(token)
+    await makePolling(
+      () =>
+        apiClient.producers.getProducerEServiceDescriptor(
+          eserviceId,
+          descriptorId,
+          { headers: { Authorization: "Bearer " + token } }
+        ),
+      (res) => res.status !== 404
     );
   }
   return response;
