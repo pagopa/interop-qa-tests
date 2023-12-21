@@ -30,4 +30,4 @@ Feature: Creazione e-service
     Given l'utente è un "admin" di "GSP"
     Given l'utente ha già creato un e-service
     When l'utente crea un e-service con lo stesso nome
-    Then la creazione restituisce errore - "409"
+    Then si ottiene status code "409"
