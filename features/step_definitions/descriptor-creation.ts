@@ -3,13 +3,13 @@ import { z } from "zod";
 import {
   getAuthorizationHeader,
   makePolling,
-  validateContext,
+  assertContextSchema,
 } from "../../utils/commons";
 import { apiClient } from "../../api";
 import { createEservice } from "./e-service-creation";
 
 When("l'utente crea una versione di un e-service", async function () {
-  validateContext(this, {
+  assertContextSchema(this, {
     token: z.string(),
     eserviceId: z.string(),
   });
@@ -60,7 +60,7 @@ async function createDescriptor(
 Given(
   "l'utente ha già creato una versione di e-service in bozza",
   async function () {
-    validateContext(this, {
+    assertContextSchema(this, {
       token: z.string(),
       eserviceId: z.string(),
     });

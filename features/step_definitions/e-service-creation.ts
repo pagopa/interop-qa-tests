@@ -4,7 +4,7 @@ import { z } from "zod";
 import {
   getAuthorizationHeader,
   makePolling,
-  validateContext,
+  assertContextSchema,
 } from "../../utils/commons";
 import { apiClient } from "../../api";
 
@@ -44,7 +44,7 @@ export async function createEservice(
 }
 
 When("l'utente crea un e-service con lo stesso nome", async function () {
-  validateContext(this, {
+  assertContextSchema(this, {
     token: z.string(),
   });
 
@@ -56,7 +56,7 @@ When("l'utente crea un e-service con lo stesso nome", async function () {
 });
 
 Given("l'utente ha già creato un e-service", async function () {
-  validateContext(this, {
+  assertContextSchema(this, {
     token: z.string(),
   });
 
@@ -72,7 +72,7 @@ Given("l'utente ha già creato un e-service", async function () {
 });
 
 When("l'utente crea un e-service", async function () {
-  validateContext(this, {
+  assertContextSchema(this, {
     token: z.string(),
   });
 
@@ -82,7 +82,7 @@ When("l'utente crea un e-service", async function () {
 });
 
 Then("si ottiene status code {string}", function (statusCode: string) {
-  validateContext(this, {
+  assertContextSchema(this, {
     response: z.object({
       status: z.number(),
     }),

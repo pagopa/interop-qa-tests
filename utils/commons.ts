@@ -26,7 +26,7 @@ export function getAuthorizationHeader(token: string) {
   return { headers: { Authorization: "Bearer " + token } } as const;
 }
 
-export function validateContext<TSchema extends z.ZodRawShape>(
+export function assertContextSchema<TSchema extends z.ZodRawShape>(
   context: unknown,
   schema: TSchema
 ): asserts context is z.infer<z.ZodObject<TSchema>> {
