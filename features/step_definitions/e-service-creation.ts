@@ -81,6 +81,18 @@ When("l'utente crea un e-service", async function () {
   this.response = response;
 });
 
+Then(
+  "la creazione restituisce errore - {string}",
+  function (statusCode: string) {
+    assertContextSchema(this, {
+      response: z.object({
+        status: z.number(),
+      }),
+    });
+    assert.equal(this.response.status, Number(statusCode));
+  }
+);
+
 Then("si ottiene status code {string}", function (statusCode: string) {
   assertContextSchema(this, {
     response: z.object({

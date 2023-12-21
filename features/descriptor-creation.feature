@@ -21,4 +21,4 @@ Feature: Creazione versione di un e-service
     Given l'utente è un "admin" di "GSP"
     Given l'utente ha già creato una versione di e-service in bozza
     When l'utente crea una versione di un e-service
-    Then si ottiene status code "400"
+    Then la creazione restituisce errore - "400"
