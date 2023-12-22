@@ -1,7 +1,8 @@
+import { z } from "zod";
+
 export const getRandomInt = () =>
   Number(Math.random() * Number.MAX_SAFE_INTEGER).toFixed(0);
 export const TEST_SEED = getRandomInt();
-import { z } from "zod";
 
 export async function sleep(time: number) {
   return new Promise((resolve) => {
