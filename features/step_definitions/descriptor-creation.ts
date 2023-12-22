@@ -1,19 +1,22 @@
 import { When, Given } from "@cucumber/cucumber";
-import { getAuthorizationHeader, makePolling } from "../../utils/commons";
+import { z } from "zod";
+import {
+  getAuthorizationHeader,
+  makePolling,
+  assertContextSchema,
+} from "../../utils/commons";
 import { apiClient } from "../../api";
 import { createEservice } from "./e-service-creation";
 
-When(
-  "l'utente crea una versione di un e-service",
-  async function (this: {
-    token: string;
-    eserviceId: string;
-    response: unknown;
-  }) {
-    const response = await createDescriptor(this.token, this.eserviceId);
-    this.response = response;
-  }
-);
+When("l'utente crea una versione di un e-service", async function () {
+  assertContextSchema(this, {
+    token: z.string(),
+    eserviceId: z.string(),
+  });
+
+  const response = await createDescriptor(this.token, this.eserviceId);
+  this.response = response;
+});
 
 async function createDescriptor(
   token: string,
@@ -56,7 +59,12 @@ async function createDescriptor(
 
 Given(
   "l'utente ha già creato una versione di e-service in bozza",
-  async function (this: { token: string; eserviceId: string }) {
+  async function () {
+    assertContextSchema(this, {
+      token: z.string(),
+      eserviceId: z.string(),
+    });
+
     const { eserviceId } = await createEservice(this.token, {
       withPolling: true,
     });

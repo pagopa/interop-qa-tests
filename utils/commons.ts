@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 export async function sleep(time: number) {
   return new Promise((resolve) => {
     setTimeout(resolve, time);
@@ -22,4 +24,11 @@ export async function makePolling<TReturnType>(
 
 export function getAuthorizationHeader(token: string) {
   return { headers: { Authorization: "Bearer " + token } } as const;
+}
+
+export function assertContextSchema<TSchema extends z.ZodRawShape>(
+  context: unknown,
+  schema: TSchema
+): asserts context is z.infer<z.ZodObject<TSchema>> {
+  z.object(schema).parse(context);
 }
