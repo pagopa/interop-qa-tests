@@ -12,82 +12,70 @@ import { z } from "zod";
 
 setDefaultTimeout(5 * 60 * 1000);
 
-When(
-  "l'utente crea un e-service con lo stesso nome",
-  async function (this: {
-    token: string;
-    eserviceName: string;
-    response: unknown;
-  }) {
-    this.response = await apiClient.eservices.createEService(
-      {
-        name: this.eserviceName,
-        description: "Questo è un e-service di test",
-        technology: "REST",
-        mode: "DELIVER",
-      },
-      getAuthorizationHeader(this.token)
-    );
-  }
-);
+When("l'utente crea un e-service con lo stesso nome", async function () {
+  assertContextSchema(this, {
+    token: z.string(),
+    eserviceName: z.string(),
+  });
+  this.response = await apiClient.eservices.createEService(
+    {
+      name: this.eserviceName,
+      description: "Questo è un e-service di test",
+      technology: "REST",
+      mode: "DELIVER",
+    },
+    getAuthorizationHeader(this.token)
+  );
+});
 
-Given(
-  "l'utente ha già creato un e-service",
-  async function (this: {
-    token: string;
-    eserviceName: string;
-    response: unknown;
-    eserviceId: string;
-  }) {
-    const eserviceName = `e-service-${getRandomInt()}`;
-    const response = await apiClient.eservices.createEService(
-      {
-        name: eserviceName,
-        description: "Questo è un e-service di test",
-        technology: "REST",
-        mode: "DELIVER",
-      },
-      getAuthorizationHeader(this.token)
-    );
-    const eserviceId = response.data.id;
-    assertValidResponse(response);
+Given("l'utente ha già creato un e-service", async function () {
+  assertContextSchema(this, {
+    token: z.string(),
+  });
+  const eserviceName = `e-service-${getRandomInt()}`;
+  const response = await apiClient.eservices.createEService(
+    {
+      name: eserviceName,
+      description: "Questo è un e-service di test",
+      technology: "REST",
+      mode: "DELIVER",
+    },
+    getAuthorizationHeader(this.token)
+  );
+  const eserviceId = response.data.id;
+  assertValidResponse(response);
 
-    await makePolling(
-      () =>
-        apiClient.producers.getProducerEServiceDetails(
-          eserviceId,
-          getAuthorizationHeader(this.token)
-        ),
-      (res) => res.status !== 404
-    );
+  await makePolling(
+    () =>
+      apiClient.producers.getProducerEServiceDetails(
+        eserviceId,
+        getAuthorizationHeader(this.token)
+      ),
+    (res) => res.status !== 404
+  );
 
-    this.eserviceName = eserviceName;
-    this.response = response;
-    this.eserviceId = eserviceId;
-  }
-);
+  this.eserviceName = eserviceName;
+  this.response = response;
+  this.eserviceId = eserviceId;
+});
 
-When(
-  "l'utente crea un e-service",
-  async function (this: {
-    token: string;
-    eserviceName: string;
-    response: unknown;
-  }) {
-    const eserviceName = `e-service-${getRandomInt()}`;
-    const response = await apiClient.eservices.createEService(
-      {
-        name: eserviceName,
-        description: "Questo è un e-service di test",
-        technology: "REST",
-        mode: "DELIVER",
-      },
-      getAuthorizationHeader(this.token)
-    );
-    this.eserviceName = eserviceName;
-    this.response = response;
-  }
-);
+When("l'utente crea un e-service", async function () {
+  assertContextSchema(this, {
+    token: z.string(),
+  });
+  const eserviceName = `e-service-${getRandomInt()}`;
+  const response = await apiClient.eservices.createEService(
+    {
+      name: eserviceName,
+      description: "Questo è un e-service di test",
+      technology: "REST",
+      mode: "DELIVER",
+    },
+    getAuthorizationHeader(this.token)
+  );
+  this.eserviceName = eserviceName;
+  this.response = response;
+});
 
 Then(
   "la creazione restituisce errore - {string}",

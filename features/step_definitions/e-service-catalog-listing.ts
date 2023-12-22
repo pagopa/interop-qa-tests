@@ -6,10 +6,12 @@ import { AxiosResponse } from "axios";
 import { apiClient } from "../../api";
 import {
   TEST_SEED,
+  assertContextSchema,
   getAuthorizationHeader,
   makePolling,
 } from "../../utils/commons";
 import { CreatedResource } from "../../api/models";
+import { z } from "zod";
 
 const TOTAL_ESERVICES = 20;
 const PUBLISHED_ESERVICES = 6;
@@ -18,6 +20,9 @@ const SUSPENDED_ESERVICES = 9;
 Given(
   "esistono più di 12 e-services in catalogo in stato Published o Suspended",
   async function () {
+    assertContextSchema(this, {
+      token: z.string(),
+    });
     const eservicesIds: string[] = [];
     const descriptorIds: string[] = [];
     for (let i = 0; i < TOTAL_ESERVICES; i++) {
@@ -143,6 +148,9 @@ Given(
 When(
   "l'utente richiede una operazione di listing limitata ai primi 12",
   async function () {
+    assertContextSchema(this, {
+      token: z.string(),
+    });
     this.response = await apiClient.catalog.getEServicesCatalog(
       {
         limit: 12,
