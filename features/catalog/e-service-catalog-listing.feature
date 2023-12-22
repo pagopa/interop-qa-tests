@@ -2,7 +2,7 @@
 Feature: Listing catalogo e-services
   Tutti gli utenti autenticati di enti PA, GSP e privati possono ottenere la lista di e-services
 
-  Scenario Outline: Un utente con sufficienti permessi di un ente autorizzato crea un e-service
+  Scenario Outline: Un utente richiede la lista degli eservices
     Given l'utente è un "<ruolo>" di "<ente>"
     Given esistono più di 12 e-services in catalogo in stato Published o Suspended
     When l'utente richiede una operazione di listing limitata ai primi 12

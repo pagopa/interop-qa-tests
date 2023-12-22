@@ -6,8 +6,8 @@ import {
   getRandomInt,
   makePolling,
   assertContextSchema,
-} from "../../utils/commons";
-import { apiClient } from "../../api";
+} from "../../../utils/commons";
+import { apiClient } from "../../../api";
 import { assertValidResponse } from "./e-service-catalog-listing";
 
 setDefaultTimeout(5 * 60 * 1000);

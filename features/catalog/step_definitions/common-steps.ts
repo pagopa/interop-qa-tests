@@ -1,5 +1,5 @@
-import { Given } from "@cucumber/cucumber";
-import { generateSessionTokens } from "../../utils/session-tokens";
+import { Before, Given } from "@cucumber/cucumber";
+import { generateSessionTokens } from "../../../utils/session-tokens";
 
 type Party = "GSP" | "PA1" | "Privato";
 type Role = "admin" | "api,security";
@@ -15,3 +15,7 @@ Given(
     this.token = tokens[party][role];
   }
 );
+
+Before(function (scenario) {
+  console.log(`\n\n${scenario.pickle.name}\n`);
+});

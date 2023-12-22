@@ -4,8 +4,8 @@ import {
   getAuthorizationHeader,
   makePolling,
   assertContextSchema,
-} from "../../utils/commons";
-import { apiClient } from "../../api";
+} from "../../../utils/commons";
+import { apiClient } from "../../../api";
 import { assertValidResponse } from "./e-service-catalog-listing";
 
 When("l'utente crea una versione di un e-service", async function () {
