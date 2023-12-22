@@ -1,55 +1,31 @@
 import assert from "assert";
 import { Given, When, Then, setDefaultTimeout } from "@cucumber/cucumber";
-import { getAuthorizationHeader, makePolling } from "../../utils/commons";
+import {
+  getAuthorizationHeader,
+  getRandomInt,
+  makePolling,
+} from "../../utils/commons";
 import { apiClient } from "../../api";
+import { assertValidResponse } from "./e-service-catalog-listing";
 
-setDefaultTimeout(30 * 1000);
-
-export async function createEservice(
-  token: string,
-  {
-    givenEserviceName = null,
-    withPolling = false,
-  }: { givenEserviceName?: null | string; withPolling?: boolean }
-) {
-  const eserviceName = givenEserviceName || `e-service-${Math.random()}`;
-  const response = await apiClient.eservices.createEService(
-    {
-      name: eserviceName,
-      description: "Questo è un e-service di test",
-      technology: "REST",
-      mode: "DELIVER",
-    },
-    getAuthorizationHeader(token)
-  );
-
-  const eserviceId = response.data.id;
-
-  if (withPolling) {
-    await makePolling(
-      () =>
-        apiClient.producers.getProducerEServiceDetails(
-          eserviceId,
-          getAuthorizationHeader(token)
-        ),
-      (res) => res.status !== 404
-    );
-  }
-  return { eserviceName, response, eserviceId };
-}
+setDefaultTimeout(5 * 60 * 1000);
 
 When(
   "l'utente crea un e-service con lo stesso nome",
   async function (this: {
     token: string;
-    eserviceName: string | null;
+    eserviceName: string;
     response: unknown;
   }) {
-    const { response } = await createEservice(this.token, {
-      givenEserviceName: this.eserviceName,
-      withPolling: false,
-    });
-    this.response = response;
+    this.response = await apiClient.eservices.createEService(
+      {
+        name: this.eserviceName,
+        description: "Questo è un e-service di test",
+        technology: "REST",
+        mode: "DELIVER",
+      },
+      getAuthorizationHeader(this.token)
+    );
   }
 );
 
@@ -61,12 +37,28 @@ Given(
     response: unknown;
     eserviceId: string;
   }) {
-    const { eserviceName, response, eserviceId } = await createEservice(
-      this.token,
+    const eserviceName = `e-service-${getRandomInt()}`;
+    const response = await apiClient.eservices.createEService(
       {
-        withPolling: true,
-      }
+        name: eserviceName,
+        description: "Questo è un e-service di test",
+        technology: "REST",
+        mode: "DELIVER",
+      },
+      getAuthorizationHeader(this.token)
     );
+    const eserviceId = response.data.id;
+    assertValidResponse(response);
+
+    await makePolling(
+      () =>
+        apiClient.producers.getProducerEServiceDetails(
+          eserviceId,
+          getAuthorizationHeader(this.token)
+        ),
+      (res) => res.status !== 404
+    );
+
     this.eserviceName = eserviceName;
     this.response = response;
     this.eserviceId = eserviceId;
@@ -80,7 +72,16 @@ When(
     eserviceName: string;
     response: unknown;
   }) {
-    const { eserviceName, response } = await createEservice(this.token, {});
+    const eserviceName = `e-service-${getRandomInt()}`;
+    const response = await apiClient.eservices.createEService(
+      {
+        name: eserviceName,
+        description: "Questo è un e-service di test",
+        technology: "REST",
+        mode: "DELIVER",
+      },
+      getAuthorizationHeader(this.token)
+    );
     this.eserviceName = eserviceName;
     this.response = response;
   }

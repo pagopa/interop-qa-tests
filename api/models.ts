@@ -9,6 +9,8 @@
  * ---------------------------------------------------------------
  */
 
+import { File } from "buffer";
+
 export interface GoogleSAMLPayload {
   /** SAML response */
   SAMLResponse: string;

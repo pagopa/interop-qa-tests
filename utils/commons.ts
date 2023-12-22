@@ -1,3 +1,7 @@
+export const getRandomInt = () =>
+  Number(Math.random() * Number.MAX_SAFE_INTEGER).toFixed(0);
+export const TEST_SEED = getRandomInt();
+
 export async function sleep(time: number) {
   return new Promise((resolve) => {
     setTimeout(resolve, time);
@@ -15,9 +19,10 @@ export async function makePolling<TReturnType>(
     const result = await promise();
     if (shouldStop(result)) {
       console.log(`Polling ended at iteration: ${i}`);
-      break;
+      return;
     }
   }
+  throw Error("Eventual consistency error");
 }
 
 export function getAuthorizationHeader(token: string) {

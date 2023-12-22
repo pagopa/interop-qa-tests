@@ -19,6 +19,7 @@ Feature: Creazione versione di un e-service
 # Si usa l'admin di PagoPA ma va bene qualsiasi utente autorizzato a creare un e-service
   Scenario: Un utente autorizzato vuole creare una versione di e-service avendone già una in bozza
     Given l'utente è un "admin" di "GSP"
-    Given l'utente ha già creato una versione di e-service in bozza
+    Given l'utente ha già creato un e-service
+    Given l'utente ha già creato una versione in bozza per quell'eservice
     When l'utente crea una versione di un e-service
     Then la creazione restituisce errore - "400"

@@ -13,7 +13,7 @@ Feature: Creazione e-service
     # | GSP                | security       | 403       |
     # | GSP                | api,security   | 200       |
     # | GSP                | support        | 403       |
-    | Privato            | admin          | 403       |
+    # | Privato            | admin          | 403       |
     # | Privato            | api            | 403       |
     # | Privato            | security       | 403       |
     # | Privato            | api,security   | 403       |

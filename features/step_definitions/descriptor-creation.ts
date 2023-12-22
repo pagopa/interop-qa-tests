@@ -1,7 +1,7 @@
-import { When, Given } from "@cucumber/cucumber";
+import { Given, When } from "@cucumber/cucumber";
 import { getAuthorizationHeader, makePolling } from "../../utils/commons";
 import { apiClient } from "../../api";
-import { createEservice } from "./e-service-creation";
+import { assertValidResponse } from "./e-service-catalog-listing";
 
 When(
   "l'utente crea una versione di un e-service",
@@ -10,57 +10,58 @@ When(
     eserviceId: string;
     response: unknown;
   }) {
-    const response = await createDescriptor(this.token, this.eserviceId);
-    this.response = response;
+    this.response = await apiClient.eservices.createDescriptor(
+      this.eserviceId,
+      {
+        description: "Questo è un e-service di test",
+        audience: ["api/v1"],
+        voucherLifespan: 60,
+        dailyCallsPerConsumer: 10,
+        dailyCallsTotal: 100,
+        agreementApprovalPolicy: "AUTOMATIC",
+        attributes: {
+          certified: [],
+          declared: [],
+          verified: [],
+        },
+      },
+      getAuthorizationHeader(this.token)
+    );
   }
 );
 
-async function createDescriptor(
-  token: string,
-  eserviceId: string,
-  withPolling = false
-) {
-  const response = await apiClient.eservices.createDescriptor(
-    eserviceId,
-    {
-      description: "Questo è un e-service di test",
-      audience: ["api/v1"],
-      voucherLifespan: 60,
-      dailyCallsPerConsumer: 10,
-      dailyCallsTotal: 100,
-      agreementApprovalPolicy: "AUTOMATIC",
-      attributes: {
-        certified: [],
-        declared: [],
-        verified: [],
+Given(
+  "l'utente ha già creato una versione in bozza per quell'eservice",
+  async function (this: { token: string; eserviceId: string }) {
+    const response = await apiClient.eservices.createDescriptor(
+      this.eserviceId,
+      {
+        description: "Questo è un e-service di test",
+        audience: ["api/v1"],
+        voucherLifespan: 60,
+        dailyCallsPerConsumer: 10,
+        dailyCallsTotal: 100,
+        agreementApprovalPolicy: "AUTOMATIC",
+        attributes: {
+          certified: [],
+          declared: [],
+          verified: [],
+        },
       },
-    },
-    getAuthorizationHeader(token)
-  );
+      getAuthorizationHeader(this.token)
+    );
 
-  const descriptorId = response.data.id;
+    const descriptorId = response.data.id;
+    assertValidResponse(response);
 
-  if (withPolling) {
     await makePolling(
       () =>
         apiClient.producers.getProducerEServiceDescriptor(
-          eserviceId,
+          this.eserviceId,
           descriptorId,
-          { headers: { Authorization: "Bearer " + token } }
+          getAuthorizationHeader(this.token)
         ),
       (res) => res.status !== 404
     );
-  }
-  return response;
-}
-
-Given(
-  "l'utente ha già creato una versione di e-service in bozza",
-  async function (this: { token: string; eserviceId: string }) {
-    const { eserviceId } = await createEservice(this.token, {
-      withPolling: true,
-    });
-    await createDescriptor(this.token, eserviceId, true);
-    this.eserviceId = eserviceId;
   }
 );
