@@ -22,7 +22,6 @@ module.exports = {
     "no-invalid-this": "off",
     "@typescript-eslint/explicit-function-return-type": "off",
     "functional/no-let": "off",
-    "no-console": "off"
     "no-console": "off",
     "sonarjs/no-identical-functions": "off",
   },

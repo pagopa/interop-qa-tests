@@ -1,4 +1,5 @@
 import { Given, When } from "@cucumber/cucumber";
+import { z } from "zod";
 import {
   getAuthorizationHeader,
   makePolling,
@@ -6,7 +7,6 @@ import {
 } from "../../utils/commons";
 import { apiClient } from "../../api";
 import { assertValidResponse } from "./e-service-catalog-listing";
-import { z } from "zod";
 
 When("l'utente crea una versione di un e-service", async function () {
   assertContextSchema(this, {

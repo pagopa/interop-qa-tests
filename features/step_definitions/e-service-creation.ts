@@ -1,5 +1,6 @@
 import assert from "assert";
 import { Given, When, Then, setDefaultTimeout } from "@cucumber/cucumber";
+import { z } from "zod";
 import {
   getAuthorizationHeader,
   getRandomInt,
@@ -8,7 +9,6 @@ import {
 } from "../../utils/commons";
 import { apiClient } from "../../api";
 import { assertValidResponse } from "./e-service-catalog-listing";
-import { z } from "zod";
 
 setDefaultTimeout(5 * 60 * 1000);
 

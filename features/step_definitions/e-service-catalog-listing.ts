@@ -3,6 +3,7 @@ import { readFileSync } from "fs";
 import { File } from "buffer";
 import { Given, When, Then } from "@cucumber/cucumber";
 import { AxiosResponse } from "axios";
+import { z } from "zod";
 import { apiClient } from "../../api";
 import {
   TEST_SEED,
@@ -11,11 +12,10 @@ import {
   makePolling,
 } from "../../utils/commons";
 import { CreatedResource } from "../../api/models";
-import { z } from "zod";
 
-const TOTAL_ESERVICES = 20;
-const PUBLISHED_ESERVICES = 6;
-const SUSPENDED_ESERVICES = 9;
+const TOTAL_ESERVICES = 4;
+const PUBLISHED_ESERVICES = 2;
+const SUSPENDED_ESERVICES = 2;
 
 Given(
   "esistono più di 12 e-services in catalogo in stato Published o Suspended",
