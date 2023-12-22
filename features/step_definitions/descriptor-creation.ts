@@ -1,5 +1,9 @@
 import { Given, When } from "@cucumber/cucumber";
-import { getAuthorizationHeader, makePolling } from "../../utils/commons";
+import {
+  getAuthorizationHeader,
+  makePolling,
+  assertContextSchema,
+} from "../../utils/commons";
 import { apiClient } from "../../api";
 import { assertValidResponse } from "./e-service-catalog-listing";
 

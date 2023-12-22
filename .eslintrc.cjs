@@ -1,5 +1,8 @@
 module.exports = {
   extends: ["@pagopa/eslint-config/strong"],
+  "env": {
+    node: true
+  },
   rules: {
     // Any project level custom rule
     "@typescript-eslint/switch-exhaustiveness-check": "error",
@@ -25,7 +28,5 @@ module.exports = {
   },
   ignorePatterns: [
     ".eslintrc.cjs",
-    "cucumber.js",
-    "scripts/**/*"
   ],
 };

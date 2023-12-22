@@ -4,9 +4,11 @@ import {
   getAuthorizationHeader,
   getRandomInt,
   makePolling,
+  assertContextSchema,
 } from "../../utils/commons";
 import { apiClient } from "../../api";
 import { assertValidResponse } from "./e-service-catalog-listing";
+import { z } from "zod";
 
 setDefaultTimeout(5 * 60 * 1000);
 
@@ -89,14 +91,21 @@ When(
 
 Then(
   "la creazione restituisce errore - {string}",
-  function (this: { response: { status: number } }, statusCode: string) {
+  function (statusCode: string) {
+    assertContextSchema(this, {
+      response: z.object({
+        status: z.number(),
+      }),
+    });
     assert.equal(this.response.status, Number(statusCode));
   }
 );
 
-Then(
-  "si ottiene status code {string}",
-  function (this: { response: { status: number } }, statusCode: string) {
-    assert.equal(this.response.status, Number(statusCode));
-  }
-);
+Then("si ottiene status code {string}", function (statusCode: string) {
+  assertContextSchema(this, {
+    response: z.object({
+      status: z.number(),
+    }),
+  });
+  assert.equal(this.response.status, Number(statusCode));
+});
