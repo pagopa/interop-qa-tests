@@ -6,34 +6,36 @@ import { AxiosResponse } from "axios";
 import { z } from "zod";
 import { apiClient } from "../../../api";
 import {
-  TEST_SEED,
   assertContextSchema,
   getAuthorizationHeader,
+  getOrganizationId,
   makePolling,
 } from "../../../utils/commons";
 import { CreatedResource } from "../../../api/models";
+import { Party, Role } from "./common-steps";
 
 const TOTAL_ESERVICES = 20;
 const PUBLISHED_ESERVICES = 9;
 const SUSPENDED_ESERVICES = 6;
 
 Given(
-  "esistono più di 12 e-services in catalogo in stato Published o Suspended",
-  async function () {
+  "un {string} di {string} ha già creato più di 12 e-services in catalogo in stato Published o Suspended",
+  async function (role: Role, party: Party) {
+    const token = this.tokens[party][role];
     assertContextSchema(this, {
-      token: z.string(),
+      tokens: z.record(z.string(), z.record(z.string(), z.string())),
     });
     const eservicesIds: string[] = [];
     const descriptorIds: string[] = [];
     for (let i = 0; i < TOTAL_ESERVICES; i++) {
       const eserviceCreationResponse = await apiClient.eservices.createEService(
         {
-          name: `eservice-${i}${TEST_SEED}`,
+          name: `eservice-${i}${this.TEST_SEED}`,
           description: "Questo è un e-service di test",
           technology: "REST",
           mode: "DELIVER",
         },
-        getAuthorizationHeader(this.token)
+        getAuthorizationHeader(token)
       );
       const eserviceId = eserviceCreationResponse.data.id;
 
@@ -43,7 +45,7 @@ Given(
         () =>
           apiClient.producers.getProducerEServiceDetails(
             eserviceId,
-            getAuthorizationHeader(this.token)
+            getAuthorizationHeader(token)
           ),
         (res) => res.status !== 404
       );
@@ -66,7 +68,7 @@ Given(
               verified: [],
             },
           },
-          getAuthorizationHeader(this.token)
+          getAuthorizationHeader(token)
         );
 
       const descriptorId = descriptorCreationResponse.data.id;
@@ -76,7 +78,7 @@ Given(
           apiClient.producers.getProducerEServiceDescriptor(
             eserviceId,
             descriptorId,
-            getAuthorizationHeader(this.token)
+            getAuthorizationHeader(token)
           ),
         (res) => res.status !== 404
       );
@@ -95,7 +97,7 @@ Given(
           prettyName: "Interfaccia",
           doc: file,
         },
-        getAuthorizationHeader(this.token)
+        getAuthorizationHeader(token)
       );
 
       await makePolling(
@@ -103,7 +105,7 @@ Given(
           apiClient.producers.getProducerEServiceDescriptor(
             eservicesIds[i],
             descriptorIds[i],
-            getAuthorizationHeader(this.token)
+            getAuthorizationHeader(token)
           ),
         (res) => res.data.interface !== undefined
       );
@@ -111,7 +113,7 @@ Given(
       await apiClient.eservices.publishDescriptor(
         eservicesIds[i],
         descriptorIds[i],
-        getAuthorizationHeader(this.token)
+        getAuthorizationHeader(token)
       );
 
       await makePolling(
@@ -119,7 +121,7 @@ Given(
           apiClient.producers.getProducerEServiceDescriptor(
             eservicesIds[i],
             descriptorIds[i],
-            getAuthorizationHeader(this.token)
+            getAuthorizationHeader(token)
           ),
         (res) => res.data.state === "PUBLISHED"
       );
@@ -129,7 +131,7 @@ Given(
       await apiClient.eservices.suspendDescriptor(
         eservicesIds[i],
         descriptorIds[i],
-        getAuthorizationHeader(this.token)
+        getAuthorizationHeader(token)
       );
 
       await makePolling(
@@ -137,7 +139,7 @@ Given(
           apiClient.producers.getProducerEServiceDescriptor(
             eservicesIds[i],
             descriptorIds[i],
-            getAuthorizationHeader(this.token)
+            getAuthorizationHeader(token)
           ),
         (res) => res.data.state === "SUSPENDED"
       );
@@ -155,7 +157,7 @@ When(
       {
         limit: 12,
         offset: 0,
-        q: TEST_SEED,
+        q: this.TEST_SEED,
         states: ["PUBLISHED", "SUSPENDED"],
       },
       getAuthorizationHeader(this.token)
@@ -170,6 +172,38 @@ Then(
     assert.equal(
       this.response.data.results.length,
       Math.min(12, PUBLISHED_ESERVICES + SUSPENDED_ESERVICES)
+    );
+  }
+);
+
+When(
+  "l'utente richiede una operazione di listing limitata ai primi 12 e-services dell'erogatore {string}",
+  async function (producer: Party) {
+    assertContextSchema(this, {
+      token: z.string(),
+    });
+    const producerId = getOrganizationId(producer);
+    this.response = await apiClient.catalog.getEServicesCatalog(
+      {
+        limit: 12,
+        offset: 0,
+        q: this.TEST_SEED,
+        states: [],
+        producersIds: [producerId],
+      },
+      getAuthorizationHeader(this.token)
+    );
+    this.producerId = producerId;
+  }
+);
+
+Then(
+  "si ottiene status code {string} e la lista degli eservices dell'erogatore specificato",
+  function (statusCode: string) {
+    assert.equal(this.response.status, Number(statusCode));
+    assert.equal(
+      this.response.data.pagination.totalCount,
+      PUBLISHED_ESERVICES + SUSPENDED_ESERVICES
     );
   }
 );

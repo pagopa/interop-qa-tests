@@ -10,5 +10,44 @@
       "organizationId": "69e2865e-65ab-4e48-a638-2037a9ee2ee7",
       "uid": "f07ddb8f-17f9-47d4-b31e-35d1ac10e521"
     }
+  },
+
+  "ComuneDiMilano": {
+    "admin": {
+      "externalId": {
+        "origin": "IPA",
+        "value": "c_f205"
+      },
+      "user-roles": "admin",
+      "selfcareId": "026e8c72-7944-4dcd-8668-f596447fec6d",
+      "organizationId": "e79a24cd-8edc-441e-ae8d-e87c3aea0059",
+      "uid": "f07ddb8f-17f9-47d4-b31e-35d1ac10e521"
+    }
+  },
+
+  "AgID": {
+    "admin": {
+      "externalId": {
+        "origin": "IPA",
+        "value": "agid"
+      },
+      "user-roles": "admin",
+      "selfcareId": "83e6fc9d-7f60-4a62-8cec-785524b6a0a5",
+      "organizationId": "0e9e2dab-2e93-4f24-ba59-38d9f11198ca",
+      "uid": "4ea722c3-defd-4372-a0c4-b4613072b632"
+    }
+  },
+
+  "Privato": {
+    "admin": {
+      "externalId": {
+        "origin": "IVASS",
+        "value": "07160010968"
+      },
+      "user-roles": "admin",
+      "selfcareId": "335a4117-5044-4d28-9473-70b74d3bf072",
+      "organizationId": "a7a87b2c-5742-43fb-a847-6304bb0414b4",
+      "uid": "c27e3508-3d26-4b6b-9c73-54cb38e6fe1b"
+    }
   }
 }
