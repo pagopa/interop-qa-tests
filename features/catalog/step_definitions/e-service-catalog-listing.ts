@@ -10,12 +10,13 @@ import {
   assertContextSchema,
   getAuthorizationHeader,
   makePolling,
+  runParallelPromisesInChunks,
 } from "../../../utils/commons";
 import { CreatedResource } from "../../../api/models";
 
-const TOTAL_ESERVICES = 20;
 const PUBLISHED_ESERVICES = 9;
 const SUSPENDED_ESERVICES = 6;
+const PROMISES_CHUNK_SIZE = 5;
 
 Given(
   "esistono più di 12 e-services in catalogo in stato Published o Suspended",
@@ -23,125 +24,60 @@ Given(
     assertContextSchema(this, {
       token: z.string(),
     });
-    const eservicesIds: string[] = [];
-    const descriptorIds: string[] = [];
-    for (let i = 0; i < TOTAL_ESERVICES; i++) {
-      const eserviceCreationResponse = await apiClient.eservices.createEService(
-        {
-          name: `eservice-${i}${TEST_SEED}`,
-          description: "Questo è un e-service di test",
-          technology: "REST",
-          mode: "DELIVER",
-        },
-        getAuthorizationHeader(this.token)
-      );
-      const eserviceId = eserviceCreationResponse.data.id;
 
-      assertValidResponse(eserviceCreationResponse);
+    const eserviceIds = await runParallelPromisesInChunks(
+      Array.from(
+        { length: PUBLISHED_ESERVICES + SUSPENDED_ESERVICES },
+        (_, i) => createEService.bind(null, i, this.token)
+      ),
+      PROMISES_CHUNK_SIZE
+    );
 
-      await makePolling(
-        () =>
-          apiClient.producers.getProducerEServiceDetails(
-            eserviceId,
-            getAuthorizationHeader(this.token)
-          ),
-        (res) => res.status !== 404
-      );
+    const descriptorIds = await runParallelPromisesInChunks(
+      eserviceIds.map((eserviceId) =>
+        createDescriptorDraft.bind(null, eserviceId, this.token)
+      ),
+      PROMISES_CHUNK_SIZE
+    );
 
-      eservicesIds.push(eserviceId);
-
-      const descriptorCreationResponse =
-        await apiClient.eservices.createDescriptor(
+    await runParallelPromisesInChunks(
+      eserviceIds.map((eserviceId, index) =>
+        addInterfaceToDescriptor.bind(
+          null,
           eserviceId,
-          {
-            description: "Questo è un e-service di test",
-            audience: ["api/v1"],
-            voucherLifespan: 60,
-            dailyCallsPerConsumer: 10,
-            dailyCallsTotal: 100,
-            agreementApprovalPolicy: "AUTOMATIC",
-            attributes: {
-              certified: [],
-              declared: [],
-              verified: [],
-            },
-          },
-          getAuthorizationHeader(this.token)
-        );
+          descriptorIds[index],
+          this.token
+        )
+      ),
+      PROMISES_CHUNK_SIZE
+    );
 
-      const descriptorId = descriptorCreationResponse.data.id;
+    await runParallelPromisesInChunks(
+      eserviceIds.map((eserviceId, index) =>
+        publishDescriptor.bind(
+          null,
+          eserviceId,
+          descriptorIds[index],
+          this.token
+        )
+      ),
+      PROMISES_CHUNK_SIZE
+    );
 
-      await makePolling(
-        () =>
-          apiClient.producers.getProducerEServiceDescriptor(
-            eserviceId,
-            descriptorId,
-            getAuthorizationHeader(this.token)
-          ),
-        (res) => res.status !== 404
-      );
-      descriptorIds.push(descriptorId);
-    }
+    const eservicesIdsToSuspend = eserviceIds.slice(0, SUSPENDED_ESERVICES);
+    const descriptorIdsToSuspend = descriptorIds.slice(0, SUSPENDED_ESERVICES);
 
-    for (let i = 0; i < PUBLISHED_ESERVICES + SUSPENDED_ESERVICES; i++) {
-      const blobFile = new Blob([readFileSync("./utils/interface.yaml")]);
-      const file = new File([blobFile], "interface.yaml");
-
-      await apiClient.eservices.createEServiceDocument(
-        eservicesIds[i],
-        descriptorIds[i],
-        {
-          kind: "INTERFACE",
-          prettyName: "Interfaccia",
-          doc: file,
-        },
-        getAuthorizationHeader(this.token)
-      );
-
-      await makePolling(
-        () =>
-          apiClient.producers.getProducerEServiceDescriptor(
-            eservicesIds[i],
-            descriptorIds[i],
-            getAuthorizationHeader(this.token)
-          ),
-        (res) => res.data.interface !== undefined
-      );
-
-      await apiClient.eservices.publishDescriptor(
-        eservicesIds[i],
-        descriptorIds[i],
-        getAuthorizationHeader(this.token)
-      );
-
-      await makePolling(
-        () =>
-          apiClient.producers.getProducerEServiceDescriptor(
-            eservicesIds[i],
-            descriptorIds[i],
-            getAuthorizationHeader(this.token)
-          ),
-        (res) => res.data.state === "PUBLISHED"
-      );
-    }
-
-    for (let i = 0; i < SUSPENDED_ESERVICES; i++) {
-      await apiClient.eservices.suspendDescriptor(
-        eservicesIds[i],
-        descriptorIds[i],
-        getAuthorizationHeader(this.token)
-      );
-
-      await makePolling(
-        () =>
-          apiClient.producers.getProducerEServiceDescriptor(
-            eservicesIds[i],
-            descriptorIds[i],
-            getAuthorizationHeader(this.token)
-          ),
-        (res) => res.data.state === "SUSPENDED"
-      );
-    }
+    await runParallelPromisesInChunks(
+      eservicesIdsToSuspend.map((eserviceId, index) =>
+        suspendDescriptor.bind(
+          null,
+          eserviceId,
+          descriptorIdsToSuspend[index],
+          this.token
+        )
+      ),
+      PROMISES_CHUNK_SIZE
+    );
   }
 );
 
@@ -175,7 +111,7 @@ Then(
 );
 
 export function assertValidResponse(
-  response: AxiosResponse<CreatedResource, any> // eslint-disable-line @typescript-eslint/no-explicit-any
+  response: AxiosResponse<CreatedResource | void, any> // eslint-disable-line @typescript-eslint/no-explicit-any
 ) {
   if (response.status !== 200) {
     throw Error(
@@ -185,4 +121,234 @@ export function assertValidResponse(
       )}`
     );
   }
+}
+
+// async function test(i: number, token: string) {
+//   const eserviceCreationResponse = await apiClient.eservices.createEService(
+//     {
+//       name: `eservice-${i}${TEST_SEED}`,
+//       description: "Questo è un e-service di test",
+//       technology: "REST",
+//       mode: "DELIVER",
+//     },
+//     getAuthorizationHeader(token)
+//   );
+//   assertValidResponse(eserviceCreationResponse);
+//   const eserviceId = eserviceCreationResponse.data.id;
+
+//   await makePolling(
+//     () =>
+//       apiClient.producers.getProducerEServiceDetails(
+//         eserviceId,
+//         getAuthorizationHeader(token)
+//       ),
+//     (res) => res.status !== 404
+//   );
+
+//   const descriptorCreationResponse = await apiClient.eservices.createDescriptor(
+//     eserviceId,
+//     {
+//       description: "Questo è un e-service di test",
+//       audience: ["api/v1"],
+//       voucherLifespan: 60,
+//       dailyCallsPerConsumer: 10,
+//       dailyCallsTotal: 100,
+//       agreementApprovalPolicy: "AUTOMATIC",
+//       attributes: {
+//         certified: [],
+//         declared: [],
+//         verified: [],
+//       },
+//     },
+//     getAuthorizationHeader(token)
+//   );
+//   assertValidResponse(descriptorCreationResponse);
+//   const descriptorId = descriptorCreationResponse.data.id;
+
+//   await makePolling(
+//     () =>
+//       apiClient.producers.getProducerEServiceDescriptor(
+//         eserviceId,
+//         descriptorId,
+//         getAuthorizationHeader(token)
+//       ),
+//     (res) => res.status !== 404
+//   );
+
+//   const blobFile = new Blob([readFileSync("./utils/interface.yaml")]);
+//   const file = new File([blobFile], "interface.yaml");
+
+//   const response = await apiClient.eservices.createEServiceDocument(
+//     eserviceId,
+//     descriptorId,
+//     {
+//       kind: "INTERFACE",
+//       prettyName: "Interfaccia",
+//       doc: file,
+//     },
+//     getAuthorizationHeader(token)
+//   );
+
+//   assertValidResponse(response);
+
+//   await makePolling(
+//     () =>
+//       apiClient.producers.getProducerEServiceDescriptor(
+//         eserviceId,
+//         descriptorId,
+//         getAuthorizationHeader(token)
+//       ),
+//     (res) => res.data.interface !== undefined
+//   );
+
+//   await apiClient.eservices.publishDescriptor(
+//     eserviceId,
+//     descriptorId,
+//     getAuthorizationHeader(token)
+//   );
+
+//   await makePolling(
+//     () =>
+//       apiClient.producers.getProducerEServiceDescriptor(
+//         eserviceId,
+//         descriptorId,
+//         getAuthorizationHeader(token)
+//       ),
+//     (res) => res.data.state === "PUBLISHED"
+//   );
+// }
+
+async function createEService(i: number, token: string) {
+  const eserviceCreationResponse = await apiClient.eservices.createEService(
+    {
+      name: `eservice-${i}${TEST_SEED}`,
+      description: "Questo è un e-service di test",
+      technology: "REST",
+      mode: "DELIVER",
+    },
+    getAuthorizationHeader(token)
+  );
+  assertValidResponse(eserviceCreationResponse);
+  const eserviceId = eserviceCreationResponse.data.id;
+
+  await makePolling(
+    () =>
+      apiClient.producers.getProducerEServiceDetails(
+        eserviceId,
+        getAuthorizationHeader(token)
+      ),
+    (res) => res.status !== 404
+  );
+
+  return eserviceId;
+}
+
+async function createDescriptorDraft(eserviceId: string, token: string) {
+  const descriptorCreationResponse = await apiClient.eservices.createDescriptor(
+    eserviceId,
+    {
+      description: "Questo è un e-service di test",
+      audience: ["api/v1"],
+      voucherLifespan: 60,
+      dailyCallsPerConsumer: 10,
+      dailyCallsTotal: 100,
+      agreementApprovalPolicy: "AUTOMATIC",
+      attributes: {
+        certified: [],
+        declared: [],
+        verified: [],
+      },
+    },
+    getAuthorizationHeader(token)
+  );
+  assertValidResponse(descriptorCreationResponse);
+  const descriptorId = descriptorCreationResponse.data.id;
+
+  await makePolling(
+    () =>
+      apiClient.producers.getProducerEServiceDescriptor(
+        eserviceId,
+        descriptorId,
+        getAuthorizationHeader(token)
+      ),
+    (res) => res.status !== 404
+  );
+
+  return descriptorId;
+}
+
+async function addInterfaceToDescriptor(
+  eserviceId: string,
+  descriptorId: string,
+  token: string
+) {
+  const blobFile = new Blob([readFileSync("./utils/interface.yaml")]);
+  const file = new File([blobFile], "interface.yaml");
+
+  const response = await apiClient.eservices.createEServiceDocument(
+    eserviceId,
+    descriptorId,
+    {
+      kind: "INTERFACE",
+      prettyName: "Interfaccia",
+      doc: file,
+    },
+    getAuthorizationHeader(token)
+  );
+
+  assertValidResponse(response);
+
+  await makePolling(
+    () =>
+      apiClient.producers.getProducerEServiceDescriptor(
+        eserviceId,
+        descriptorId,
+        getAuthorizationHeader(token)
+      ),
+    (res) => res.data.interface !== undefined
+  );
+}
+
+async function publishDescriptor(
+  eserviceId: string,
+  descriptorId: string,
+  token: string
+) {
+  await apiClient.eservices.publishDescriptor(
+    eserviceId,
+    descriptorId,
+    getAuthorizationHeader(token)
+  );
+
+  await makePolling(
+    () =>
+      apiClient.producers.getProducerEServiceDescriptor(
+        eserviceId,
+        descriptorId,
+        getAuthorizationHeader(token)
+      ),
+    (res) => res.data.state === "PUBLISHED"
+  );
+}
+
+async function suspendDescriptor(
+  eserviceId: string,
+  descriptorId: string,
+  token: string
+) {
+  await apiClient.eservices.suspendDescriptor(
+    eserviceId,
+    descriptorId,
+    getAuthorizationHeader(token)
+  );
+
+  await makePolling(
+    () =>
+      apiClient.producers.getProducerEServiceDescriptor(
+        eserviceId,
+        descriptorId,
+        getAuthorizationHeader(token)
+      ),
+    (res) => res.data.state === "SUSPENDED"
+  );
 }

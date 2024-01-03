@@ -12,9 +12,10 @@ export async function sleep(time: number) {
 
 export async function makePolling<TReturnType>(
   promise: () => Promise<TReturnType>,
-  shouldStop: (data: Awaited<TReturnType>) => boolean
+  shouldStop: (data: Awaited<TReturnType>) => boolean,
+  errorMessage: string = ""
 ) {
-  const MAX_POLLING_TRIES = 4;
+  const MAX_POLLING_TRIES = 8;
 
   for (let i = 0; i < MAX_POLLING_TRIES; i++) {
     await sleep(400);
@@ -24,7 +25,7 @@ export async function makePolling<TReturnType>(
       return;
     }
   }
-  throw Error("Eventual consistency error");
+  throw Error(`Eventual consistency error: ${errorMessage}`);
 }
 
 export function getAuthorizationHeader(token: string) {
@@ -36,4 +37,23 @@ export function assertContextSchema<TSchema extends z.ZodRawShape>(
   schema: TSchema
 ): asserts context is z.infer<z.ZodObject<TSchema>> {
   z.object(schema).parse(context);
+}
+
+export function divideArrayInChunks<T>(array: T[], chunkSize: number): T[][] {
+  return Array.from({ length: Math.ceil(array.length / chunkSize) }, (_, i) =>
+    array.slice(i * chunkSize, i * chunkSize + chunkSize)
+  );
+}
+
+export async function runParallelPromisesInChunks<T>(
+  promises: Array<() => Promise<T>>,
+  chunkSize: number
+): Promise<T[]> {
+  const chunks = divideArrayInChunks(promises, chunkSize);
+  const results: T[] = [];
+  for (const chunk of chunks) {
+    const data = await Promise.all(chunk.map((promise) => promise()));
+    results.push(...data);
+  }
+  return results;
 }

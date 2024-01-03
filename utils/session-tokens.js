@@ -6,6 +6,8 @@ import { v4 as uuidv4 } from "uuid";
 import _ from "lodash";
 import { VerifyCommand, KMSClient, SignCommand } from "@aws-sdk/client-kms";
 
+// import { VerifyCommand, KMSClient, SignCommand } from "@aws-sdk/client-kms";
+
 const verboseMode =
   typeof process.env.ST_VERBOSE_MODE != "undefined" &&
   process.env.ST_VERBOSE_MODE === "1";
