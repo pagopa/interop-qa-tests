@@ -51,7 +51,7 @@ Given(
     // 2.1. Zip the two arrays
     const ids = zip(eserviceIds, descriptorIds) as Array<[string, string]>;
 
-    // 3. For each draft descriptor, add the interface. This is needed in order to publish the descriptor.
+    // 3. For each draft descriptor, in order to publish it, add the document interface
     await executePromisesInParallelChunks(
       ids.map(([eserviceId, descriptorId]) =>
         addInterfaceToDescriptor.bind(null, eserviceId, descriptorId, token)
