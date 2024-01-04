@@ -1,9 +1,9 @@
+import { readFileSync } from "fs";
 import { z } from "zod";
+import { Party } from "../features/catalog/step_definitions/common-steps";
 
 export const getRandomInt = () =>
   Number(Math.random() * Number.MAX_SAFE_INTEGER).toFixed(0);
-export const TEST_SEED = getRandomInt();
-
 export async function sleep(time: number) {
   return new Promise((resolve) => {
     setTimeout(resolve, time);
@@ -15,7 +15,7 @@ export async function makePolling<TReturnType>(
   shouldStop: (data: Awaited<TReturnType>) => boolean,
   errorMessage: string = ""
 ) {
-  const MAX_POLLING_TRIES = 8;
+  const MAX_POLLING_TRIES = 6;
 
   for (let i = 0; i < MAX_POLLING_TRIES; i++) {
     await sleep(400);
@@ -56,4 +56,12 @@ export async function executePromisesInParallelChunks<T>(
     results.push(...data);
   }
   return results;
+}
+
+export function getOrganizationId(party: Party) {
+  const file = JSON.parse(
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    Buffer.from(readFileSync(process.env.TENANT_IDS_FILE_PATH!)).toString()
+  );
+  return file[party].admin.organizationId;
 }

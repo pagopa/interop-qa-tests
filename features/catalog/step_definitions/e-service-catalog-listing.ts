@@ -7,24 +7,27 @@ import { z } from "zod";
 import zip from "lodash/zip";
 import { apiClient } from "../../../api";
 import {
-  TEST_SEED,
   assertContextSchema,
   getAuthorizationHeader,
+  getOrganizationId,
   makePolling,
   executePromisesInParallelChunks,
 } from "../../../utils/commons";
 import { CreatedResource } from "../../../api/models";
+import { Party, Role } from "./common-steps";
 
 const PUBLISHED_ESERVICES = 9;
 const SUSPENDED_ESERVICES = 6;
 const TOTAL_ESERVICES = PUBLISHED_ESERVICES + SUSPENDED_ESERVICES;
 
 Given(
-  "esistono più di 12 e-services in catalogo in stato Published o Suspended",
-  async function () {
+  "un {string} di {string} ha già creato più di 12 e-services in catalogo in stato Published o Suspended",
+  async function (role: Role, party: Party) {
     assertContextSchema(this, {
-      token: z.string(),
+      tokens: z.record(z.string(), z.record(z.string(), z.string())),
     });
+
+    const token = this.tokens[party][role];
 
     /**
      * To speed up the process and avoid the BFF rate limit restriction,
@@ -34,13 +37,13 @@ Given(
     // 1. Create the draft e-services
     const arr = new Array(TOTAL_ESERVICES).fill(0);
     const eserviceIds = await executePromisesInParallelChunks(
-      arr.map((_, i) => createEService.bind(null, i, this.token))
+      arr.map((_, i) => createEService.bind(null, i, token))
     );
 
     // 2. For each e-service, create his own draft descriptor
     const descriptorIds = await executePromisesInParallelChunks(
       eserviceIds.map((eserviceId) =>
-        createDescriptorDraft.bind(null, eserviceId, this.token)
+        createDescriptorDraft.bind(null, eserviceId, token)
       )
     );
 
@@ -50,19 +53,14 @@ Given(
     // 3. For each draft descriptor, add the interface. This is needed in order to publish the descriptor.
     await executePromisesInParallelChunks(
       ids.map(([eserviceId, descriptorId]) =>
-        addInterfaceToDescriptor.bind(
-          null,
-          eserviceId,
-          descriptorId,
-          this.token
-        )
+        addInterfaceToDescriptor.bind(null, eserviceId, descriptorId, token)
       )
     );
 
     // 4. Publish the descriptors
     await executePromisesInParallelChunks(
       ids.map(([eserviceId, descriptorId]) =>
-        publishDescriptor.bind(null, eserviceId, descriptorId, this.token)
+        publishDescriptor.bind(null, eserviceId, descriptorId, token)
       )
     );
 
@@ -70,7 +68,7 @@ Given(
     const idsToSuspend = ids.slice(0, SUSPENDED_ESERVICES);
     await executePromisesInParallelChunks(
       idsToSuspend.map(([eserviceId, descriptorId]) =>
-        suspendDescriptor.bind(null, eserviceId, descriptorId, this.token)
+        suspendDescriptor.bind(null, eserviceId, descriptorId, token)
       )
     );
   }
@@ -86,7 +84,7 @@ When(
       {
         limit: 12,
         offset: 0,
-        q: TEST_SEED,
+        q: this.TEST_SEED,
         states: ["PUBLISHED", "SUSPENDED"],
       },
       getAuthorizationHeader(this.token)
@@ -101,6 +99,38 @@ Then(
     assert.equal(
       this.response.data.results.length,
       Math.min(12, TOTAL_ESERVICES)
+    );
+  }
+);
+
+When(
+  "l'utente richiede una operazione di listing limitata ai primi 12 e-services dell'erogatore {string}",
+  async function (producer: Party) {
+    assertContextSchema(this, {
+      token: z.string(),
+    });
+    const producerId = getOrganizationId(producer);
+    this.response = await apiClient.catalog.getEServicesCatalog(
+      {
+        limit: 12,
+        offset: 0,
+        q: this.TEST_SEED,
+        states: [],
+        producersIds: [producerId],
+      },
+      getAuthorizationHeader(this.token)
+    );
+    this.producerId = producerId;
+  }
+);
+
+Then(
+  "si ottiene status code {string} e la lista degli eservices dell'erogatore specificato",
+  function (statusCode: string) {
+    assert.equal(this.response.status, Number(statusCode));
+    assert.equal(
+      this.response.data.pagination.totalCount,
+      PUBLISHED_ESERVICES + SUSPENDED_ESERVICES
     );
   }
 );
