@@ -45,9 +45,9 @@ export function divideArrayInChunks<T>(array: T[], chunkSize: number): T[][] {
   );
 }
 
-export async function runParallelPromisesInChunks<T>(
+export async function executePromisesInParallelChunks<T>(
   promises: Array<() => Promise<T>>,
-  chunkSize: number
+  chunkSize: number = 5
 ): Promise<T[]> {
   const chunks = divideArrayInChunks(promises, chunkSize);
   const results: T[] = [];
