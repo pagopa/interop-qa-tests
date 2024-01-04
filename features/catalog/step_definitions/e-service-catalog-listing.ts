@@ -25,6 +25,7 @@ Given(
   async function (role: Role, party: Party) {
     assertContextSchema(this, {
       tokens: z.record(z.string(), z.record(z.string(), z.string())),
+      TEST_SEED: z.string(),
     });
 
     const token = this.tokens[party][role];
@@ -37,7 +38,7 @@ Given(
     // 1. Create the draft e-services
     const arr = new Array(TOTAL_ESERVICES).fill(0);
     const eserviceIds = await executePromisesInParallelChunks(
-      arr.map((_, i) => createEService.bind(null, i, token))
+      arr.map((_, i) => createEService.bind(null, i, token, this.TEST_SEED))
     );
 
     // 2. For each e-service, create his own draft descriptor
@@ -148,10 +149,10 @@ export function assertValidResponse(
   }
 }
 
-async function createEService(i: number, token: string) {
+async function createEService(i: number, token: string, testSeed: string) {
   const eserviceCreationResponse = await apiClient.eservices.createEService(
     {
-      name: `eservice-${i}${TEST_SEED}`,
+      name: `eservice-${i}-${testSeed}`,
       description: "Questo è un e-service di test",
       technology: "REST",
       mode: "DELIVER",
