@@ -11,32 +11,35 @@ dependencies:
   '@cucumber/cucumber':
     specifier: ^10.0.1
     version: 10.0.1
-  lodash:
-    specifier: ^4.17.21
-    version: 4.17.21
   axios:
     specifier: ^1.6.2
     version: 1.6.2
   dotenv:
     specifier: ^16.3.1
     version: 16.3.1
+  lodash:
+    specifier: ^4.17.21
+    version: 4.17.21
   openapi-fetch:
     specifier: ^0.8.2
     version: 0.8.2
   ts-node:
     specifier: ^10.9.2
     version: 10.9.2(@types/node@20.10.4)(typescript@5.3.3)
-  zod:
-    specifier: ^3.22.4
-    version: 3.22.4
   uuid:
     specifier: ^9.0.1
     version: 9.0.1
+  zod:
+    specifier: ^3.22.4
+    version: 3.22.4
 
 devDependencies:
   '@pagopa/eslint-config':
     specifier: ^3.0.0
     version: 3.0.0(typescript@5.3.3)
+  '@types/lodash':
+    specifier: ^4.14.202
+    version: 4.14.202
   '@types/node':
     specifier: ^20.10.4
     version: 20.10.4
@@ -1223,6 +1226,10 @@ packages:
 
   /@types/json5@0.0.29:
     resolution: {integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==}
+    dev: true
+
+  /@types/lodash@4.14.202:
+    resolution: {integrity: sha512-OvlIYQK9tNneDlS0VN54LLd5uiPCBOp7gS5Z0f1mjoJYBrtStzgmJBxONW3U6OZqdtNzZPmn9BS/7WI7BFFcFQ==}
     dev: true
 
   /@types/node@20.10.4:
