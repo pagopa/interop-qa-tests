@@ -4,11 +4,10 @@ import { z } from "zod";
 import {
   getAuthorizationHeader,
   getRandomInt,
-  makePolling,
   assertContextSchema,
 } from "../../../utils/commons";
 import { apiClient } from "../../../api";
-import { assertValidResponse } from "./e-service-catalog-listing";
+import { dataPreparationService } from "../../../services/data-preparation.service";
 
 setDefaultTimeout(5 * 60 * 1000);
 
@@ -33,29 +32,11 @@ Given("l'utente ha già creato un e-service", async function () {
     token: z.string(),
   });
   const eserviceName = `e-service-${getRandomInt()}`;
-  const response = await apiClient.eservices.createEService(
-    {
-      name: eserviceName,
-      description: "Questo è un e-service di test",
-      technology: "REST",
-      mode: "DELIVER",
-    },
-    getAuthorizationHeader(this.token)
-  );
-  const eserviceId = response.data.id;
-  assertValidResponse(response);
-
-  await makePolling(
-    () =>
-      apiClient.producers.getProducerEServiceDetails(
-        eserviceId,
-        getAuthorizationHeader(this.token)
-      ),
-    (res) => res.status !== 404
-  );
+  const eserviceId = await dataPreparationService.createEService(this.token, {
+    name: eserviceName,
+  });
 
   this.eserviceName = eserviceName;
-  this.response = response;
   this.eserviceId = eserviceId;
 });
 

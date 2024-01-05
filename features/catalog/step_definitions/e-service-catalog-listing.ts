@@ -1,18 +1,14 @@
 import assert from "assert";
-import { readFileSync } from "fs";
-import { File } from "buffer";
 import { Given, When, Then } from "@cucumber/cucumber";
-import { AxiosResponse } from "axios";
 import { z } from "zod";
 import { apiClient } from "../../../api";
 import {
   assertContextSchema,
   getAuthorizationHeader,
   getOrganizationId,
-  makePolling,
   executePromisesInParallelChunks,
 } from "../../../utils/commons";
-import { CreatedResource } from "../../../api/models";
+import { dataPreparationService } from "../../../services/data-preparation.service";
 import { Party, Role } from "./common-steps";
 
 const PUBLISHED_ESERVICES = 1;
@@ -40,8 +36,13 @@ Given(
     const arr = new Array(TOTAL_ESERVICES).fill(0);
     const allIds = await executePromisesInParallelChunks(
       arr.map((_, i) => async () => {
-        const eserviceId = await createEService(i, token, this.TEST_SEED);
-        const descriptorId = await createDescriptorDraft(eserviceId, token);
+        const eserviceId = await dataPreparationService.createEService(token, {
+          name: `eservice-${i}-${this.TEST_SEED}`,
+        });
+        const descriptorId = await dataPreparationService.createDraftDescriptor(
+          token,
+          eserviceId
+        );
 
         return [eserviceId, descriptorId];
       })
@@ -56,14 +57,24 @@ Given(
     // 3. For each draft descriptor, in order to publish it, add the document interface
     await executePromisesInParallelChunks(
       idsToPublishAndSuspend.map(([eserviceId, descriptorId]) =>
-        addInterfaceToDescriptor.bind(null, eserviceId, descriptorId, token)
+        dataPreparationService.addInterfaceToDescriptor.bind(
+          null,
+          token,
+          eserviceId,
+          descriptorId
+        )
       )
     );
 
     // 4. Publish the descriptors
     await executePromisesInParallelChunks(
       idsToPublishAndSuspend.map(([eserviceId, descriptorId]) =>
-        publishDescriptor.bind(null, eserviceId, descriptorId, token)
+        dataPreparationService.publishDescriptor.bind(
+          null,
+          token,
+          eserviceId,
+          descriptorId
+        )
       )
     );
 
@@ -71,8 +82,20 @@ Given(
     const idsToSuspend = idsToPublishAndSuspend.slice(0, SUSPENDED_ESERVICES);
     await executePromisesInParallelChunks(
       idsToSuspend.map(([eserviceId, descriptorId]) =>
-        suspendDescriptor.bind(null, eserviceId, descriptorId, token)
+        dataPreparationService.suspendDescriptor.bind(
+          null,
+          token,
+          eserviceId,
+          descriptorId
+        )
       )
+    );
+
+    this.publishedEservicesIds =
+      idsToPublishAndSuspend.slice(SUSPENDED_ESERVICES);
+    this.suspendedEservicesIds = idsToSuspend;
+    this.draftEServicesIds = allIds.slice(
+      SUSPENDED_ESERVICES + PUBLISHED_ESERVICES
     );
   }
 );
@@ -82,72 +105,34 @@ Given(
   async function () {
     assertContextSchema(this, {
       token: z.string(),
-      eservicesIds: z.array(z.string()),
-      descriptorIds: z.array(z.string()),
+      publishedEservicesIds: z.array(z.tuple([z.string(), z.string()])),
     });
 
-    const eserviceId = this.eservicesIds[SUSPENDED_ESERVICES];
-    const descriptorId = this.descriptorIds[SUSPENDED_ESERVICES];
-    this.response = await apiClient.agreements.createAgreement(
-      { eserviceId, descriptorId },
-      getAuthorizationHeader(this.token)
+    const [eserviceId, descriptorId] = this.publishedEservicesIds[0];
+
+    const agreementId = await dataPreparationService.createAgreement(
+      this.token,
+      eserviceId,
+      descriptorId
     );
 
-    assertValidResponse(this.response);
+    await dataPreparationService.submitAgreement(this.token, agreementId);
 
-    this.agreementId = this.response.data.id;
-    await makePolling(
-      () =>
-        apiClient.agreements.getAgreementById(
-          this.agreementId,
-          getAuthorizationHeader(this.token)
-        ),
-      (res) => res.status !== 404
-    );
-
-    this.response = await apiClient.agreements.submitAgreement(
-      this.agreementId,
-      {},
-      getAuthorizationHeader(this.token)
-    );
-
-    assertValidResponse(this.response);
-
-    await makePolling(
-      () =>
-        apiClient.agreements.getAgreementById(
-          this.agreementId,
-          getAuthorizationHeader(this.token)
-        ),
-      (res) => res.data.state === "PENDING"
-    );
+    this.agreementId = agreementId;
   }
 );
 
 Given(
   "un {string} di {string} ha già approvato la richiesta di agreement di ente_fruitore",
   async function (role: Role, party: Party) {
-    const token = this.tokens[party][role];
     assertContextSchema(this, {
       tokens: z.record(z.string(), z.record(z.string(), z.string())),
       agreementId: z.string(),
     });
 
-    this.response = await apiClient.agreements.activateAgreement(
-      this.agreementId,
-      getAuthorizationHeader(token)
-    );
+    const token = this.tokens[party][role];
 
-    assertValidResponse(this.response);
-
-    await makePolling(
-      () =>
-        apiClient.agreements.getAgreementById(
-          this.agreementId,
-          getAuthorizationHeader(token)
-        ),
-      (res) => res.data.state === "ACTIVE"
-    );
+    await dataPreparationService.activateAgreement(token, this.agreementId);
   }
 );
 
@@ -238,151 +223,3 @@ Then(
     assert.equal(this.response.data.pagination.totalCount, 1);
   }
 );
-
-export function assertValidResponse(
-  response: AxiosResponse<CreatedResource | void, any> // eslint-disable-line @typescript-eslint/no-explicit-any
-) {
-  if (response.status !== 200) {
-    throw Error(
-      `Something went wrong: ${JSON.stringify(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (response.data as unknown as any).errors
-      )}`
-    );
-  }
-}
-
-async function createEService(i: number, token: string, testSeed: string) {
-  const eserviceCreationResponse = await apiClient.eservices.createEService(
-    {
-      name: `eservice-${i}-${testSeed}`,
-      description: "Questo è un e-service di test",
-      technology: "REST",
-      mode: "DELIVER",
-    },
-    getAuthorizationHeader(token)
-  );
-  assertValidResponse(eserviceCreationResponse);
-  const eserviceId = eserviceCreationResponse.data.id;
-
-  await makePolling(
-    () =>
-      apiClient.producers.getProducerEServiceDetails(
-        eserviceId,
-        getAuthorizationHeader(token)
-      ),
-    (res) => res.status !== 404
-  );
-
-  return eserviceId;
-}
-
-async function createDescriptorDraft(eserviceId: string, token: string) {
-  const descriptorCreationResponse = await apiClient.eservices.createDescriptor(
-    eserviceId,
-    {
-      description: "Questo è un e-service di test",
-      audience: ["api/v1"],
-      voucherLifespan: 60,
-      dailyCallsPerConsumer: 10,
-      dailyCallsTotal: 100,
-      agreementApprovalPolicy: "MANUAL",
-      attributes: {
-        certified: [],
-        declared: [],
-        verified: [],
-      },
-    },
-    getAuthorizationHeader(token)
-  );
-  assertValidResponse(descriptorCreationResponse);
-  const descriptorId = descriptorCreationResponse.data.id;
-
-  await makePolling(
-    () =>
-      apiClient.producers.getProducerEServiceDescriptor(
-        eserviceId,
-        descriptorId,
-        getAuthorizationHeader(token)
-      ),
-    (res) => res.status !== 404
-  );
-
-  return descriptorId;
-}
-
-async function addInterfaceToDescriptor(
-  eserviceId: string,
-  descriptorId: string,
-  token: string
-) {
-  const blobFile = new Blob([readFileSync("./utils/interface.yaml")]);
-  const file = new File([blobFile], "interface.yaml");
-
-  const response = await apiClient.eservices.createEServiceDocument(
-    eserviceId,
-    descriptorId,
-    {
-      kind: "INTERFACE",
-      prettyName: "Interfaccia",
-      doc: file,
-    },
-    getAuthorizationHeader(token)
-  );
-
-  assertValidResponse(response);
-
-  await makePolling(
-    () =>
-      apiClient.producers.getProducerEServiceDescriptor(
-        eserviceId,
-        descriptorId,
-        getAuthorizationHeader(token)
-      ),
-    (res) => res.data.interface !== undefined
-  );
-}
-
-async function publishDescriptor(
-  eserviceId: string,
-  descriptorId: string,
-  token: string
-) {
-  await apiClient.eservices.publishDescriptor(
-    eserviceId,
-    descriptorId,
-    getAuthorizationHeader(token)
-  );
-
-  await makePolling(
-    () =>
-      apiClient.producers.getProducerEServiceDescriptor(
-        eserviceId,
-        descriptorId,
-        getAuthorizationHeader(token)
-      ),
-    (res) => res.data.state === "PUBLISHED"
-  );
-}
-
-async function suspendDescriptor(
-  eserviceId: string,
-  descriptorId: string,
-  token: string
-) {
-  await apiClient.eservices.suspendDescriptor(
-    eserviceId,
-    descriptorId,
-    getAuthorizationHeader(token)
-  );
-
-  await makePolling(
-    () =>
-      apiClient.producers.getProducerEServiceDescriptor(
-        eserviceId,
-        descriptorId,
-        getAuthorizationHeader(token)
-      ),
-    (res) => res.data.state === "SUSPENDED"
-  );
-}

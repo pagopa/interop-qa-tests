@@ -2,11 +2,10 @@ import { Given, When } from "@cucumber/cucumber";
 import { z } from "zod";
 import {
   getAuthorizationHeader,
-  makePolling,
   assertContextSchema,
 } from "../../../utils/commons";
 import { apiClient } from "../../../api";
-import { assertValidResponse } from "./e-service-catalog-listing";
+import { dataPreparationService } from "../../../services/data-preparation.service";
 
 When("l'utente crea una versione di un e-service", async function () {
   assertContextSchema(this, {
@@ -39,35 +38,9 @@ Given(
       token: z.string(),
       eserviceId: z.string(),
     });
-    const response = await apiClient.eservices.createDescriptor(
-      this.eserviceId,
-      {
-        description: "Questo è un e-service di test",
-        audience: ["api/v1"],
-        voucherLifespan: 60,
-        dailyCallsPerConsumer: 10,
-        dailyCallsTotal: 100,
-        agreementApprovalPolicy: "AUTOMATIC",
-        attributes: {
-          certified: [],
-          declared: [],
-          verified: [],
-        },
-      },
-      getAuthorizationHeader(this.token)
-    );
-
-    const descriptorId = response.data.id;
-    assertValidResponse(response);
-
-    await makePolling(
-      () =>
-        apiClient.producers.getProducerEServiceDescriptor(
-          this.eserviceId,
-          descriptorId,
-          getAuthorizationHeader(this.token)
-        ),
-      (res) => res.status !== 404
+    await dataPreparationService.createDraftDescriptor(
+      this.token,
+      this.eserviceId
     );
   }
 );
