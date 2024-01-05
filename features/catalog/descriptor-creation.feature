@@ -4,7 +4,7 @@ Feature: Creazione versione di un e-service
   Scenario Outline: Un utente autorizzato a creare un e-service crea una versione di un e-service
     Given l'utente è un "<ruolo>" di "<ente>"
     Given l'utente ha già creato un e-service
-    When l'utente crea una versione di un e-service
+    When l'utente crea una versione in bozza per quell'e-service
     Then si ottiene status code "<risultato>"
 
       Examples:
@@ -21,5 +21,5 @@ Feature: Creazione versione di un e-service
     Given l'utente è un "admin" di "GSP"
     Given l'utente ha già creato un e-service
     Given l'utente ha già creato una versione in bozza per quell'eservice
-    When l'utente crea una versione di un e-service
+    When l'utente crea una versione in bozza per quell'e-service
     Then la creazione restituisce errore - "400"
