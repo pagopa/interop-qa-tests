@@ -4,7 +4,6 @@ import { File } from "buffer";
 import { Given, When, Then } from "@cucumber/cucumber";
 import { AxiosResponse } from "axios";
 import { z } from "zod";
-import zip from "lodash/zip";
 import { apiClient } from "../../../api";
 import {
   assertContextSchema,
@@ -16,9 +15,11 @@ import {
 import { CreatedResource } from "../../../api/models";
 import { Party, Role } from "./common-steps";
 
-const PUBLISHED_ESERVICES = 9;
-const SUSPENDED_ESERVICES = 6;
-const TOTAL_ESERVICES = PUBLISHED_ESERVICES + SUSPENDED_ESERVICES;
+const PUBLISHED_ESERVICES = 1;
+const SUSPENDED_ESERVICES = 1;
+const DRAFT_ESERVICES = 1;
+const TOTAL_ESERVICES =
+  PUBLISHED_ESERVICES + SUSPENDED_ESERVICES + DRAFT_ESERVICES;
 
 Given(
   "un {string} di {string} ha già creato più di 12 e-services in catalogo in stato Published o Suspended",
@@ -35,38 +36,39 @@ Given(
      * we are calling each service in parallel chunks.
      */
 
-    // 1. Create the draft e-services
+    // 1. Create the draft e-services with draft descriptors
     const arr = new Array(TOTAL_ESERVICES).fill(0);
-    const eserviceIds = await executePromisesInParallelChunks(
-      arr.map((_, i) => createEService.bind(null, i, token, this.TEST_SEED))
+    const allIds = await executePromisesInParallelChunks(
+      arr.map((_, i) => async () => {
+        const eserviceId = await createEService(i, token, this.TEST_SEED);
+        const descriptorId = await createDescriptorDraft(eserviceId, token);
+
+        return [eserviceId, descriptorId];
+      })
     );
 
-    // 2. For each e-service, create his own draft descriptor
-    const descriptorIds = await executePromisesInParallelChunks(
-      eserviceIds.map((eserviceId) =>
-        createDescriptorDraft.bind(null, eserviceId, token)
-      )
+    // 2. Take only the ids of the e-services that needs to be published and suspended
+    const idsToPublishAndSuspend = allIds.slice(
+      0,
+      SUSPENDED_ESERVICES + PUBLISHED_ESERVICES
     );
-
-    // 2.1. Zip the two arrays
-    const ids = zip(eserviceIds, descriptorIds) as Array<[string, string]>;
 
     // 3. For each draft descriptor, in order to publish it, add the document interface
     await executePromisesInParallelChunks(
-      ids.map(([eserviceId, descriptorId]) =>
+      idsToPublishAndSuspend.map(([eserviceId, descriptorId]) =>
         addInterfaceToDescriptor.bind(null, eserviceId, descriptorId, token)
       )
     );
 
     // 4. Publish the descriptors
     await executePromisesInParallelChunks(
-      ids.map(([eserviceId, descriptorId]) =>
+      idsToPublishAndSuspend.map(([eserviceId, descriptorId]) =>
         publishDescriptor.bind(null, eserviceId, descriptorId, token)
       )
     );
 
     // 5. Suspend the desired number of descriptors
-    const idsToSuspend = ids.slice(0, SUSPENDED_ESERVICES);
+    const idsToSuspend = idsToPublishAndSuspend.slice(0, SUSPENDED_ESERVICES);
     await executePromisesInParallelChunks(
       idsToSuspend.map(([eserviceId, descriptorId]) =>
         suspendDescriptor.bind(null, eserviceId, descriptorId, token)
@@ -99,7 +101,7 @@ Then(
     assert.equal(this.response.status, Number(statusCode));
     assert.equal(
       this.response.data.results.length,
-      Math.min(12, TOTAL_ESERVICES)
+      Math.min(12, PUBLISHED_ESERVICES + SUSPENDED_ESERVICES)
     );
   }
 );
@@ -116,7 +118,7 @@ When(
         limit: 12,
         offset: 0,
         q: this.TEST_SEED,
-        states: [],
+        states: ["PUBLISHED", "SUSPENDED"],
         producersIds: [producerId],
       },
       getAuthorizationHeader(this.token)
