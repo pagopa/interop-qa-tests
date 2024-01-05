@@ -15,10 +15,10 @@ export async function makePolling<TReturnType>(
   shouldStop: (data: Awaited<TReturnType>) => boolean,
   errorMessage: string = ""
 ) {
-  const MAX_POLLING_TRIES = 24;
+  const MAX_POLLING_TRIES = 8;
 
   for (let i = 0; i < MAX_POLLING_TRIES; i++) {
-    await sleep(200);
+    await sleep(400);
     const result = await promise();
     if (shouldStop(result)) {
       console.log(`Polling ended at iteration: ${i}`);
@@ -45,11 +45,11 @@ export function divideArrayInChunks<T>(array: T[], chunkSize: number): T[][] {
   );
 }
 
+const MAX_PARALLEL_CHUNKS = 5;
 export async function executePromisesInParallelChunks<T>(
-  promises: Array<() => Promise<T>>,
-  chunkSize: number = 5
+  promises: Array<() => Promise<T>>
 ): Promise<T[]> {
-  const chunks = divideArrayInChunks(promises, chunkSize);
+  const chunks = divideArrayInChunks(promises, MAX_PARALLEL_CHUNKS);
   const results: T[] = [];
   for (const chunk of chunks) {
     const data = await Promise.all(chunk.map((promise) => promise()));
