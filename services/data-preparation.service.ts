@@ -1,4 +1,5 @@
 import { readFileSync } from "fs";
+import { File } from "buffer";
 import { apiClient } from "../api";
 import {
   getAuthorizationHeader,
