@@ -15,10 +15,10 @@ export async function makePolling<TReturnType>(
   shouldStop: (data: Awaited<TReturnType>) => boolean,
   errorMessage: string = ""
 ) {
-  const MAX_POLLING_TRIES = 6;
+  const MAX_POLLING_TRIES = 24;
 
   for (let i = 0; i < MAX_POLLING_TRIES; i++) {
-    await sleep(400);
+    await sleep(200);
     const result = await promise();
     if (shouldStop(result)) {
       console.log(`Polling ended at iteration: ${i}`);

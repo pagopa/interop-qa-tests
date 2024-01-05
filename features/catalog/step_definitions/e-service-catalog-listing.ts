@@ -77,6 +77,99 @@ Given(
   }
 );
 
+Given(
+  "ente_fruitore ha già richiesto l'approvazione dell'agreement per un eservice di ComuneDiMilano",
+  async function () {
+    assertContextSchema(this, {
+      token: z.string(),
+      eservicesIds: z.array(z.string()),
+      descriptorIds: z.array(z.string()),
+    });
+
+    const eserviceId = this.eservicesIds[SUSPENDED_ESERVICES];
+    const descriptorId = this.descriptorIds[SUSPENDED_ESERVICES];
+    this.response = await apiClient.agreements.createAgreement(
+      { eserviceId, descriptorId },
+      getAuthorizationHeader(this.token)
+    );
+
+    assertValidResponse(this.response);
+
+    this.agreementId = this.response.data.id;
+    await makePolling(
+      () =>
+        apiClient.agreements.getAgreementById(
+          this.agreementId,
+          getAuthorizationHeader(this.token)
+        ),
+      (res) => res.status !== 404
+    );
+
+    this.response = await apiClient.agreements.submitAgreement(
+      this.agreementId,
+      {},
+      getAuthorizationHeader(this.token)
+    );
+
+    assertValidResponse(this.response);
+
+    await makePolling(
+      () =>
+        apiClient.agreements.getAgreementById(
+          this.agreementId,
+          getAuthorizationHeader(this.token)
+        ),
+      (res) => res.data.state === "PENDING"
+    );
+  }
+);
+
+Given(
+  "un {string} di {string} ha già approvato la richiesta di agreement di ente_fruitore",
+  async function (role: Role, party: Party) {
+    const token = this.tokens[party][role];
+    assertContextSchema(this, {
+      tokens: z.record(z.string(), z.record(z.string(), z.string())),
+      agreementId: z.string(),
+    });
+
+    this.response = await apiClient.agreements.activateAgreement(
+      this.agreementId,
+      getAuthorizationHeader(token)
+    );
+
+    assertValidResponse(this.response);
+
+    await makePolling(
+      () =>
+        apiClient.agreements.getAgreementById(
+          this.agreementId,
+          getAuthorizationHeader(token)
+        ),
+      (res) => res.data.state === "ACTIVE"
+    );
+  }
+);
+
+When(
+  "l'utente richiede la lista di eservices per i quali ha almeno un agreement attivo",
+  async function () {
+    assertContextSchema(this, {
+      token: z.string(),
+    });
+    this.response = await apiClient.catalog.getEServicesCatalog(
+      {
+        limit: 12,
+        offset: 0,
+        q: this.TEST_SEED,
+        states: ["PUBLISHED"],
+        agreementStates: ["ACTIVE"],
+      },
+      getAuthorizationHeader(this.token)
+    );
+  }
+);
+
 When(
   "l'utente richiede una operazione di listing limitata ai primi 12",
   async function () {
@@ -138,6 +231,14 @@ Then(
   }
 );
 
+Then(
+  "si ottiene status code {string} e la lista degli eservices di cui è fruitore con un agreement attivo",
+  function (statusCode: string) {
+    assert.equal(this.response.status, Number(statusCode));
+    assert.equal(this.response.data.pagination.totalCount, 1);
+  }
+);
+
 export function assertValidResponse(
   response: AxiosResponse<CreatedResource | void, any> // eslint-disable-line @typescript-eslint/no-explicit-any
 ) {
@@ -185,7 +286,7 @@ async function createDescriptorDraft(eserviceId: string, token: string) {
       voucherLifespan: 60,
       dailyCallsPerConsumer: 10,
       dailyCallsTotal: 100,
-      agreementApprovalPolicy: "AUTOMATIC",
+      agreementApprovalPolicy: "MANUAL",
       attributes: {
         certified: [],
         declared: [],
