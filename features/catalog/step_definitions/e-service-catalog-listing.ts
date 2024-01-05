@@ -119,6 +119,8 @@ Given(
     await dataPreparationService.submitAgreement(this.token, agreementId);
 
     this.agreementId = agreementId;
+    this.eserviceSubscribedId = eserviceId;
+    this.descriptorSubscribedId = descriptorId;
   }
 );
 
@@ -136,6 +138,22 @@ Given(
   }
 );
 
+Given(
+  "un {string} di {string} ha già sospeso la versione dell'eservice che ente_fruitore ha sottoscritto",
+  async function (role: Role, party: Party) {
+    assertContextSchema(this, {
+      tokens: z.record(z.string(), z.record(z.string(), z.string())),
+      agreementId: z.string(),
+      eserviceSubscribedId: z.string(),
+      descriptorSubscribedId: z.string(),
+    });
+
+    const token = this.tokens[party][role];
+    // TODO: erogatore sospende il descriptor associato a eserviceSubscribedId, descriptorSubscribedId
+    // da implementare con dataPreparationService() con polling
+  }
+);
+
 When(
   "l'utente richiede la lista di eservices per i quali ha almeno un agreement attivo",
   async function () {
@@ -148,6 +166,25 @@ When(
         offset: 0,
         q: this.TEST_SEED,
         states: ["PUBLISHED"],
+        agreementStates: ["ACTIVE"],
+      },
+      getAuthorizationHeader(this.token)
+    );
+  }
+);
+
+When(
+  "l'utente richiede la lista di eservices per i quali ha almeno un agreement attivo che contengono la keyword di ricerca",
+  async function () {
+    assertContextSchema(this, {
+      token: z.string(),
+    });
+    this.response = await apiClient.catalog.getEServicesCatalog(
+      {
+        limit: 12,
+        offset: 0,
+        q: this.TEST_SEED,
+        states: ["SUSPENDED"],
         agreementStates: ["ACTIVE"],
       },
       getAuthorizationHeader(this.token)
@@ -221,5 +258,12 @@ Then(
   function (statusCode: string) {
     assert.equal(this.response.status, Number(statusCode));
     assert.equal(this.response.data.pagination.totalCount, 1);
+  }
+);
+
+Then(
+  "si ottiene status code {string} e la lista degli eservices di cui è fruitore con un agreement attivo per una versione dell'eservice in stato SUSPENDED, che contiene la chiave di ricerca",
+  function () {
+    assert.equal(1, 1);
   }
 );
