@@ -1,4 +1,5 @@
-import { Before, Given } from "@cucumber/cucumber";
+import assert from "assert";
+import { Before, Given, Then } from "@cucumber/cucumber";
 import { generateSessionTokens } from "../../../utils/session-tokens";
 import { getRandomInt } from "./../../../utils/commons";
 
@@ -17,6 +18,14 @@ Given(
     this.token = tokens[party][role];
     // TO DO IMPROVE
     this.tokens = tokens;
+  }
+);
+
+Then(
+  "si ottiene status code {int} e la lista di {int} risultati",
+  function (statusCode: number, count: number) {
+    assert.equal(this.response.status, statusCode);
+    assert.equal(this.response.data.pagination.totalCount, count);
   }
 );
 

@@ -30,7 +30,6 @@ export const dataPreparationService = {
       eserviceSeed,
       getAuthorizationHeader(token)
     );
-
     assertValidResponse(eserviceCreationResponse);
     const eserviceId = eserviceCreationResponse.data.id;
 

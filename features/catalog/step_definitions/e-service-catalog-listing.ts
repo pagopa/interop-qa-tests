@@ -101,8 +101,8 @@ Given(
 );
 
 Given(
-  "ente_fruitore ha già richiesto l'approvazione dell'agreement per un eservice di ComuneDiMilano",
-  async function () {
+  "ente_fruitore ha già richiesto l'approvazione dell'agreement per un eservice di {string}",
+  async function (_producer: string) {
     assertContextSchema(this, {
       token: z.string(),
       publishedEservicesIds: z.array(z.tuple([z.string(), z.string()])),
@@ -261,17 +261,9 @@ Then(
 );
 
 Then(
-  "si ottiene status code {string} e la lista degli eservices di cui è fruitore con un agreement attivo",
-  function (statusCode: string) {
-    assert.equal(this.response.status, Number(statusCode));
-    assert.equal(this.response.data.pagination.totalCount, 1);
-  }
-);
-
-Then(
   "si ottiene status code {string} e la lista degli eservices di cui è fruitore con un agreement attivo per una versione dell'eservice in stato SUSPENDED, che contiene la chiave di ricerca",
   function (statusCode: string) {
     assert.equal(this.response.status, Number(statusCode));
-    assert.equal(this.response.data.pagination.totalCount, 1);
+    assert.equal(this.response.data.pagination.totalCount, 2);
   }
 );
