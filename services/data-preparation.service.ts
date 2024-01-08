@@ -130,11 +130,13 @@ export const dataPreparationService = {
     eserviceId: string,
     descriptorId: string
   ) {
-    await apiClient.eservices.publishDescriptor(
+    const response = await apiClient.eservices.publishDescriptor(
       eserviceId,
       descriptorId,
       getAuthorizationHeader(token)
     );
+
+    assertValidResponse(response);
 
     await makePolling(
       () =>
@@ -152,11 +154,13 @@ export const dataPreparationService = {
     eserviceId: string,
     descriptorId: string
   ) {
-    await apiClient.eservices.suspendDescriptor(
+    const response = await apiClient.eservices.suspendDescriptor(
       eserviceId,
       descriptorId,
       getAuthorizationHeader(token)
     );
+
+    assertValidResponse(response);
 
     await makePolling(
       () =>

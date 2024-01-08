@@ -62,7 +62,7 @@ Feature: Listing catalogo e-services
     Given ente_fruitore ha già richiesto l'approvazione dell'agreement per un eservice di ComuneDiMilano
     Given un "admin" di "ComuneDiMilano" ha già approvato la richiesta di agreement di ente_fruitore
     Given un "admin" di "ComuneDiMilano" ha già sospeso la versione dell'eservice che ente_fruitore ha sottoscritto
-    When l'utente richiede la lista di eservices per i quali ha almeno un agreement attivo che contengono la keyword di ricerca
+    When l'utente richiede la lista di eservices che hanno almeno una versione in stato SUSPENDED, erogati da "ComuneDiMilano" e "AgID" per i quali ha almeno un agreement attivo che contengono la keyword di ricerca
     Then si ottiene status code "<risultato>" e la lista degli eservices di cui è fruitore con un agreement attivo per una versione dell'eservice in stato SUSPENDED, che contiene la chiave di ricerca
 
     Examples: 

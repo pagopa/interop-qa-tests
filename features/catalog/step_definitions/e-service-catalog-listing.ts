@@ -149,8 +149,12 @@ Given(
     });
 
     const token = this.tokens[party][role];
-    // TODO: erogatore sospende il descriptor associato a eserviceSubscribedId, descriptorSubscribedId
-    // da implementare con dataPreparationService() con polling
+
+    await dataPreparationService.suspendDescriptor(
+      token,
+      this.eserviceSubscribedId,
+      this.descriptorSubscribedId
+    );
   }
 );
 
@@ -174,11 +178,13 @@ When(
 );
 
 When(
-  "l'utente richiede la lista di eservices per i quali ha almeno un agreement attivo che contengono la keyword di ricerca",
-  async function () {
+  "l'utente richiede la lista di eservices che hanno almeno una versione in stato SUSPENDED, erogati da {string} e {string} per i quali ha almeno un agreement attivo che contengono la keyword di ricerca",
+  async function (producer1: Party, producer2: Party) {
     assertContextSchema(this, {
       token: z.string(),
     });
+    const producerId1 = getOrganizationId(producer1);
+    const producerId2 = getOrganizationId(producer2);
     this.response = await apiClient.catalog.getEServicesCatalog(
       {
         limit: 12,
@@ -186,6 +192,7 @@ When(
         q: this.TEST_SEED,
         states: ["SUSPENDED"],
         agreementStates: ["ACTIVE"],
+        producersIds: [producerId1, producerId2],
       },
       getAuthorizationHeader(this.token)
     );
@@ -263,7 +270,8 @@ Then(
 
 Then(
   "si ottiene status code {string} e la lista degli eservices di cui è fruitore con un agreement attivo per una versione dell'eservice in stato SUSPENDED, che contiene la chiave di ricerca",
-  function () {
-    assert.equal(1, 1);
+  function (statusCode: string) {
+    assert.equal(this.response.status, Number(statusCode));
+    assert.equal(this.response.data.pagination.totalCount, 1);
   }
 );
