@@ -56,7 +56,7 @@ export const dataPreparationService = {
       voucherLifespan: 60,
       dailyCallsPerConsumer: 10,
       dailyCallsTotal: 100,
-      agreementApprovalPolicy: "MANUAL",
+      agreementApprovalPolicy: "AUTOMATIC",
       attributes: {
         certified: [],
         declared: [],
@@ -213,7 +213,7 @@ export const dataPreparationService = {
           agreementId,
           getAuthorizationHeader(token)
         ),
-      (res) => res.data.state === "PENDING"
+      (res) => res.data.state === "ACTIVE" || res.data.state === "PENDING"
     );
   },
 

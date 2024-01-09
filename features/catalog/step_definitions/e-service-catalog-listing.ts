@@ -104,8 +104,7 @@ Given(
   }
 );
 
-Given(
-  "ente_fruitore ha già richiesto l'approvazione dell'agreement per un eservice di {string}",
+Given("ente_fruitore ha un agreement attivo con un eservice di {string}",
   async function (_producer: string) {
     assertContextSchema(this, {
       token: z.string(),
@@ -162,8 +161,7 @@ Given(
   }
 );
 
-When(
-  "l'utente richiede la lista di eservices per i quali ha almeno un agreement attivo",
+When("l'utente richiede la lista di eservices per i quali ha almeno un agreement attivo",
   async function () {
     assertContextSchema(this, {
       token: z.string(),
@@ -173,7 +171,7 @@ When(
         limit: 12,
         offset: 0,
         q: this.TEST_SEED,
-        states: ["PUBLISHED"],
+        states: ["PUBLISHED", "SUSPENDED"],
         agreementStates: ["ACTIVE"],
       },
       getAuthorizationHeader(this.token)
@@ -203,8 +201,7 @@ When(
   }
 );
 
-When(
-  "l'utente richiede una operazione di listing limitata ai primi 12",
+When("l'utente richiede una operazione di listing sul catalogo",
   async function () {
     assertContextSchema(this, {
       token: z.string(),
@@ -221,19 +218,42 @@ When(
   }
 );
 
-// Then(
-//   "si ottiene status code {string} e la lista di  e-services",
-//   function (statusCode: string) {
-//     assert.equal(this.response.status, Number(statusCode));
-//     assert.equal(
-//       this.response.data.results.length,
-//       Math.min(12, PUBLISHED_ESERVICES + SUSPENDED_ESERVICES)
-//     );
-//   }
-// );
+When("l'utente richiede una operazione di listing sul catalogo limitata ai primi {int} e-services",
+  async function (limit: number) {
+    assertContextSchema(this, {
+      token: z.string(),
+    });
+    this.response = await apiClient.catalog.getEServicesCatalog(
+      {
+        limit: limit,
+        offset: 0,
+        q: this.TEST_SEED,
+        states: ["PUBLISHED", "SUSPENDED"],
+      },
+      getAuthorizationHeader(this.token)
+    );
+  }
+);
+
+When("l'utente richiede una operazione di listing sul catalogo con offset {int}",
+  async function (offset: number) {
+    assertContextSchema(this, {
+      token: z.string(),
+    });
+    this.response = await apiClient.catalog.getEServicesCatalog(
+      {
+        limit: 12,
+        offset: offset,
+        q: this.TEST_SEED,
+        states: ["PUBLISHED", "SUSPENDED"],
+      },
+      getAuthorizationHeader(this.token)
+    );
+  }
+);
 
 When(
-  "l'utente richiede una operazione di listing limitata ai primi 12 e-services dell'erogatore {string}",
+  "l'utente richiede una operazione di listing degli e-services dell'erogatore {string}",
   async function (producer: Party) {
     assertContextSchema(this, {
       token: z.string(),
@@ -249,20 +269,46 @@ When(
       },
       getAuthorizationHeader(this.token)
     );
-    this.producerId = producerId;
   }
 );
 
-// Then(
-//   "si ottiene status code {string} e la lista degli eservices dell'erogatore specificato",
-//   function (statusCode: string) {
-//     assert.equal(this.response.status, Number(statusCode));
-//     assert.equal(
-//       this.response.data.pagination.totalCount,
-//       PUBLISHED_ESERVICES + SUSPENDED_ESERVICES
-//     );
-//   }
-// );
+When(
+  "l'utente richiede una operazione di listing sul catalogo filtrando per la keyword {string}",
+  async function (keyword: string) {
+    assertContextSchema(this, {
+      token: z.string(),
+      TEST_SEED: z.string(),
+    });
+    this.response = await apiClient.catalog.getEServicesCatalog(
+      {
+        limit: 12,
+        offset: 0,
+        q: `${this.TEST_SEED}-${keyword}`,
+        states: ["PUBLISHED", "SUSPENDED"],
+      },
+      getAuthorizationHeader(this.token)
+    );
+  }
+);
+
+Given("un {string} di {string} ha già creato un e-service contenente la keyword {string}", async function (
+  role: Role,
+  party: Party,
+  keyword: string) {
+  assertContextSchema(this, {
+    tokens: SessionTokens,
+    TEST_SEED: z.string(),
+  });
+
+  const token = this.tokens[party]![role]!;
+  const eserviceName = `e-service-${this.TEST_SEED}-${keyword}`;
+  await dataPreparationService.createEService(token, {
+    name: eserviceName,
+  });
+
+  // TODO Publish descriptor
+
+});
 
 Then(
   "si ottiene status code {string} e la lista degli eservices di cui è fruitore con un agreement attivo per una versione dell'eservice in stato SUSPENDED, che contiene la chiave di ricerca",
