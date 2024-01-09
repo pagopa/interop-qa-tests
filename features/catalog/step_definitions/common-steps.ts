@@ -32,7 +32,7 @@ Given(
 );
 
 Then(
-  "si ottiene status code {int} e la lista di {int} risultati",
+  "si ottiene status code {int} e la lista di {int} e-services",
   function (statusCode: number, count: number) {
     assertContextSchema(this, {
       response: z.object({

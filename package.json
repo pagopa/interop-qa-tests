@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "cucumber-js",
+    "test:tags": "cucumber-js --tags",
     "generate-model": "node ./scripts/generate-api-models.mjs"
   },
   "keywords": [],

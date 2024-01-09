@@ -11,21 +11,25 @@ import {
 import { dataPreparationService } from "../../../services/data-preparation.service";
 import { Party, Role, SessionTokens } from "./common-steps";
 
-const PUBLISHED_ESERVICES = 1;
-const SUSPENDED_ESERVICES = 1;
-const DRAFT_ESERVICES = 1;
-const TOTAL_ESERVICES =
-  PUBLISHED_ESERVICES + SUSPENDED_ESERVICES + DRAFT_ESERVICES;
+// const PUBLISHED_ESERVICES = 1;
+// const SUSPENDED_ESERVICES = 1;
+// const DRAFT_ESERVICES = 1;
+// const TOTAL_ESERVICES =
+//   PUBLISHED_ESERVICES + SUSPENDED_ESERVICES + DRAFT_ESERVICES;
 
 Given(
-  "un {string} di {string} ha già creato più di 12 e-services in catalogo in stato Published o Suspended",
-  async function (role: Role, party: Party) {
+  "un {string} di {string} ha già creato {int} e-services in catalogo in stato Published o Suspended",
+  async function (role: Role, party: Party, countEservices: number) {
     assertContextSchema(this, {
       tokens: SessionTokens,
       TEST_SEED: z.string(),
     });
 
     const token = this.tokens[party]![role]!;
+    const PUBLISHED_ESERVICES = 1;
+    const SUSPENDED_ESERVICES = countEservices - PUBLISHED_ESERVICES;
+    const DRAFT_ESERVICES = 1;
+    const TOTAL_ESERVICES = countEservices + DRAFT_ESERVICES;
 
     /**
      * To speed up the process and avoid the BFF rate limit restriction,
@@ -217,16 +221,16 @@ When(
   }
 );
 
-Then(
-  "si ottiene status code {string} e la lista di 12 e-services",
-  function (statusCode: string) {
-    assert.equal(this.response.status, Number(statusCode));
-    assert.equal(
-      this.response.data.results.length,
-      Math.min(12, PUBLISHED_ESERVICES + SUSPENDED_ESERVICES)
-    );
-  }
-);
+// Then(
+//   "si ottiene status code {string} e la lista di  e-services",
+//   function (statusCode: string) {
+//     assert.equal(this.response.status, Number(statusCode));
+//     assert.equal(
+//       this.response.data.results.length,
+//       Math.min(12, PUBLISHED_ESERVICES + SUSPENDED_ESERVICES)
+//     );
+//   }
+// );
 
 When(
   "l'utente richiede una operazione di listing limitata ai primi 12 e-services dell'erogatore {string}",
@@ -249,16 +253,16 @@ When(
   }
 );
 
-Then(
-  "si ottiene status code {string} e la lista degli eservices dell'erogatore specificato",
-  function (statusCode: string) {
-    assert.equal(this.response.status, Number(statusCode));
-    assert.equal(
-      this.response.data.pagination.totalCount,
-      PUBLISHED_ESERVICES + SUSPENDED_ESERVICES
-    );
-  }
-);
+// Then(
+//   "si ottiene status code {string} e la lista degli eservices dell'erogatore specificato",
+//   function (statusCode: string) {
+//     assert.equal(this.response.status, Number(statusCode));
+//     assert.equal(
+//       this.response.data.pagination.totalCount,
+//       PUBLISHED_ESERVICES + SUSPENDED_ESERVICES
+//     );
+//   }
+// );
 
 Then(
   "si ottiene status code {string} e la lista degli eservices di cui è fruitore con un agreement attivo per una versione dell'eservice in stato SUSPENDED, che contiene la chiave di ricerca",
