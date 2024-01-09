@@ -9,7 +9,7 @@ import {
   executePromisesInParallelChunks,
 } from "../../../utils/commons";
 import { dataPreparationService } from "../../../services/data-preparation.service";
-import { Party, Role } from "./common-steps";
+import { Party, Role, SessionTokens } from "./common-steps";
 
 const PUBLISHED_ESERVICES = 1;
 const SUSPENDED_ESERVICES = 1;
@@ -21,11 +21,11 @@ Given(
   "un {string} di {string} ha già creato più di 12 e-services in catalogo in stato Published o Suspended",
   async function (role: Role, party: Party) {
     assertContextSchema(this, {
-      tokens: z.record(z.string(), z.record(z.string(), z.string())),
+      tokens: SessionTokens,
       TEST_SEED: z.string(),
     });
 
-    const token = this.tokens[party][role];
+    const token = this.tokens[party]![role]!;
 
     /**
      * To speed up the process and avoid the BFF rate limit restriction,
@@ -128,11 +128,11 @@ Given(
   "un {string} di {string} ha già approvato la richiesta di agreement di ente_fruitore",
   async function (role: Role, party: Party) {
     assertContextSchema(this, {
-      tokens: z.record(z.string(), z.record(z.string(), z.string())),
+      tokens: SessionTokens,
       agreementId: z.string(),
     });
 
-    const token = this.tokens[party][role];
+    const token = this.tokens[party]![role]!;
 
     await dataPreparationService.activateAgreement(token, this.agreementId);
   }
@@ -142,13 +142,13 @@ Given(
   "un {string} di {string} ha già sospeso la versione dell'eservice che ente_fruitore ha sottoscritto",
   async function (role: Role, party: Party) {
     assertContextSchema(this, {
-      tokens: z.record(z.string(), z.record(z.string(), z.string())),
+      tokens: SessionTokens,
       agreementId: z.string(),
       eserviceSubscribedId: z.string(),
       descriptorSubscribedId: z.string(),
     });
 
-    const token = this.tokens[party][role];
+    const token = this.tokens[party]![role]!;
 
     await dataPreparationService.suspendDescriptor(
       token,
