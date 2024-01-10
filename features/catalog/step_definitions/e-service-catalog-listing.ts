@@ -6,7 +6,6 @@ import {
   assertContextSchema,
   getAuthorizationHeader,
   getOrganizationId,
-  executePromisesInParallelChunks,
 } from "../../../utils/commons";
 import { dataPreparationService } from "../../../services/data-preparation.service";
 import { Party, Role, SessionTokens } from "./common-steps";
@@ -38,18 +37,19 @@ Given(
 
     // 1. Create the draft e-services with draft descriptors
     const arr = new Array(TOTAL_ESERVICES).fill(0);
-    const allIds = await executePromisesInParallelChunks(
-      arr.map((_, i) => async () => {
-        const eserviceId = await dataPreparationService.createEService(token, {
-          name: `eservice-${i}-${this.TEST_SEED}`,
-        });
-        const descriptorId = await dataPreparationService.createDraftDescriptor(
-          token,
-          eserviceId
-        );
+    const createEServiceWithDescriptor = async (i: number) => {
+      const eserviceId = await dataPreparationService.createEService(token, {
+        name: `eservice-${i}-${this.TEST_SEED}`,
+      });
+      const descriptorId = await dataPreparationService.createDraftDescriptor(
+        token,
+        eserviceId
+      );
 
-        return [eserviceId, descriptorId];
-      })
+      return [eserviceId, descriptorId];
+    };
+    const allIds = await Promise.all(
+      arr.map((_, i) => createEServiceWithDescriptor(i))
     );
 
     // 2. Take only the ids of the e-services that needs to be published and suspended
@@ -59,10 +59,9 @@ Given(
     );
 
     // 3. For each draft descriptor, in order to publish it, add the document interface
-    await executePromisesInParallelChunks(
+    await Promise.all(
       idsToPublishAndSuspend.map(([eserviceId, descriptorId]) =>
-        dataPreparationService.addInterfaceToDescriptor.bind(
-          null,
+        dataPreparationService.addInterfaceToDescriptor(
           token,
           eserviceId,
           descriptorId
@@ -71,10 +70,9 @@ Given(
     );
 
     // 4. Publish the descriptors
-    await executePromisesInParallelChunks(
+    await Promise.all(
       idsToPublishAndSuspend.map(([eserviceId, descriptorId]) =>
-        dataPreparationService.publishDescriptor.bind(
-          null,
+        dataPreparationService.publishDescriptor(
           token,
           eserviceId,
           descriptorId
@@ -84,10 +82,9 @@ Given(
 
     // 5. Suspend the desired number of descriptors
     const idsToSuspend = idsToPublishAndSuspend.slice(0, SUSPENDED_ESERVICES);
-    await executePromisesInParallelChunks(
+    await Promise.all(
       idsToSuspend.map(([eserviceId, descriptorId]) =>
-        dataPreparationService.suspendDescriptor.bind(
-          null,
+        dataPreparationService.suspendDescriptor(
           token,
           eserviceId,
           descriptorId
@@ -104,7 +101,8 @@ Given(
   }
 );
 
-Given("ente_fruitore ha un agreement attivo con un eservice di {string}",
+Given(
+  "ente_fruitore ha un agreement attivo con un eservice di {string}",
   async function (_producer: string) {
     assertContextSchema(this, {
       token: z.string(),
@@ -161,7 +159,8 @@ Given(
   }
 );
 
-When("l'utente richiede la lista di eservices per i quali ha almeno un agreement attivo",
+When(
+  "l'utente richiede la lista di eservices per i quali ha almeno un agreement attivo",
   async function () {
     assertContextSchema(this, {
       token: z.string(),
@@ -201,7 +200,8 @@ When(
   }
 );
 
-When("l'utente richiede una operazione di listing sul catalogo",
+When(
+  "l'utente richiede una operazione di listing sul catalogo",
   async function () {
     assertContextSchema(this, {
       token: z.string(),
@@ -218,14 +218,15 @@ When("l'utente richiede una operazione di listing sul catalogo",
   }
 );
 
-When("l'utente richiede una operazione di listing sul catalogo limitata ai primi {int} e-services",
+When(
+  "l'utente richiede una operazione di listing sul catalogo limitata ai primi {int} e-services",
   async function (limit: number) {
     assertContextSchema(this, {
       token: z.string(),
     });
     this.response = await apiClient.catalog.getEServicesCatalog(
       {
-        limit: limit,
+        limit,
         offset: 0,
         q: this.TEST_SEED,
         states: ["PUBLISHED", "SUSPENDED"],
@@ -235,7 +236,8 @@ When("l'utente richiede una operazione di listing sul catalogo limitata ai primi
   }
 );
 
-When("l'utente richiede una operazione di listing sul catalogo con offset {int}",
+When(
+  "l'utente richiede una operazione di listing sul catalogo con offset {int}",
   async function (offset: number) {
     assertContextSchema(this, {
       token: z.string(),
@@ -243,7 +245,7 @@ When("l'utente richiede una operazione di listing sul catalogo con offset {int}"
     this.response = await apiClient.catalog.getEServicesCatalog(
       {
         limit: 12,
-        offset: offset,
+        offset,
         q: this.TEST_SEED,
         states: ["PUBLISHED", "SUSPENDED"],
       },
@@ -291,24 +293,23 @@ When(
   }
 );
 
-Given("un {string} di {string} ha già creato un e-service contenente la keyword {string}", async function (
-  role: Role,
-  party: Party,
-  keyword: string) {
-  assertContextSchema(this, {
-    tokens: SessionTokens,
-    TEST_SEED: z.string(),
-  });
+Given(
+  "un {string} di {string} ha già creato un e-service contenente la keyword {string}",
+  async function (role: Role, party: Party, keyword: string) {
+    assertContextSchema(this, {
+      tokens: SessionTokens,
+      TEST_SEED: z.string(),
+    });
 
-  const token = this.tokens[party]![role]!;
-  const eserviceName = `e-service-${this.TEST_SEED}-${keyword}`;
-  await dataPreparationService.createEService(token, {
-    name: eserviceName,
-  });
+    const token = this.tokens[party]![role]!;
+    const eserviceName = `e-service-${this.TEST_SEED}-${keyword}`;
+    await dataPreparationService.createEService(token, {
+      name: eserviceName,
+    });
 
-  // TODO Publish descriptor
-
-});
+    // TODO Publish descriptor
+  }
+);
 
 Then(
   "si ottiene status code {string} e la lista degli eservices di cui è fruitore con un agreement attivo per una versione dell'eservice in stato SUSPENDED, che contiene la chiave di ricerca",

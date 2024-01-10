@@ -23,15 +23,16 @@ Before(function (scenario) {
   console.log(`\n\n${scenario.pickle.name}\n`);
 });
 
-Given("l'utente è un {string} di {string}",
+Given(
+  "l'utente è un {string} di {string}",
   async function (role: Role, party: Party) {
     this.token = this.parameters.tokens[party]![role]!;
     this.tokens = this.parameters.tokens;
   }
 );
 
-
-Then("si ottiene status code {int} e la lista di {int} e-services",
+Then(
+  "si ottiene status code {int} e la lista di {int} e-services",
   function (statusCode: number, count: number) {
     assertContextSchema(this, {
       response: z.object({

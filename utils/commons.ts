@@ -18,8 +18,8 @@ export async function makePolling<TReturnType>(
   shouldStop: (data: Awaited<TReturnType>) => boolean,
   errorMessage: string = ""
 ) {
-  const MAX_POLLING_TRIES = 8;
-  const SLEEP_TIME = 400;
+  const MAX_POLLING_TRIES = 32;
+  const SLEEP_TIME = 100;
 
   for (let i = 0; i < MAX_POLLING_TRIES; i++) {
     await sleep(SLEEP_TIME);
@@ -43,25 +43,6 @@ export function assertContextSchema<TSchema extends z.ZodRawShape>(
   schema: TSchema
 ): asserts context is z.infer<z.ZodObject<TSchema>> {
   z.object(schema).parse(context);
-}
-
-export function divideArrayInChunks<T>(array: T[], chunkSize: number): T[][] {
-  return Array.from({ length: Math.ceil(array.length / chunkSize) }, (_, i) =>
-    array.slice(i * chunkSize, i * chunkSize + chunkSize)
-  );
-}
-
-const MAX_PARALLEL_CHUNKS = 5;
-export async function executePromisesInParallelChunks<T>(
-  promises: Array<() => Promise<T>>
-): Promise<T[]> {
-  const chunks = divideArrayInChunks(promises, MAX_PARALLEL_CHUNKS);
-  const results: T[] = [];
-  for (const chunk of chunks) {
-    const data = await Promise.all(chunk.map((promise) => promise()));
-    results.push(...data);
-  }
-  return results;
 }
 
 export function getOrganizationId(party: Party) {
