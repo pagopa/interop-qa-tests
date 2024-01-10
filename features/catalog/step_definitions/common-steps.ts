@@ -20,14 +20,15 @@ BeforeAll(async function () {
 
 Before(function (scenario) {
   this.TEST_SEED = getRandomInt();
+  this.tokens = this.parameters.tokens;
+
   console.log(`\n\n${scenario.pickle.name}\n`);
 });
 
 Given(
   "l'utente è un {string} di {string}",
   async function (role: Role, party: Party) {
-    this.token = this.parameters.tokens[party]![role]!;
-    this.tokens = this.parameters.tokens;
+    this.token = this.tokens[party]![role]!;
   }
 );
 

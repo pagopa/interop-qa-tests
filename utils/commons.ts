@@ -1,7 +1,10 @@
 import { readFileSync } from "fs";
 import { z } from "zod";
 import { AxiosResponse } from "axios";
-import { Party } from "../features/catalog/step_definitions/common-steps";
+import {
+  Party,
+  SessionTokens,
+} from "../features/catalog/step_definitions/common-steps";
 import { CreatedResource } from "../api/models";
 
 export const getRandomInt = () =>
@@ -38,11 +41,18 @@ export function getAuthorizationHeader(token: string) {
   return { headers: { Authorization: "Bearer " + token } } as const;
 }
 
+const COMMON_CONTEXT_SCHEMA = z.object({
+  TEST_SEED: z.string(),
+  tokens: SessionTokens,
+});
 export function assertContextSchema<TSchema extends z.ZodRawShape>(
   context: unknown,
-  schema: TSchema
-): asserts context is z.infer<z.ZodObject<TSchema>> {
-  z.object(schema).parse(context);
+  schema?: TSchema
+): asserts context is z.infer<z.ZodObject<TSchema>> &
+  z.infer<typeof COMMON_CONTEXT_SCHEMA> {
+  if (schema) {
+    z.object(schema).parse(context);
+  }
 }
 
 export function getOrganizationId(party: Party) {

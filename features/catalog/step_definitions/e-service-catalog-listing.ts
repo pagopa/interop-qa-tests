@@ -8,7 +8,7 @@ import {
   getOrganizationId,
 } from "../../../utils/commons";
 import { dataPreparationService } from "../../../services/data-preparation.service";
-import { Party, Role, SessionTokens } from "./common-steps";
+import { Party, Role } from "./common-steps";
 
 // const PUBLISHED_ESERVICES = 1;
 // const SUSPENDED_ESERVICES = 1;
@@ -19,10 +19,7 @@ import { Party, Role, SessionTokens } from "./common-steps";
 Given(
   "un {string} di {string} ha già creato {int} e-services in catalogo in stato Published o Suspended",
   async function (role: Role, party: Party, countEservices: number) {
-    assertContextSchema(this, {
-      tokens: SessionTokens,
-      TEST_SEED: z.string(),
-    });
+    assertContextSchema(this);
 
     const token = this.tokens[party]![role]!;
     const PUBLISHED_ESERVICES = 1;
@@ -129,7 +126,6 @@ Given(
   "un {string} di {string} ha già approvato la richiesta di agreement di ente_fruitore",
   async function (role: Role, party: Party) {
     assertContextSchema(this, {
-      tokens: SessionTokens,
       agreementId: z.string(),
     });
 
@@ -143,7 +139,6 @@ Given(
   "un {string} di {string} ha già sospeso la versione dell'eservice che ente_fruitore ha sottoscritto",
   async function (role: Role, party: Party) {
     assertContextSchema(this, {
-      tokens: SessionTokens,
       agreementId: z.string(),
       eserviceSubscribedId: z.string(),
       descriptorSubscribedId: z.string(),
@@ -279,7 +274,6 @@ When(
   async function (keyword: string) {
     assertContextSchema(this, {
       token: z.string(),
-      TEST_SEED: z.string(),
     });
     this.response = await apiClient.catalog.getEServicesCatalog(
       {
@@ -296,10 +290,7 @@ When(
 Given(
   "un {string} di {string} ha già creato un e-service contenente la keyword {string}",
   async function (role: Role, party: Party, keyword: string) {
-    assertContextSchema(this, {
-      tokens: SessionTokens,
-      TEST_SEED: z.string(),
-    });
+    assertContextSchema(this);
 
     const token = this.tokens[party]![role]!;
     const eserviceName = `e-service-${this.TEST_SEED}-${keyword}`;
