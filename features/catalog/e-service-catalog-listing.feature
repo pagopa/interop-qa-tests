@@ -12,8 +12,8 @@ Feature: Listing catalogo e-services
     Examples: 
       | ente           | ruolo | risultato |
       | GSP            | admin |       200 |
-      # | ComuneDiMilano | admin |       200 |
-      # | AgID           | admin |       200 |
+      # | PA1 | admin |       200 |
+      # | PA2           | admin |       200 |
       # | Privato        | admin |       200 |
 
   @catalog2
@@ -26,8 +26,8 @@ Feature: Listing catalogo e-services
     Examples: 
       | ente           | ruolo | risultato |
       | GSP            | admin |       200 |
-      # | ComuneDiMilano | admin |       200 |
-      # | AgID           | admin |       200 |
+      # | PA1 | admin |       200 |
+      # | PA2           | admin |       200 |
       # | Privato        | admin |       200 |
 
   @catalog3
@@ -40,37 +40,37 @@ Feature: Listing catalogo e-services
     Examples: 
       | ente           | ruolo | risultato |
       | GSP            | admin |       200 |
-      # | ComuneDiMilano | admin |       200 |
-      # | AgID           | admin |       200 |
+      # | PA1 | admin |       200 |
+      # | PA2           | admin |       200 |
       # | Privato        | admin |       200 |
 
   @catalog4
   Scenario Outline: Restituisce gli e-service a catalogo erogati da almeno uno degli erogatori specifici
     Given l'utente è un "<ruolo>" di "<ente>"
-    Given un "admin" di "ComuneDiMilano" ha già creato 2 e-services in catalogo in stato Published o Suspended
-    Given un "admin" di "AgID" ha già creato 2 e-services in catalogo in stato Published o Suspended
-    When l'utente richiede una operazione di listing degli e-services dell'erogatore "ComuneDiMilano"
+    Given un "admin" di "PA1" ha già creato 2 e-services in catalogo in stato Published o Suspended
+    Given un "admin" di "PA2" ha già creato 2 e-services in catalogo in stato Published o Suspended
+    When l'utente richiede una operazione di listing degli e-services dell'erogatore "PA1"
     Then si ottiene status code <risultato> e la lista di 2 e-services
 
     Examples: 
       | ente           | ruolo | risultato |
       | GSP            | admin |       200 |
-      # | ComuneDiMilano | admin |       200 |
-      # | AgID           | admin |       200 |
+      # | PA1 | admin |       200 |
+      # | PA2           | admin |       200 |
       # | Privato        | admin |       200 |
 
   @catalog5
   Scenario Outline: Restituisce gli e-service a catalogo per i quali lo specifico fruitore ha almeno un agreement in stato ACTIVE
     Given l'utente è un "<ruolo>" di "<ente_fruitore>"
-    Given un "admin" di "ComuneDiMilano" ha già creato 3 e-services in catalogo in stato Published o Suspended
-    And   ente_fruitore ha un agreement attivo con un eservice di "ComuneDiMilano"
+    Given un "admin" di "PA1" ha già creato 3 e-services in catalogo in stato Published o Suspended
+    And   ente_fruitore ha un agreement attivo con un eservice di "PA1"
     When l'utente richiede la lista di eservices per i quali ha almeno un agreement attivo
     Then si ottiene status code <risultato> e la lista di 1 e-services
 
     Examples: 
       | ente_fruitore   | ruolo | risultato |
       | GSP             | admin |       200 |
-      # | AgID            | admin |       200 |
+      # | PA2            | admin |       200 |
       # | Privato         | admin |       200 |
 
   @catalog6
@@ -85,8 +85,8 @@ Feature: Listing catalogo e-services
     Examples: 
       | ente           | ruolo | risultato |
       | GSP            | admin |       200 |
-      # | ComuneDiMilano | admin |       200 |
-      # | AgID           | admin |       200 |
+      # | PA1 | admin |       200 |
+      # | PA2           | admin |       200 |
       # | Privato        | admin |       200 |
 
   @catalog7
@@ -99,6 +99,6 @@ Feature: Listing catalogo e-services
     Examples: 
       | ente           | ruolo | risultato |
       | GSP            | admin |       200 |
-      # | ComuneDiMilano | admin |       200 |
-      # | AgID           | admin |       200 |
+      # | PA1 | admin |       200 |
+      # | PA2           | admin |       200 |
       # | Privato        | admin |       200 |

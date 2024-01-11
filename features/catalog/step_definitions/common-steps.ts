@@ -4,7 +4,7 @@ import { z } from "zod";
 import { generateSessionTokens } from "../../../utils/session-tokens";
 import { assertContextSchema, getRandomInt } from "./../../../utils/commons";
 
-const Party = z.enum(["GSP", "ComuneDiMilano", "AgID", "Privato"]);
+const Party = z.enum(["GSP", "PA1", "PA2", "Privato"]);
 export type Party = z.infer<typeof Party>;
 const Role = z.enum(["admin"]);
 export type Role = z.infer<typeof Role>;

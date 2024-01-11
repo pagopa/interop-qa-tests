@@ -12,7 +12,7 @@
     }
   },
 
-  "ComuneDiMilano": {
+  "PA1": {
     "admin": {
       "externalId": {
         "origin": "IPA",
@@ -25,7 +25,7 @@
     }
   },
 
-  "AgID": {
+  "PA2": {
     "admin": {
       "externalId": {
         "origin": "IPA",
