@@ -78,7 +78,7 @@ Feature: Listing catalogo e-services
   con ricerca case insensitive
     Given l'utente è un "<ruolo>" di "<ente>"
     Given un "admin" di "GSP" ha già creato 2 e-services in catalogo in stato Published o Suspended
-    Given un "admin" di "GSP" ha già creato un e-service contenente la keyword "test"
+    Given un "admin" di "GSP" ha già creato e pubblicato un e-service contenente la keyword "test"
     When l'utente richiede una operazione di listing sul catalogo filtrando per la keyword "test"
     Then si ottiene status code <risultato> e la lista di 1 e-services
 
