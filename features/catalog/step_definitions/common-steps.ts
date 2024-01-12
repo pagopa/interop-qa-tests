@@ -2,6 +2,7 @@ import assert from "assert";
 import { Before, Given, Then, BeforeAll } from "@cucumber/cucumber";
 import { z } from "zod";
 import { generateSessionTokens } from "../../../utils/session-tokens";
+import { env } from "../../../configs/env";
 import { assertContextSchema, getRandomInt } from "./../../../utils/commons";
 
 const Party = z.enum(["GSP", "PA1", "PA2", "Privato"]);
@@ -14,7 +15,7 @@ export type SessionTokens = z.infer<typeof SessionTokens>;
 
 BeforeAll(async function () {
   this.parameters.tokens = SessionTokens.parse(
-    await generateSessionTokens(process.env.TENANT_IDS_FILE_PATH)
+    await generateSessionTokens(env.TENANT_IDS_FILE_PATH)
   );
 });
 

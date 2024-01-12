@@ -6,6 +6,7 @@ import {
   SessionTokens,
 } from "../features/catalog/step_definitions/common-steps";
 import { CreatedResource } from "../api/models";
+import { env } from "../configs/env";
 
 export const getRandomInt = () =>
   Number(Math.random() * Number.MAX_SAFE_INTEGER).toFixed(0);
@@ -57,8 +58,7 @@ export function assertContextSchema<TSchema extends z.ZodRawShape>(
 
 export function getOrganizationId(party: Party) {
   const file = JSON.parse(
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    Buffer.from(readFileSync(process.env.TENANT_IDS_FILE_PATH!)).toString()
+    Buffer.from(readFileSync(env.TENANT_IDS_FILE_PATH)).toString()
   );
   return file[party].admin.organizationId;
 }
