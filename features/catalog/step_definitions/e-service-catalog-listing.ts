@@ -103,10 +103,23 @@ Given(
   async function (_producer: string) {
     assertContextSchema(this, {
       token: z.string(),
-      publishedEservicesIds: z.array(z.tuple([z.string(), z.string()])),
+      publishedEservicesIds: z
+        .array(z.tuple([z.string(), z.string()]))
+        .optional(),
+      eserviceId: z.string().optional(),
+      descriptorId: z.string().optional(),
     });
 
-    const [eserviceId, descriptorId] = this.publishedEservicesIds[0];
+    // Context is different based on what is executed before this given,
+    // the ids could be passed in the publishedEservicesIds tuple or in the eserviceId and descriptorId properties
+    const eserviceId = this.eserviceId ?? this.publishedEservicesIds![0][0];
+    const descriptorId = this.descriptorId ?? this.publishedEservicesIds![0][1];
+
+    if (!eserviceId || !descriptorId) {
+      throw new Error(
+        "eserviceId or descriptorId not found in function context"
+      );
+    }
 
     const agreementId = await dataPreparationService.createAgreement(
       this.token,
@@ -115,6 +128,44 @@ Given(
     );
 
     await dataPreparationService.submitAgreement(this.token, agreementId);
+
+    this.agreementId = agreementId;
+    this.eserviceSubscribedId = eserviceId;
+    this.descriptorSubscribedId = descriptorId;
+  }
+);
+
+Given(
+  "{string} ha un agreement attivo con un eservice di {string}",
+  async function (consumer: Party, _producer: string) {
+    assertContextSchema(this, {
+      publishedEservicesIds: z
+        .array(z.tuple([z.string(), z.string()]))
+        .optional(),
+      eserviceId: z.string().optional(),
+      descriptorId: z.string().optional(),
+    });
+
+    // Context is different based on what is executed before this given,
+    // the ids could be passed in the publishedEservicesIds tuple or in the eserviceId and descriptorId properties
+    const eserviceId = this.eserviceId ?? this.publishedEservicesIds![0][0];
+    const descriptorId = this.descriptorId ?? this.publishedEservicesIds![0][1];
+
+    if (!eserviceId || !descriptorId) {
+      throw new Error(
+        "eserviceId or descriptorId not found in function context"
+      );
+    }
+
+    const token = this.tokens[consumer]!.admin!;
+
+    const agreementId = await dataPreparationService.createAgreement(
+      token,
+      eserviceId,
+      descriptorId
+    );
+
+    await dataPreparationService.submitAgreement(token, agreementId);
 
     this.agreementId = agreementId;
     this.eserviceSubscribedId = eserviceId;
