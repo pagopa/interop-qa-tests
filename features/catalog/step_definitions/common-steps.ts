@@ -4,7 +4,13 @@ import { z } from "zod";
 import { generateSessionTokens } from "../../../utils/session-tokens";
 import { EServiceDescriptorState } from "../../../api/models";
 import { dataPreparationService } from "../../../services/data-preparation.service";
-import { assertContextSchema, getRandomInt } from "./../../../utils/commons";
+import { apiClient } from "../../../api";
+import {
+  assertContextSchema,
+  getAuthorizationHeader,
+  getRandomInt,
+  makePolling,
+} from "./../../../utils/commons";
 
 const Party = z.enum(["GSP", "PA1", "PA2", "Privato"]);
 export type Party = z.infer<typeof Party>;
@@ -59,12 +65,6 @@ Given(
   ) {
     assertContextSchema(this);
 
-    if (descriptorState === "ARCHIVED" || descriptorState === "DEPRECATED") {
-      throw new Error(
-        "ARCHIVED and DEPRECATED state not supported by this Given"
-      );
-    }
-
     const token = this.tokens[party]![role]!;
 
     // 1. Create e-service
@@ -102,10 +102,59 @@ Given(
     }
 
     // 5. Suspend Descriptor
-    await dataPreparationService.suspendDescriptor(
-      token,
-      eserviceId,
-      descriptorId
-    );
+    if (descriptorState === "SUSPENDED") {
+      await dataPreparationService.suspendDescriptor(
+        token,
+        eserviceId,
+        descriptorId
+      );
+      return;
+    }
+
+    if (descriptorState === "ARCHIVED" || descriptorState === "DEPRECATED") {
+      if (descriptorState === "DEPRECATED") {
+        // Optional. Create an agreement
+
+        const agreementId = await dataPreparationService.createAgreement(
+          token,
+          eserviceId,
+          this.firstDescriptorId
+        );
+
+        await dataPreparationService.submitAgreement(token, agreementId);
+      }
+
+      // Create another DRAFT descriptor
+      const secondDescriptorId =
+        await dataPreparationService.createDraftDescriptor(token, eserviceId);
+
+      this.eserviceId = eserviceId;
+      this.secondDescriptorId = secondDescriptorId;
+
+      // Add interface to secondDescriptor
+      await dataPreparationService.addInterfaceToDescriptor(
+        token,
+        eserviceId,
+        this.secondDescriptorId
+      );
+
+      // Publish secondDescriptor
+      await dataPreparationService.publishDescriptor(
+        token,
+        eserviceId,
+        this.secondDescriptorId
+      );
+
+      // Check until firstDescriptor is in desired state
+      await makePolling(
+        () =>
+          apiClient.producers.getProducerEServiceDescriptor(
+            eserviceId,
+            this.firstDescriptorId,
+            getAuthorizationHeader(token)
+          ),
+        (res) => res.data.state === descriptorState
+      );
+    }
   }
 );
