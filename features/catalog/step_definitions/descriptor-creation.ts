@@ -41,7 +41,7 @@ Given(
       token: z.string(),
       eserviceId: z.string(),
     });
-    await dataPreparationService.createDraftDescriptor(
+    this.descriptorId = await dataPreparationService.createDraftDescriptor(
       this.token,
       this.eserviceId
     );
