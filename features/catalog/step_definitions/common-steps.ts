@@ -118,7 +118,7 @@ Given(
         const agreementId = await dataPreparationService.createAgreement(
           token,
           eserviceId,
-          this.firstDescriptorId
+          this.descriptorId
         );
 
         await dataPreparationService.submitAgreement(token, agreementId);
@@ -145,12 +145,12 @@ Given(
         this.secondDescriptorId
       );
 
-      // Check until firstDescriptor is in desired state
+      // Check until the first descriptor is in desired state
       await makePolling(
         () =>
           apiClient.producers.getProducerEServiceDescriptor(
             eserviceId,
-            this.firstDescriptorId,
+            this.descriptorId,
             getAuthorizationHeader(token)
           ),
         (res) => res.data.state === descriptorState
