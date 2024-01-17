@@ -158,7 +158,6 @@ Given(
     }
   }
 );
-
 Then("si ottiene status code {int}", function (statusCode: number) {
   assertContextSchema(this, {
     response: z.object({
