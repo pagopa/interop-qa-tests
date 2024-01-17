@@ -79,16 +79,16 @@ Given(
     this.eserviceId = eserviceId;
     this.descriptorId = descriptorId;
 
-    if (descriptorState === "DRAFT") {
-      return;
-    }
-
     // 3. Add interface to descriptor
     await dataPreparationService.addInterfaceToDescriptor(
       token,
       eserviceId,
       descriptorId
     );
+
+    if (descriptorState === "DRAFT") {
+      return;
+    }
 
     // 4. Publish Descriptor
     await dataPreparationService.publishDescriptor(
