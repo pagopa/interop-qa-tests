@@ -7,7 +7,7 @@ Feature: Aggiornamento di un descrittore
     Given l'utente è un "<ruolo>" di "<ente>"
     Given un "<ruolo>" di "<ente>" ha già creato un e-service con un descrittore in stato "DRAFT"
     When l'utente aggiorna alcuni parametri di quel descriptor
-    Then si ottiene status code "200"
+    Then si ottiene status code 200
 
     Examples: 
       | ente           | ruolo |
@@ -19,7 +19,7 @@ Feature: Aggiornamento di un descrittore
     Given l'utente è un "<ruolo>" di "<ente>"
     Given un "<ruolo>" di "<ente>" ha già creato un e-service con un descrittore in stato "<statoVersione>"
     When l'utente aggiorna alcuni parametri di quel descriptor
-    Then si ottiene status code "400"
+    Then si ottiene status code 400
 
     Examples: 
       | ente           | ruolo |      statoVersione |
