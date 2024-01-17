@@ -5,7 +5,7 @@ Feature: Creazione versione di un e-service
     Given l'utente è un "<ruolo>" di "<ente>"
     Given l'utente ha già creato un e-service
     When l'utente crea una versione in bozza per quell'e-service
-    Then si ottiene status code "<risultato>"
+    Then si ottiene status code <risultato>
 
       Examples:
     | ente               | ruolo          | risultato |
@@ -22,4 +22,4 @@ Feature: Creazione versione di un e-service
     Given l'utente ha già creato un e-service
     Given l'utente ha già creato una versione in bozza per quell'eservice
     When l'utente crea una versione in bozza per quell'e-service
-    Then la creazione restituisce errore - "400"
+    Then la creazione restituisce errore - 400

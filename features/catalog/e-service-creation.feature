@@ -4,7 +4,7 @@ Feature: Creazione e-service
   Scenario Outline: Un utente con sufficienti permessi di un ente autorizzato crea un e-service
     Given l'utente è un "<ruolo>" di "<ente>"
     When l'utente crea un e-service
-    Then si ottiene status code "<risultato>"
+    Then si ottiene status code <risultato>
 
   Examples:
     | ente               | ruolo          | risultato |
@@ -30,4 +30,4 @@ Feature: Creazione e-service
     Given l'utente è un "admin" di "GSP"
     Given l'utente ha già creato un e-service
     When l'utente crea un e-service con lo stesso nome
-    Then la creazione restituisce errore - "409"
+    Then la creazione restituisce errore - 409
