@@ -288,17 +288,32 @@ When(
 );
 
 Given(
-  "un {string} di {string} ha già creato un e-service contenente la keyword {string}",
+  "un {string} di {string} ha già creato e pubblicato un e-service contenente la keyword {string}",
   async function (role: Role, party: Party, keyword: string) {
     assertContextSchema(this);
 
     const token = this.tokens[party]![role]!;
     const eserviceName = `e-service-${this.TEST_SEED}-${keyword}`;
-    await dataPreparationService.createEService(token, {
+    const eserviceId = await dataPreparationService.createEService(token, {
       name: eserviceName,
     });
 
-    // TODO Publish descriptor
+    const descriptorId = await dataPreparationService.createDraftDescriptor(
+      token,
+      eserviceId
+    );
+
+    await dataPreparationService.addInterfaceToDescriptor(
+      token,
+      eserviceId,
+      descriptorId
+    );
+
+    await dataPreparationService.publishDescriptor(
+      token,
+      eserviceId,
+      descriptorId
+    );
   }
 );
 
