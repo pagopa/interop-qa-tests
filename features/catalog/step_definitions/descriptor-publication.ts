@@ -8,7 +8,7 @@ import {
 import { apiClient } from "../../../api";
 
 Given(
-  "l'utente ha caricato un'interfaccia per quel descrittore",
+  "l'utente ha già caricato un'interfaccia per quel descrittore",
   async function () {
     assertContextSchema(this, {
       token: z.string(),
