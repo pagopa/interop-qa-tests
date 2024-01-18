@@ -30,4 +30,6 @@ Feature: Aggiornamento di un descrittore
     # | PA1            | admin | ARCHIVED         |
       | PA1            | admin | DRAFT            |
       | PA1            | admin | DEPRECATED       |
-      | PA1            | admin | PUBLISHED        |      
+      | PA1            | admin | PUBLISHED        |
+
+      
