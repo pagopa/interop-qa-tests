@@ -6,9 +6,9 @@ Feature: Pubblicazione di un descrittore
   Scenario Outline: Per un e-service che ha un solo descrittore, il quale è in stato DRAFT, con tutti i parametri richiesti inseriti e formattati correttamente, alla richiesta di pubblicazione, la bozza viene pubblicata correttamente
     Given l'utente è un "<ruolo>" di "<ente>"
     Given un "<ruolo>" di "<ente>" ha già creato un e-service con un descrittore in stato "DRAFT"
-    Given l'utente ha caricato un'interfaccia per quel descrittore
+    Given l'utente ha già caricato un'interfaccia per quel descrittore
     When l'utente pubblica quel descrittore
-    Then si ottiene status code 200
+    Then si ottiene status code 204
 
     Examples: 
       | ente           | ruolo |
