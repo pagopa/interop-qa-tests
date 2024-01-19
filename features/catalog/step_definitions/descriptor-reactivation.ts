@@ -6,7 +6,7 @@ import {
 } from "../../../utils/commons";
 import { apiClient } from "../../../api/client";
 
-When("l'utente attiva il descriptor dell'e-service", async function () {
+When("l'utente attiva il descrittore dell'e-service", async function () {
   assertContextSchema(this, {
     token: z.string(),
     eserviceId: z.string(),
