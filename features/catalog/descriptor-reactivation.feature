@@ -15,7 +15,7 @@ Feature: Attivazione di un descrittore
       | PA1            | admin |
   
   @descriptor_activation2
-  Scenario Outline: Per un e-service che ha un solo descrittore, il quale non si trova in stato SUSPENDED, alla riattivazione del descrittore, ottiene un errore
+  Scenario Outline: Per un e-service che ha un solo descrittore, il quale non si trova in stato SUSPENDED, alla riattivazione del descrittore, si ottiene un errore
     Given l'utente è un "<ruolo>" di "<ente>"
     Given un "<ruolo>" di "<ente>" ha già creato un e-service con un descrittore in stato "<statoDescrittore>"
     When l'utente attiva il descrittore dell'e-service
