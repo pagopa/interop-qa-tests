@@ -17,7 +17,7 @@ Feature: Sospensione di un descrittore
       | PA1            | admin |      DEPRECATED    |
 
  @descriptor_suspension2
-  Scenario Outline: Per un e-service che ha un descrittore in stato ARCHIVED, DRAFT o SUSPENDED, alla richiesta di sospensione, ottiene un errore 
+  Scenario Outline: Per un e-service che ha un descrittore in stato ARCHIVED, DRAFT o SUSPENDED, alla richiesta di sospensione, si ottiene un errore 
     Given l'utente è un "<ruolo>" di "<ente>"
     Given un "<ruolo>" di "<ente>" ha già creato un e-service con un descrittore in stato "<statoVersione>"
     When l'utente sospende quel descrittore
