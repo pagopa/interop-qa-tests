@@ -15,12 +15,11 @@ Given(
       eserviceId: z.string(),
       descriptorId: z.string(),
     });
-    const documentId = await dataPreparationService.addDocumentToDescriptor(
+    this.documentId = await dataPreparationService.addDocumentToDescriptor(
       this.token,
       this.eserviceId,
       this.descriptorId
     );
-    this.documentId = documentId;
   }
 );
 When("l'utente richiede il documento", async function () {
