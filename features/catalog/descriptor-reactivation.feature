@@ -1,5 +1,5 @@
 @descriptor_activation
-Feature: Aggiornamento di un descrittore
+Feature: Attivazione di un descrittore
   Tutti gli utenti autenticati di enti erogatori possono attivare (ripubblicare) un descrittore in stato SUSPENDED
 
   @descriptor_activation1
