@@ -23,7 +23,7 @@ Given(
     this.documentId = documentId;
   }
 );
-When("l'utente cancella il documento", async function () {
+When("l'utente cancella quel documento", async function () {
   assertContextSchema(this, {
     token: z.string(),
     eserviceId: z.string(),

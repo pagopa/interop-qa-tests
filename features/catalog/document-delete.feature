@@ -8,7 +8,7 @@ Feature: Cancellazione di un documento
      Given l'utente è un "<ruolo>" di "<ente>"
      Given un "<ruolo>" di "<ente>" ha già creato un e-service con un descrittore in stato "DRAFT"
      Given l'utente ha già caricato un documento su quel descrittore
-     When l'utente cancella il documento
+     When l'utente cancella quel documento
      Then si ottiene status code 204
    
 
@@ -25,7 +25,7 @@ Feature: Cancellazione di un documento
      Given l'utente è un "<ruolo>" di "<ente>"
      Given un "<ruolo>" di "<ente>" ha già creato un e-service con un descrittore in stato "<statoDescrittore>"
      Given l'utente ha già caricato un documento su quel descrittore
-     When l'utente cancella il documento
+     When l'utente cancella quel documento
      Then si ottiene status code 204
      # Then si ottiene status code 400 # TODO: waiting for fix to BFF to return status code 400
    
