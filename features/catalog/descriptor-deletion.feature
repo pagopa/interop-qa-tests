@@ -6,8 +6,8 @@ Feature: Cancellazione di un descrittore
   Scenario Outline: Per un e-service che ha un solo descrittore, il quale è in stato DRAFT, la richiesta di cancellazione del descrittore cancella contestualmente anche l'e-service del quale fa parte
     Given l'utente è un "<ruolo>" di "<ente>"
     Given un "<ruolo>" di "<ente>" ha già creato un e-service con un descrittore in stato "DRAFT"
-    When l'utente cancella il descriptor di quell'e-service
-    Then si ottiene status code "204"
+    When l'utente cancella il descrittore di quell'e-service
+    Then si ottiene status code 204
     Then quell'eservice è stato cancellato
 
     Examples: 
@@ -22,8 +22,8 @@ Feature: Cancellazione di un descrittore
     Given l'utente è un "<ruolo>" di "<ente>"
     Given un "<ruolo>" di "<ente>" ha già creato un e-service con un descrittore in stato "PUBLISHED"
     Given l'utente ha già creato una versione in bozza per quell'eservice
-    When l'utente cancella il descriptor di quell'e-service
-    Then si ottiene status code "204"
+    When l'utente cancella il descrittore di quell'e-service
+    Then si ottiene status code 204
     Then quell'eservice non è stato cancellato
 
 
@@ -38,8 +38,8 @@ Feature: Cancellazione di un descrittore
   Scenario Outline: Per un e-service che ha un solo descrittore, il quale è in stato NON DRAFT (PUBLISHED, SUSPENDED, DEPRECATED, ARCHIVED), la richiesta di cancellazione del descrittore restituisce errore 
     Given l'utente è un "<ruolo>" di "<ente>"
     Given un "<ruolo>" di "<ente>" ha già creato un e-service con un descrittore in stato "<statoVersione>"
-    When l'utente cancella il descriptor di quell'e-service
-    Then si ottiene status code "500"
+    When l'utente cancella il descrittore di quell'e-service
+    Then si ottiene status code 500
     # // TO DO it should be 400 after the fix in backend
 
     Examples: 

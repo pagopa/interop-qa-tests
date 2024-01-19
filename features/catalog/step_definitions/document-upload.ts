@@ -60,7 +60,7 @@ When(
 );
 
 When(
-  "l'utente carica un documento con estensione {string} che contiene il termine localhost",
+  "l'utente carica un documento di interfaccia con estensione {string} che contiene il termine localhost",
   async function (estensioneFile: string) {
     assertContextSchema(this, {
       token: z.string(),
