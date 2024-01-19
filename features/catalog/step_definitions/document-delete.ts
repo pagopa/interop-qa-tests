@@ -15,7 +15,7 @@ Given(
       eserviceId: z.string(),
       descriptorId: z.string(),
     });
-    const documentId = await dataPreparationService.addInterfaceToDescriptor(
+    const documentId = await dataPreparationService.addDocumentToDescriptor(
       this.token,
       this.eserviceId,
       this.descriptorId

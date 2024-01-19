@@ -124,7 +124,39 @@ export const dataPreparationService = {
     );
     return response.data.id;
   },
+  async addDocumentToDescriptor(
+    token: string,
+    eserviceId: string,
+    descriptorId: string
+  ) {
+    const blobFile = new Blob([readFileSync("./utils/dummy.pdf")]);
+    const file = new File([blobFile], "documento-test-qa.pdf");
 
+    const response = await apiClient.eservices.createEServiceDocument(
+      eserviceId,
+      descriptorId,
+      {
+        kind: "DOCUMENT",
+        prettyName: "Documento_test_qa",
+        doc: file,
+      },
+      getAuthorizationHeader(token)
+    );
+
+    assertValidResponse(response);
+    const documentId = response.data.id;
+
+    await makePolling(
+      () =>
+        apiClient.producers.getProducerEServiceDescriptor(
+          eserviceId,
+          descriptorId,
+          getAuthorizationHeader(token)
+        ),
+      (res) => res.data.docs.some((doc) => doc.id === documentId)
+    );
+    return documentId;
+  },
   async publishDescriptor(
     token: string,
     eserviceId: string,
