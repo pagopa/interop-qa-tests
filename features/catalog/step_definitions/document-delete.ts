@@ -1,4 +1,4 @@
-import { When } from "@cucumber/cucumber";
+import { Given, When } from "@cucumber/cucumber";
 import { z } from "zod";
 import {
   assertContextSchema,
@@ -20,7 +20,7 @@ When("l'utente cancella il documento", async function () {
     getAuthorizationHeader(this.token)
   );
 });
-When(
+Given(
   "l'utente ha già cancellato quel documento su quel descrittore",
   async function () {
     assertContextSchema(this, {
