@@ -16,6 +16,8 @@ Feature: Listing catalogo e-services
       | PA2            | admin |
       | Privato        | admin |
 
+      
+
   @catalog2
   Scenario Outline: A fronte di 20 e-service in db, restituisce solo i primi 12 risultati di e-service
     Given l'utente è un "<ruolo>" di "<ente>"

@@ -7,7 +7,7 @@ Feature: Sospensione di un descrittore
     Given l'utente è un "<ruolo>" di "<ente>"
     Given un "<ruolo>" di "<ente>" ha già creato un e-service con un descrittore in stato "<statoVersione>"
     When l'utente sospende quel descrittore
-    Then si ottiene status code 200
+    Then si ottiene status code 204
 
     Examples: 
       | ente           | ruolo |      statoVersione |

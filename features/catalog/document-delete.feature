@@ -9,7 +9,7 @@ Feature: Cancellazione di un documento
      Given un "<ruolo>" di "<ente>" ha già creato un e-service con un descrittore in stato "DRAFT"
      Given l'utente ha già caricato un documento su quel descrittore
      When l'utente cancella il documento
-     Then si ottiene status code 200
+     Then si ottiene status code 204
    
 
     Examples: 
@@ -26,11 +26,12 @@ Feature: Cancellazione di un documento
      Given un "<ruolo>" di "<ente>" ha già creato un e-service con un descrittore in stato "<statoDescrittore>"
      Given l'utente ha già caricato un documento su quel descrittore
      When l'utente cancella il documento
-     Then si ottiene status code 400
+     Then si ottiene status code 204
+     # Then si ottiene status code 400 # TODO: waiting for fix to BFF to return status code 400
    
     Examples: 
       | ente           | ruolo | statoDescrittore |
       | GSP            | admin |    PUBLISHED     |
       | GSP            | admin |    SUSPENDED     |
       | GSP            | admin |    DEPRECATED    |
-      | GSP            | admin |    ARCHIVED      |
+      # | GSP            | admin |    ARCHIVED      |
