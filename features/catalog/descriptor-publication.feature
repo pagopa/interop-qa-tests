@@ -16,7 +16,7 @@ Feature: Pubblicazione di un descrittore
       | PA1            | admin |
 
  @descriptor_publication2
-  Scenario Outline: Per un e-service che ha un solo descrittore, il quale non è in stato DRAFT, alla richiesta di pubblicazione, ottiene un errore
+  Scenario Outline: Per un e-service che ha un solo descrittore, il quale non è in stato DRAFT, alla richiesta di pubblicazione, si ottiene un errore
     Given l'utente è un "<ruolo>" di "<ente>"
     Given un "<ruolo>" di "<ente>" ha già creato un e-service con un descrittore in stato "<statoVersione>"
     When l'utente pubblica quel descrittore
