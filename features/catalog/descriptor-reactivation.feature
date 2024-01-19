@@ -31,5 +31,3 @@ Feature: Attivazione di un descrittore
       | PA1            | admin | DRAFT            |
       | PA1            | admin | DEPRECATED       |
       | PA1            | admin | PUBLISHED        |
-
-      
