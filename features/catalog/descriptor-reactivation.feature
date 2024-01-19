@@ -3,7 +3,7 @@ Feature: Attivazione di un descrittore
   Tutti gli utenti autenticati di enti erogatori possono attivare (ripubblicare) un descrittore in stato SUSPENDED
 
   @descriptor_activation1
-  Scenario Outline: Per un e-service che ha un solo descrittore, il quale è in stato SUSPENDED, alla attivazione del descrittore, si ripubblica correttamente
+  Scenario Outline: Per un e-service che ha un solo descrittore, il quale è in stato SUSPENDED, all'attivazione del descrittore, si ripubblica correttamente
     Given l'utente è un "<ruolo>" di "<ente>"
     Given un "<ruolo>" di "<ente>" ha già creato un e-service con un descrittore in stato "SUSPENDED"
     When l'utente attiva il descriptor dell'e-service
