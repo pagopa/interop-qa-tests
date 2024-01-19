@@ -8,7 +8,7 @@ import { apiClient } from "../../../api";
 import { UpdateEServiceDescriptorSeed } from "../../../api/models";
 
 When(
-  "l'utente aggiorna alcuni parametri di quel descriptor",
+  "l'utente aggiorna alcuni parametri di quel descrittore",
   async function () {
     assertContextSchema(this, {
       token: z.string(),
