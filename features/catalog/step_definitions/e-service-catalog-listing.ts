@@ -318,9 +318,9 @@ Given(
 );
 
 Then(
-  "si ottiene status code {string} e la lista degli eservices di cui è fruitore con un agreement attivo per una versione dell'eservice in stato SUSPENDED, che contiene la chiave di ricerca",
-  function (statusCode: string) {
-    assert.equal(this.response.status, Number(statusCode));
+  "si ottiene status code {int} e la lista degli eservices di cui è fruitore con un agreement attivo per una versione dell'eservice in stato SUSPENDED, che contiene la chiave di ricerca",
+  function (statusCode: number) {
+    assert.equal(this.response.status, statusCode);
     assert.equal(this.response.data.pagination.totalCount, 2);
   }
 );
