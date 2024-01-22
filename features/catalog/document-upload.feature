@@ -4,7 +4,7 @@ Feature: Caricamento di un documento di interfaccia
   Tutti gli utenti autenticati di enti erogatori possono caricare un documento di interfaccia ai propri descrittori
 
   @document_upload1
-  Scenario Outline: Per un e-service che eroga con una determinata tecnologia e che ha un solo descrittore, il quale è in stato DRAFT, alla richiesta di caricamento di un documento di interfaccia coerente con la tecnologia, l'operazione avrà successo altrimenti resituirà errore. 
+  Scenario Outline: Per un e-service che eroga con una determinata tecnologia e che ha un solo descrittore, il quale è in stato DRAFT, alla richiesta di caricamento di un documento di interfaccia coerente con la tecnologia, l'operazione avrà successo altrimenti restituirà errore. 
      Given l'utente è un "<ruolo>" di "<ente>"
      Given un "<ruolo>" di "<ente>" ha già creato un e-service con un descrittore in stato DRAFT e tecnologia "<technology>"
      When l'utente carica un documento di interfaccia con estensione "<estensioneFile>"
