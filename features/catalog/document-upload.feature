@@ -23,7 +23,7 @@ Feature: Caricamento di un documento di interfaccia
      Given l'utente è un "<ruolo>" di "<ente>"
      Given un "<ruolo>" di "<ente>" ha già creato un e-service con un descrittore in stato DRAFT e tecnologia "<technology>"
      When l'utente carica un documento di interfaccia con estensione "<estensioneFile>" che contiene il termine localhost
-     Then si ottiene status code 400
+     Then si ottiene status code 403
 
     Examples: 
       | ente | ruolo |    technology | estensioneFile|
