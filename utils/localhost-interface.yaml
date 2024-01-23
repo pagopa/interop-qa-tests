@@ -12,8 +12,8 @@ info:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
 servers:
-  - url: localhost:8080/v1
-  - url: localhost:8080/v2
+  - url: https://localhost:8080/v1
+  - url: https://localhost:8080/v2
 paths:
   /pets:
     get:
