@@ -113,7 +113,7 @@ Given(
 
     if (descriptorState === "ARCHIVED" || descriptorState === "DEPRECATED") {
       if (descriptorState === "DEPRECATED") {
-        // When a newer descriptor becomes PUBLISHED, the older one becomes DEPRECATED only if it already had an agreement related to it
+        // When a newer descriptor becomes PUBLISHED, the older one becomes DEPRECATED. Then, if it still has an active agreement associated, it remains DEPRECATED, otherwise it becomes ARCHIVED.
 
         const agreementId = await dataPreparationService.createAgreement(
           token,
