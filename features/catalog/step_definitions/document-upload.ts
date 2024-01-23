@@ -69,7 +69,7 @@ When(
     });
 
     const blobFile = new Blob([
-      readFileSync(`./utils/interface${estensioneFile}`),
+      readFileSync(`./utils/localhost-interface${estensioneFile}`),
     ]);
     const file = new File([blobFile], `localhost-interface${estensioneFile}`);
 

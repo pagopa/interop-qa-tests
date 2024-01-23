@@ -50,7 +50,7 @@
         </wsdl:binding>
         <wsdl:service name="TestWS">
                 <wsdl:port name="TestWS" binding="tns:TestWS">
-                        <soap:address location="localhost:8080/v1"/>
+                        <soap:address location="https://localhost:8080/v1"/>
                 </wsdl:port>
         </wsdl:service>
 </wsdl:definitions>
