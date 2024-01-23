@@ -6,7 +6,7 @@ import {
 } from "../../../utils/commons";
 import { apiClient } from "../../../api";
 import { EServiceDescriptorState } from "../../../api/models";
-import { masterDescriptor } from "./common-steps";
+import { dataPreparationService } from "./../../../services/data-preparation.service";
 
 Given(
   "l'utente ha già creato una versione in {string} per quell'eservice",
@@ -15,11 +15,12 @@ Given(
       token: z.string(),
       eserviceId: z.string(),
     });
-    this.descriptorId = await masterDescriptor(
-      this.token,
-      this.eserviceId,
-      descriptorState
-    );
+    this.descriptorId =
+      await dataPreparationService.createDescriptorWithGivenState(
+        this.token,
+        this.eserviceId,
+        descriptorState
+      );
   }
 );
 
