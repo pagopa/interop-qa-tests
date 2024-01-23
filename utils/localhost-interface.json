@@ -17,10 +17,10 @@
   },
   "servers": [
     {
-      "url": "localhost:8080/v1"
+      "url": "https://localhost:8080/v1"
     },
     {
-      "url": "localhost:8080/v2"
+      "url": "https://localhost:8080/v2"
     }
   ],
   "paths": {
