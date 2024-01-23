@@ -19,7 +19,7 @@ Feature: Cancellazione di un e-service
     Given l'utente è un "<ruolo>" di "<ente>"
     Given un "<ruolo>" di "<ente>" ha già creato un e-service con un descrittore in stato "<statoDescrittore>"
     When l'utente cancella quell'e-service
-    Then si ottiene status code 400
+    Then si ottiene status code 409
 
     Examples: 
       | ente           | ruolo | statoDescrittore |
