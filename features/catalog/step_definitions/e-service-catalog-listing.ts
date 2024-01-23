@@ -17,14 +17,19 @@ import { Party, Role } from "./common-steps";
 //   PUBLISHED_ESERVICES + SUSPENDED_ESERVICES + DRAFT_ESERVICES;
 
 Given(
-  "un {string} di {string} ha già creato {int} e-services in catalogo in stato Published o Suspended",
-  async function (role: Role, party: Party, countEservices: number) {
+  "un {string} di {string} ha già creato {int} e-services in catalogo in stato Published o Suspended e {int} in stato Draft",
+  async function (
+    role: Role,
+    party: Party,
+    countEservices: number,
+    countDraftEservices: number
+  ) {
     assertContextSchema(this);
 
     const token = this.tokens[party]![role]!;
     const PUBLISHED_ESERVICES = 1;
     const SUSPENDED_ESERVICES = countEservices - PUBLISHED_ESERVICES;
-    const DRAFT_ESERVICES = 1;
+    const DRAFT_ESERVICES = countDraftEservices;
     const TOTAL_ESERVICES = countEservices + DRAFT_ESERVICES;
 
     /**
@@ -98,6 +103,7 @@ Given(
   }
 );
 
+// TODO: parametrizzare ente_fruitore
 Given(
   "ente_fruitore ha un agreement attivo con un eservice di {string}",
   async function (_producer: string) {
