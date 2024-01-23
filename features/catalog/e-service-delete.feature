@@ -7,7 +7,7 @@ Feature: Cancellazione di un e-service
     Given l'utente è un "<ruolo>" di "<ente>"
     Given l'utente ha già creato un e-service senza descrittore
     When l'utente cancella quell'e-service
-    Then si ottiene status code 200
+    Then si ottiene status code 204
 
     Examples: 
       | ente           | ruolo |

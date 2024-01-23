@@ -5,7 +5,7 @@ Feature: Clonazione di un e-service
   @cloning1
   Scenario Outline: Per un e-service che ha un solo descrittore in stato PUBLISHED, alla richiesta di clonazione, viene creato un nuovo e-service che ha un solo descrittore in stato DRAFT
     Given l'utente è un "<ruolo>" di "<ente>"
-    Given un "admin" di "GSP" ha già creato un e-service con un descrittore in stato "PUBLISHED"
+    Given un "<ruolo>" di "<ente>" ha già creato un e-service con un descrittore in stato "PUBLISHED"
     When l'utente clona quell'e-service
     Then si ottiene status code 200
 
@@ -18,7 +18,7 @@ Feature: Clonazione di un e-service
   @cloning2
   Scenario Outline: Per un e-service che ha un solo descrittore in stato DRAFT, alla richiesta di clonazione, si ottiene un errore
     Given l'utente è un "<ruolo>" di "<ente>"
-    Given un "admin" di "GSP" ha già creato un e-service con un descrittore in stato "DRAFT"
+    Given un "<ruolo>" di "<ente>" ha già creato un e-service con un descrittore in stato "DRAFT"
     When l'utente clona quell'e-service
     Then si ottiene status code 400
 
