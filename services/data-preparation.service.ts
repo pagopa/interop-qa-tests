@@ -7,7 +7,11 @@ import {
   makePolling,
   assertValidResponse,
 } from "../utils/commons";
-import { EServiceSeed, EServiceDescriptorSeed } from "./../api/models";
+import {
+  EServiceSeed,
+  EServiceDescriptorSeed,
+  EServiceDescriptorState,
+} from "./../api/models";
 
 export const dataPreparationService = {
   async createEService(
@@ -266,5 +270,94 @@ export const dataPreparationService = {
         ),
       (res) => res.data.state === "ACTIVE"
     );
+  },
+
+  async createDescriptorWithGivenState(
+    token: string,
+    eserviceId: string,
+    descriptorState: EServiceDescriptorState
+  ) {
+    // 1. Create DRAFT descriptor
+    const descriptorId = await dataPreparationService.createDraftDescriptor(
+      token,
+      eserviceId
+    );
+
+    if (descriptorState === "DRAFT") {
+      return descriptorId;
+    }
+
+    // 2. Add interface to descriptor
+    await dataPreparationService.addInterfaceToDescriptor(
+      token,
+      eserviceId,
+      descriptorId
+    );
+
+    // 3. Publish Descriptor
+    await dataPreparationService.publishDescriptor(
+      token,
+      eserviceId,
+      descriptorId
+    );
+
+    if (descriptorState === "PUBLISHED") {
+      return descriptorId;
+    }
+
+    // 4. Suspend Descriptor
+    if (descriptorState === "SUSPENDED") {
+      await dataPreparationService.suspendDescriptor(
+        token,
+        eserviceId,
+        descriptorId
+      );
+      return descriptorId;
+    }
+
+    if (descriptorState === "ARCHIVED" || descriptorState === "DEPRECATED") {
+      if (descriptorState === "DEPRECATED") {
+        // Optional. Create an agreement
+
+        const agreementId = await dataPreparationService.createAgreement(
+          token,
+          eserviceId,
+          descriptorId
+        );
+
+        await dataPreparationService.submitAgreement(token, agreementId);
+      }
+
+      // Create another DRAFT descriptor
+      const secondDescriptorId =
+        await dataPreparationService.createDraftDescriptor(token, eserviceId);
+
+      // Add interface to secondDescriptor
+      await dataPreparationService.addInterfaceToDescriptor(
+        token,
+        eserviceId,
+        secondDescriptorId
+      );
+
+      // Publish secondDescriptor
+      await dataPreparationService.publishDescriptor(
+        token,
+        eserviceId,
+        secondDescriptorId
+      );
+
+      // Check until the first descriptor is in desired state
+      await makePolling(
+        () =>
+          apiClient.producers.getProducerEServiceDescriptor(
+            eserviceId,
+            descriptorId,
+            getAuthorizationHeader(token)
+          ),
+        (res) => res.data.state === descriptorState
+      );
+
+      return descriptorId;
+    }
   },
 };
