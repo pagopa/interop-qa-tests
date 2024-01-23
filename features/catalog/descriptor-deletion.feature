@@ -7,7 +7,7 @@ Feature: Cancellazione di un descrittore
     Given l'utente è un "<ruolo>" di "<ente>"
     Given un "<ruolo>" di "<ente>" ha già creato un e-service con un descrittore in stato "DRAFT"
     When l'utente cancella il descriptor di quell'e-service
-    Then si ottiene status code "204"
+    Then si ottiene status code 204
     Then quell'eservice è stato cancellato
 
     Examples: 
@@ -23,7 +23,7 @@ Feature: Cancellazione di un descrittore
     Given un "<ruolo>" di "<ente>" ha già creato un e-service con un descrittore in stato "PUBLISHED"
     Given l'utente ha già creato una versione in bozza per quell'eservice
     When l'utente cancella il descriptor di quell'e-service
-    Then si ottiene status code "204"
+    Then si ottiene status code 204
     Then quell'eservice non è stato cancellato
 
 
@@ -39,7 +39,7 @@ Feature: Cancellazione di un descrittore
     Given l'utente è un "<ruolo>" di "<ente>"
     Given un "<ruolo>" di "<ente>" ha già creato un e-service con un descrittore in stato "<statoVersione>"
     When l'utente cancella il descriptor di quell'e-service
-    Then si ottiene status code "500"
+    Then si ottiene status code 500
     # // TO DO it should be 400 after the fix in backend
 
     Examples: 
