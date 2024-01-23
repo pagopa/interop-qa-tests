@@ -45,6 +45,9 @@ Then("quell'eservice non è stato cancellato", async function () {
   });
   await sleep(3000);
 
+  // We don't have an exact way to assert that the eService "doesn't get deleted".
+  // We can only check if it still exists after a reasonable time.
+
   const res = await apiClient.producers.getProducerEServiceDetails(
     this.eserviceId,
     getAuthorizationHeader(this.token)
