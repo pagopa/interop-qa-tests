@@ -1,14 +1,23 @@
 import assert from "assert";
-import { Before, Given, Then, BeforeAll } from "@cucumber/cucumber";
+import {
+  Before,
+  Given,
+  Then,
+  BeforeAll,
+  setDefaultTimeout,
+} from "@cucumber/cucumber";
 import { z } from "zod";
 import { generateSessionTokens } from "../../../utils/session-tokens";
 import { EServiceDescriptorState } from "../../../api/models";
 import { dataPreparationService } from "../../../services/data-preparation.service";
 import { assertContextSchema, getRandomInt } from "./../../../utils/commons";
 
+// Increase duration of every step with the following timeout (Default is 5000 milliseconds)
+setDefaultTimeout(5 * 60 * 1000);
+
 const Party = z.enum(["GSP", "PA1", "PA2", "Privato"]);
 export type Party = z.infer<typeof Party>;
-const Role = z.enum(["admin"]);
+const Role = z.enum(["admin", "api", "security"]);
 export type Role = z.infer<typeof Role>;
 
 export const SessionTokens = z.record(Party, z.record(Role, z.string()));
