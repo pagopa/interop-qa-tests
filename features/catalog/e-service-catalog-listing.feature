@@ -32,7 +32,7 @@ Feature: Listing catalogo e-services
     Then si ottiene status code 200 e la lista di 12 e-services
 
   @catalog3
-  Scenario Outline: A fronte di 15 e-service in db e una richiesta di risultati a partire dal dodicesimo, vengono restituiti solo 3 e-service
+  Scenario Outline: A fronte di 15 e-service in db e una richiesta di risultati a partire dal tredicesimo, vengono restituiti solo 3 e-service
     Given l'utente è un "admin" di "GSP"
     Given un "admin" di "GSP" ha già creato 15 e-services in catalogo in stato Published o Suspended
     When l'utente richiede una operazione di listing sul catalogo con offset 12
