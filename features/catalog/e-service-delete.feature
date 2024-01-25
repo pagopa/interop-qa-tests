@@ -28,4 +28,3 @@ Feature: Cancellazione di un e-service
       | GSP            | admin |    SUSPENDED     |
       | GSP            | admin |    DEPRECATED    |
       # | GSP            | admin |    ARCHIVED      |
-      
