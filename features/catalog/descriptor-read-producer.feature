@@ -36,8 +36,3 @@ Feature: Lettura di un descrittore lato erogatore
       |      DEPRECATED    |
       |      DRAFT         |
       #|      ARCHIVED      |
-      |      PUBLISHED     |
-      |      SUSPENDED     |
-      |      DEPRECATED    |
-      |      DRAFT         |
-      #|      ARCHIVED      |
