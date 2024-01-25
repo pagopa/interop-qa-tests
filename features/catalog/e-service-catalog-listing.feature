@@ -63,7 +63,7 @@ Feature: Listing catalogo e-services
   Scenario Outline: Restituisce gli e-service a catalogo per i quali lo specifico fruitore ha almeno un agreement in stato ACTIVE
     Given l'utente è un "<ruolo>" di "<ente_fruitore>"
     Given un "admin" di "PA1" ha già creato 3 e-services in catalogo in stato Published o Suspended e 1 in stato Draft
-    And   ente_fruitore ha un agreement attivo con un eservice di "PA1"
+    And "ente_fruitore" ha un agreement attivo con un eservice di "PA1"
     When l'utente richiede la lista di eservices per i quali ha almeno un agreement attivo
     Then si ottiene status code 200 e la lista di 1 e-services
 

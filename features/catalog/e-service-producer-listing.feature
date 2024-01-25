@@ -46,9 +46,8 @@ Feature: Listing e-services lato erogatore
   Scenario Outline: Restituisce gli e-service erogati dall’ente fruiti da almeno uno degli fruitori specifici
     Given l'utente è un "<ruolo>" di "<ente>"
     Given un "<ruolo>" di "<ente>" ha già creato 2 e-services in catalogo in stato Published o Suspended e 1 in stato Draft
-    # TODO: riusare Given da parametrizzare features/catalog/step_definitions/e-service-catalog-listing.ts
-    Given "GSP" ha un agreement attivo con e-service di "PA1"
-    Given "PA2" ha un agreement attivo con e-service di "PA1"
+    Given "GSP" ha un agreement attivo con e-service di "<ente>"
+    Given "PA2" ha un agreement attivo con e-service di "<ente>"
     When l'utente richiede una operazione di listing sui propri e-services fruiti da "GSP"
     Then si ottiene status code 200 e la lista di 1 e-services
 
@@ -57,7 +56,6 @@ Feature: Listing e-services lato erogatore
       | GSP            | admin |
       | PA1            | admin |
       | PA2            | admin |
-      | Privato        | admin | 
 
   @producer_listing5
   Scenario Outline: Restituisce gli e-service erogati dall’ente che contengono la keyword "test" all'interno del nome, con ricerca case insensitive
@@ -85,4 +83,3 @@ Feature: Listing e-services lato erogatore
       | GSP            | admin |
       | PA1            | admin |
       | PA2            | admin |
-      | Privato        | admin |      

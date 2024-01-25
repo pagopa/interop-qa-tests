@@ -8,7 +8,7 @@ import {
   getOrganizationId,
 } from "../../../utils/commons";
 import { dataPreparationService } from "../../../services/data-preparation.service";
-import { Party, Role } from "./common-steps";
+import { Party, Role, SessionTokens } from "./common-steps";
 
 // const PUBLISHED_ESERVICES = 1;
 // const SUSPENDED_ESERVICES = 1;
@@ -103,19 +103,19 @@ Given(
   }
 );
 
-// TODO: parametrizzare ente_fruitore
 Given(
-  "ente_fruitore ha un agreement attivo con un eservice di {string}",
-  async function (_producer: string) {
+  "{string} ha un agreement attivo con e-service di {string}",
+  async function (consumer: Party, _producer: string) {
     assertContextSchema(this, {
       token: z.string(),
       publishedEservicesIds: z.array(z.tuple([z.string(), z.string()])),
+      tokens: SessionTokens,
     });
-
+    const token = this.tokens[consumer]!.admin!;
     const [eserviceId, descriptorId] = this.publishedEservicesIds[0];
 
     const agreementId = await dataPreparationService.createAgreement(
-      this.token,
+      token,
       eserviceId,
       descriptorId
     );
