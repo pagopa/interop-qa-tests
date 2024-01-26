@@ -54,7 +54,6 @@ When(
       token: z.string(),
     });
     const consumerId = getOrganizationId(consumer);
-    console.log(this.token);
     this.response = await apiClient.producers.getProducerEServices(
       { q: this.TEST_SEED, consumersIds: [consumerId], offset: 0, limit: 12 },
       getAuthorizationHeader(this.token)
