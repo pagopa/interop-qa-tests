@@ -7,6 +7,28 @@ import {
 } from "../features/catalog/step_definitions/common-steps";
 import { CreatedResource } from "../api/models";
 
+export function getRiskAnalysis(config = { completed: true }) {
+  const answers = {
+    purpose: ["INSTITUTIONAL"],
+    institutionalPurpose: ["test"],
+    usesPersonalData: ["NO"],
+    usesThirdPartyPersonalData: ["NO"],
+  };
+
+  const uncompletedAnswers = {
+    purpose: ["INSTITUTIONAL"],
+    usesPersonalData: ["NO"],
+    usesThirdPartyPersonalData: ["NO"],
+  };
+  return {
+    name: "finalità 1",
+    riskAnalysisForm: {
+      version: "2.0",
+      answers: config.completed ? answers : uncompletedAnswers,
+    },
+  };
+}
+
 export const getRandomInt = () =>
   Number(Math.random() * Number.MAX_SAFE_INTEGER).toFixed(0);
 
