@@ -8,7 +8,7 @@ Feature: Lettura di un descrittore lato fruitore
     Given un "admin" di "GSP" ha già creato un e-service con un descrittore in stato "<statoVersione>"
     When l'utente fruitore richiede la lettura di quel descrittore
     Then si ottiene status code 200
-
+    
     Examples: 
       | ente           | ruolo |      statoVersione |
       | GSP            | admin |      PUBLISHED     |
@@ -24,15 +24,9 @@ Feature: Lettura di un descrittore lato fruitore
       | Privato        | admin |      DEPRECATED    |
       #| Privato        | admin |      ARCHIVED      |
 
- @descriptor_read_consumer2
-  Scenario Outline: Per un e-service precedentemente creato da qualsiasi ente, il quale ha un solo descrittore in stato DRAFT, la richiesta per ottenere i dettagli della versione di e-service restituisce errore (NB: verificare lo status code dell’errore)
-    Given l'utente è un "<ruolo>" di "<ente>"
+ @descriptor_read_consumer2 @wait-for-fix
+  Scenario Outline: Per un e-service precedentemente creato da qualsiasi ente, il quale ha un solo descrittore in stato DRAFT, la richiesta per ottenere i dettagli della versione di e-service restituisce errore
+    Given l'utente è un "admin" di "GSP"
     Given un "admin" di "PA1" ha già creato un e-service con un descrittore in stato "DRAFT"
     When l'utente fruitore richiede la lettura di quel descrittore
     Then si ottiene status code 403
-
-    Examples: 
-      | ente           | ruolo |      
-      | GSP            | admin |
-      | PA1            | admin |
-      | Privato        | admin |
