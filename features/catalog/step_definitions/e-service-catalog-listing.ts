@@ -104,7 +104,7 @@ Given(
 );
 
 Given(
-  "{string} ha un agreement attivo con e-service di {string}",
+  "{string} ha un agreement attivo con un e-service di {string}",
   async function (consumer: Party, _producer: string) {
     assertContextSchema(this, {
       token: z.string(),
@@ -120,7 +120,7 @@ Given(
       descriptorId
     );
 
-    await dataPreparationService.submitAgreement(this.token, agreementId);
+    await dataPreparationService.submitAgreement(token, agreementId);
 
     this.agreementId = agreementId;
     this.eserviceSubscribedId = eserviceId;

@@ -15,7 +15,7 @@ When(
       token: z.string(),
     });
     this.response = await apiClient.producers.getProducerEServices(
-      { offset: 0, limit: 50 },
+      { q: this.TEST_SEED, offset: 0, limit: 50 },
       getAuthorizationHeader(this.token)
     );
   }
@@ -28,7 +28,7 @@ When(
       token: z.string(),
     });
     this.response = await apiClient.producers.getProducerEServices(
-      { offset: 0, limit },
+      { q: this.TEST_SEED, offset: 0, limit },
       getAuthorizationHeader(this.token)
     );
   }
@@ -41,7 +41,7 @@ When(
       token: z.string(),
     });
     this.response = await apiClient.producers.getProducerEServices(
-      { offset, limit: 12 },
+      { q: this.TEST_SEED, offset, limit: 12 },
       getAuthorizationHeader(this.token)
     );
   }
@@ -54,10 +54,12 @@ When(
       token: z.string(),
     });
     const consumerId = getOrganizationId(consumer);
+    console.log(this.token);
     this.response = await apiClient.producers.getProducerEServices(
-      { consumersIds: [consumerId], offset: 0, limit: 12 },
+      { q: this.TEST_SEED, consumersIds: [consumerId], offset: 0, limit: 12 },
       getAuthorizationHeader(this.token)
     );
+    console.log(this.response);
   }
 );
 

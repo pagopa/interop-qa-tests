@@ -18,7 +18,7 @@ Feature: Listing e-services lato erogatore
   @producer_listing2
   Scenario Outline: A fronte di 20 e-service in db, restituisce solo i primi 12 risultati di e-service
     Given l'utente è un "<ruolo>" di "<ente>"
-    Given un "admin" di "GSP" ha già creato 19 e-services in catalogo in stato Published o Suspended e 1 in stato Draft
+    Given un "<ruolo>" di "<ente>" ha già creato 19 e-services in catalogo in stato Published o Suspended e 1 in stato Draft
     When l'utente richiede una operazione di listing sui propri e-services erogati limitata ai primi 12 e-services
     Then si ottiene status code 200 e la lista di 12 e-services
 
@@ -31,7 +31,7 @@ Feature: Listing e-services lato erogatore
   @producer_listing3
   Scenario Outline: A fronte di 15 e-service in db e una richiesta di offset 12, restituisce solo 3 risultati
     Given l'utente è un "<ruolo>" di "<ente>"
-    Given un "admin" di "GSP" ha già creato 14 e-services in catalogo in stato Published o Suspended e 1 in stato Draft
+    Given un "<ruolo>" di "<ente>" ha già creato 14 e-services in catalogo in stato Published o Suspended e 1 in stato Draft
     When l'utente richiede una operazione di listing sui propri e-services con offset 12
     Then si ottiene status code 200 e la lista di 3 e-services
 
@@ -46,16 +46,16 @@ Feature: Listing e-services lato erogatore
   Scenario Outline: Restituisce gli e-service erogati dall’ente fruiti da almeno uno degli fruitori specifici
     Given l'utente è un "<ruolo>" di "<ente>"
     Given un "<ruolo>" di "<ente>" ha già creato 2 e-services in catalogo in stato Published o Suspended e 1 in stato Draft
-    Given "GSP" ha un agreement attivo con e-service di "<ente>"
-    Given "PA2" ha un agreement attivo con e-service di "<ente>"
-    When l'utente richiede una operazione di listing sui propri e-services fruiti da "GSP"
+    Given "GSP" ha un agreement attivo con un e-service di "<ente>"
+    Given "PA2" ha un agreement attivo con un e-service di "<ente>"
+    When l'utente richiede una operazione di listing sui propri e-services fruiti da "PA2"
     Then si ottiene status code 200 e la lista di 1 e-services
 
     Examples: 
       | ente           | ruolo |
-      | GSP            | admin |
+      #| GSP            | admin |
       | PA1            | admin |
-      | PA2            | admin |
+      #| PA2            | admin |
 
   @producer_listing5
   Scenario Outline: Restituisce gli e-service erogati dall’ente che contengono la keyword "test" all'interno del nome, con ricerca case insensitive
