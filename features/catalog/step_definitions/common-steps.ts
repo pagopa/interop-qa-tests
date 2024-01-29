@@ -6,9 +6,9 @@ import { EServiceDescriptorState } from "../../../api/models";
 import { dataPreparationService } from "../../../services/data-preparation.service";
 import { assertContextSchema, getRandomInt } from "./../../../utils/commons";
 
-const Party = z.enum(["GSP", "PA1", "PA2", "Privato"]);
+export const Party = z.enum(["GSP", "PA1", "PA2", "Privato"]);
 export type Party = z.infer<typeof Party>;
-const Role = z.enum(["admin"]);
+export const Role = z.enum(["admin"]);
 export type Role = z.infer<typeof Role>;
 
 export const SessionTokens = z.record(Party, z.record(Role, z.string()));
@@ -31,6 +31,8 @@ Given(
   "l'utente è un {string} di {string}",
   async function (role: Role, party: Party) {
     this.token = this.tokens[party]![role]!;
+    this.role = role;
+    this.party = party;
   }
 );
 
