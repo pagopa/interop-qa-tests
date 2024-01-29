@@ -6,7 +6,7 @@ Feature: Aggiunta di un'analisi del rischio ad un eservice
   @eservice_risk_analysis_addition1
   Scenario Outline: Per un e-service creato con mode="RECEIVE", il quale non ha descrittori, è possibile inserire una nuova analisi del rischio. L'analisi del rischio deve essere ben formattata ma non necessariamente completamente compilata. La richiesta va a buon fine
     Given l'utente è un "<ruolo>" di "<ente>"
-    Given un "<ruolo>" di "<ente>" ha già creato un e-service in modalità "RECEIVE" senza descrittore
+    Given l'utente ha già creato un e-service in modalità "RECEIVE" senza descrittore
     When l'utente aggiunge un'analisi del rischio
     Then si ottiene status code 200
 
@@ -32,7 +32,7 @@ Feature: Aggiunta di un'analisi del rischio ad un eservice
   @eservice_risk_analysis_addition3
   Scenario Outline: Per un e-service creato con mode="DELIVER", il quale non ha descrittori, alla richiesta di inserimento di un analisi del rischio, ottiene un errore (NB: verificare lo status code dell’errore)
     Given l'utente è un "<ruolo>" di "<ente>"
-    Given un "<ruolo>" di "<ente>" ha già creato un e-service in modalità "DELIVER" senza descrittore
+    Given l'utente ha già creato un e-service in modalità "DELIVER" senza descrittore
     When l'utente aggiunge un'analisi del rischio
     Then si ottiene status code 400
 
