@@ -41,11 +41,12 @@ Given(
 
     // If descriptorState is not DRAFT we have to add a completed risk analysis in order to correctly publish the descriptor
     if (mode === "RECEIVE" && descriptorState !== "DRAFT") {
-      await dataPreparationService.addRiskAnalysisToEService(
-        this.token,
-        this.eserviceId,
-        getRiskAnalysis({ completed: true, party: this.party })
-      );
+      this.riskAnalysisId =
+        await dataPreparationService.addRiskAnalysisToEService(
+          this.token,
+          this.eserviceId,
+          getRiskAnalysis({ completed: true, party: this.party })
+        );
     }
 
     this.descriptorId =
