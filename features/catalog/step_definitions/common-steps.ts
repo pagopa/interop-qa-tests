@@ -10,7 +10,13 @@ import { z } from "zod";
 import { generateSessionTokens } from "../../../utils/session-tokens";
 import { EServiceDescriptorState } from "../../../api/models";
 import { dataPreparationService } from "../../../services/data-preparation.service";
-import { assertContextSchema, getRandomInt } from "./../../../utils/commons";
+import { apiClient } from "../../../api";
+import {
+  assertContextSchema,
+  getAuthorizationHeader,
+  getRandomInt,
+  makePolling,
+} from "./../../../utils/commons";
 
 // Increase duration of every step with the following timeout (Default is 5000 milliseconds)
 setDefaultTimeout(5 * 60 * 1000);
@@ -68,12 +74,6 @@ Given(
   ) {
     assertContextSchema(this);
 
-    if (descriptorState === "ARCHIVED" || descriptorState === "DEPRECATED") {
-      throw new Error(
-        "ARCHIVED and DEPRECATED state not supported by this Given"
-      );
-    }
-
     const token = this.tokens[party]![role]!;
 
     // 1. Create e-service
@@ -111,11 +111,60 @@ Given(
     }
 
     // 5. Suspend Descriptor
-    await dataPreparationService.suspendDescriptor(
-      token,
-      eserviceId,
-      descriptorId
-    );
+    if (descriptorState === "SUSPENDED") {
+      await dataPreparationService.suspendDescriptor(
+        token,
+        eserviceId,
+        descriptorId
+      );
+      return;
+    }
+
+    if (descriptorState === "ARCHIVED" || descriptorState === "DEPRECATED") {
+      if (descriptorState === "DEPRECATED") {
+        // When a newer descriptor becomes PUBLISHED, the older one becomes DEPRECATED. Then, if it still has an active agreement associated, it remains DEPRECATED, otherwise it becomes ARCHIVED.
+
+        const agreementId = await dataPreparationService.createAgreement(
+          token,
+          eserviceId,
+          this.descriptorId
+        );
+
+        await dataPreparationService.submitAgreement(token, agreementId);
+      }
+
+      // Create another DRAFT descriptor
+      const secondDescriptorId =
+        await dataPreparationService.createDraftDescriptor(token, eserviceId);
+
+      this.eserviceId = eserviceId;
+      this.secondDescriptorId = secondDescriptorId;
+
+      // Add interface to secondDescriptor
+      await dataPreparationService.addInterfaceToDescriptor(
+        token,
+        eserviceId,
+        this.secondDescriptorId
+      );
+
+      // Publish secondDescriptor
+      await dataPreparationService.publishDescriptor(
+        token,
+        eserviceId,
+        this.secondDescriptorId
+      );
+
+      // Check until the first descriptor is in desired state
+      await makePolling(
+        () =>
+          apiClient.producers.getProducerEServiceDescriptor(
+            eserviceId,
+            this.descriptorId,
+            getAuthorizationHeader(token)
+          ),
+        (res) => res.data.state === descriptorState
+      );
+    }
   }
 );
 
