@@ -8,6 +8,7 @@ import {
 } from "../../../utils/commons";
 import { apiClient } from "../../../api";
 import { EServiceDescriptorState, EServiceMode } from "../../../api/models";
+import { Party } from "./common-steps";
 
 Given(
   "l'utente ha già caricato un'interfaccia per quel descrittore",
@@ -32,7 +33,7 @@ Given(
     mode: EServiceMode,
     descriptorState: EServiceDescriptorState
   ) {
-    assertContextSchema(this, { token: z.string() });
+    assertContextSchema(this, { token: z.string(), party: Party });
 
     this.eserviceId = await dataPreparationService.createEService(this.token, {
       mode,
@@ -43,7 +44,7 @@ Given(
       await dataPreparationService.addRiskAnalysisToEService(
         this.token,
         this.eserviceId,
-        getRiskAnalysis({ completed: true })
+        getRiskAnalysis({ completed: true, party: this.party })
       );
     }
 
