@@ -32,3 +32,54 @@ When("l'utente aggiunge un'analisi del rischio", async function () {
     getAuthorizationHeader(this.token)
   );
 });
+
+When(
+  "l'utente aggiunge un'analisi del rischio non corretta per la tipologia di ente",
+  async function () {
+    assertContextSchema(this, {
+      token: z.string(),
+      eserviceId: z.string(),
+      party: Party,
+    });
+
+    // We want to get the wrong risk analysis template, so we need to invert the party
+    const party =
+      this.party === "GSP" || this.party === "Privato" ? "PA1" : "Privato";
+
+    this.response = await apiClient.eservices.addRiskAnalysisToEService(
+      this.eserviceId,
+      getRiskAnalysis({ completed: true, party }),
+      getAuthorizationHeader(this.token)
+    );
+  }
+);
+
+When(
+  "l'utente aggiunge un'analisi del rischio con versione template non aggiornata",
+  async function () {
+    assertContextSchema(this, {
+      token: z.string(),
+      eserviceId: z.string(),
+      party: Party,
+    });
+
+    const { name, riskAnalysisForm } = getRiskAnalysis({
+      completed: true,
+      party: this.party,
+    });
+
+    const outdatedVersion = "1.0";
+
+    this.response = await apiClient.eservices.addRiskAnalysisToEService(
+      this.eserviceId,
+      {
+        name,
+        riskAnalysisForm: {
+          ...riskAnalysisForm,
+          version: outdatedVersion,
+        },
+      },
+      getAuthorizationHeader(this.token)
+    );
+  }
+);
