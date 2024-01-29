@@ -5,20 +5,21 @@
   "main": "index.js",
   "scripts": {
     "test": "cucumber-js",
+    "test:tags": "cucumber-js --tags",
     "generate-model": "node ./scripts/generate-api-models.mjs"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@cucumber/cucumber": "^10.0.1",
     "@aws-sdk/client-kms": "^3.474.0",
-    "ts-node": "^10.9.2",
+    "@cucumber/cucumber": "^10.2.1",
+    "axios": "^1.6.2",
     "dotenv": "^16.3.1",
     "lodash": "^4.17.21",
-    "uuid": "^9.0.1",
-    "axios": "^1.6.2",
     "openapi-fetch": "^0.8.2",
+    "ts-node": "^10.9.2",
+    "uuid": "^9.0.1",
     "zod": "^3.22.4"
   },
   "devDependencies": {
