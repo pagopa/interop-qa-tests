@@ -7,24 +7,91 @@ import {
 } from "../features/catalog/step_definitions/common-steps";
 import { CreatedResource } from "../api/models";
 
-export function getRiskAnalysis(config = { completed: true }) {
-  const answers = {
-    purpose: ["INSTITUTIONAL"],
-    institutionalPurpose: ["test"],
-    usesPersonalData: ["NO"],
-    usesThirdPartyPersonalData: ["NO"],
-  };
+const RISK_ANALYSIS_DATA: Record<
+  "GSP" | "PA" | "Privato",
+  { version: string; completed: unknown; uncompleted: unknown }
+> = {
+  GSP: {
+    version: "2.0",
+    completed: {
+      purpose: ["INSTITUTIONAL"],
+      institutionalPurpose: ["test"],
+      usesPersonalData: ["NO"],
+      usesThirdPartyPersonalData: ["NO"],
+    },
+    uncompleted: {
+      purpose: ["INSTITUTIONAL"],
+      usesPersonalData: ["NO"],
+      usesThirdPartyPersonalData: ["NO"],
+    },
+  },
+  PA: {
+    version: "3.0",
+    completed: {
+      purpose: ["INSTITUTIONAL"],
+      institutionalPurpose: ["test"],
+      personalDataTypes: ["WITH_NON_IDENTIFYING_DATA"],
+      legalBasis: ["CONSENT"],
+      knowsDataQuantity: ["NO"],
+      deliveryMethod: ["CLEARTEXT"],
+      policyProvided: ["YES"],
+      confirmPricipleIntegrityAndDiscretion: ["true"],
+      doneDpia: ["NO"],
+      dataDownload: ["NO"],
+      purposePursuit: ["MERE_CORRECTNESS"],
+      checkedExistenceMereCorrectnessInteropCatalogue: ["true"],
+      usesThirdPartyData: ["NO"],
+      declarationConfirmGDPR: ["true"],
+    },
+    uncompleted: {
+      purpose: ["INSTITUTIONAL"],
+      institutionalPurpose: ["test"],
+      legalBasis: ["CONSENT"],
+      knowsDataQuantity: ["NO"],
+      deliveryMethod: ["CLEARTEXT"],
+      policyProvided: ["YES"],
+      confirmPricipleIntegrityAndDiscretion: ["true"],
+      doneDpia: ["NO"],
+      dataDownload: ["NO"],
+      purposePursuit: ["MERE_CORRECTNESS"],
+      checkedExistenceMereCorrectnessInteropCatalogue: ["true"],
+      usesThirdPartyData: ["NO"],
+      declarationConfirmGDPR: ["true"],
+    },
+  },
+  Privato: {
+    version: "2.0",
+    completed: {
+      purpose: ["INSTITUTIONAL"],
+      institutionalPurpose: ["test"],
+      usesPersonalData: ["NO"],
+      usesThirdPartyPersonalData: ["NO"],
+    },
+    uncompleted: {
+      purpose: ["INSTITUTIONAL"],
+      usesPersonalData: ["NO"],
+      usesThirdPartyPersonalData: ["NO"],
+    },
+  },
+};
 
-  const uncompletedAnswers = {
-    purpose: ["INSTITUTIONAL"],
-    usesPersonalData: ["NO"],
-    usesThirdPartyPersonalData: ["NO"],
-  };
+export function getRiskAnalysis(params?: {
+  completed?: boolean;
+  party?: Party;
+}) {
+  const completed = params?.completed ?? true;
+  const party: Party = params?.party ?? "GSP";
+  const partyType = party === "PA1" || party === "PA2" ? "PA" : party;
+
+  const answers =
+    RISK_ANALYSIS_DATA[partyType][completed ? "completed" : "uncompleted"];
+  const version = RISK_ANALYSIS_DATA[partyType].version;
+
   return {
-    name: "finalità 1",
+    name: "finalità test",
     riskAnalysisForm: {
-      version: "2.0",
-      answers: config.completed ? answers : uncompletedAnswers,
+      version,
+      answers,
     },
   };
 }
