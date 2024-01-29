@@ -7,11 +7,13 @@ import {
 } from "../features/catalog/step_definitions/common-steps";
 import { CreatedResource } from "../api/models";
 
+type RiskAnalysisTemplateType = "PA" | "Privato/GSP";
+
 const RISK_ANALYSIS_DATA: Record<
-  "GSP" | "PA" | "Privato",
+  RiskAnalysisTemplateType,
   { version: string; completed: unknown; uncompleted: unknown }
 > = {
-  GSP: {
+  "Privato/GSP": {
     version: "2.0",
     completed: {
       purpose: ["INSTITUTIONAL"],
@@ -59,20 +61,6 @@ const RISK_ANALYSIS_DATA: Record<
       declarationConfirmGDPR: ["true"],
     },
   },
-  Privato: {
-    version: "2.0",
-    completed: {
-      purpose: ["INSTITUTIONAL"],
-      institutionalPurpose: ["test"],
-      usesPersonalData: ["NO"],
-      usesThirdPartyPersonalData: ["NO"],
-    },
-    uncompleted: {
-      purpose: ["INSTITUTIONAL"],
-      usesPersonalData: ["NO"],
-      usesThirdPartyPersonalData: ["NO"],
-    },
-  },
 };
 
 export function getRiskAnalysis(params?: {
@@ -81,11 +69,12 @@ export function getRiskAnalysis(params?: {
 }) {
   const completed = params?.completed ?? true;
   const party: Party = params?.party ?? "GSP";
-  const partyType = party === "PA1" || party === "PA2" ? "PA" : party;
+  const templateType =
+    party === "PA1" || party === "PA2" ? "PA" : "Privato/GSP";
+  const templateStatus = completed ? "completed" : "uncompleted";
 
-  const answers =
-    RISK_ANALYSIS_DATA[partyType][completed ? "completed" : "uncompleted"];
-  const version = RISK_ANALYSIS_DATA[partyType].version;
+  const answers = RISK_ANALYSIS_DATA[templateType][templateStatus];
+  const version = RISK_ANALYSIS_DATA[templateType].version;
 
   return {
     name: "finalità test",
