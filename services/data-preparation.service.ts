@@ -374,14 +374,24 @@ export const dataPreparationService = {
     );
 
     assertValidResponse(response);
-
+    let riskAnalysisId = "";
     await makePolling(
       () =>
         apiClient.producers.getProducerEServiceDetails(
           eserviceId,
           getAuthorizationHeader(token)
         ),
-      (res) => res.data.riskAnalysis.length > 0
+      (res) => {
+        if (res.data.riskAnalysis.length > 0) {
+          riskAnalysisId = res.data.riskAnalysis[0].id;
+          return true;
+        }
+        return false;
+      }
     );
+    if (riskAnalysisId === "") {
+      throw new Error("Risk analysis not found");
+    }
+    return riskAnalysisId;
   },
 };

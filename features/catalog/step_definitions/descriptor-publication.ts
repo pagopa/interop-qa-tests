@@ -7,8 +7,8 @@ import {
   getRiskAnalysis,
 } from "../../../utils/commons";
 import { apiClient } from "../../../api";
-import { EServiceDescriptorState } from "../../../api/models";
-import { Party, Role } from "./common-steps";
+import { EServiceDescriptorState, EServiceMode } from "../../../api/models";
+import { Party } from "./common-steps";
 
 Given(
   "l'utente ha già caricato un'interfaccia per quel descrittore",
@@ -28,32 +28,30 @@ Given(
 );
 
 Given(
-  "un {string} di {string} ha già creato un e-service in modalità RECEIVE con un descrittore in stato {string}",
+  "l'utente ha già creato un e-service in modalità {string} con un descrittore in stato {string}",
   async function (
-    role: Role,
-    party: Party,
+    mode: EServiceMode,
     descriptorState: EServiceDescriptorState
   ) {
-    assertContextSchema(this);
+    assertContextSchema(this, { token: z.string(), party: Party });
 
-    const token = this.tokens[party]![role]!;
-
-    this.eserviceId = await dataPreparationService.createEService(token, {
-      mode: "RECEIVE",
+    this.eserviceId = await dataPreparationService.createEService(this.token, {
+      mode,
     });
 
     // If descriptorState is not DRAFT we have to add a completed risk analysis in order to correctly publish the descriptor
-    if (descriptorState !== "DRAFT") {
-      await dataPreparationService.addRiskAnalysisToEService(
-        this.token,
-        this.eserviceId,
-        getRiskAnalysis({ completed: true })
-      );
+    if (mode === "RECEIVE" && descriptorState !== "DRAFT") {
+      this.riskAnalysisId =
+        await dataPreparationService.addRiskAnalysisToEService(
+          this.token,
+          this.eserviceId,
+          getRiskAnalysis({ completed: true, party: this.party })
+        );
     }
 
     this.descriptorId =
       await dataPreparationService.createDescriptorWithGivenState(
-        token,
+        this.token,
         this.eserviceId,
         descriptorState
       );
