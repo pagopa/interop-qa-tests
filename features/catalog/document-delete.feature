@@ -18,7 +18,7 @@ Feature: Cancellazione di un documento
       | PA1            | admin |
 
 
-  @document_delete2
+  @document_delete2 @wait-for-fix
   Scenario Outline: Per un e-service che ha un solo descrittore, il quale è in stato NON DRAFT (PUBLISHED, SUSPENDED, DEPRECATED, ARCHIVED), alla richiesta di cancellazione di un documento precedentemente caricato, si ottiene un errore
   # (NB: status code restituito: BadRequest attualmente (18/01) questo controllo non viene effettuato e la cancellazione va a buon fine)
 
@@ -26,7 +26,7 @@ Feature: Cancellazione di un documento
      Given un "<ruolo>" di "<ente>" ha già creato un e-service con un descrittore in stato "<statoDescrittore>"
      Given l'utente ha già caricato un documento su quel descrittore
      When l'utente cancella quel documento
-     Then si ottiene status code 204
+     Then si ottiene status code 400
      # Then si ottiene status code 400 # TODO: waiting for fix to BFF to return status code 400
    
     Examples: 
@@ -34,4 +34,4 @@ Feature: Cancellazione di un documento
       | GSP            | admin |    PUBLISHED     |
       | GSP            | admin |    SUSPENDED     |
       | GSP            | admin |    DEPRECATED    |
-      # | GSP            | admin |    ARCHIVED      |
+      | GSP            | admin |    ARCHIVED      |
