@@ -33,18 +33,16 @@ Given(
 );
 
 When(
-  "l'utente carica un documento di interfaccia con estensione {string}",
-  async function (estensioneFile: string) {
+  "l'utente carica un documento di interfaccia di tipo {string}",
+  async function (tipoFile: string) {
     assertContextSchema(this, {
       token: z.string(),
       eserviceId: z.string(),
       descriptorId: z.string(),
     });
 
-    const blobFile = new Blob([
-      readFileSync(`./utils/interface${estensioneFile}`),
-    ]);
-    const file = new File([blobFile], `interface${estensioneFile}`);
+    const blobFile = new Blob([readFileSync(`./utils/interface.${tipoFile}`)]);
+    const file = new File([blobFile], `interface.${tipoFile}`);
 
     this.response = await apiClient.eservices.createEServiceDocument(
       this.eserviceId,
@@ -60,7 +58,7 @@ When(
 );
 
 When(
-  "l'utente carica un documento di interfaccia con estensione {string} che contiene il termine localhost",
+  "l'utente carica un documento di interfaccia di tipo {string} che contiene il termine localhost",
   async function (estensioneFile: string) {
     assertContextSchema(this, {
       token: z.string(),
@@ -69,9 +67,9 @@ When(
     });
 
     const blobFile = new Blob([
-      readFileSync(`./utils/localhost-interface${estensioneFile}`),
+      readFileSync(`./utils/localhost-interface.${estensioneFile}`),
     ]);
-    const file = new File([blobFile], `localhost-interface${estensioneFile}`);
+    const file = new File([blobFile], `localhost-interface.${estensioneFile}`);
 
     this.response = await apiClient.eservices.createEServiceDocument(
       this.eserviceId,
