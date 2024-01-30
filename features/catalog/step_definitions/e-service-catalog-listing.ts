@@ -1,5 +1,4 @@
-import assert from "assert";
-import { Given, When, Then } from "@cucumber/cucumber";
+import { Given, When } from "@cucumber/cucumber";
 import { z } from "zod";
 import { apiClient } from "../../../api";
 import {
@@ -8,13 +7,7 @@ import {
   getOrganizationId,
 } from "../../../utils/commons";
 import { dataPreparationService } from "../../../services/data-preparation.service";
-import { Party, Role } from "./common-steps";
-
-// const PUBLISHED_ESERVICES = 1;
-// const SUSPENDED_ESERVICES = 1;
-// const DRAFT_ESERVICES = 1;
-// const TOTAL_ESERVICES =
-//   PUBLISHED_ESERVICES + SUSPENDED_ESERVICES + DRAFT_ESERVICES;
+import { Party, Role, SessionTokens } from "./common-steps";
 
 Given(
   "un {string} di {string} ha già creato {int} e-services in catalogo in stato Published o Suspended e {int} in stato Draft",
@@ -27,15 +20,10 @@ Given(
     assertContextSchema(this);
 
     const token = this.tokens[party]![role]!;
-    const PUBLISHED_ESERVICES = 1;
-    const SUSPENDED_ESERVICES = countEservices - PUBLISHED_ESERVICES;
+    const SUSPENDED_ESERVICES = Math.floor(countEservices / 2);
+    const PUBLISHED_ESERVICES = countEservices - SUSPENDED_ESERVICES;
     const DRAFT_ESERVICES = countDraftEservices;
     const TOTAL_ESERVICES = countEservices + DRAFT_ESERVICES;
-
-    /**
-     * To speed up the process and avoid the BFF rate limit restriction,
-     * we are calling each service in parallel chunks.
-     */
 
     // 1. Create the draft e-services with draft descriptors
     const arr = new Array(TOTAL_ESERVICES).fill(0);
@@ -103,24 +91,24 @@ Given(
   }
 );
 
-// TODO: parametrizzare ente_fruitore
 Given(
-  "ente_fruitore ha un agreement attivo con un eservice di {string}",
-  async function (_producer: string) {
+  "{string} ha un agreement attivo con un e-service di {string}",
+  async function (consumer: Party, _producer: string) {
     assertContextSchema(this, {
       token: z.string(),
       publishedEservicesIds: z.array(z.tuple([z.string(), z.string()])),
+      tokens: SessionTokens,
     });
-
+    const token = this.tokens[consumer]!.admin!;
     const [eserviceId, descriptorId] = this.publishedEservicesIds[0];
 
     const agreementId = await dataPreparationService.createAgreement(
-      this.token,
+      token,
       eserviceId,
       descriptorId
     );
 
-    await dataPreparationService.submitAgreement(this.token, agreementId);
+    await dataPreparationService.submitAgreement(token, agreementId);
 
     this.agreementId = agreementId;
     this.eserviceSubscribedId = eserviceId;
@@ -320,13 +308,5 @@ Given(
       eserviceId,
       descriptorId
     );
-  }
-);
-
-Then(
-  "si ottiene status code {int} e la lista degli eservices di cui è fruitore con un agreement attivo per una versione dell'eservice in stato SUSPENDED, che contiene la chiave di ricerca",
-  function (statusCode: number) {
-    assert.equal(this.response.status, statusCode);
-    assert.equal(this.response.data.pagination.totalCount, 2);
   }
 );

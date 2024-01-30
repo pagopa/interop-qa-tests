@@ -162,6 +162,33 @@ export const dataPreparationService = {
     );
     return documentId;
   },
+
+  async deleteDocumentFromDescriptor(
+    eserviceId: string,
+    descriptorId: string,
+    documentId: string,
+    token: string
+  ) {
+    const response = await apiClient.eservices.deleteEServiceDocumentById(
+      eserviceId,
+      descriptorId,
+      documentId,
+      getAuthorizationHeader(token)
+    );
+
+    assertValidResponse(response);
+
+    await makePolling(
+      () =>
+        apiClient.producers.getProducerEServiceDescriptor(
+          eserviceId,
+          descriptorId,
+          getAuthorizationHeader(token)
+        ),
+      (res) => res.data.docs.every((doc) => doc.id !== documentId)
+    );
+  },
+
   async publishDescriptor(
     token: string,
     eserviceId: string,
