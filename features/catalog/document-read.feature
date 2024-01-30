@@ -28,8 +28,7 @@ Feature: Lettura di un documento
      Given l'utente ha già caricato un documento su quel descrittore
      Given l'utente ha già cancellato quel documento su quel descrittore
      When l'utente richiede il documento
-     Then si ottiene status code 500
-     # Then si ottiene status code 404 # TODO: check if correct status code is 500 or 404
+     Then si ottiene status code 404
    
     Examples: 
       | ente           | ruolo |
