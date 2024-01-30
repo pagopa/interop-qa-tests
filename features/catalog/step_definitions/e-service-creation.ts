@@ -1,5 +1,5 @@
 import assert from "assert";
-import { Given, When, Then, setDefaultTimeout } from "@cucumber/cucumber";
+import { Given, When, Then } from "@cucumber/cucumber";
 import { z } from "zod";
 import {
   getAuthorizationHeader,
@@ -8,8 +8,6 @@ import {
 } from "../../../utils/commons";
 import { apiClient } from "../../../api";
 import { dataPreparationService } from "../../../services/data-preparation.service";
-
-setDefaultTimeout(5 * 60 * 1000);
 
 When("l'utente crea un e-service con lo stesso nome", async function () {
   assertContextSchema(this, {
