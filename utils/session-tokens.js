@@ -7,8 +7,6 @@ import _ from "lodash";
 import { VerifyCommand, KMSClient, SignCommand } from "@aws-sdk/client-kms";
 import { env } from "../configs/env";
 
-// import { VerifyCommand, KMSClient, SignCommand } from "@aws-sdk/client-kms";
-
 const verboseMode =
   typeof env.ST_VERBOSE_MODE != "undefined" && env.ST_VERBOSE_MODE === "1";
 
