@@ -58,7 +58,6 @@ When(
       { q: this.TEST_SEED, consumersIds: [consumerId], offset: 0, limit: 12 },
       getAuthorizationHeader(this.token)
     );
-    console.log(this.response);
   }
 );
 
