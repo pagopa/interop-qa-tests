@@ -11,6 +11,7 @@ import {
   EServiceSeed,
   EServiceDescriptorSeed,
   EServiceDescriptorState,
+  EServiceRiskAnalysisSeed,
 } from "./../api/models";
 
 export const dataPreparationService = {
@@ -359,5 +360,38 @@ export const dataPreparationService = {
 
       return descriptorId;
     }
+  },
+
+  async addRiskAnalysisToEService(
+    token: string,
+    eserviceId: string,
+    data: EServiceRiskAnalysisSeed
+  ) {
+    const response = await apiClient.eservices.addRiskAnalysisToEService(
+      eserviceId,
+      data,
+      getAuthorizationHeader(token)
+    );
+
+    assertValidResponse(response);
+    let riskAnalysisId = "";
+    await makePolling(
+      () =>
+        apiClient.producers.getProducerEServiceDetails(
+          eserviceId,
+          getAuthorizationHeader(token)
+        ),
+      (res) => {
+        if (res.data.riskAnalysis.length > 0) {
+          riskAnalysisId = res.data.riskAnalysis[0].id;
+          return true;
+        }
+        return false;
+      }
+    );
+    if (riskAnalysisId === "") {
+      throw new Error("Risk analysis not found");
+    }
+    return riskAnalysisId;
   },
 };
