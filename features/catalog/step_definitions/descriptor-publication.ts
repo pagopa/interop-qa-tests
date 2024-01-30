@@ -6,18 +6,20 @@ import {
   getAuthorizationHeader,
 } from "../../../utils/commons";
 import { apiClient } from "../../../api";
+import { Party, Role } from "./common-steps";
 
 Given(
-  "l'utente ha già caricato un'interfaccia per quel descrittore",
-  async function () {
+  "un {string} di {string} ha già caricato un'interfaccia per quel descrittore",
+  async function (role: Role, party: Party) {
     assertContextSchema(this, {
-      token: z.string(),
       eserviceId: z.string(),
       descriptorId: z.string(),
     });
 
+    const token = this.tokens[party]![role]!;
+
     await dataPreparationService.addInterfaceToDescriptor(
-      this.token,
+      token,
       this.eserviceId,
       this.descriptorId
     );

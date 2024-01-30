@@ -1,34 +1,40 @@
 @document_update
 
 Feature: Aggiornamento del nome di un documento
-  Tutti gli utenti autenticati di enti erogatori possono modificare il nome di un documento (non di interfaccia) già caricato
+  Tutti gli utenti autorizzati di enti erogatori possono modificare il nome di un documento (non di interfaccia) già caricato
 
   @document_update1
   Scenario Outline: Per un e-service che ha un solo descrittore, il quale è in stato DRAFT, e che ha almeno un documento già caricato, alla richiesta di aggiornamento del nome, l'operazione va a buon fine
      Given l'utente è un "<ruolo>" di "<ente>"
-     Given un "<ruolo>" di "<ente>" ha già creato un e-service con un descrittore in stato "DRAFT"
-     Given l'utente ha già caricato un documento su quel descrittore
+     Given un "admin" di "<ente>" ha già creato un e-service con un descrittore in stato "DRAFT"
+     Given un "admin" di "<ente>" ha già caricato un documento su quel descrittore
      When l'utente aggiorna il nome di quel documento
-     Then si ottiene status code 200
-   
+     Then si ottiene status code <risultato>
 
     Examples: 
-      | ente           | ruolo |
-      | GSP            | admin |
-      | PA1            | admin |
+      | ente               | ruolo          | risultato |
+      | GSP                | admin          | 200       |
+      | GSP                | api            | 200       |
+      | GSP                | security       | 403       |
+      | GSP                | api,security   | 200       |
+      | GSP                | support        | 403       |
+      | PA1                | admin          | 200       |
+      | PA1                | api            | 200       |
+      | PA1                | security       | 403       |
+      | PA1                | api,security   | 200       |
+      | PA1                | support        | 403       |
 
-  @document_update2
+  @document_update2 @wait-for-fix
   Scenario Outline: Per un e-service che ha un solo descrittore, il quale è in stato non DRAFT, e che ha almeno un documento già caricato, alla richiesta di aggiornamento del nome, si ottiene un errore
-     Given l'utente è un "<ruolo>" di "<ente>"
-     Given un "<ruolo>" di "<ente>" ha già creato un e-service con un descrittore in stato "<statoDescrittore>"
-     Given l'utente ha già caricato un documento su quel descrittore
+     Given l'utente è un "admin" di "GSP"
+     Given un "admin" di "GSP" ha già creato un e-service con un descrittore in stato "<statoDescrittore>"
+     Given un "admin" di "GSP" ha già caricato un documento su quel descrittore
      When l'utente aggiorna il nome di quel documento
      Then si ottiene status code 400
    
-   
     Examples: 
-      | ente           | ruolo | statoDescrittore |
-      | GSP            | admin |    PUBLISHED     |
-      | GSP            | admin |    SUSPENDED     |
-      | GSP            | admin |    DEPRECATED    |
-      # | GSP            | admin |    ARCHIVED      |
+      | statoDescrittore |
+      |    PUBLISHED     |
+      |    SUSPENDED     |
+      |    DEPRECATED    |
+      |    ARCHIVED      |

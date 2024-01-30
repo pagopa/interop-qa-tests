@@ -14,7 +14,7 @@ When("l'utente aggiorna quell'e-service", async function () {
     {
       name: `e-service - ${getRandomInt()}`,
       description: "Nuova descrizione",
-      mode: "RECEIVE",
+      mode: "DELIVER",
       technology: "SOAP",
     },
     getAuthorizationHeader(this.token)
