@@ -87,5 +87,8 @@ Then("si ottiene status code {int}", function (statusCode: number) {
       status: z.number(),
     }),
   });
+
+  console.log(this.response);
+
   assert.equal(this.response.status, statusCode);
 });
