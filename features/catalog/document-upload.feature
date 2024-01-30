@@ -44,3 +44,12 @@ Feature: Caricamento di un documento di interfaccia
       | GSP  | admin |    SUSPENDED      |  
       | GSP  | admin |    DEPRECATED     |  
       #| GSP  | admin |    ARCHIVED       |  
+
+  @document_upload4 @wait-for-fix
+  Scenario Outline: Per un e-service che ha un solo descrittore, il quale è in stato DRAFT, e per il quale è già stato caricato un documento di interfaccia, alla richiesta di caricamento di un nuovo documento di interfaccia, l’operazione restituirà errore.
+
+    Given l'utente è un "admin" di "GSP"
+    Given un "admin" di "GSP" ha già creato un e-service con un descrittore in stato "DRAFT"
+    Given l'utente ha già caricato un'interfaccia per quel descrittore
+    When l'utente carica un documento di interfaccia con estensione ".yaml"
+    Then si ottiene status code 400
