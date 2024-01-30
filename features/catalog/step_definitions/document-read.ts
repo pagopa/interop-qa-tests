@@ -5,6 +5,7 @@ import {
   getAuthorizationHeader,
 } from "../../../utils/commons";
 import { apiClient } from "../../../api";
+import { dataPreparationService } from "../../../services/data-preparation.service";
 
 When("l'utente richiede il documento", async function () {
   assertContextSchema(this, {
@@ -30,11 +31,11 @@ Given(
       descriptorId: z.string(),
       documentId: z.string(),
     });
-    this.response = await apiClient.eservices.deleteEServiceDocumentById(
+    await dataPreparationService.deleteDocumentFromDescriptor(
       this.eserviceId,
       this.descriptorId,
       this.documentId,
-      getAuthorizationHeader(this.token)
+      this.token
     );
   }
 );
