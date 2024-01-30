@@ -35,7 +35,4 @@ Feature: Riattivazione di un descrittore
       | DRAFT            |
       | DEPRECATED       |
       | PUBLISHED        |
-      | ARCHIVED         |
-      | DRAFT            |
-      | DEPRECATED       |
-      | PUBLISHED        |
+
