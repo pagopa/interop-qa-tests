@@ -1,6 +1,6 @@
 @descriptor_deletion
 Feature: Cancellazione di un descrittore
-  Tutti gli utenti autenticati di enti erogatori possono cancellare i propri descrittori e, potenzialmente, gli e-services
+  Tutti gli utenti autorizzati di enti erogatori possono cancellare i propri descrittori e, potenzialmente, gli e-services
 
   @descriptor_deletion1
   Scenario Outline: Per un e-service che ha un solo descrittore, il quale è in stato DRAFT, la richiesta di cancellazione del descrittore cancella contestualmente anche l'e-service del quale fa parte
