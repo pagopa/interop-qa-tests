@@ -27,8 +27,7 @@ Feature: Cancellazione di un documento
   Scenario Outline: Per un e-service che ha un solo descrittore, il quale è in stato NON DRAFT (PUBLISHED, SUSPENDED, DEPRECATED, ARCHIVED), alla richiesta di cancellazione di un documento precedentemente caricato, si ottiene un errore
 
      Given l'utente è un "admin" di "GSP"
-     Given un "admin" di "GSP" ha già creato un e-service con un descrittore in stato "<statoDescrittore>"
-     Given un "admin" di "GSP" ha già caricato un documento su quel descrittore
+     Given un "admin" di "GSP" ha già creato un e-service con un descrittore in stato "<statoDescrittore>" e un documento già caricato
      When l'utente cancella quel documento
      Then si ottiene status code 400
    
