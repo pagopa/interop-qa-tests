@@ -3,11 +3,11 @@ Feature: Lettura di un documento
   Tutti gli utenti autenticati di enti erogatori possono recuperare un'interfaccia o un documento dai propri descrittori
 
   @document_read1 @wait-for-fix
-  Scenario Outline: Per un e-service che ha un solo descrittore, il quale è in qualsiasi stato (DRAFT, PUBLISHED, SUSPENDED, DEPRECATED, ARCHIVED), alla richiesta di recupero di un documento precedentemente caricato, l'operazione va a buon fine
+  Scenario Outline: Per un e-service che ha un solo descrittore, il quale è in qualsiasi stato (DRAFT, PUBLISHED, SUSPENDED, DEPRECATED, ARCHIVED), alla richiesta di recupero di un documento precedentemente caricato da parte di un utente autorizzato, ottiene il documento
     Given l'utente è un "<ruolo>" di "<ente>"
     Given un "admin" di "<ente>" ha già creato un e-service con un descrittore in stato "<statoDescrittore>" e un documento già caricato
     When l'utente richiede il documento
-    Then si ottiene status code 200
+    Then si ottiene status code <risultato>
 
     Examples: 
       | ente | ruolo        | statoDescrittore | risultato |
