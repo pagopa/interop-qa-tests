@@ -23,11 +23,11 @@ Given(
     const token = this.tokens[party]![role]!;
 
     this.descriptorId =
-      await dataPreparationService.createDescriptorWithGivenState(
+      await dataPreparationService.createDescriptorWithGivenState({
         token,
-        this.eserviceId,
-        descriptorState
-      );
+        eserviceId: this.eserviceId,
+        descriptorState,
+      });
   }
 );
 
