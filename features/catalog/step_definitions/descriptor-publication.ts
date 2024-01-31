@@ -80,12 +80,13 @@ Given(
     assertContextSchema(this, {
       token: z.string(),
       eserviceId: z.string(),
+      party: Party,
     });
 
     await dataPreparationService.addRiskAnalysisToEService(
       this.token,
       this.eserviceId,
-      getRiskAnalysis({ completed: false })
+      getRiskAnalysis({ completed: false, party: this.party })
     );
   }
 );
