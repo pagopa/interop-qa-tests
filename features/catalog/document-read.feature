@@ -1,75 +1,71 @@
 @document_read
-
 Feature: Lettura di un documento
   Tutti gli utenti autenticati di enti erogatori possono recuperare un'interfaccia o un documento dai propri descrittori
 
   @document_read1 @wait-for-fix
-  Scenario Outline: Per un e-service che ha un solo descrittore, il quale è in qualsiasi stato (DRAFT, PUBLISHED, SUSPENDED, DEPRECATED, ARCHIVED), alla richiesta di recupero di un documento precedentemente caricato, l'operazione va a buon fine
-     Given l'utente è un "<ruolo>" di "<ente>"
-     Given un "admin" di "<ente>" ha già creato un e-service con un descrittore in stato "<statoDescrittore>"
-     Given un "admin" di "<ente>" ha già caricato un documento su quel descrittore
-     When l'utente richiede il documento
-     Then si ottiene status code 200
-   
-    Examples: 
-      | ente           | ruolo        | statoDescrittore | 
-      | GSP            | admin        |    DRAFT         | 
-      | GSP            | api          |    DRAFT         | 
-      | GSP            | security     |    DRAFT         | 
-      | GSP            | api,security |    DRAFT         | 
-      | GSP            | support      |    DRAFT         | 
-      | GSP            | admin        |    PUBLISHED     | 
-      | GSP            | api          |    PUBLISHED     | 
-      | GSP            | security     |    PUBLISHED     | 
-      | GSP            | api,security |    PUBLISHED     | 
-      | GSP            | support      |    PUBLISHED     | 
-      | GSP            | admin        |    SUSPENDED     | 
-      | GSP            | api          |    SUSPENDED     | 
-      | GSP            | security     |    SUSPENDED     | 
-      | GSP            | api,security |    SUSPENDED     | 
-      | GSP            | support      |    SUSPENDED     | 
-      | GSP            | admin        |    DEPRECATED    | 
-      | GSP            | api          |    DEPRECATED    | 
-      | GSP            | security     |    DEPRECATED    | 
-      | GSP            | api,security |    DEPRECATED    | 
-      | GSP            | support      |    DEPRECATED    | 
-      | GSP            | admin        |    ARCHIVED      | 
-      | GSP            | api          |    ARCHIVED      | 
-      | GSP            | security     |    ARCHIVED      | 
-      | GSP            | api,security |    ARCHIVED      | 
-      | GSP            | support      |    ARCHIVED      | 
-      | PA1            | admin        |    DRAFT         | 
-      | PA1            | api          |    DRAFT         | 
-      | PA1            | security     |    DRAFT         | 
-      | PA1            | api,security |    DRAFT         | 
-      | PA1            | support      |    DRAFT         | 
-      | PA1            | admin        |    PUBLISHED     | 
-      | PA1            | api          |    PUBLISHED     | 
-      | PA1            | security     |    PUBLISHED     | 
-      | PA1            | api,security |    PUBLISHED     | 
-      | PA1            | support      |    PUBLISHED     | 
-      | PA1            | admin        |    SUSPENDED     | 
-      | PA1            | api          |    SUSPENDED     | 
-      | PA1            | security     |    SUSPENDED     | 
-      | PA1            | api,security |    SUSPENDED     | 
-      | PA1            | support      |    SUSPENDED     | 
-      | PA1            | admin        |    DEPRECATED    | 
-      | PA1            | api          |    DEPRECATED    | 
-      | PA1            | security     |    DEPRECATED    | 
-      | PA1            | api,security |    DEPRECATED    | 
-      | PA1            | support      |    DEPRECATED    | 
-      | PA1            | admin        |    ARCHIVED      | 
-      | PA1            | api          |    ARCHIVED      | 
-      | PA1            | security     |    ARCHIVED      | 
-      | PA1            | api,security |    ARCHIVED      | 
-      | PA1            | support      |    ARCHIVED      | 
-  
-  @document_read2
-  Scenario Outline: Per un e-service che ha un solo descrittore, il quale è in stato DRAFT, alla richiesta di recupero di un documento precedentemente caricato e poi cancellato, ottiene un errore 
+  Scenario Outline: Per un e-service che ha un solo descrittore, il quale è in qualsiasi stato (DRAFT, PUBLISHED, SUSPENDED, DEPRECATED, ARCHIVED), alla richiesta di recupero di un documento precedentemente caricato da parte di un utente autorizzato, ottiene il documento
+    Given l'utente è un "<ruolo>" di "<ente>"
+    Given un "admin" di "<ente>" ha già creato un e-service con un descrittore in stato "<statoDescrittore>" e un documento già caricato
+    When l'utente richiede il documento
+    Then si ottiene status code <risultato>
 
-     Given l'utente è un "admin" di "GSP"
-     Given un "admin" di "GSP" ha già creato un e-service con un descrittore in stato "DRAFT"
-     Given un "admin" di "GSP" ha già caricato un documento su quel descrittore
-     Given l'utente ha già cancellato quel documento su quel descrittore
-     When l'utente richiede il documento
-     Then si ottiene status code 404
+    Examples: 
+      | ente | ruolo        | statoDescrittore | risultato |
+      | GSP  | admin        | DRAFT            |       200 |
+      | GSP  | api          | DRAFT            |       200 |
+      | GSP  | security     | DRAFT            |       400 |
+      | GSP  | api,security | DRAFT            |       200 |
+      | GSP  | support      | DRAFT            |       400 |
+      | GSP  | admin        | PUBLISHED        |       200 |
+      | GSP  | api          | PUBLISHED        |       200 |
+      | GSP  | security     | PUBLISHED        |       200 |
+      | GSP  | api,security | PUBLISHED        |       200 |
+      | GSP  | support      | PUBLISHED        |       200 |
+      | GSP  | admin        | SUSPENDED        |       200 |
+      | GSP  | api          | SUSPENDED        |       200 |
+      | GSP  | security     | SUSPENDED        |       200 |
+      | GSP  | api,security | SUSPENDED        |       200 |
+      | GSP  | support      | SUSPENDED        |       200 |
+      | GSP  | admin        | DEPRECATED       |       200 |
+      | GSP  | api          | DEPRECATED       |       200 |
+      | GSP  | security     | DEPRECATED       |       200 |
+      | GSP  | api,security | DEPRECATED       |       200 |
+      | GSP  | support      | DEPRECATED       |       200 |
+      | GSP  | admin        | ARCHIVED         |       200 |
+      | GSP  | api          | ARCHIVED         |       200 |
+      | GSP  | security     | ARCHIVED         |       200 |
+      | GSP  | api,security | ARCHIVED         |       200 |
+      | GSP  | support      | ARCHIVED         |       200 |
+      | PA1  | admin        | DRAFT            |       200 |
+      | PA1  | api          | DRAFT            |       200 |
+      | PA1  | security     | DRAFT            |       400 |
+      | PA1  | api,security | DRAFT            |       200 |
+      | PA1  | support      | DRAFT            |       400 |
+      | PA1  | admin        | PUBLISHED        |       200 |
+      | PA1  | api          | PUBLISHED        |       200 |
+      | PA1  | security     | PUBLISHED        |       200 |
+      | PA1  | api,security | PUBLISHED        |       200 |
+      | PA1  | support      | PUBLISHED        |       200 |
+      | PA1  | admin        | SUSPENDED        |       200 |
+      | PA1  | api          | SUSPENDED        |       200 |
+      | PA1  | security     | SUSPENDED        |       200 |
+      | PA1  | api,security | SUSPENDED        |       200 |
+      | PA1  | support      | SUSPENDED        |       200 |
+      | PA1  | admin        | DEPRECATED       |       200 |
+      | PA1  | api          | DEPRECATED       |       200 |
+      | PA1  | security     | DEPRECATED       |       200 |
+      | PA1  | api,security | DEPRECATED       |       200 |
+      | PA1  | support      | DEPRECATED       |       200 |
+      | PA1  | admin        | ARCHIVED         |       200 |
+      | PA1  | api          | ARCHIVED         |       200 |
+      | PA1  | security     | ARCHIVED         |       200 |
+      | PA1  | api,security | ARCHIVED         |       200 |
+      | PA1  | support      | ARCHIVED         |       200 |
+
+  @document_read2
+  Scenario Outline: Per un e-service che ha un solo descrittore, il quale è in stato DRAFT, alla richiesta di recupero di un documento precedentemente caricato e poi cancellato, ottiene un errore
+    Given l'utente è un "admin" di "GSP"
+    Given un "admin" di "GSP" ha già creato un e-service con un descrittore in stato "DRAFT" e un documento già caricato
+    Given l'utente ha già cancellato quel documento su quel descrittore
+    When l'utente richiede il documento
+    Then si ottiene status code 404
