@@ -68,7 +68,7 @@ export function getRiskAnalysis(params?: {
   party?: Party;
 }) {
   const completed = params?.completed ?? true;
-  const party: Party = params?.party ?? "GSP";
+  const party: Party = params?.party ?? "PA1";
   const templateType =
     party === "PA1" || party === "PA2" ? "PA" : "Privato/GSP";
   const templateStatus = completed ? "completed" : "uncompleted";
