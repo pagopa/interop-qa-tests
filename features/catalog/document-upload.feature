@@ -1,5 +1,4 @@
 @document_upload
-
 Feature: Caricamento di un documento di interfaccia
   Tutti gli utenti autenticati di enti erogatori possono caricare un documento di interfaccia ai propri descrittori
 
@@ -9,7 +8,6 @@ Feature: Caricamento di un documento di interfaccia
      Given un "admin" di "<ente>" ha già creato un e-service con un descrittore in stato DRAFT e tecnologia "<technology>"
      When l'utente carica un documento di interfaccia di tipo "<tipoFile>"
      Then si ottiene status code <risultato>
-   
 
     Examples: 
       | ente | ruolo        |    technology | tipoFile      | risultato |
@@ -67,13 +65,12 @@ Feature: Caricamento di un documento di interfaccia
       |    REST       | yaml     |
       |    SOAP       | wsdl     |
 
-  @document_upload3 @wait-for-fix
+  @document_upload3
   Scenario Outline: Per un e-service che ha un solo descrittore, il quale è in stato NON DRAFT, alla richiesta di caricamento di un documento di interfaccia, l'operazione restituirà errore. 
      Given l'utente è un "admin" di "GSP"
      Given un "admin" di "GSP" ha già creato un e-service con un descrittore in stato "<statoDescrittore>"
      When l'utente carica un documento di interfaccia di tipo "yaml"
      Then si ottiene status code 400
- 
     
     Examples: 
       | statoDescrittore  |
@@ -82,11 +79,11 @@ Feature: Caricamento di un documento di interfaccia
       |    DEPRECATED     |  
       |    ARCHIVED       |  
 
-  @document_upload4 @wait-for-fix
+  @document_upload4
   Scenario Outline: Per un e-service che ha un solo descrittore, il quale è in stato DRAFT, e per il quale è già stato caricato un documento di interfaccia, alla richiesta di caricamento di un nuovo documento di interfaccia, l’operazione restituirà errore.
-
     Given l'utente è un "admin" di "GSP"
     Given un "admin" di "GSP" ha già creato un e-service con un descrittore in stato "DRAFT"
     Given un "admin" di "GSP" ha già caricato un'interfaccia per quel descrittore
     When l'utente carica un documento di interfaccia di tipo "yaml"
     Then si ottiene status code 400
+    
