@@ -316,18 +316,7 @@ export const dataPreparationService = {
       eserviceId
     );
 
-    if (descriptorState === "DRAFT") {
-      return { descriptorId };
-    }
-
-    // 2. Add interface to descriptor
-    await dataPreparationService.addInterfaceToDescriptor(
-      token,
-      eserviceId,
-      descriptorId
-    );
-
-    // 2.1 add document to descriptor
+    // 1.1 add document to descriptor
     let documentId: string | undefined;
     if (withDocument) {
       documentId = await dataPreparationService.addDocumentToDescriptor(
@@ -337,6 +326,19 @@ export const dataPreparationService = {
       );
     }
 
+    const result = { descriptorId, documentId };
+
+    if (descriptorState === "DRAFT") {
+      return result;
+    }
+
+    // 2. Add interface to descriptor
+    await dataPreparationService.addInterfaceToDescriptor(
+      token,
+      eserviceId,
+      descriptorId
+    );
+
     // 3. Publish Descriptor
     await dataPreparationService.publishDescriptor(
       token,
@@ -345,7 +347,7 @@ export const dataPreparationService = {
     );
 
     if (descriptorState === "PUBLISHED") {
-      return { descriptorId, documentId };
+      return result;
     }
 
     // 4. Suspend Descriptor
@@ -355,7 +357,7 @@ export const dataPreparationService = {
         eserviceId,
         descriptorId
       );
-      return { descriptorId, documentId };
+      return result;
     }
 
     if (descriptorState === "ARCHIVED" || descriptorState === "DEPRECATED") {
@@ -400,8 +402,8 @@ export const dataPreparationService = {
         (res) => res.data.state === descriptorState
       );
 
-      return { descriptorId, documentId };
+      return result;
     }
-    return { descriptorId, documentId };
+    return result;
   },
 };
