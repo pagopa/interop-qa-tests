@@ -8,18 +8,20 @@ import {
 } from "../../../utils/commons";
 import { apiClient } from "../../../api";
 import { EServiceDescriptorState, EServiceMode } from "../../../api/models";
+import { Party, Role } from "./common-steps";
 
 Given(
-  "l'utente ha già caricato un'interfaccia per quel descrittore",
-  async function () {
+  "un {string} di {string} ha già caricato un'interfaccia per quel descrittore",
+  async function (role: Role, party: Party) {
     assertContextSchema(this, {
-      token: z.string(),
       eserviceId: z.string(),
       descriptorId: z.string(),
     });
 
+    const token = this.tokens[party]![role]!;
+
     await dataPreparationService.addInterfaceToDescriptor(
-      this.token,
+      token,
       this.eserviceId,
       this.descriptorId
     );
@@ -48,11 +50,11 @@ Given(
     }
 
     this.descriptorId =
-      await dataPreparationService.createDescriptorWithGivenState(
-        this.token,
-        this.eserviceId,
-        descriptorState
-      );
+      await dataPreparationService.createDescriptorWithGivenState({
+        token: this.token,
+        eserviceId: this.eserviceId,
+        descriptorState,
+      });
   }
 );
 
