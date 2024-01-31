@@ -6,6 +6,7 @@
   "scripts": {
     "test": "cucumber-js",
     "test:tags": "cucumber-js --tags",
+    "lint": "tsc --noEmit && eslint .",
     "generate-model": "node ./scripts/generate-api-models.mjs"
   },
   "keywords": [],
