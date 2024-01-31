@@ -22,7 +22,7 @@ Feature: Cancellazione di un documento
       | PA1   | api,security   | 204       |
       | PA1   | support        | 403       |
 
-  @document_delete2 @wait-for-fix
+  @document_delete2
   Scenario Outline: Per un e-service che ha un solo descrittore, il quale è in stato NON DRAFT (PUBLISHED, SUSPENDED, DEPRECATED, ARCHIVED), alla richiesta di cancellazione di un documento precedentemente caricato, si ottiene un errore
 
      Given l'utente è un "admin" di "GSP"
