@@ -49,12 +49,14 @@ Given(
       );
     }
 
-    this.descriptorId =
+    const { descriptorId } =
       await dataPreparationService.createDescriptorWithGivenState({
         token: this.token,
         eserviceId: this.eserviceId,
         descriptorState,
       });
+
+    this.descriptorId = descriptorId;
   }
 );
 
