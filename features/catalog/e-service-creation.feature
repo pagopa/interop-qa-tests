@@ -1,8 +1,8 @@
-@eservice-creation
+@eservice_creation
 Feature: Creazione e-service
   Gli admin e gli operatori API di enti PA e GSP possono creare e-service
 
-  @eservice-creation1
+  @eservice_creation1
   Scenario Outline: Un utente con sufficienti permessi di un ente autorizzato crea un e-service
     Given l'utente è un "<ruolo>" di "<ente>"
     When l'utente crea un e-service
@@ -26,7 +26,7 @@ Feature: Creazione e-service
     | PA1                | api,security   | 200       |
     | PA1                | support        | 403       |
 
-  @eservice-creation2
+  @eservice_creation2
   Scenario: Un utente autorizzato vuole creare due e-service con lo stesso nome
     Given l'utente è un "admin" di "GSP"
     Given l'utente ha già creato un e-service
