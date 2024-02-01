@@ -29,21 +29,23 @@ Given(
 );
 
 Given(
-  "l'utente ha già creato un e-service in modalità {string} con un descrittore in stato {string}",
+  "un {string} di {string} ha già creato un e-service in modalità {string} con un descrittore in stato {string}",
   async function (
+    role: Role,
+    party: Party,
     mode: EServiceMode,
     descriptorState: EServiceDescriptorState
   ) {
-    assertContextSchema(this, { token: z.string() });
-
-    this.eserviceId = await dataPreparationService.createEService(this.token, {
+    assertContextSchema(this);
+    const token = this.tokens[party]![role]!;
+    this.eserviceId = await dataPreparationService.createEService(token, {
       mode,
     });
 
     // If descriptorState is not DRAFT we have to add a completed risk analysis in order to correctly publish the descriptor
     if (mode === "RECEIVE" && descriptorState !== "DRAFT") {
       await dataPreparationService.addRiskAnalysisToEService(
-        this.token,
+        token,
         this.eserviceId,
         getRiskAnalysis({ completed: true })
       );
@@ -51,7 +53,7 @@ Given(
 
     const { descriptorId } =
       await dataPreparationService.createDescriptorWithGivenState({
-        token: this.token,
+        token,
         eserviceId: this.eserviceId,
         descriptorState,
       });
