@@ -7,21 +7,20 @@ import {
 } from "../../../utils/commons";
 import { dataPreparationService } from "../../../services/data-preparation.service";
 import { apiClient } from "../../../api";
-import { Party } from "./common-steps";
+import { Party, Role } from "./common-steps";
 
 Given(
-  "l'utente ha già aggiunto un'analisi del rischio a quell'e-service",
-  async function () {
+  "un {string} di {string} ha già aggiunto un'analisi del rischio a quell'e-service",
+  async function (role: Role, party: Party) {
     assertContextSchema(this, {
-      token: z.string(),
       eserviceId: z.string(),
-      party: Party,
     });
+    const token = this.tokens[party]![role]!;
     this.riskAnalysisId =
       await dataPreparationService.addRiskAnalysisToEService(
-        this.token,
+        token,
         this.eserviceId,
-        getRiskAnalysis({ completed: true, party: this.party })
+        getRiskAnalysis({ completed: true, party })
       );
   }
 );
