@@ -8,19 +8,20 @@ import {
 } from "../../../utils/commons";
 import { apiClient } from "../../../api";
 import { EServiceDescriptorState, EServiceMode } from "../../../api/models";
-import { Party } from "./common-steps";
+import { Party, Role } from "./common-steps";
 
 Given(
-  "l'utente ha già caricato un'interfaccia per quel descrittore",
-  async function () {
+  "un {string} di {string} ha già caricato un'interfaccia per quel descrittore",
+  async function (role: Role, party: Party) {
     assertContextSchema(this, {
-      token: z.string(),
       eserviceId: z.string(),
       descriptorId: z.string(),
     });
 
+    const token = this.tokens[party]![role]!;
+
     await dataPreparationService.addInterfaceToDescriptor(
-      this.token,
+      token,
       this.eserviceId,
       this.descriptorId
     );
@@ -28,33 +29,36 @@ Given(
 );
 
 Given(
-  "l'utente ha già creato un e-service in modalità {string} con un descrittore in stato {string}",
+  "un {string} di {string} ha già creato un e-service in modalità {string} con un descrittore in stato {string}",
   async function (
+    role: Role,
+    party: Party,
     mode: EServiceMode,
     descriptorState: EServiceDescriptorState
   ) {
-    assertContextSchema(this, { token: z.string(), party: Party });
-
-    this.eserviceId = await dataPreparationService.createEService(this.token, {
+    assertContextSchema(this);
+    const token = this.tokens[party]![role]!;
+    this.eserviceId = await dataPreparationService.createEService(token, {
       mode,
     });
 
     // If descriptorState is not DRAFT we have to add a completed risk analysis in order to correctly publish the descriptor
     if (mode === "RECEIVE" && descriptorState !== "DRAFT") {
-      this.riskAnalysisId =
-        await dataPreparationService.addRiskAnalysisToEService(
-          this.token,
-          this.eserviceId,
-          getRiskAnalysis({ completed: true, party: this.party })
-        );
+      await dataPreparationService.addRiskAnalysisToEService(
+        token,
+        this.eserviceId,
+        getRiskAnalysis({ completed: true, party: this.party })
+      );
     }
 
-    this.descriptorId =
-      await dataPreparationService.createDescriptorWithGivenState(
-        this.token,
-        this.eserviceId,
-        descriptorState
-      );
+    const { descriptorId } =
+      await dataPreparationService.createDescriptorWithGivenState({
+        token,
+        eserviceId: this.eserviceId,
+        descriptorState,
+      });
+
+    this.descriptorId = descriptorId;
   }
 );
 
@@ -78,12 +82,13 @@ Given(
     assertContextSchema(this, {
       token: z.string(),
       eserviceId: z.string(),
+      party: Party,
     });
 
     await dataPreparationService.addRiskAnalysisToEService(
       this.token,
       this.eserviceId,
-      getRiskAnalysis({ completed: false })
+      getRiskAnalysis({ completed: false, party: this.party })
     );
   }
 );
