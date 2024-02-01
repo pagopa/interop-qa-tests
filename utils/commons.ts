@@ -104,9 +104,6 @@ export async function makePolling<TReturnType>(
     await sleep(SLEEP_TIME);
     const result = await promise();
     if (shouldStop(result)) {
-      console.log(
-        `Polling ended at iteration: ${i}. Waited ${SLEEP_TIME * i}ms`
-      );
       return;
     }
   }
