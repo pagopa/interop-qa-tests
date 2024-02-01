@@ -20,7 +20,7 @@ When(
       audience: ["api/v1"],
       voucherLifespan: 60,
       dailyCallsPerConsumer: 10,
-      dailyCallsTotal: 200, // changed
+      dailyCallsTotal: 200,
       agreementApprovalPolicy: "AUTOMATIC",
       attributes: {
         certified: [],
