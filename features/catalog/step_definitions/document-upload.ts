@@ -41,7 +41,7 @@ When(
       descriptorId: z.string(),
     });
 
-    const blobFile = new Blob([readFileSync(`./utils/interface.${tipoFile}`)]);
+    const blobFile = new Blob([readFileSync(`./data/interface.${tipoFile}`)]);
     const file = new File([blobFile], `interface.${tipoFile}`);
 
     this.response = await apiClient.eservices.createEServiceDocument(

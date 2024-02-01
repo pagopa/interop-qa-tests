@@ -102,7 +102,7 @@ export const dataPreparationService = {
     eserviceId: string,
     descriptorId: string
   ) {
-    const blobFile = new Blob([readFileSync("./utils/interface.yaml")]);
+    const blobFile = new Blob([readFileSync("./data/interface.yaml")]);
     const file = new File([blobFile], "interface.yaml");
 
     const response = await apiClient.eservices.createEServiceDocument(
@@ -134,7 +134,7 @@ export const dataPreparationService = {
     eserviceId: string,
     descriptorId: string
   ) {
-    const blobFile = new Blob([readFileSync("./utils/dummy.pdf")]);
+    const blobFile = new Blob([readFileSync("./data/dummy.pdf")]);
     const file = new File([blobFile], "documento-test-qa.pdf");
 
     const response = await apiClient.eservices.createEServiceDocument(
