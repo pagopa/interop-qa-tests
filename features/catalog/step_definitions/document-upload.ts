@@ -6,17 +6,18 @@ import { EServiceTechnology } from "../../../api/models";
 import {
   assertContextSchema,
   getAuthorizationHeader,
+  getToken,
 } from "../../../utils/commons";
 import { dataPreparationService } from "../../../services/data-preparation.service";
 import { apiClient } from "../../../api";
-import { Party, Role } from "./common-steps";
+import { Role, Party } from "../../common-steps";
 
 Given(
   "un {string} di {string} ha già creato un e-service con un descrittore in stato DRAFT e tecnologia {string}",
   async function (role: Role, party: Party, technology: EServiceTechnology) {
     assertContextSchema(this);
 
-    const token = this.tokens[party]![role]!;
+    const token = getToken(this.tokens, party, role);
 
     const eserviceId = await dataPreparationService.createEService(token, {
       technology,

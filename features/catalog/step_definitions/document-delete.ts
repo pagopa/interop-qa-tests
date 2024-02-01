@@ -4,9 +4,10 @@ import { dataPreparationService } from "../../../services/data-preparation.servi
 import {
   assertContextSchema,
   getAuthorizationHeader,
+  getToken,
 } from "../../../utils/commons";
 import { apiClient } from "../../../api";
-import { Party, Role } from "./common-steps";
+import { Role, Party } from "../../common-steps";
 
 Given(
   "un {string} di {string} ha già caricato un documento su quel descrittore",
@@ -16,7 +17,7 @@ Given(
       descriptorId: z.string(),
     });
 
-    const token = this.tokens[party]![role]!;
+    const token = getToken(this.tokens, party, role);
 
     const documentId = await dataPreparationService.addDocumentToDescriptor(
       token,

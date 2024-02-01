@@ -3,11 +3,12 @@ import { z } from "zod";
 import {
   assertContextSchema,
   getAuthorizationHeader,
+  getToken,
 } from "../../../utils/commons";
 import { apiClient } from "../../../api";
 import { EServiceDescriptorState } from "../../../api/models";
+import { Role, Party } from "../../common-steps";
 import { dataPreparationService } from "./../../../services/data-preparation.service";
-import { Party, Role } from "./common-steps";
 
 Given(
   "un {string} di {string} ha già creato una versione in {string} per quell'eservice",
@@ -20,7 +21,7 @@ Given(
       eserviceId: z.string(),
     });
 
-    const token = this.tokens[party]![role]!;
+    const token = getToken(this.tokens, party, role);
 
     const { descriptorId } =
       await dataPreparationService.createDescriptorWithGivenState({

@@ -5,9 +5,10 @@ import {
   assertContextSchema,
   getAuthorizationHeader,
   getOrganizationId,
+  getToken,
 } from "../../../utils/commons";
 import { dataPreparationService } from "../../../services/data-preparation.service";
-import { Party, Role, SessionTokens } from "./common-steps";
+import { Role, Party, SessionTokens } from "../../common-steps";
 
 Given(
   "un {string} di {string} ha già creato {int} e-services in catalogo in stato Published o Suspended e {int} in stato Draft",
@@ -19,7 +20,7 @@ Given(
   ) {
     assertContextSchema(this);
 
-    const token = this.tokens[party]![role]!;
+    const token = getToken(this.tokens, party, role);
     const SUSPENDED_ESERVICES = Math.floor(countEservices / 2);
     const PUBLISHED_ESERVICES = countEservices - SUSPENDED_ESERVICES;
     const DRAFT_ESERVICES = countDraftEservices;
@@ -99,7 +100,7 @@ Given(
       publishedEservicesIds: z.array(z.tuple([z.string(), z.string()])),
       tokens: SessionTokens,
     });
-    const token = this.tokens[consumer]!.admin!;
+    const token = getToken(this.tokens, consumer, "admin");
     const [eserviceId, descriptorId] = this.publishedEservicesIds[0];
 
     const agreementId = await dataPreparationService.createAgreement(
@@ -123,7 +124,7 @@ Given(
       agreementId: z.string(),
     });
 
-    const token = this.tokens[party]![role]!;
+    const token = getToken(this.tokens, party, role);
 
     await dataPreparationService.activateAgreement(token, this.agreementId);
   }
@@ -138,7 +139,7 @@ Given(
       descriptorSubscribedId: z.string(),
     });
 
-    const token = this.tokens[party]![role]!;
+    const token = getToken(this.tokens, party, role);
 
     await dataPreparationService.suspendDescriptor(
       token,
@@ -286,7 +287,7 @@ Given(
   async function (role: Role, party: Party, keyword: string) {
     assertContextSchema(this);
 
-    const token = this.tokens[party]![role]!;
+    const token = getToken(this.tokens, party, role);
     const eserviceName = `e-service-${this.TEST_SEED}-${keyword}`;
     const eserviceId = await dataPreparationService.createEService(token, {
       name: eserviceName,

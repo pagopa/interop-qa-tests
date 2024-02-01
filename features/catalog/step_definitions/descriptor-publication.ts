@@ -5,10 +5,11 @@ import {
   assertContextSchema,
   getAuthorizationHeader,
   getRiskAnalysis,
+  getToken,
 } from "../../../utils/commons";
 import { apiClient } from "../../../api";
 import { EServiceDescriptorState, EServiceMode } from "../../../api/models";
-import { Party, Role } from "./common-steps";
+import { Party, Role } from "../../common-steps";
 
 Given(
   "un {string} di {string} ha già caricato un'interfaccia per quel descrittore",
@@ -18,7 +19,7 @@ Given(
       descriptorId: z.string(),
     });
 
-    const token = this.tokens[party]![role]!;
+    const token = getToken(this.tokens, party, role);
 
     await dataPreparationService.addInterfaceToDescriptor(
       token,
@@ -37,7 +38,7 @@ Given(
     descriptorState: EServiceDescriptorState
   ) {
     assertContextSchema(this);
-    const token = this.tokens[party]![role]!;
+    const token = getToken(this.tokens, party, role);
     this.eserviceId = await dataPreparationService.createEService(token, {
       mode,
     });

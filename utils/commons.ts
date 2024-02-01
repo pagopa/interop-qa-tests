@@ -1,11 +1,8 @@
 import { readFileSync } from "fs";
 import { z } from "zod";
 import { AxiosResponse } from "axios";
-import {
-  Party,
-  SessionTokens,
-} from "../features/catalog/step_definitions/common-steps";
 import { CreatedResource } from "../api/models";
+import { Party, Role, SessionTokens } from "../features/common-steps";
 
 type RiskAnalysisTemplateType = "PA" | "Privato/GSP";
 
@@ -136,10 +133,17 @@ export function assertContextSchema<TSchema extends z.ZodRawShape>(
 
 export function getOrganizationId(party: Party) {
   const file = JSON.parse(
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     Buffer.from(readFileSync(process.env.TENANT_IDS_FILE_PATH!)).toString()
   );
   return file[party].admin.organizationId;
+}
+
+export function getToken(tokens: SessionTokens, party: Party, role: Role) {
+  const token = tokens[party]?.[role];
+  if (!token) {
+    throw Error(`Token not found for party: ${party} and role: ${role}`);
+  }
+  return token;
 }
 
 export function assertValidResponse(

@@ -6,7 +6,7 @@ import {
   getAuthorizationHeader,
   getOrganizationId,
 } from "../../../utils/commons";
-import { Party } from "./common-steps";
+import { Party } from "../../common-steps";
 
 When(
   "l'utente richiede una operazione di listing sui propri e-services erogati",

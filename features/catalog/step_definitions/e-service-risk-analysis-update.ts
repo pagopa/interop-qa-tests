@@ -4,10 +4,11 @@ import {
   assertContextSchema,
   getAuthorizationHeader,
   getRiskAnalysis,
+  getToken,
 } from "../../../utils/commons";
 import { dataPreparationService } from "../../../services/data-preparation.service";
 import { apiClient } from "../../../api";
-import { Party, Role } from "./common-steps";
+import { Role, Party } from "../../common-steps";
 
 Given(
   "un {string} di {string} ha già aggiunto un'analisi del rischio a quell'e-service",
@@ -15,7 +16,7 @@ Given(
     assertContextSchema(this, {
       eserviceId: z.string(),
     });
-    const token = this.tokens[party]![role]!;
+    const token = getToken(this.tokens, party, role);
     this.riskAnalysisId =
       await dataPreparationService.addRiskAnalysisToEService(
         token,
