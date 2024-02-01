@@ -8,13 +8,16 @@ import {
 } from "../../../utils/commons";
 import { EServiceMode } from "../../../api/models";
 import { apiClient } from "../../../api";
-import { Party } from "./common-steps";
+import { Party, Role } from "./common-steps";
 
 Given(
-  "l'utente ha già creato un e-service in modalità {string} senza descrittore",
-  async function (mode: EServiceMode) {
+  "un {string} di {string} ha già creato un e-service in modalità {string} senza descrittore",
+  async function (role: Role, party: Party, mode: EServiceMode) {
     assertContextSchema(this, { token: z.string() });
-    this.eserviceId = await dataPreparationService.createEService(this.token, {
+
+    const token = this.tokens[party]![role]!;
+
+    this.eserviceId = await dataPreparationService.createEService(token, {
       mode,
     });
   }

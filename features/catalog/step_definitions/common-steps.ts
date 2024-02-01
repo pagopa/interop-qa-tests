@@ -80,12 +80,39 @@ Given(
 
     this.eserviceId = await dataPreparationService.createEService(token);
 
-    this.descriptorId =
-      await dataPreparationService.createDescriptorWithGivenState(
+    const { descriptorId } =
+      await dataPreparationService.createDescriptorWithGivenState({
         token,
-        this.eserviceId,
-        descriptorState
-      );
+        eserviceId: this.eserviceId,
+        descriptorState,
+      });
+
+    this.descriptorId = descriptorId;
+  }
+);
+
+Given(
+  "un {string} di {string} ha già creato un e-service con un descrittore in stato {string} e un documento già caricato",
+  async function (
+    role: Role,
+    party: Party,
+    descriptorState: EServiceDescriptorState
+  ) {
+    assertContextSchema(this);
+
+    const token = this.tokens[party]![role]!;
+
+    this.eserviceId = await dataPreparationService.createEService(token);
+
+    const { descriptorId, documentId } =
+      await dataPreparationService.createDescriptorWithGivenState({
+        token,
+        eserviceId: this.eserviceId,
+        descriptorState,
+        withDocument: true,
+      });
+    this.descriptorId = descriptorId;
+    this.documentId = documentId;
   }
 );
 
@@ -95,5 +122,6 @@ Then("si ottiene status code {int}", function (statusCode: number) {
       status: z.number(),
     }),
   });
+
   assert.equal(this.response.status, statusCode);
 });
