@@ -31,11 +31,9 @@ BeforeAll(async function () {
   );
 });
 
-Before(function (scenario) {
+Before(function () {
   this.TEST_SEED = getRandomInt();
   this.tokens = this.parameters.tokens;
-
-  console.log(`\n\n${scenario.pickle.name}\n`);
 });
 
 Given(
