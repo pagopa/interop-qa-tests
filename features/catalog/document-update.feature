@@ -23,7 +23,7 @@ Feature: Aggiornamento del nome di un documento
       | PA1                | api,security   | 200       |
       | PA1                | support        | 403       |
 
-  @document_update2 @wait-for-fix
+  @document_update2 @wait_for_fix
   Scenario Outline: Per un e-service che ha un solo descrittore, il quale è in stato NON DRAFT (PUBLISHED, SUSPENDED, DEPRECATED, ARCHIVED), e che ha almeno un documento già caricato, alla richiesta di aggiornamento del nome, si ottiene un errore
      Given l'utente è un "admin" di "GSP"
      Given un "admin" di "GSP" ha già creato un e-service con un descrittore in stato "<statoDescrittore>" e un documento già caricato
