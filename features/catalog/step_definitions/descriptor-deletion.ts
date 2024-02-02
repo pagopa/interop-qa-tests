@@ -9,7 +9,7 @@ import {
 } from "../../../utils/commons";
 import { apiClient } from "../../../api";
 
-When("l'utente cancella il descriptor di quell'e-service", async function () {
+When("l'utente cancella il descrittore di quell'e-service", async function () {
   assertContextSchema(this, {
     token: z.string(),
     eserviceId: z.string(),
