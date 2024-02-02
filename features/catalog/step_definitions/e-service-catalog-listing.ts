@@ -131,7 +131,7 @@ Given(
 );
 
 Given(
-  "un {string} di {string} ha già sospeso la versione dell'eservice che ente_fruitore ha sottoscritto",
+  "un {string} di {string} ha già sospeso la versione dell'e-service che ente_fruitore ha sottoscritto",
   async function (role: Role, tenantType: TenantType) {
     assertContextSchema(this, {
       agreementId: z.string(),
@@ -150,7 +150,7 @@ Given(
 );
 
 When(
-  "l'utente richiede la lista di eservices per i quali ha almeno un agreement attivo",
+  "l'utente richiede la lista di e-services per i quali ha almeno un agreement attivo",
   async function () {
     assertContextSchema(this, {
       token: z.string(),

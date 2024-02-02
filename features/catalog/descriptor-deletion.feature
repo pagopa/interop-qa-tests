@@ -8,16 +8,16 @@ Feature: Cancellazione di un descrittore
     Given un "admin" di "GSP" ha già creato un e-service con un descrittore in stato "DRAFT"
     When l'utente cancella il descrittore di quell'e-service
     Then si ottiene status code 204
-    Then quell'eservice è stato cancellato
+    Then quell'e-service è stato cancellato
 
  @descriptor_deletion2
   Scenario Outline: Per un e-service che ha più di un descrittore, l’ultimo dei quali è in stato DRAFT, la richiesta di cancellazione del descrittore cancella solo il descrittore stesso e non l’e-service del quale fa parte né nessuno degli altri descrittori dell’e-service
     Given l'utente è un "admin" di "GSP"
     Given un "admin" di "GSP" ha già creato un e-service con un descrittore in stato "PUBLISHED"
-    Given l'utente ha già creato una versione in bozza per quell'eservice
+    Given l'utente ha già creato una versione in bozza per quell'e-service
     When l'utente cancella il descrittore di quell'e-service
     Then si ottiene status code 204
-    Then quell'eservice non è stato cancellato
+    Then quell'e-service non è stato cancellato
 
   @descriptor_deletion3
   Scenario Outline: Per un e-service che ha un solo descrittore, il quale è in stato NON DRAFT (PUBLISHED, SUSPENDED, DEPRECATED, ARCHIVED), la richiesta di cancellazione del descrittore restituisce errore 

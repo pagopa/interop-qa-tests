@@ -54,7 +54,7 @@ Feature: Listing catalogo e-services
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA2" ha già creato 3 e-services in catalogo in stato Published o Suspended e 1 in stato Draft
     And "PA1" ha un agreement attivo con un e-service di "PA2"
-    When l'utente richiede la lista di eservices per i quali ha almeno un agreement attivo
+    When l'utente richiede la lista di e-services per i quali ha almeno un agreement attivo
     Then si ottiene status code 200 e la lista di 1 e-services
 
   @catalog_listing6

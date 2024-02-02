@@ -13,6 +13,6 @@ Feature: Creazione versione di un e-service
   Scenario: Un utente autorizzato vuole creare una versione di e-service avendone già una in bozza
     Given l'utente è un "admin" di "GSP"
     Given l'utente ha già creato un e-service
-    Given l'utente ha già creato una versione in bozza per quell'eservice
+    Given l'utente ha già creato una versione in bozza per quell'e-service
     When l'utente crea una versione in bozza per quell'e-service
     Then la creazione restituisce errore - 400

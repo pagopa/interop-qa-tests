@@ -11,7 +11,7 @@ import { Role, TenantType } from "../../common-steps";
 import { dataPreparationService } from "./../../../services/data-preparation.service";
 
 Given(
-  "un {string} di {string} ha già creato una versione in {string} per quell'eservice",
+  "un {string} di {string} ha già creato una versione in {string} per quell'e-service",
   async function (
     role: Role,
     tenantType: TenantType,
