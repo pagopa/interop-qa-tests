@@ -23,7 +23,7 @@ Feature: Riattivazione di un descrittore
     | PA1                | support        | 403       |
   
   @descriptor_activation2
-  Scenario Outline: Per un e-service che ha un solo descrittore, il quale non si trova in stato SUSPENDED, alla riattivazione del descrittore, si ottiene un errore
+  Scenario Outline: Per un e-service che ha un solo descrittore, il quale è in stato NON SUSPENDED (ARCHIVED, DRAFT, DEPRECATED, PUBLISHED), alla riattivazione del descrittore, si ottiene un errore
     Given l'utente è un "admin" di "GSP"
     Given un "admin" di "GSP" ha già creato un e-service con un descrittore in stato "<statoDescrittore>"
     When l'utente riattiva il descrittore di quell'e-service

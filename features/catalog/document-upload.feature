@@ -66,7 +66,7 @@ Feature: Caricamento di un documento di interfaccia
       |    SOAP       | wsdl     |
 
   @document_upload3
-  Scenario Outline: Per un e-service che ha un solo descrittore, il quale è in stato NON DRAFT, alla richiesta di caricamento di un documento di interfaccia, l'operazione restituirà errore. 
+  Scenario Outline: Per un e-service che ha un solo descrittore, il quale è in stato NON DRAFT (PUBLISHED, SUSPENDED, DEPRECATED, ARCHIVED), alla richiesta di caricamento di un documento di interfaccia, l'operazione restituirà errore. 
      Given l'utente è un "admin" di "GSP"
      Given un "admin" di "GSP" ha già creato un e-service con un descrittore in stato "<statoDescrittore>"
      When l'utente carica un documento di interfaccia di tipo "yaml"
