@@ -5,7 +5,7 @@ Feature: Listing catalogo e-services
   @catalog-listing1
   Scenario Outline: Restituisce gli e-service a catalogo
     Given l'utente è un "<ruolo>" di "<ente>"
-    Given un "admin" di "PA2" ha già creato 5 e-services in catalogo in stato Published o Suspended
+    Given un "admin" di "PA1" ha già creato 5 e-services in catalogo in stato Published o Suspended
     When l'utente richiede una operazione di listing sul catalogo
     Then si ottiene status code 200 e la lista di 5 e-services
 
