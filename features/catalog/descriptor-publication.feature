@@ -11,35 +11,35 @@ Feature: Pubblicazione di un descrittore
     Then si ottiene status code <risultato>
 
     Examples: 
-    | ente               | ruolo          | risultato |
-    | GSP                | admin          | 204       |
-    | GSP                | api            | 204       |
-    | GSP                | security       | 403       |
-    | GSP                | api,security   | 204       |
-    | GSP                | support        | 403       |
-    | PA1                | admin          | 204       |
-    | PA1                | api            | 204       |
-    | PA1                | security       | 403       |
-    | PA1                | api,security   | 204       |
-    | PA1                | support        | 403       |
+      | ente | ruolo        | risultato |
+      | GSP  | admin        |       204 |
+      | GSP  | api          |       204 |
+      | GSP  | security     |       403 |
+      | GSP  | api,security |       204 |
+      | GSP  | support      |       403 |
+      | PA1  | admin        |       204 |
+      | PA1  | api          |       204 |
+      | PA1  | security     |       403 |
+      | PA1  | api,security |       204 |
+      | PA1  | support      |       403 |
 
- @descriptor_publication2
+  @descriptor_publication2
   Scenario Outline: Per un e-service che ha un solo descrittore, il quale non è in stato DRAFT, alla richiesta di pubblicazione, si ottiene un errore
-    Given l'utente è un "admin" di "GSP"
-    Given un "admin" di "GSP" ha già creato un e-service con un descrittore in stato "<statoVersione>"
+    Given l'utente è un "admin" di "PA1"
+    Given un "admin" di "PA1" ha già creato un e-service con un descrittore in stato "<statoVersione>"
     When l'utente pubblica quel descrittore
     Then si ottiene status code 400
 
     Examples: 
-      | ente           | ruolo |      statoVersione |
-      | GSP            | admin |      PUBLISHED     |
-      | GSP            | admin |      SUSPENDED     |
-      | GSP            | admin |      DEPRECATED    |
-      | GSP            | admin |      ARCHIVED      |
-      | PA1            | admin |      PUBLISHED     |
-      | PA1            | admin |      SUSPENDED     |
-      | PA1            | admin |      DEPRECATED    |
-      | PA1            | admin |      ARCHIVED      |
+      | statoVersione |
+      | PUBLISHED     |
+      | SUSPENDED     |
+      | DEPRECATED    |
+      | ARCHIVED      |
+      | PUBLISHED     |
+      | SUSPENDED     |
+      | DEPRECATED    |
+      | ARCHIVED      |
 
   @descriptor_publication3
   Scenario Outline: Per un e-service creato in modalità "RECEIVE" che ha un solo descrittore, il quale è in stato DRAFT, con tutti i parametri richiesti inseriti e formattati correttamente, senza nessuna analisi del rischio inserita, alla richiesta di pubblicazione, ottiene un errore
