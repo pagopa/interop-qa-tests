@@ -6,6 +6,7 @@ import {
   SessionTokens,
 } from "../features/catalog/step_definitions/common-steps";
 import { CreatedResource } from "../api/models";
+import { apiClient } from "../api";
 
 type RiskAnalysisTemplateType = "PA" | "Privato/GSP";
 
@@ -153,4 +154,27 @@ export function assertValidResponse(
       )}`
     );
   }
+}
+export type FileType = "yaml" | "wsdl";
+
+export async function uploadInterfaceDocument(
+  filePath: string,
+  fileType: FileType,
+  eserviceId: string,
+  descriptorId: string,
+  token: string
+): Promise<AxiosResponse<CreatedResource>> {
+  const blobFile = new Blob([readFileSync(filePath)]);
+  const file = new File([blobFile], `interface.${fileType}`);
+
+  return apiClient.eservices.createEServiceDocument(
+    eserviceId,
+    descriptorId,
+    {
+      kind: "INTERFACE",
+      prettyName: "Interfaccia",
+      doc: file,
+    },
+    getAuthorizationHeader(token)
+  );
 }

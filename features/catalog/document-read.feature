@@ -64,8 +64,8 @@ Feature: Lettura di un documento
 
   @document_read2
   Scenario Outline: Per un e-service che ha un solo descrittore, il quale è in stato DRAFT, alla richiesta di recupero di un documento precedentemente caricato e poi cancellato, ottiene un errore
-    Given l'utente è un "admin" di "GSP"
-    Given un "admin" di "GSP" ha già creato un e-service con un descrittore in stato "DRAFT" e un documento già caricato
+    Given l'utente è un "admin" di "PA1"
+    Given un "admin" di "PA1" ha già creato un e-service con un descrittore in stato "DRAFT" e un documento già caricato
     Given l'utente ha già cancellato quel documento su quel descrittore
     When l'utente richiede il documento
     Then si ottiene status code 404
