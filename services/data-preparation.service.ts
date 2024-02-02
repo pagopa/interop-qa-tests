@@ -1,11 +1,19 @@
 import { readFileSync } from "fs";
 import { File } from "buffer";
 import { apiClient } from "../api";
-import { getAuthorizationHeader, getRandomInt, makePolling, assertValidResponse } from "../utils/commons";
+import {
+  getAuthorizationHeader,
+  getRandomInt,
+  makePolling,
+  assertValidResponse,
+} from "../utils/commons";
 import { EServiceSeed, EServiceDescriptorSeed } from "./../api/models";
 
 export const dataPreparationService = {
-  async createEService(token: string, partialEserviceSeed: Partial<EServiceSeed> = {}) {
+  async createEService(
+    token: string,
+    partialEserviceSeed: Partial<EServiceSeed> = {}
+  ) {
     const DEFAULT_ESERVICE_SEED: EServiceSeed = {
       name: `e-service ${getRandomInt()}`,
       description: "Descrizione e-service",
@@ -26,7 +34,11 @@ export const dataPreparationService = {
     const eserviceId = eserviceCreationResponse.data.id;
 
     await makePolling(
-      () => apiClient.producers.getProducerEServiceDetails(eserviceId, getAuthorizationHeader(token)),
+      () =>
+        apiClient.producers.getProducerEServiceDetails(
+          eserviceId,
+          getAuthorizationHeader(token)
+        ),
       (res) => res.status !== 404
     );
 
@@ -57,24 +69,34 @@ export const dataPreparationService = {
       ...partialEServiceDescriptorSeed,
     };
 
-    const descriptorCreationResponse = await apiClient.eservices.createDescriptor(
-      eserviceId,
-      eserviceDescriptorSeed,
-      getAuthorizationHeader(token)
-    );
+    const descriptorCreationResponse =
+      await apiClient.eservices.createDescriptor(
+        eserviceId,
+        eserviceDescriptorSeed,
+        getAuthorizationHeader(token)
+      );
 
     assertValidResponse(descriptorCreationResponse);
     const descriptorId = descriptorCreationResponse.data.id;
 
     await makePolling(
-      () => apiClient.producers.getProducerEServiceDescriptor(eserviceId, descriptorId, getAuthorizationHeader(token)),
+      () =>
+        apiClient.producers.getProducerEServiceDescriptor(
+          eserviceId,
+          descriptorId,
+          getAuthorizationHeader(token)
+        ),
       (res) => res.status !== 404
     );
 
     return descriptorId;
   },
 
-  async addInterfaceToDescriptor(token: string, eserviceId: string, descriptorId: string) {
+  async addInterfaceToDescriptor(
+    token: string,
+    eserviceId: string,
+    descriptorId: string
+  ) {
     const blobFile = new Blob([readFileSync("./utils/interface.yaml")]);
     const file = new File([blobFile], "interface.yaml");
 
@@ -92,12 +114,21 @@ export const dataPreparationService = {
     assertValidResponse(response);
 
     await makePolling(
-      () => apiClient.producers.getProducerEServiceDescriptor(eserviceId, descriptorId, getAuthorizationHeader(token)),
+      () =>
+        apiClient.producers.getProducerEServiceDescriptor(
+          eserviceId,
+          descriptorId,
+          getAuthorizationHeader(token)
+        ),
       (res) => res.data.interface !== undefined
     );
   },
 
-  async publishDescriptor(token: string, eserviceId: string, descriptorId: string) {
+  async publishDescriptor(
+    token: string,
+    eserviceId: string,
+    descriptorId: string
+  ) {
     const response = await apiClient.eservices.publishDescriptor(
       eserviceId,
       descriptorId,
@@ -107,12 +138,21 @@ export const dataPreparationService = {
     assertValidResponse(response);
 
     await makePolling(
-      () => apiClient.producers.getProducerEServiceDescriptor(eserviceId, descriptorId, getAuthorizationHeader(token)),
+      () =>
+        apiClient.producers.getProducerEServiceDescriptor(
+          eserviceId,
+          descriptorId,
+          getAuthorizationHeader(token)
+        ),
       (res) => res.data.state === "PUBLISHED"
     );
   },
 
-  async suspendDescriptor(token: string, eserviceId: string, descriptorId: string) {
+  async suspendDescriptor(
+    token: string,
+    eserviceId: string,
+    descriptorId: string
+  ) {
     const response = await apiClient.eservices.suspendDescriptor(
       eserviceId,
       descriptorId,
@@ -122,12 +162,21 @@ export const dataPreparationService = {
     assertValidResponse(response);
 
     await makePolling(
-      () => apiClient.producers.getProducerEServiceDescriptor(eserviceId, descriptorId, getAuthorizationHeader(token)),
+      () =>
+        apiClient.producers.getProducerEServiceDescriptor(
+          eserviceId,
+          descriptorId,
+          getAuthorizationHeader(token)
+        ),
       (res) => res.data.state === "SUSPENDED"
     );
   },
 
-  async createAgreement(token: string, eserviceId: string, descriptorId: string) {
+  async createAgreement(
+    token: string,
+    eserviceId: string,
+    descriptorId: string
+  ) {
     const response = await apiClient.agreements.createAgreement(
       { eserviceId, descriptorId },
       getAuthorizationHeader(token)
@@ -138,7 +187,11 @@ export const dataPreparationService = {
     const agreementId = response.data.id;
 
     await makePolling(
-      () => apiClient.agreements.getAgreementById(agreementId, getAuthorizationHeader(token)),
+      () =>
+        apiClient.agreements.getAgreementById(
+          agreementId,
+          getAuthorizationHeader(token)
+        ),
       (res) => res.status !== 404
     );
 
@@ -146,23 +199,38 @@ export const dataPreparationService = {
   },
 
   async submitAgreement(token: string, agreementId: string) {
-    const response = await apiClient.agreements.submitAgreement(agreementId, {}, getAuthorizationHeader(token));
+    const response = await apiClient.agreements.submitAgreement(
+      agreementId,
+      {},
+      getAuthorizationHeader(token)
+    );
 
     assertValidResponse(response);
 
     await makePolling(
-      () => apiClient.agreements.getAgreementById(agreementId, getAuthorizationHeader(token)),
+      () =>
+        apiClient.agreements.getAgreementById(
+          agreementId,
+          getAuthorizationHeader(token)
+        ),
       (res) => res.data.state === "ACTIVE" || res.data.state === "PENDING"
     );
   },
 
   async activateAgreement(token: string, agreementId: string) {
-    const response = await apiClient.agreements.activateAgreement(agreementId, getAuthorizationHeader(token));
+    const response = await apiClient.agreements.activateAgreement(
+      agreementId,
+      getAuthorizationHeader(token)
+    );
 
     assertValidResponse(response);
 
     await makePolling(
-      () => apiClient.agreements.getAgreementById(agreementId, getAuthorizationHeader(token)),
+      () =>
+        apiClient.agreements.getAgreementById(
+          agreementId,
+          getAuthorizationHeader(token)
+        ),
       (res) => res.data.state === "ACTIVE"
     );
   },
