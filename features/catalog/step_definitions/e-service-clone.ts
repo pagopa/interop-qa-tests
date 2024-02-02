@@ -7,21 +7,21 @@ import {
 } from "../../../utils/commons";
 import { apiClient } from "../../../api";
 import { EServiceDescriptorState } from "../../../api/models";
-import { Role, Party } from "../../common-steps";
+import { Role, TenantType } from "../../common-steps";
 import { dataPreparationService } from "./../../../services/data-preparation.service";
 
 Given(
   "un {string} di {string} ha già creato una versione in {string} per quell'eservice",
   async function (
     role: Role,
-    party: Party,
+    tenantType: TenantType,
     descriptorState: EServiceDescriptorState
   ) {
     assertContextSchema(this, {
       eserviceId: z.string(),
     });
 
-    const token = getToken(this.tokens, party, role);
+    const token = getToken(this.tokens, tenantType, role);
 
     const { descriptorId } =
       await dataPreparationService.createDescriptorWithGivenState({

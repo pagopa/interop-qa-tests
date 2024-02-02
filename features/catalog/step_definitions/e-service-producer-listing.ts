@@ -6,7 +6,7 @@ import {
   getAuthorizationHeader,
   getOrganizationId,
 } from "../../../utils/commons";
-import { Party } from "../../common-steps";
+import { TenantType } from "../../common-steps";
 
 When(
   "l'utente richiede una operazione di listing sui propri e-services erogati",
@@ -49,7 +49,7 @@ When(
 
 When(
   "l'utente richiede una operazione di listing sui propri e-services fruiti da {string}",
-  async function (consumer: Party) {
+  async function (consumer: TenantType) {
     assertContextSchema(this, {
       token: z.string(),
     });

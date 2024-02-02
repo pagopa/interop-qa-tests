@@ -2,7 +2,7 @@ import { readFileSync } from "fs";
 import { z } from "zod";
 import { AxiosResponse } from "axios";
 import { CreatedResource } from "../api/models";
-import { Party, Role, SessionTokens } from "../features/common-steps";
+import { TenantType, Role, SessionTokens } from "../features/common-steps";
 
 type RiskAnalysisTemplateType = "PA" | "Privato/GSP";
 
@@ -61,14 +61,14 @@ const RISK_ANALYSIS_DATA: Record<
 };
 
 export function getRiskAnalysis({
-  party,
+  tenantType,
   completed,
 }: {
-  party: Party;
+  tenantType: TenantType;
   completed?: boolean;
 }) {
   const templateType =
-    party === "PA1" || party === "PA2" ? "PA" : "Privato/GSP";
+    tenantType === "PA1" || tenantType === "PA2" ? "PA" : "Privato/GSP";
   const templateStatus = completed ?? true ? "completed" : "uncompleted";
 
   const answers = RISK_ANALYSIS_DATA[templateType][templateStatus];
@@ -128,17 +128,23 @@ export function assertContextSchema<TSchema extends z.ZodRawShape>(
   }
 }
 
-export function getOrganizationId(party: Party) {
+export function getOrganizationId(tenantType: TenantType) {
   const file = JSON.parse(
     Buffer.from(readFileSync(process.env.TENANT_IDS_FILE_PATH!)).toString()
   );
-  return file[party].admin.organizationId;
+  return file[tenantType].admin.organizationId;
 }
 
-export function getToken(tokens: SessionTokens, party: Party, role: Role) {
-  const token = tokens[party]?.[role];
+export function getToken(
+  tokens: SessionTokens,
+  tenantType: TenantType,
+  role: Role
+) {
+  const token = tokens[tenantType]?.[role];
   if (!token) {
-    throw Error(`Token not found for party: ${party} and role: ${role}`);
+    throw Error(
+      `Token not found for tenantType: ${tenantType} and role: ${role}`
+    );
   }
   return token;
 }

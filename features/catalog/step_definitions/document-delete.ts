@@ -7,17 +7,17 @@ import {
   getToken,
 } from "../../../utils/commons";
 import { apiClient } from "../../../api";
-import { Role, Party } from "../../common-steps";
+import { Role, TenantType } from "../../common-steps";
 
 Given(
   "un {string} di {string} ha già caricato un documento su quel descrittore",
-  async function (role: Role, party: Party) {
+  async function (role: Role, tenantType: TenantType) {
     assertContextSchema(this, {
       eserviceId: z.string(),
       descriptorId: z.string(),
     });
 
-    const token = getToken(this.tokens, party, role);
+    const token = getToken(this.tokens, tenantType, role);
 
     const documentId = await dataPreparationService.addDocumentToDescriptor(
       token,

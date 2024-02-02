@@ -11,8 +11,8 @@ import { generateSessionTokens } from "../utils/session-tokens";
 // Increase duration of every step with the following timeout (Default is 5000 milliseconds)
 setDefaultTimeout(5 * 60 * 1000);
 
-export const Party = z.enum(["GSP", "PA1", "PA2", "Privato"]);
-export type Party = z.infer<typeof Party>;
+export const TenantType = z.enum(["GSP", "PA1", "PA2", "Privato"]);
+export type TenantType = z.infer<typeof TenantType>;
 export const Role = z.enum([
   "admin",
   "api",
@@ -22,7 +22,7 @@ export const Role = z.enum([
 ]);
 export type Role = z.infer<typeof Role>;
 
-export const SessionTokens = z.record(Party, z.record(Role, z.string()));
+export const SessionTokens = z.record(TenantType, z.record(Role, z.string()));
 export type SessionTokens = z.infer<typeof SessionTokens>;
 
 BeforeAll(async function () {
@@ -38,9 +38,9 @@ Before(function () {
 
 Given(
   "l'utente è un {string} di {string}",
-  async function (role: Role, party: Party) {
-    this.token = getToken(this.tokens, party, role);
+  async function (role: Role, tenantType: TenantType) {
+    this.token = getToken(this.tokens, tenantType, role);
     this.role = role;
-    this.party = party;
+    this.tenantType = tenantType;
   }
 );
