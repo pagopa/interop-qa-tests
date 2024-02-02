@@ -1,4 +1,5 @@
-import { readFileSync } from "fs";
+import { createReadStream, readFileSync } from "fs";
+import { Readable } from "stream";
 import { z } from "zod";
 import { AxiosResponse } from "axios";
 import {
@@ -6,6 +7,7 @@ import {
   SessionTokens,
 } from "../features/catalog/step_definitions/common-steps";
 import { CreatedResource } from "../api/models";
+import { apiClient } from "../api";
 
 export const getRandomInt = () =>
   Number(Math.random() * Number.MAX_SAFE_INTEGER).toFixed(0);
@@ -74,4 +76,26 @@ export function assertValidResponse(
       )}`
     );
   }
+}
+
+export async function uploadInterfaceDocument(
+  filePath: string,
+  tipoFile: string,
+  eserviceId: string,
+  descriptorId: string,
+  token: string
+): Promise<AxiosResponse<CreatedResource>> {
+  const blobFile = new Blob([readFileSync(filePath)]);
+  const file = new File([blobFile], `interface.${tipoFile}`);
+
+  return apiClient.eservices.createEServiceDocument(
+    eserviceId,
+    descriptorId,
+    {
+      kind: "INTERFACE",
+      prettyName: "Interfaccia",
+      doc: file,
+    },
+    getAuthorizationHeader(token)
+  );
 }
