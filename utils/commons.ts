@@ -1,5 +1,4 @@
-import { createReadStream, readFileSync } from "fs";
-import { Readable } from "stream";
+import { readFileSync } from "fs";
 import { z } from "zod";
 import { AxiosResponse } from "axios";
 import {
@@ -77,16 +76,17 @@ export function assertValidResponse(
     );
   }
 }
+export type FileType = "yaml" | "wsdl";
 
 export async function uploadInterfaceDocument(
   filePath: string,
-  tipoFile: string,
+  fileType: FileType,
   eserviceId: string,
   descriptorId: string,
   token: string
 ): Promise<AxiosResponse<CreatedResource>> {
   const blobFile = new Blob([readFileSync(filePath)]);
-  const file = new File([blobFile], `interface.${tipoFile}`);
+  const file = new File([blobFile], `interface.${fileType}`);
 
   return apiClient.eservices.createEServiceDocument(
     eserviceId,

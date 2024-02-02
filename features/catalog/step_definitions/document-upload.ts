@@ -2,6 +2,7 @@ import { Given, When } from "@cucumber/cucumber";
 import { z } from "zod";
 import { EServiceTechnology } from "../../../api/models";
 import {
+  FileType,
   assertContextSchema,
   uploadInterfaceDocument,
 } from "../../../utils/commons";
@@ -31,7 +32,7 @@ Given(
 
 When(
   "l'utente carica un documento di interfaccia di tipo {string}",
-  async function (tipoFile: string) {
+  async function (fileType: FileType) {
     assertContextSchema(this, {
       token: z.string(),
       eserviceId: z.string(),
@@ -39,8 +40,8 @@ When(
     });
 
     this.response = await uploadInterfaceDocument(
-      `./utils/interface.${tipoFile}`,
-      tipoFile,
+      `./utils/interface.${fileType}`,
+      fileType,
       this.eserviceId,
       this.descriptorId,
       this.token
@@ -50,7 +51,7 @@ When(
 
 When(
   "l'utente carica un documento di interfaccia di tipo {string} che contiene il termine localhost",
-  async function (tipoFile: string) {
+  async function (fileType: FileType) {
     assertContextSchema(this, {
       token: z.string(),
       eserviceId: z.string(),
@@ -58,8 +59,8 @@ When(
     });
 
     this.response = await uploadInterfaceDocument(
-      `./utils/localhost-interface.${tipoFile}`,
-      tipoFile,
+      `./utils/localhost-interface.${fileType}`,
+      fileType,
       this.eserviceId,
       this.descriptorId,
       this.token
