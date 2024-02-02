@@ -10,23 +10,23 @@ Feature: Attivazione di un descrittore
     Then si ottiene status code <risultato>
 
     Examples: 
-    | ente               | ruolo          | risultato |
-    | GSP                | admin          | 204       |
-    | GSP                | api            | 204       |
-    | GSP                | security       | 403       |
-    | GSP                | api,security   | 204       |
-    | GSP                | support        | 403       |
-    | PA1                | admin          | 204       |
-    | PA1                | api            | 204       |
-    | PA1                | security       | 403       |
-    | PA1                | api,security   | 204       |
-    | PA1                | support        | 403       |
-  
+      | ente | ruolo        | risultato |
+      | GSP  | admin        |       204 |
+      | GSP  | api          |       204 |
+      | GSP  | security     |       403 |
+      | GSP  | api,security |       204 |
+      | GSP  | support      |       403 |
+      | PA1  | admin        |       204 |
+      | PA1  | api          |       204 |
+      | PA1  | security     |       403 |
+      | PA1  | api,security |       204 |
+      | PA1  | support      |       403 |
+
   @descriptor_activation2
-  Scenario Outline: Per un e-service che ha un solo descrittore, il quale è in stato NON SUSPENDED (ARCHIVED, DRAFT, DEPRECATED, PUBLISHED), alla riattivazione del descrittore, si ottiene un errore
-    Given l'utente è un "admin" di "GSP"
-    Given un "admin" di "GSP" ha già creato un e-service con un descrittore in stato "<statoDescrittore>"
-    When l'utente attiva il descrittore di quell'e-service
+  Scenario Outline: Per un e-service che ha un solo descrittore, il quale non si trova in stato SUSPENDED, alla riattivazione del descrittore, si ottiene un errore
+    Given l'utente è un "admin" di "PA1"
+    Given un "admin" di "PA1" ha già creato un e-service con un descrittore in stato "<statoDescrittore>"
+    When l'utente riattiva il descrittore di quell'e-service
     Then si ottiene status code 400
 
     Examples: 
@@ -35,4 +35,3 @@ Feature: Attivazione di un descrittore
       | DRAFT            |
       | DEPRECATED       |
       | PUBLISHED        |
-

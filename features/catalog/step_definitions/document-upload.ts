@@ -1,15 +1,13 @@
-import { readFileSync } from "fs";
-import { File } from "buffer";
 import { Given, When } from "@cucumber/cucumber";
 import { z } from "zod";
 import { EServiceTechnology } from "../../../api/models";
 import {
+  FileType,
   assertContextSchema,
-  getAuthorizationHeader,
   getToken,
+  uploadInterfaceDocument,
 } from "../../../utils/commons";
 import { dataPreparationService } from "../../../services/data-preparation.service";
-import { apiClient } from "../../../api";
 import { Role, TenantType } from "../../common-steps";
 
 Given(
@@ -39,52 +37,38 @@ Given(
 
 When(
   "l'utente carica un documento di interfaccia di tipo {string}",
-  async function (tipoFile: string) {
+  async function (fileType: FileType) {
     assertContextSchema(this, {
       token: z.string(),
       eserviceId: z.string(),
       descriptorId: z.string(),
     });
 
-    const blobFile = new Blob([readFileSync(`./data/interface.${tipoFile}`)]);
-    const file = new File([blobFile], `interface.${tipoFile}`);
-
-    this.response = await apiClient.eservices.createEServiceDocument(
+    this.response = await uploadInterfaceDocument(
+      `./utils/interface.${fileType}`,
+      fileType,
       this.eserviceId,
       this.descriptorId,
-      {
-        kind: "INTERFACE",
-        prettyName: "Interfaccia",
-        doc: file,
-      },
-      getAuthorizationHeader(this.token)
+      this.token
     );
   }
 );
 
 When(
   "l'utente carica un documento di interfaccia di tipo {string} che contiene il termine localhost",
-  async function (estensioneFile: string) {
+  async function (fileType: FileType) {
     assertContextSchema(this, {
       token: z.string(),
       eserviceId: z.string(),
       descriptorId: z.string(),
     });
 
-    const blobFile = new Blob([
-      readFileSync(`./utils/localhost-interface.${estensioneFile}`),
-    ]);
-    const file = new File([blobFile], `localhost-interface.${estensioneFile}`);
-
-    this.response = await apiClient.eservices.createEServiceDocument(
+    this.response = await uploadInterfaceDocument(
+      `./utils/localhost-interface.${fileType}`,
+      fileType,
       this.eserviceId,
       this.descriptorId,
-      {
-        kind: "INTERFACE",
-        prettyName: "Interfaccia",
-        doc: file,
-      },
-      getAuthorizationHeader(this.token)
+      this.token
     );
   }
 );
