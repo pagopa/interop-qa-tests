@@ -156,8 +156,7 @@ export function assertValidResponse(
   if (response.status >= 400) {
     throw Error(
       `Something went wrong: ${JSON.stringify(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (response.data as unknown as any).errors
+        response.data ?? response.statusText
       )}`
     );
   }
