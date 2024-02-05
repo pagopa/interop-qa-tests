@@ -1,6 +1,6 @@
 @eservice_risk_analysis_delete
 Feature: Cancellazione di un'analisi del rischio ad un e-service
-  Tutti gli utenti autenticati di enti erogatori possono cancellare un'analisi del rischio di un e-service se è in mode RECEIVE
+  Tutti gli utenti autorizzati di enti erogatori possono cancellare un'analisi del rischio di un e-service se è in mode RECEIVE
 
   @eservice_risk_analysis_delete1
   Scenario Outline: Per un e-service creato in modalità "RECEIVE", il quale non ha descrittori, è possibile cancellare un'analisi del rischio precedentemente creata. L'analisi del rischio deve essere ben formattata ma non necessariamente completamente compilata. La richiesta va a buon fine se effettuata da un utente autorizzato
