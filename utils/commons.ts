@@ -170,7 +170,7 @@ export async function uploadInterfaceDocument(
   descriptorId: string,
   token: string
 ): Promise<AxiosResponse<CreatedResource>> {
-  const blobFile = new Blob([readFileSync(`./utils/${fileName}`)]);
+  const blobFile = new Blob([readFileSync(`./data/${fileName}`)]);
   const file = new File([blobFile], fileName);
 
   return apiClient.eservices.createEServiceDocument(
