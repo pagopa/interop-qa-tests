@@ -49,7 +49,7 @@ Given(
         await dataPreparationService.addRiskAnalysisToEService(
           token,
           this.eserviceId,
-          getRiskAnalysis({ completed: true, tenantType: this.party })
+          getRiskAnalysis({ completed: true, tenantType: this.tenantType })
         );
     }
 

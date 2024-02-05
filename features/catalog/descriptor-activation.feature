@@ -26,7 +26,7 @@ Feature: Attivazione di un descrittore
   Scenario Outline: Per un e-service che ha un solo descrittore, il quale non si trova in stato SUSPENDED, alla riattivazione del descrittore, si ottiene un errore
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA1" ha già creato un e-service con un descrittore in stato "<statoDescrittore>"
-    When l'utente riattiva il descrittore di quell'e-service
+    When l'utente attiva il descrittore di quell'e-service
     Then si ottiene status code 400
 
     Examples: 

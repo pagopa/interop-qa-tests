@@ -1,7 +1,7 @@
 @catalog_listing
 Feature: Listing catalogo e-services
   Tutti gli utenti autenticati di enti PA, GSP e privati possono ottenere la lista di e-services
- 
+
   @catalog_listing1
   Scenario Outline: Restituisce gli e-service a catalogo
     Given l'utente è un "<ruolo>" di "<ente>"
@@ -58,9 +58,8 @@ Feature: Listing catalogo e-services
     Then si ottiene status code 200 e la lista di 1 e-services
 
   @catalog_listing6
-  Scenario Outline: Restituisce gli e-service a catalogo che contengono la keyword "test" all'interno del nome, 
+  Scenario Outline: Restituisce gli e-service a catalogo che contengono la keyword "test" all'interno del nome,
   con ricerca case insensitive
-
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA1" ha già creato 2 e-services in catalogo in stato Published o Suspended e 1 in stato Draft
     Given un "admin" di "PA1" ha già creato e pubblicato un e-service contenente la keyword "test"
