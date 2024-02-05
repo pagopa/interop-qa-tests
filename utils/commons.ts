@@ -157,14 +157,13 @@ export function assertValidResponse(
 export type FileType = "yaml" | "wsdl";
 
 export async function uploadInterfaceDocument(
-  filePath: string,
-  fileType: FileType,
+  fileName: string,
   eserviceId: string,
   descriptorId: string,
   token: string
 ): Promise<AxiosResponse<CreatedResource>> {
-  const blobFile = new Blob([readFileSync(filePath)]);
-  const file = new File([blobFile], `interface.${fileType}`);
+  const blobFile = new Blob([readFileSync(`./utils/${fileName}`)]);
+  const file = new File([blobFile], fileName);
 
   return apiClient.eservices.createEServiceDocument(
     eserviceId,
