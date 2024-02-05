@@ -40,8 +40,7 @@ When(
     });
 
     this.response = await uploadInterfaceDocument(
-      `./utils/interface.${fileType}`,
-      fileType,
+      `interface.${fileType}`,
       this.eserviceId,
       this.descriptorId,
       this.token
@@ -59,8 +58,7 @@ When(
     });
 
     this.response = await uploadInterfaceDocument(
-      `./utils/localhost-interface.${fileType}`,
-      fileType,
+      `localhost-interface.${fileType}`,
       this.eserviceId,
       this.descriptorId,
       this.token
