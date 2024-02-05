@@ -36,10 +36,6 @@ Feature: Pubblicazione di un descrittore
       | SUSPENDED     |
       | DEPRECATED    |
       | ARCHIVED      |
-      | PUBLISHED     |
-      | SUSPENDED     |
-      | DEPRECATED    |
-      | ARCHIVED      |
 
   @descriptor_publication3
   Scenario Outline: Per un e-service creato in modalità "RECEIVE" che ha un solo descrittore, il quale è in stato DRAFT, con tutti i parametri richiesti inseriti e formattati correttamente, senza nessuna analisi del rischio inserita, alla richiesta di pubblicazione, ottiene un errore
