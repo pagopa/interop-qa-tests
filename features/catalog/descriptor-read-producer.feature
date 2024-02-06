@@ -16,7 +16,7 @@ Feature: Lettura di un descrittore lato erogatore
       | GSP  | admin        | SUSPENDED     |       200 |
       | GSP  | admin        | DEPRECATED    |       200 |
       | GSP  | admin        | ARCHIVED      |       200 |
-      | GSP  | api          | DRAFT         |       403 |
+      | GSP  | api          | DRAFT         |       200 |
       | GSP  | api          | PUBLISHED     |       200 |
       | GSP  | api          | SUSPENDED     |       200 |
       | GSP  | api          | DEPRECATED    |       200 |
@@ -56,7 +56,7 @@ Feature: Lettura di un descrittore lato erogatore
       | PA1  | api,security | SUSPENDED     |       200 |
       | PA1  | api,security | DEPRECATED    |       200 |
       | PA1  | api,security | ARCHIVED      |       200 |
-      | PA1  | support      | DRAFT         |       403 |
+      | PA1  | support      | DRAFT         |       404 |
       | PA1  | support      | PUBLISHED     |       200 |
       | PA1  | support      | SUSPENDED     |       200 |
       | PA1  | support      | DEPRECATED    |       200 |
