@@ -10,7 +10,7 @@ import { dataPreparationService } from "../../../services/data-preparation.servi
 import { Party, Role, SessionTokens } from "./common-steps";
 
 Given(
-  "un {string} di {string} ha già creato {int} e-services in catalogo in stato PUBLISHED o SUSPENDED e {int} in stato Draft",
+  "un {string} di {string} ha già creato {int} e-services in catalogo in stato PUBLISHED o SUSPENDED e {int} in stato DRAFT",
   async function (
     role: Role,
     party: Party,
