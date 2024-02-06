@@ -7,6 +7,7 @@ import {
 } from "../features/catalog/step_definitions/common-steps";
 import { CreatedResource } from "../api/models";
 import { env } from "../configs/env";
+import { apiClient } from "../api";
 
 export const getRandomInt = () =>
   Number(Math.random() * Number.MAX_SAFE_INTEGER).toFixed(0);
@@ -74,4 +75,26 @@ export function assertValidResponse(
       )}`
     );
   }
+}
+export type FileType = "yaml" | "wsdl";
+
+export async function uploadInterfaceDocument(
+  fileName: string,
+  eserviceId: string,
+  descriptorId: string,
+  token: string
+): Promise<AxiosResponse<CreatedResource>> {
+  const blobFile = new Blob([readFileSync(`./utils/${fileName}`)]);
+  const file = new File([blobFile], fileName);
+
+  return apiClient.eservices.createEServiceDocument(
+    eserviceId,
+    descriptorId,
+    {
+      kind: "INTERFACE",
+      prettyName: "Interfaccia",
+      doc: file,
+    },
+    getAuthorizationHeader(token)
+  );
 }

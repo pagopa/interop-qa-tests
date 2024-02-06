@@ -4,15 +4,16 @@ import {
   assertContextSchema,
   getAuthorizationHeader,
 } from "../../../utils/commons";
-import { apiClient } from "../../../api/client";
+import { apiClient } from "../../../api";
 
-When("l'utente riattiva il descrittore di quell'e-service", async function () {
+When("l'utente sospende quel descrittore", async function () {
   assertContextSchema(this, {
     token: z.string(),
     eserviceId: z.string(),
     descriptorId: z.string(),
   });
-  this.response = await apiClient.eservices.activateDescriptor(
+
+  this.response = await apiClient.eservices.suspendDescriptor(
     this.eserviceId,
     this.descriptorId,
     getAuthorizationHeader(this.token)
