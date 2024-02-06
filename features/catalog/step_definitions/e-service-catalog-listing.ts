@@ -7,17 +7,22 @@ import {
   getOrganizationId,
 } from "../../../utils/commons";
 import { dataPreparationService } from "../../../services/data-preparation.service";
-import { Party, Role } from "./common-steps";
+import { Party, Role, SessionTokens } from "./common-steps";
 
 Given(
-  "un {string} di {string} ha già creato {int} e-services in catalogo in stato Published o Suspended",
-  async function (role: Role, party: Party, countEservices: number) {
+  "un {string} di {string} ha già creato {int} e-services in catalogo in stato PUBLISHED o SUSPENDED e {int} in stato DRAFT",
+  async function (
+    role: Role,
+    party: Party,
+    countEservices: number,
+    countDraftEservices: number
+  ) {
     assertContextSchema(this);
 
     const token = this.tokens[party]![role]!;
     const SUSPENDED_ESERVICES = Math.floor(countEservices / 2);
     const PUBLISHED_ESERVICES = countEservices - SUSPENDED_ESERVICES;
-    const DRAFT_ESERVICES = 1;
+    const DRAFT_ESERVICES = countDraftEservices;
     const TOTAL_ESERVICES = countEservices + DRAFT_ESERVICES;
 
     // 1. Create the draft e-services with draft descriptors
@@ -87,22 +92,23 @@ Given(
 );
 
 Given(
-  "ente_fruitore ha un agreement attivo con un eservice di {string}",
-  async function (_producer: string) {
+  "{string} ha un agreement attivo con un e-service di {string}",
+  async function (consumer: Party, _producer: string) {
     assertContextSchema(this, {
       token: z.string(),
       publishedEservicesIds: z.array(z.tuple([z.string(), z.string()])),
+      tokens: SessionTokens,
     });
-
+    const token = this.tokens[consumer]!.admin!;
     const [eserviceId, descriptorId] = this.publishedEservicesIds[0];
 
     const agreementId = await dataPreparationService.createAgreement(
-      this.token,
+      token,
       eserviceId,
       descriptorId
     );
 
-    await dataPreparationService.submitAgreement(this.token, agreementId);
+    await dataPreparationService.submitAgreement(token, agreementId);
 
     this.agreementId = agreementId;
     this.eserviceSubscribedId = eserviceId;
