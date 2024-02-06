@@ -150,9 +150,7 @@ export function getToken(
   return token;
 }
 
-export function assertValidResponse(
-  response: AxiosResponse<CreatedResource | void>
-) {
+export function assertValidResponse<T>(response: AxiosResponse<T>) {
   if (response.status >= 400) {
     throw Error(
       `Something went wrong: ${JSON.stringify(
@@ -161,6 +159,7 @@ export function assertValidResponse(
     );
   }
 }
+
 export type FileType = "yaml" | "wsdl";
 
 export async function uploadInterfaceDocument(

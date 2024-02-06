@@ -41,7 +41,7 @@ Feature: Listing e-services lato erogatore
   Scenario Outline: Restituisce gli e-service erogati dall’ente fruiti da almeno uno dei fruitori specifici
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA1" ha già creato 2 e-services in catalogo in stato Published o Suspended e 1 in stato Draft
-    Given "PA1" ha un agreement attivo con un e-service di "PA1"
+    Given "GSP" ha un agreement attivo con un e-service di "PA1"
     Given "PA2" ha un agreement attivo con un e-service di "PA1"
     When l'utente richiede una operazione di listing sui propri e-services fruiti da "PA2"
     Then si ottiene status code 200 e la lista di 1 e-services
