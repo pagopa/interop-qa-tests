@@ -114,5 +114,6 @@ Then("si ottiene status code {int}", function (statusCode: number) {
       status: z.number(),
     }),
   });
+
   assert.equal(this.response.status, statusCode);
 });
