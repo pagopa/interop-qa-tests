@@ -52,7 +52,7 @@ Feature: Lettura di un descrittore lato fruitore
       | PA1  | support      | DEPRECATED    |
       | PA1  | support      | ARCHIVED      |
 
-  @descriptor_read_consumer2 @wait-for-fix
+  @descriptor_read_consumer2 @wait_for_fix
   Scenario Outline: Per un e-service precedentemente creato da qualsiasi ente, il quale ha un solo descrittore in stato DRAFT, la richiesta per ottenere i dettagli della versione di e-service restituisce errore
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA1" ha già creato un e-service con un descrittore in stato "DRAFT"
