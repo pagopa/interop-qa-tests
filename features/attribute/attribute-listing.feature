@@ -1,5 +1,5 @@
 @attribute_listing
-Feature: Creazione attributo certificato
+Feature: Listing attributi
   Tutti gli utenti autenticati possono leggere la lista degli attributi
 
   @attribute_listing1
