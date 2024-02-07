@@ -23,14 +23,14 @@ Feature: Aggiornamento di un e-service
       | PA1  | support      |       403 |
 
   @eservice_updating2
-  Scenario Outline: Per un e-service precedentemente creato, il quale ha un solo descrittore, il quale è in stato DRAFT, l’aggiornamento dei campi dell’e-service avviene correttamente
+  Scenario Outline: Per un e-service precedentemente creato, il quale ha un solo descrittore in stato DRAFT, l’aggiornamento dei campi dell’e-service avviene correttamente
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA1" ha già creato un e-service con un descrittore in stato "DRAFT"
     When l'utente aggiorna quell'e-service
     Then si ottiene status code 200
 
   @eservice_updating3
-  Scenario Outline: Per un e-service precedentemente creato, il quale ha un solo descrittore, il quale è in stato NON DRAFT (PUBLISHED, SUSPENDED, DEPRECATED, ARCHIVED), l’aggiornamento dei campi dell’e-service restituisce errore
+  Scenario Outline: Per un e-service precedentemente creato, il quale ha un solo descrittore in stato NON DRAFT (PUBLISHED, SUSPENDED, DEPRECATED, ARCHIVED), l’aggiornamento dei campi dell’e-service restituisce errore
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA1" ha già creato un e-service con un descrittore in stato "<statoDescrittore>"
     When l'utente aggiorna quell'e-service
