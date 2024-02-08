@@ -1,5 +1,6 @@
 import { readFileSync } from "fs";
 import { File } from "buffer";
+import { AxiosResponse } from "axios";
 import { apiClient } from "../api";
 import {
   getAuthorizationHeader,
@@ -12,6 +13,8 @@ import {
   EServiceDescriptorSeed,
   EServiceDescriptorState,
   EServiceRiskAnalysisSeed,
+  AttributeKind,
+  Attribute,
 } from "./../api/models";
 
 export const dataPreparationService = {
@@ -434,5 +437,57 @@ export const dataPreparationService = {
       throw new Error("Risk analysis not found");
     }
     return riskAnalysisId;
+  },
+
+  async createAttribute(
+    token: string,
+    attributeKind: AttributeKind,
+    name?: string
+  ) {
+    let response: AxiosResponse<Attribute, unknown>;
+    switch (attributeKind) {
+      case "CERTIFIED":
+        response = await apiClient.certifiedAttributes.createCertifiedAttribute(
+          {
+            description: "description test",
+            name: name ?? `new certified attribute ${getRandomInt()}`,
+          },
+          getAuthorizationHeader(token)
+        );
+        break;
+
+      case "VERIFIED":
+        response = await apiClient.verifiedAttributes.createVerifiedAttribute(
+          {
+            description: "description test",
+            name: name ?? `new verified attribute ${getRandomInt()}`,
+          },
+          getAuthorizationHeader(token)
+        );
+        break;
+
+      case "DECLARED":
+        response = await apiClient.declaredAttributes.createDeclaredAttribute(
+          {
+            description: "description test",
+            name: name ?? `new declared attribute ${getRandomInt()}`,
+          },
+          getAuthorizationHeader(token)
+        );
+        break;
+
+      default:
+        throw new Error(`Invalid attributeKind ${attributeKind}`);
+    }
+    assertValidResponse(response);
+    const attributeId = response.data.id;
+    await makePolling(
+      () =>
+        apiClient.attributes.getAttributeById(
+          attributeId,
+          getAuthorizationHeader(token)
+        ),
+      (res) => res.status === 200
+    );
   },
 };
