@@ -8,20 +8,20 @@ Feature: Listing e-services lato erogatore
     Given un "admin" di "<ente>" ha già creato 5 e-services in catalogo in stato PUBLISHED o SUSPENDED e 1 in stato DRAFT
     Given un "admin" di "PA2" ha già creato 5 e-services in catalogo in stato PUBLISHED o SUSPENDED e 1 in stato DRAFT
     When l'utente richiede una operazione di listing sui propri e-services erogati
-    Then si ottiene status code 200 e la lista di 6 e-services
+    Then si ottiene status code 200 e la lista di <risultati> e-services
 
     Examples: 
-      | ente | ruolo        |
-      | GSP  | admin        |
-      | GSP  | api          |
-      | GSP  | security     |
-      | GSP  | api,security |
-      | GSP  | support      |
-      | PA1  | admin        |
-      | PA1  | api          |
-      | PA1  | security     |
-      | PA1  | api,security |
-      | PA1  | support      |
+      | ente | ruolo        | risultati |
+      | GSP  | admin        |     6     |
+      | GSP  | api          |     6     |
+      | GSP  | security     |     5     |
+      | GSP  | api,security |     6     |
+      | GSP  | support      |     5     |
+      | PA1  | admin        |     6     |
+      | PA1  | api          |     6     |
+      | PA1  | security     |     5     |
+      | PA1  | api,security |     6     |
+      | PA1  | support      |     5     |
 
   @producer_listing2
   Scenario Outline: A fronte di 20 e-service in db, restituisce solo i primi 12 risultati di e-service
