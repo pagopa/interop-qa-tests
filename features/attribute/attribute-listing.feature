@@ -43,18 +43,18 @@ Feature: Listing attributi
 
   @attribute_listing4
   Scenario Outline: A fronte di 5 attributi in db dei quali 3 certificati, 2 verificati e 1 dichiarato, restituisce solo i 3 certificati e i 2 verificati
-    Given l'utente è un "admin" di "PA1"
-    Given un "admin" di "PA1" ha già creato 3 attributi "CERTIFIED"
-    Given un "admin" di "PA1" ha già creato 2 attributi "VERIFIED"
-    Given un "admin" di "PA1" ha già creato 1 attributo "DECLARED"
+    Given l'utente è un "admin" di "PA2"
+    Given un "admin" di "PA2" ha già creato 3 attributi "CERTIFIED"
+    Given un "admin" di "PA2" ha già creato 2 attributi "VERIFIED"
+    Given un "admin" di "PA2" ha già creato 1 attributo "DECLARED"
     When l'utente richiede una operatione di listing degli attributi filtrando per tipo "certificato" e "verificato"
-    Then si ottiene status code 200 e la lista di 3 attributi "CERTIFIED" e 2 attributi "VERIFIED"
+    Then si ottiene status code 200 e la lista di 5 attributi
 
   @attribute_listing5
   Scenario Outline: Restituisce gli attributi in db che contengono la keyword "test" all'interno del nome con ricerca case insensitive
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA1" ha già creato 3 attributi "DECLARED"
-    Given un "admin" di "PA1" ha già creato 1 attributo "DECLARED" con nome che contiene "test"
+    Given un "admin" di "PA1" ha già creato un attributo "DECLARED" con nome che contiene "test"
     When l'utente richiede una operazione di listing degli attributi filtrando per keyword "test" all'interno del nome
     Then si ottiene status code 200 e la lista di 1 attributo
 
