@@ -168,28 +168,6 @@ When(
 );
 
 When(
-  "l'utente richiede la lista di eservices che hanno almeno una versione in stato SUSPENDED, erogati da {string} e {string} per i quali ha almeno un agreement attivo che contengono la keyword di ricerca",
-  async function (producer1: Party, producer2: Party) {
-    assertContextSchema(this, {
-      token: z.string(),
-    });
-    const producerId1 = getOrganizationId(producer1);
-    const producerId2 = getOrganizationId(producer2);
-    this.response = await apiClient.catalog.getEServicesCatalog(
-      {
-        limit: 12,
-        offset: 0,
-        q: this.TEST_SEED,
-        states: ["SUSPENDED"],
-        agreementStates: ["ACTIVE"],
-        producersIds: [producerId1, producerId2],
-      },
-      getAuthorizationHeader(this.token)
-    );
-  }
-);
-
-When(
   "l'utente richiede una operazione di listing sul catalogo",
   async function () {
     assertContextSchema(this, {
