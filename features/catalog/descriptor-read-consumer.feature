@@ -52,9 +52,9 @@ Feature: Lettura di un descrittore lato fruitore
       | PA1  | support      | DEPRECATED    |
       | PA1  | support      | ARCHIVED      |
 
-  @descriptor_read_consumer2 @wait_for_fix #PIN-4479
+  @descriptor_read_consumer2 @wait_for_fix
   Scenario Outline: Per un e-service precedentemente creato da qualsiasi ente, il quale ha un solo descrittore in stato DRAFT, la richiesta per ottenere i dettagli della versione di e-service restituisce errore
     Given l'utente è un "admin" di "PA1"
-    Given un "admin" di "PA2" ha già creato un e-service con un descrittore in stato "DRAFT"
+    Given un "admin" di "PA1" ha già creato un e-service con un descrittore in stato "DRAFT"
     When l'utente fruitore richiede la lettura di quel descrittore
-    Then si ottiene status code 403
+    Then si ottiene status code 404

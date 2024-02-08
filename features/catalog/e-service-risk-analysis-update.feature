@@ -24,7 +24,7 @@ Feature: Aggiornamento di un'analisi del rischio ad un e-service
       | PA1  | support      |       403 |
 
   @eservice_risk_analysis_update2
-  Scenario Outline: Per un e-service creato in modalità "RECEIVE", il quale ha un solo descrittore in stato DRAFT, è possibile aggiornare un'analisi del rischio precedentemente creata. L'analisi del rischio deve essere ben formattata ma non necessariamente completamente compilata. La richiesta va a buon fine se è un utente autorizzato
+  Scenario Outline: Per un e-service creato in modalità "RECEIVE", il quale ha un solo descrittore in stato DRAFT, è possibile aggiornare un'analisi del rischio precedentemente creata. L'analisi del rischio deve essere ben formattata ma non necessariamente completamente compilata. La richiesta va a buon fine
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA1" ha già creato un e-service in modalità "RECEIVE" con un descrittore in stato "DRAFT"
     Given un "admin" di "PA1" ha già aggiunto un'analisi del rischio a quell'e-service
