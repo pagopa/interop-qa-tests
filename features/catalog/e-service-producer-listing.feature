@@ -44,7 +44,7 @@ Feature: Listing e-services lato erogatore
     Given "PA1" ha un agreement attivo con un e-service di "PA1"
     Given "PA2" ha un agreement attivo con un e-service di "PA1"
     When l'utente richiede una operazione di listing sui propri e-services fruiti da "PA2"
-    Then si ottiene status code 200 e la lista di 1 e-services
+    Then si ottiene status code 200 e la lista di 1 e-service
 
   @producer_listing5
   Scenario Outline: Restituisce gli e-service erogati dall’ente che contengono la keyword "test" all'interno del nome, con ricerca case insensitive
@@ -52,7 +52,7 @@ Feature: Listing e-services lato erogatore
     Given un "admin" di "PA1" ha già creato 2 e-services in catalogo in stato PUBLISHED o SUSPENDED e 1 in stato DRAFT
     Given un "admin" di "PA1" ha già creato e pubblicato un e-service contenente la keyword "test"
     When l'utente richiede una operazione di listing sui propri e-services filtrando per la keyword "test"
-    Then si ottiene status code 200 e la lista di 1 e-services
+    Then si ottiene status code 200 e la lista di 1 e-service
 
   @producer_listing6
   Scenario Outline: Restituisce un insieme vuoto di e-service a catalogo per una ricerca che non porta risultati
