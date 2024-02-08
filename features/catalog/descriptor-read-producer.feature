@@ -2,7 +2,7 @@
 Feature: Lettura di un descrittore lato erogatore
   Tutti gli utenti autorizzati di enti erogatori possono leggere i propri descrittori
 
-  @descriptor_read_producer1 @wait-for-fix
+  @descriptor_read_producer1
   Scenario Outline: Per un e-service precedentemente creato dall’ente, il quale ha un solo descrittore in qualsiasi stato (DRAFT, PUBLISHED, SUSPENDED, DEPRECATED, ARCHIVED), la richiesta per ottenere i dettagli della versione di e-service, da parte di un utente autorizzato, va a buon fine
     Given l'utente è un "<ruolo>" di "<ente>"
     Given un "admin" di "<ente>" ha già creato un e-service con un descrittore in stato "<statoVersione>"
