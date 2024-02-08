@@ -5,7 +5,7 @@ Feature: Creazione attributo verificato
   # verificare se  i privati possono farlo
 
   @verified_attribute_creation1
-  Scenario Outline: Un utente con sufficienti permessi di un ente autorizzato crea un e-un attributo verificato
+  Scenario Outline: Un utente con sufficienti permessi di un ente autorizzato crea un attributo verificato
     Given l'utente è un "<ruolo>" di "<ente>"
     When l'utente crea un attributo verificato
     Then si ottiene status code <risultato>
