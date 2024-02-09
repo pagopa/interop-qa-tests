@@ -10,20 +10,20 @@ import { z } from "zod";
 import { generateSessionTokens } from "../../../utils/session-tokens";
 import { EServiceDescriptorState } from "../../../api/models";
 import { dataPreparationService } from "../../../services/data-preparation.service";
-import { apiClient } from "../../../api";
-import {
-  assertContextSchema,
-  getAuthorizationHeader,
-  getRandomInt,
-  makePolling,
-} from "./../../../utils/commons";
+import { assertContextSchema, getRandomInt } from "./../../../utils/commons";
 
 // Increase duration of every step with the following timeout (Default is 5000 milliseconds)
 setDefaultTimeout(5 * 60 * 1000);
 
-const Party = z.enum(["GSP", "PA1", "PA2", "Privato"]);
+export const Party = z.enum(["GSP", "PA1", "PA2", "Privato"]);
 export type Party = z.infer<typeof Party>;
-const Role = z.enum(["admin", "api", "security", "support", "api,security"]);
+export const Role = z.enum([
+  "admin",
+  "api",
+  "security",
+  "support",
+  "api,security",
+]);
 export type Role = z.infer<typeof Role>;
 
 export const SessionTokens = z.record(Party, z.record(Role, z.string()));
@@ -46,6 +46,8 @@ Given(
   "l'utente è un {string} di {string}",
   async function (role: Role, party: Party) {
     this.token = this.tokens[party]![role]!;
+    this.role = role;
+    this.party = party;
   }
 );
 
@@ -76,95 +78,41 @@ Given(
 
     const token = this.tokens[party]![role]!;
 
-    // 1. Create e-service
-    const eserviceId = await dataPreparationService.createEService(token);
+    this.eserviceId = await dataPreparationService.createEService(token);
 
-    // 2. Create DRAFT descriptor
-    const descriptorId = await dataPreparationService.createDraftDescriptor(
-      token,
-      eserviceId
-    );
+    const { descriptorId } =
+      await dataPreparationService.createDescriptorWithGivenState({
+        token,
+        eserviceId: this.eserviceId,
+        descriptorState,
+      });
 
-    this.eserviceId = eserviceId;
     this.descriptorId = descriptorId;
+  }
+);
 
-    if (descriptorState === "DRAFT") {
-      return;
-    }
+Given(
+  "un {string} di {string} ha già creato un e-service con un descrittore in stato {string} e un documento già caricato",
+  async function (
+    role: Role,
+    party: Party,
+    descriptorState: EServiceDescriptorState
+  ) {
+    assertContextSchema(this);
 
-    // 3. Add interface to descriptor
-    await dataPreparationService.addInterfaceToDescriptor(
-      token,
-      eserviceId,
-      descriptorId
-    );
+    const token = this.tokens[party]![role]!;
 
-    // 4. Publish Descriptor
-    await dataPreparationService.publishDescriptor(
-      token,
-      eserviceId,
-      descriptorId
-    );
+    this.eserviceId = await dataPreparationService.createEService(token);
 
-    if (descriptorState === "PUBLISHED") {
-      return;
-    }
-
-    // 5. Suspend Descriptor
-    if (descriptorState === "SUSPENDED") {
-      await dataPreparationService.suspendDescriptor(
+    const { descriptorId, documentId } =
+      await dataPreparationService.createDescriptorWithGivenState({
         token,
-        eserviceId,
-        descriptorId
-      );
-      return;
-    }
-
-    if (descriptorState === "ARCHIVED" || descriptorState === "DEPRECATED") {
-      if (descriptorState === "DEPRECATED") {
-        // When a newer descriptor becomes PUBLISHED, the older one becomes DEPRECATED. Then, if it still has an active agreement associated, it remains DEPRECATED, otherwise it becomes ARCHIVED.
-
-        const agreementId = await dataPreparationService.createAgreement(
-          token,
-          eserviceId,
-          this.descriptorId
-        );
-
-        await dataPreparationService.submitAgreement(token, agreementId);
-      }
-
-      // Create another DRAFT descriptor
-      const secondDescriptorId =
-        await dataPreparationService.createDraftDescriptor(token, eserviceId);
-
-      this.eserviceId = eserviceId;
-      this.secondDescriptorId = secondDescriptorId;
-
-      // Add interface to secondDescriptor
-      await dataPreparationService.addInterfaceToDescriptor(
-        token,
-        eserviceId,
-        this.secondDescriptorId
-      );
-
-      // Publish secondDescriptor
-      await dataPreparationService.publishDescriptor(
-        token,
-        eserviceId,
-        this.secondDescriptorId
-      );
-
-      // Check until the first descriptor is in desired state
-      await makePolling(
-        () =>
-          apiClient.producers.getProducerEServiceDescriptor(
-            eserviceId,
-            this.descriptorId,
-            getAuthorizationHeader(token)
-          ),
-        (res) => res.data.state === descriptorState
-      );
-    }
+        eserviceId: this.eserviceId,
+        descriptorState,
+        withDocument: true,
+      });
+    this.descriptorId = descriptorId;
+    this.documentId = documentId;
   }
 );
 
@@ -174,5 +122,6 @@ Then("si ottiene status code {int}", function (statusCode: number) {
       status: z.number(),
     }),
   });
+
   assert.equal(this.response.status, statusCode);
 });
