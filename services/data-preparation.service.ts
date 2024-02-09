@@ -11,6 +11,7 @@ import {
   EServiceSeed,
   EServiceDescriptorSeed,
   EServiceDescriptorState,
+  EServiceRiskAnalysisSeed,
 } from "./../api/models";
 
 export const dataPreparationService = {
@@ -405,5 +406,28 @@ export const dataPreparationService = {
       return result;
     }
     return result;
+  },
+
+  async addRiskAnalysisToEService(
+    token: string,
+    eserviceId: string,
+    data: EServiceRiskAnalysisSeed
+  ) {
+    const response = await apiClient.eservices.addRiskAnalysisToEService(
+      eserviceId,
+      data,
+      getAuthorizationHeader(token)
+    );
+
+    assertValidResponse(response);
+
+    await makePolling(
+      () =>
+        apiClient.producers.getProducerEServiceDetails(
+          eserviceId,
+          getAuthorizationHeader(token)
+        ),
+      (res) => res.data.riskAnalysis.length > 0
+    );
   },
 };
