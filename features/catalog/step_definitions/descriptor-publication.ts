@@ -47,7 +47,7 @@ Given(
       await dataPreparationService.addRiskAnalysisToEService(
         token,
         this.eserviceId,
-        getRiskAnalysis({ completed: true })
+        getRiskAnalysis({ completed: true, party: this.party })
       );
     }
 

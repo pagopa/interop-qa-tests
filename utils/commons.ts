@@ -64,15 +64,16 @@ const RISK_ANALYSIS_DATA: Record<
   },
 };
 
-export function getRiskAnalysis(params?: {
+export function getRiskAnalysis({
+  party,
+  completed,
+}: {
+  party: Party;
   completed?: boolean;
-  party?: Party;
 }) {
-  const completed = params?.completed ?? true;
-  const party: Party = params?.party ?? "GSP";
   const templateType =
     party === "PA1" || party === "PA2" ? "PA" : "Privato/GSP";
-  const templateStatus = completed ? "completed" : "uncompleted";
+  const templateStatus = completed ?? true ? "completed" : "uncompleted";
 
   const answers = RISK_ANALYSIS_DATA[templateType][templateStatus];
   const version = RISK_ANALYSIS_DATA[templateType].version;
