@@ -16,13 +16,15 @@ Given(
   ) {
     assertContextSchema(this);
     const token = getToken(this.tokens, tenantType, role);
+    const attributeIds: string[] = [];
     for (let index = 0; index < count; index++) {
-      await dataPreparationService.createAttribute(
+      const attributeId = await dataPreparationService.createAttribute(
         token,
-        attributeKind,
-        undefined
+        attributeKind
       );
+      attributeIds.push(attributeId);
     }
+    this.attributeId = attributeIds[0];
   }
 );
 

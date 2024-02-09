@@ -489,5 +489,6 @@ export const dataPreparationService = {
         ),
       (res) => res.status === 200
     );
+    return attributeId;
   },
 };
