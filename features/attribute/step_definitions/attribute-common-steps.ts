@@ -16,11 +16,11 @@ Given(
   ) {
     assertContextSchema(this);
     const token = getToken(this.tokens, tenantType, role);
-    for (let index = 0; index < count; index++) {
+    for (let i = 0; i < count; i++) {
       await dataPreparationService.createAttribute(
         token,
         attributeKind,
-        undefined
+        `attribute-${i}-${this.TEST_SEED}`
       );
     }
   }

@@ -445,12 +445,14 @@ export const dataPreparationService = {
     name?: string
   ) {
     let response: AxiosResponse<Attribute, unknown>;
+    const actualName = name ?? `new attribute ${getRandomInt()}`;
+
     switch (attributeKind) {
       case "CERTIFIED":
         response = await apiClient.certifiedAttributes.createCertifiedAttribute(
           {
             description: "description test",
-            name: name ?? `new certified attribute ${getRandomInt()}`,
+            name: actualName,
           },
           getAuthorizationHeader(token)
         );
@@ -460,7 +462,7 @@ export const dataPreparationService = {
         response = await apiClient.verifiedAttributes.createVerifiedAttribute(
           {
             description: "description test",
-            name: name ?? `new verified attribute ${getRandomInt()}`,
+            name: actualName,
           },
           getAuthorizationHeader(token)
         );
@@ -470,7 +472,7 @@ export const dataPreparationService = {
         response = await apiClient.declaredAttributes.createDeclaredAttribute(
           {
             description: "description test",
-            name: name ?? `new declared attribute ${getRandomInt()}`,
+            name: actualName,
           },
           getAuthorizationHeader(token)
         );
@@ -480,14 +482,19 @@ export const dataPreparationService = {
         throw new Error(`Invalid attributeKind ${attributeKind}`);
     }
     assertValidResponse(response);
-    const attributeId = response.data.id;
+
     await makePolling(
       () =>
-        apiClient.attributes.getAttributeById(
-          attributeId,
+        apiClient.attributes.getAttributes(
+          {
+            q: actualName,
+            limit: 1,
+            offset: 0,
+            kinds: [attributeKind],
+          },
           getAuthorizationHeader(token)
         ),
-      (res) => res.status === 200
+      (res) => res.data.results.length > 0
     );
   },
 };
