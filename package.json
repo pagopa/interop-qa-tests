@@ -7,7 +7,8 @@
     "test": "cucumber-js",
     "test:tags": "cucumber-js --tags",
     "lint": "tsc --noEmit && gherkin-lint . && eslint .",
-    "generate-model": "node ./scripts/generate-api-models.mjs"
+    "generate-model": "node ./scripts/generate-api-models.mjs",
+    "prepare": "husky"
   },
   "keywords": [],
   "author": "",
@@ -27,6 +28,7 @@
     "@pagopa/eslint-config": "^3.0.0",
     "@types/node": "^20.10.4",
     "gherkin-lint": "^4.2.4",
+    "husky": "^9.0.10",
     "openapi-typescript": "^6.7.3",
     "prettier": "^3.1.1",
     "typescript": "^5.3.3"
