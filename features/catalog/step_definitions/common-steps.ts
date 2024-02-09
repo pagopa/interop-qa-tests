@@ -15,7 +15,7 @@ import { assertContextSchema, getRandomInt } from "./../../../utils/commons";
 // Increase duration of every step with the following timeout (Default is 5000 milliseconds)
 setDefaultTimeout(5 * 60 * 1000);
 
-const Party = z.enum(["GSP", "PA1", "PA2", "Privato"]);
+export const Party = z.enum(["GSP", "PA1", "PA2", "Privato"]);
 export type Party = z.infer<typeof Party>;
 const Role = z.enum(["admin", "api", "security", "support", "api,security"]);
 export type Role = z.infer<typeof Role>;
@@ -40,6 +40,8 @@ Given(
   "l'utente è un {string} di {string}",
   async function (role: Role, party: Party) {
     this.token = this.tokens[party]![role]!;
+    this.role = role;
+    this.party = party;
   }
 );
 

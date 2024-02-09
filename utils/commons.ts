@@ -8,6 +8,84 @@ import {
 import { CreatedResource } from "../api/models";
 import { apiClient } from "../api";
 
+type RiskAnalysisTemplateType = "PA" | "Privato/GSP";
+
+const RISK_ANALYSIS_DATA: Record<
+  RiskAnalysisTemplateType,
+  { version: string; completed: unknown; uncompleted: unknown }
+> = {
+  "Privato/GSP": {
+    version: "2.0",
+    completed: {
+      purpose: ["INSTITUTIONAL"],
+      institutionalPurpose: ["test"],
+      usesPersonalData: ["NO"],
+      usesThirdPartyPersonalData: ["NO"],
+    },
+    uncompleted: {
+      purpose: ["INSTITUTIONAL"],
+      usesPersonalData: ["NO"],
+      usesThirdPartyPersonalData: ["NO"],
+    },
+  },
+  PA: {
+    version: "3.0",
+    completed: {
+      purpose: ["INSTITUTIONAL"],
+      institutionalPurpose: ["test"],
+      personalDataTypes: ["WITH_NON_IDENTIFYING_DATA"],
+      legalBasis: ["CONSENT"],
+      knowsDataQuantity: ["NO"],
+      deliveryMethod: ["CLEARTEXT"],
+      policyProvided: ["YES"],
+      confirmPricipleIntegrityAndDiscretion: ["true"],
+      doneDpia: ["NO"],
+      dataDownload: ["NO"],
+      purposePursuit: ["MERE_CORRECTNESS"],
+      checkedExistenceMereCorrectnessInteropCatalogue: ["true"],
+      usesThirdPartyData: ["NO"],
+      declarationConfirmGDPR: ["true"],
+    },
+    uncompleted: {
+      purpose: ["INSTITUTIONAL"],
+      institutionalPurpose: ["test"],
+      legalBasis: ["CONSENT"],
+      knowsDataQuantity: ["NO"],
+      deliveryMethod: ["CLEARTEXT"],
+      policyProvided: ["YES"],
+      confirmPricipleIntegrityAndDiscretion: ["true"],
+      doneDpia: ["NO"],
+      dataDownload: ["NO"],
+      purposePursuit: ["MERE_CORRECTNESS"],
+      checkedExistenceMereCorrectnessInteropCatalogue: ["true"],
+      usesThirdPartyData: ["NO"],
+      declarationConfirmGDPR: ["true"],
+    },
+  },
+};
+
+export function getRiskAnalysis(params?: {
+  completed?: boolean;
+  party?: Party;
+}) {
+  const completed = params?.completed ?? true;
+  const party: Party = params?.party ?? "GSP";
+  const templateType =
+    party === "PA1" || party === "PA2" ? "PA" : "Privato/GSP";
+  const templateStatus = completed ? "completed" : "uncompleted";
+
+  const answers = RISK_ANALYSIS_DATA[templateType][templateStatus];
+  const version = RISK_ANALYSIS_DATA[templateType].version;
+
+  return {
+    name: "finalità test",
+    riskAnalysisForm: {
+      version,
+      answers,
+    },
+  };
+}
+
 export const getRandomInt = () =>
   Number(Math.random() * Number.MAX_SAFE_INTEGER).toFixed(0);
 
