@@ -1,11 +1,10 @@
-import { Given, When } from "@cucumber/cucumber";
+import { When } from "@cucumber/cucumber";
 import { z } from "zod";
 import {
   assertContextSchema,
   getAuthorizationHeader,
 } from "../../../utils/commons";
 import { apiClient } from "../../../api";
-import { dataPreparationService } from "../../../services/data-preparation.service";
 
 When("l'utente richiede il documento", async function () {
   assertContextSchema(this, {
