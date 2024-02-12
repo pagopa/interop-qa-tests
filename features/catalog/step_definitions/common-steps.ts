@@ -8,7 +8,6 @@ import {
 } from "@cucumber/cucumber";
 import { z } from "zod";
 import { generateSessionTokens } from "../../../utils/session-tokens";
-import { env } from "../../../configs/env";
 import { EServiceDescriptorState } from "../../../api/models";
 import { dataPreparationService } from "../../../services/data-preparation.service";
 import { assertContextSchema, getRandomInt } from "./../../../utils/commons";
@@ -32,7 +31,7 @@ export type SessionTokens = z.infer<typeof SessionTokens>;
 
 BeforeAll(async function () {
   this.parameters.tokens = SessionTokens.parse(
-    await generateSessionTokens(env.TENANT_IDS_FILE_PATH)
+    await generateSessionTokens(process.env.TENANT_IDS_FILE_PATH)
   );
 });
 

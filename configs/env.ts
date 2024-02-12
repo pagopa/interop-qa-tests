@@ -1,9 +1,9 @@
 import dotenv from "dotenv";
-import { z } from "zod";
+import { TypeOf, z } from "zod";
 
 dotenv.config();
 
-const Env = z.object({
+export const Env = z.object({
   BFF_BASE_URL: z.string(),
   ENVIRONMENT: z.string(),
   REMOTE_WELLKNOWN_URL: z.string(),
@@ -19,4 +19,8 @@ if (!parsedEnv.success) {
   throw new Error("Invalid or missing env vars: " + invalidEnvVars.join(", "));
 }
 
-export const env = parsedEnv.data;
+declare global {
+  namespace NodeJS {
+    interface ProcessEnv extends TypeOf<typeof Env> {}
+  }
+}

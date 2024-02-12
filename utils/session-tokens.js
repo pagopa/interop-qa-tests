@@ -5,10 +5,10 @@ import fs from "fs";
 import { v4 as uuidv4 } from "uuid";
 import _ from "lodash";
 import { VerifyCommand, KMSClient, SignCommand } from "@aws-sdk/client-kms";
-import { env } from "../configs/env";
 
 const verboseMode =
-  typeof env.ST_VERBOSE_MODE != "undefined" && env.ST_VERBOSE_MODE === "1";
+  typeof process.env.ST_VERBOSE_MODE != "undefined" &&
+  process.env.ST_VERBOSE_MODE === "1";
 
 const sessionTokenHeaderTemplate = {
   typ: "at+jwt",
@@ -33,7 +33,7 @@ const sessionTokenPayloadTemplate = {
   jti: "uuid",
 };
 
-logInfo(env);
+logInfo(process.env);
 
 const kmsClient = new KMSClient();
 
@@ -59,7 +59,7 @@ async function generateSessionTokens(stPayloadValuesFilePath) {
 
   // Step 2. Parse well known
   logInfo("## Step 2. Parse well known ##");
-  const wellKnownUrl = new URL(env.REMOTE_WELLKNOWN_URL);
+  const wellKnownUrl = new URL(process.env.REMOTE_WELLKNOWN_URL);
   const { kid, alg } = await fetchWellKnown(
     wellKnownUrl.protocol.indexOf("https") >= 0,
     wellKnownUrl.toString()
@@ -89,7 +89,7 @@ async function generateSessionTokens(stPayloadValuesFilePath) {
 
   logInfo("\tDefine token expiration time in seconds");
   const epochTimeExpSeconds =
-    epochTimeSeconds + Number(env.SESSION_TOKENS_DURATION_SECONDS);
+    epochTimeSeconds + Number(process.env.SESSION_TOKENS_DURATION_SECONDS);
   logInfo(`\tExpiration Time in seconds: ${epochTimeExpSeconds}`);
 
   logInfo("\tDefine random UUID");
@@ -106,7 +106,7 @@ async function generateSessionTokens(stPayloadValuesFilePath) {
   stPayloadCompiled = JSON.parse(
     JSON.stringify(stPayloadCompiled).replaceAll(
       "{{ENVIRONMENT}}",
-      env.ENVIRONMENT
+      process.env.ENVIRONMENT
     )
   );
   logInfo(`\tST Payload Compiled: ${JSON.stringify(stPayloadCompiled)}`);
