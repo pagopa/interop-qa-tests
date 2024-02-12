@@ -78,7 +78,10 @@ When(
         offset: 0,
         kinds: ["CERTIFIED", "VERIFIED"],
       },
-      getAuthorizationHeader(this.token)
+      {
+        ...getAuthorizationHeader(this.token),
+        paramsSerializer: TOBE_REMOVED_customSerializer,
+      }
     );
   }
 );

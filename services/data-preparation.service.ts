@@ -485,6 +485,7 @@ export const dataPreparationService = {
 
     await makePolling(
       () =>
+        // we use getAttributes for polling and not getAttributeById because the former reads from event-sourcing, and the latter from readmodel
         apiClient.attributes.getAttributes(
           {
             q: actualName,
