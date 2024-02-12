@@ -1,7 +1,9 @@
 import { When } from "@cucumber/cucumber";
 import { z } from "zod";
 import {
+  TOBE_REMOVED_customSerializer,
   assertContextSchema,
+  assertValidResponse,
   getAuthorizationHeader,
 } from "../../../utils/commons";
 import { apiClient } from "../../../api";
@@ -17,10 +19,14 @@ When(
         q: this.TEST_SEED,
         limit: 50,
         offset: 0,
-        kinds: [],
+        kinds: ["DECLARED", "CERTIFIED", "VERIFIED"],
       },
-      getAuthorizationHeader(this.token)
+      {
+        ...getAuthorizationHeader(this.token),
+        paramsSerializer: TOBE_REMOVED_customSerializer,
+      }
     );
+    assertValidResponse(this.response);
   }
 );
 
@@ -72,7 +78,10 @@ When(
         offset: 0,
         kinds: ["CERTIFIED", "VERIFIED"],
       },
-      getAuthorizationHeader(this.token)
+      {
+        ...getAuthorizationHeader(this.token),
+        paramsSerializer: TOBE_REMOVED_customSerializer,
+      }
     );
   }
 );

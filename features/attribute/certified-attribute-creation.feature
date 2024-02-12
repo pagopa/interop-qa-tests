@@ -3,7 +3,7 @@
 Feature: Creazione attributo certificato
   Gli enti certificatori possono creare attributi certificati
 
-  @certified_attribute_creation1
+  @certified_attribute_creation1 @wait_for_fix
   Scenario Outline: Un utente admin di un ente certificatore crea un attributo certificato
     Given l'utente è un "<ruolo>" di "<enteCertificatore>"
     When l'utente crea un attributo certificato

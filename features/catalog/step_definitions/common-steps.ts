@@ -7,7 +7,7 @@ import { TenantType, Role } from "../../common-steps";
 import { assertContextSchema, getToken } from "./../../../utils/commons";
 
 Then(
-  "si ottiene status code {int} e la lista di {int} e-services",
+  "si ottiene status code {int} e la lista di {int} e-service(s)",
   function (statusCode: number, count: number) {
     assertContextSchema(this, {
       response: z.object({

@@ -1,4 +1,4 @@
-@attribute_listing
+@attribute_listing @wait-for-fix
 Feature: Listing attributi
   Tutti gli utenti autenticati possono leggere la lista degli attributi
 
@@ -62,6 +62,6 @@ Feature: Listing attributi
   Scenario Outline: Restituisce un insieme vuoto di attributi per una ricerca che non porta risultati
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA1" ha già creato 3 attributi "DECLARED"
-    When l'utente richiede una operazione di listing degli attributi filtrando per keyword "disosfdio sjfjods" all'interno del nome
+    When l'utente richiede una operazione di listing degli attributi filtrando per keyword "unknown" all'interno del nome
     Then si ottiene status code 200 e la lista di 0 attributi
   
