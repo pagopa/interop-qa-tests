@@ -55,7 +55,7 @@ Feature: Listing catalogo e-services
     Given un "admin" di "PA2" ha già creato 3 e-services in catalogo in stato PUBLISHED o SUSPENDED e 1 in stato DRAFT
     And "PA1" ha un agreement attivo con un e-service di "PA2"
     When l'utente richiede la lista di e-services per i quali ha almeno un agreement attivo
-    Then si ottiene status code 200 e la lista di 1 e-services
+    Then si ottiene status code 200 e la lista di 1 e-service
 
   @catalog_listing6
   Scenario Outline: Restituisce gli e-service a catalogo che contengono la keyword "test" all'interno del nome,
@@ -64,7 +64,7 @@ Feature: Listing catalogo e-services
     Given un "admin" di "PA1" ha già creato 2 e-services in catalogo in stato PUBLISHED o SUSPENDED e 1 in stato DRAFT
     Given un "admin" di "PA1" ha già creato e pubblicato un e-service contenente la keyword "test"
     When l'utente richiede una operazione di listing sul catalogo filtrando per la keyword "test"
-    Then si ottiene status code 200 e la lista di 1 e-services
+    Then si ottiene status code 200 e la lista di 1 e-service
 
   @catalog_listing7
   Scenario Outline: Restituisce un insieme vuoto di e-service a catalogo per una ricerca che non porta risultati
