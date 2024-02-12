@@ -11,7 +11,7 @@ import { dataPreparationService } from "../../../services/data-preparation.servi
 import { Role, TenantType, SessionTokens } from "../../common-steps";
 
 Given(
-  "un {string} di {string} ha già creato {int} e-services in catalogo in stato Published o Suspended e {int} in stato Draft",
+  "un {string} di {string} ha già creato {int} e-services in catalogo in stato PUBLISHED o SUSPENDED e {int} in stato DRAFT",
   async function (
     role: Role,
     tenantType: TenantType,
@@ -162,28 +162,6 @@ When(
         q: this.TEST_SEED,
         states: ["PUBLISHED", "SUSPENDED"],
         agreementStates: ["ACTIVE"],
-      },
-      getAuthorizationHeader(this.token)
-    );
-  }
-);
-
-When(
-  "l'utente richiede la lista di eservices che hanno almeno una versione in stato SUSPENDED, erogati da {string} e {string} per i quali ha almeno un agreement attivo che contengono la keyword di ricerca",
-  async function (producer1: TenantType, producer2: TenantType) {
-    assertContextSchema(this, {
-      token: z.string(),
-    });
-    const producerId1 = getOrganizationId(producer1);
-    const producerId2 = getOrganizationId(producer2);
-    this.response = await apiClient.catalog.getEServicesCatalog(
-      {
-        limit: 12,
-        offset: 0,
-        q: this.TEST_SEED,
-        states: ["SUSPENDED"],
-        agreementStates: ["ACTIVE"],
-        producersIds: [producerId1, producerId2],
       },
       getAuthorizationHeader(this.token)
     );
