@@ -2,7 +2,7 @@
 Feature: Aggiornamento di un e-service
   Tutti gli utenti autorizzati di enti erogatori possono aggiornare un proprio e-service
 
-  @eservice_updating1 @wait_for_fix
+  @eservice_updating1
   Scenario Outline: Per un e-service precedentemente creato, il quale non ha descrittori, l'aggiornamento dei campi dell'e-service avviene correttamente
     Given l'utente è un "<ruolo>" di "<ente>"
     Given un "admin" di "<ente>" ha già creato un e-service senza descrittore

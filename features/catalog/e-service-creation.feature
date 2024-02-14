@@ -26,7 +26,7 @@ Feature: Creazione e-service
       | PA1     | api,security |       200 |
       | PA1     | support      |       403 |
 
-  @eservice_creation2
+  @eservice_creation2 @wait_for_fix
   Scenario: Un utente autorizzato vuole creare due e-service con lo stesso nome
     Given l'utente è un "admin" di "PA1"
     Given l'utente ha già creato un e-service
