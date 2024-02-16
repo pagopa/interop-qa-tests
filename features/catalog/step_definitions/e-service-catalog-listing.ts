@@ -5,21 +5,22 @@ import {
   assertContextSchema,
   getAuthorizationHeader,
   getOrganizationId,
+  getToken,
 } from "../../../utils/commons";
 import { dataPreparationService } from "../../../services/data-preparation.service";
-import { Party, Role, SessionTokens } from "./common-steps";
+import { Role, TenantType, SessionTokens } from "../../common-steps";
 
 Given(
   "un {string} di {string} ha già creato {int} e-services in catalogo in stato PUBLISHED o SUSPENDED e {int} in stato DRAFT",
   async function (
     role: Role,
-    party: Party,
+    tenantType: TenantType,
     countEservices: number,
     countDraftEservices: number
   ) {
     assertContextSchema(this);
 
-    const token = this.tokens[party]![role]!;
+    const token = getToken(this.tokens, tenantType, role);
     const SUSPENDED_ESERVICES = Math.floor(countEservices / 2);
     const PUBLISHED_ESERVICES = countEservices - SUSPENDED_ESERVICES;
     const DRAFT_ESERVICES = countDraftEservices;
@@ -93,13 +94,13 @@ Given(
 
 Given(
   "{string} ha un agreement attivo con un e-service di {string}",
-  async function (consumer: Party, _producer: string) {
+  async function (consumer: TenantType, _producer: string) {
     assertContextSchema(this, {
       token: z.string(),
       publishedEservicesIds: z.array(z.tuple([z.string(), z.string()])),
       tokens: SessionTokens,
     });
-    const token = this.tokens[consumer]!.admin!;
+    const token = getToken(this.tokens, consumer, "admin");
     const [eserviceId, descriptorId] = this.publishedEservicesIds[0];
 
     const agreementId = await dataPreparationService.createAgreement(
@@ -118,27 +119,27 @@ Given(
 
 Given(
   "un {string} di {string} ha già approvato la richiesta di agreement di ente_fruitore",
-  async function (role: Role, party: Party) {
+  async function (role: Role, tenantType: TenantType) {
     assertContextSchema(this, {
       agreementId: z.string(),
     });
 
-    const token = this.tokens[party]![role]!;
+    const token = getToken(this.tokens, tenantType, role);
 
     await dataPreparationService.activateAgreement(token, this.agreementId);
   }
 );
 
 Given(
-  "un {string} di {string} ha già sospeso la versione dell'eservice che ente_fruitore ha sottoscritto",
-  async function (role: Role, party: Party) {
+  "un {string} di {string} ha già sospeso la versione dell'e-service che ente_fruitore ha sottoscritto",
+  async function (role: Role, tenantType: TenantType) {
     assertContextSchema(this, {
       agreementId: z.string(),
       eserviceSubscribedId: z.string(),
       descriptorSubscribedId: z.string(),
     });
 
-    const token = this.tokens[party]![role]!;
+    const token = getToken(this.tokens, tenantType, role);
 
     await dataPreparationService.suspendDescriptor(
       token,
@@ -149,7 +150,7 @@ Given(
 );
 
 When(
-  "l'utente richiede la lista di eservices per i quali ha almeno un agreement attivo",
+  "l'utente richiede la lista di e-services per i quali ha almeno un agreement attivo",
   async function () {
     assertContextSchema(this, {
       token: z.string(),
@@ -223,7 +224,7 @@ When(
 
 When(
   "l'utente richiede una operazione di listing degli e-services dell'erogatore {string}",
-  async function (producer: Party) {
+  async function (producer: TenantType) {
     assertContextSchema(this, {
       token: z.string(),
     });
@@ -261,10 +262,10 @@ When(
 
 Given(
   "un {string} di {string} ha già creato e pubblicato un e-service contenente la keyword {string}",
-  async function (role: Role, party: Party, keyword: string) {
+  async function (role: Role, tenantType: TenantType, keyword: string) {
     assertContextSchema(this);
 
-    const token = this.tokens[party]![role]!;
+    const token = getToken(this.tokens, tenantType, role);
     const eserviceName = `e-service-${this.TEST_SEED}-${keyword}`;
     const eserviceId = await dataPreparationService.createEService(token, {
       name: eserviceName,

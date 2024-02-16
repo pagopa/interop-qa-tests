@@ -1,11 +1,8 @@
 import { readFileSync } from "fs";
 import { z } from "zod";
 import { AxiosResponse } from "axios";
-import {
-  Party,
-  SessionTokens,
-} from "../features/catalog/step_definitions/common-steps";
 import { CreatedResource } from "../api/models";
+import { TenantType, Role, SessionTokens } from "../features/common-steps";
 import { apiClient } from "../api";
 
 type RiskAnalysisTemplateType = "PA" | "Privato/GSP";
@@ -65,14 +62,14 @@ const RISK_ANALYSIS_DATA: Record<
 };
 
 export function getRiskAnalysis({
-  party,
+  tenantType,
   completed,
 }: {
-  party: Party;
+  tenantType: TenantType;
   completed?: boolean;
 }) {
   const templateType =
-    party === "PA1" || party === "PA2" ? "PA" : "Privato/GSP";
+    tenantType === "PA1" || tenantType === "PA2" ? "PA" : "Privato/GSP";
   const templateStatus = completed ?? true ? "completed" : "uncompleted";
 
   const answers = RISK_ANALYSIS_DATA[templateType][templateStatus];
@@ -108,9 +105,6 @@ export async function makePolling<TReturnType>(
     await sleep(SLEEP_TIME);
     const result = await promise();
     if (shouldStop(result)) {
-      console.log(
-        `Polling ended at iteration: ${i}. Waited ${SLEEP_TIME * i}ms`
-      );
       return;
     }
   }
@@ -135,26 +129,37 @@ export function assertContextSchema<TSchema extends z.ZodRawShape>(
   }
 }
 
-export function getOrganizationId(party: Party) {
+export function getOrganizationId(tenantType: TenantType) {
   const file = JSON.parse(
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     Buffer.from(readFileSync(process.env.TENANT_IDS_FILE_PATH!)).toString()
   );
-  return file[party].admin.organizationId;
+  return file[tenantType].admin.organizationId;
 }
 
-export function assertValidResponse(
-  response: AxiosResponse<CreatedResource | void>
+export function getToken(
+  tokens: SessionTokens,
+  tenantType: TenantType,
+  role: Role
 ) {
+  const token = tokens[tenantType]?.[role];
+  if (!token) {
+    throw Error(
+      `Token not found for tenantType: ${tenantType} and role: ${role}`
+    );
+  }
+  return token;
+}
+
+export function assertValidResponse<T>(response: AxiosResponse<T>) {
   if (response.status >= 400) {
     throw Error(
       `Something went wrong: ${JSON.stringify(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (response.data as unknown as any).errors
+        response.data ?? response.statusText
       )}`
     );
   }
 }
+
 export type FileType = "yaml" | "wsdl";
 
 export async function uploadInterfaceDocument(
@@ -163,7 +168,7 @@ export async function uploadInterfaceDocument(
   descriptorId: string,
   token: string
 ): Promise<AxiosResponse<CreatedResource>> {
-  const blobFile = new Blob([readFileSync(`./utils/${fileName}`)]);
+  const blobFile = new Blob([readFileSync(`./data/${fileName}`)]);
   const file = new File([blobFile], fileName);
 
   return apiClient.eservices.createEServiceDocument(

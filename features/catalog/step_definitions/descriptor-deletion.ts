@@ -22,7 +22,7 @@ When("l'utente cancella il descrittore di quell'e-service", async function () {
   );
 });
 
-Then("quell'eservice è stato cancellato", async function () {
+Then("quell'e-service è stato cancellato", async function () {
   assertContextSchema(this, {
     token: z.string(),
     eserviceId: z.string(),
@@ -38,7 +38,7 @@ Then("quell'eservice è stato cancellato", async function () {
   );
 });
 
-Then("quell'eservice non è stato cancellato", async function () {
+Then("quell'e-service non è stato cancellato", async function () {
   assertContextSchema(this, {
     token: z.string(),
     eserviceId: z.string(),

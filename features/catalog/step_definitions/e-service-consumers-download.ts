@@ -3,19 +3,20 @@ import { z } from "zod";
 import {
   assertContextSchema,
   getAuthorizationHeader,
+  getToken,
 } from "../../../utils/commons";
 import { dataPreparationService } from "../../../services/data-preparation.service";
 import { apiClient } from "../../../api";
-import { Party } from "./common-steps";
+import { TenantType } from "../../common-steps";
 
 Given(
   "{string} ha un agreement attivo con quell'e-service",
-  async function (party: Party) {
+  async function (tenantType: TenantType) {
     assertContextSchema(this, {
       eserviceId: z.string(),
       descriptorId: z.string(),
     });
-    const token = this.tokens[party]!.admin!;
+    const token = getToken(this.tokens, tenantType, "admin");
     const agreementId = await dataPreparationService.createAgreement(
       token,
       this.eserviceId,

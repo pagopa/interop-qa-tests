@@ -7,7 +7,7 @@ import {
 } from "../../../utils/commons";
 
 When(
-  "l'utente legge un'analisi del rischio di quell'eservice",
+  "l'utente legge un'analisi del rischio di quell'e-service",
   async function () {
     assertContextSchema(this, {
       token: z.string(),

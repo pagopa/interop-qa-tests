@@ -35,7 +35,7 @@ When(
 );
 
 Given(
-  "l'utente ha già creato una versione in bozza per quell'eservice",
+  "l'utente ha già creato una versione in bozza per quell'e-service",
   async function () {
     assertContextSchema(this, {
       token: z.string(),

@@ -102,7 +102,7 @@ export const dataPreparationService = {
     eserviceId: string,
     descriptorId: string
   ) {
-    const blobFile = new Blob([readFileSync("./utils/interface.yaml")]);
+    const blobFile = new Blob([readFileSync("./data/interface.yaml")]);
     const file = new File([blobFile], "interface.yaml");
 
     const response = await apiClient.eservices.createEServiceDocument(
@@ -134,7 +134,7 @@ export const dataPreparationService = {
     eserviceId: string,
     descriptorId: string
   ) {
-    const blobFile = new Blob([readFileSync("./utils/dummy.pdf")]);
+    const blobFile = new Blob([readFileSync("./data/dummy.pdf")]);
     const file = new File([blobFile], "documento-test-qa.pdf");
 
     const response = await apiClient.eservices.createEServiceDocument(
@@ -361,50 +361,47 @@ export const dataPreparationService = {
       return result;
     }
 
-    if (descriptorState === "ARCHIVED" || descriptorState === "DEPRECATED") {
-      if (descriptorState === "DEPRECATED") {
-        // Optional. Create an agreement
+    if (descriptorState === "DEPRECATED") {
+      // Optional. Create an agreement
 
-        const agreementId = await dataPreparationService.createAgreement(
-          token,
-          eserviceId,
-          descriptorId
-        );
-
-        await dataPreparationService.submitAgreement(token, agreementId);
-      }
-
-      // Create another DRAFT descriptor
-      const secondDescriptorId =
-        await dataPreparationService.createDraftDescriptor(token, eserviceId);
-
-      // Add interface to secondDescriptor
-      await dataPreparationService.addInterfaceToDescriptor(
+      const agreementId = await dataPreparationService.createAgreement(
         token,
         eserviceId,
-        secondDescriptorId
+        descriptorId
       );
 
-      // Publish secondDescriptor
-      await dataPreparationService.publishDescriptor(
-        token,
-        eserviceId,
-        secondDescriptorId
-      );
-
-      // Check until the first descriptor is in desired state
-      await makePolling(
-        () =>
-          apiClient.producers.getProducerEServiceDescriptor(
-            eserviceId,
-            descriptorId,
-            getAuthorizationHeader(token)
-          ),
-        (res) => res.data.state === descriptorState
-      );
-
-      return result;
+      await dataPreparationService.submitAgreement(token, agreementId);
     }
+
+    // Create another DRAFT descriptor
+    const secondDescriptorId =
+      await dataPreparationService.createDraftDescriptor(token, eserviceId);
+
+    // Add interface to secondDescriptor
+    await dataPreparationService.addInterfaceToDescriptor(
+      token,
+      eserviceId,
+      secondDescriptorId
+    );
+
+    // Publish secondDescriptor
+    await dataPreparationService.publishDescriptor(
+      token,
+      eserviceId,
+      secondDescriptorId
+    );
+
+    // Check until the first descriptor is in desired state
+    await makePolling(
+      () =>
+        apiClient.producers.getProducerEServiceDescriptor(
+          eserviceId,
+          descriptorId,
+          getAuthorizationHeader(token)
+        ),
+      (res) => res.data.state === descriptorState
+    );
+
     return result;
   },
 
@@ -420,7 +417,8 @@ export const dataPreparationService = {
     );
 
     assertValidResponse(response);
-    let riskAnalysisId = "";
+
+    let riskAnalysisId: string | undefined;
     await makePolling(
       () =>
         apiClient.producers.getProducerEServiceDetails(
@@ -428,14 +426,11 @@ export const dataPreparationService = {
           getAuthorizationHeader(token)
         ),
       (res) => {
-        if (res.data.riskAnalysis.length > 0) {
-          riskAnalysisId = res.data.riskAnalysis[0].id;
-          return true;
-        }
-        return false;
+        riskAnalysisId = res.data.riskAnalysis?.[0]?.id;
+        return Boolean(riskAnalysisId);
       }
     );
-    if (riskAnalysisId === "") {
+    if (!riskAnalysisId) {
       throw new Error("Risk analysis not found");
     }
     return riskAnalysisId;
