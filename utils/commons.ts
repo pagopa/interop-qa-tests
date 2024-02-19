@@ -131,7 +131,7 @@ export function assertContextSchema<TSchema extends z.ZodRawShape>(
 
 export function getOrganizationId(tenantType: TenantType) {
   const file = JSON.parse(
-    Buffer.from(readFileSync(process.env.TENANT_IDS_FILE_PATH!)).toString()
+    Buffer.from(readFileSync(process.env.TENANTS_IDS_FILE_PATH!)).toString()
   );
   return file[tenantType].admin.organizationId;
 }
