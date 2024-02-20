@@ -35,13 +35,37 @@ Feature: Listing richieste di fruizione
     Given "GSP" ha un agreement attivo per ciascun e-service di "PA1"
     When l'utente richiede una operazione di listing delle richieste di fruizione che ha creato
     Then si ottiene status code 200 e la lista di 20 richieste di fruizione
-   
-   
+
   @agreement_listing5
   Scenario Outline: Restituisce le richieste di fruizione associate ad alcuni specifici e-service
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA1" ha già creato 10 e-services in catalogo in stato PUBLISHED
     Given "GSP" ha un agreement attivo per ciascun e-service di "PA1"
     Given "PA2" ha un agreement attivo per ciascun e-service di "PA1"
-    When l'utente richiede una operazione di listing per 3 specifici e-service
-    Then si ottiene status code 200 e la lista di 6 specifiche richieste di fruizione
+    When l'utente richiede una operazione di listing delle richieste di fruizione per 3 specifici e-service
+    Then si ottiene status code 200 e la lista di 6 richieste di fruizione
+
+  @agreement_listing6
+  Scenario Outline: Restituisce le richieste di fruizione di uno specifico fruitore che sono in uno o più specifici stati
+    Given l'utente è un "admin" di "PA1"
+    Given un "admin" di "PA1" ha già creato 10 e-services in catalogo in stato PUBLISHED
+    Given "GSP" ha un agreement in stato "ACTIVE" per un e-service di "PA1"
+    Given "GSP" ha un agreement in stato "DRAFT" per un e-service di "PA1"
+    When l'utente richiede una operazione di listing delle richieste di fruizione che sono in stato "ACTIVE"
+    Then si ottiene status code 200 e la lista di 1 richiesta di fruizione
+
+  @agreement_listing7
+  Scenario Outline: Restituisce le richieste di fruizione di uno specifico fruitore che possono essere aggiornate ad una nuova versione di e-service
+    Given l'utente è un "admin" di "PA1"
+    Given un "admin" di "PA1" ha già creato 10 e-services in catalogo in stato PUBLISHED
+    Given "GSP" ha un agreement attivo per ciascun e-service di "PA1"
+    Given un "admin" di "PA1" ha già pubblicato una nuova versione per 5 di questi e-service
+    When l'utente richiede una operazione di listing delle richieste di fruizione aggiornabili
+    Then si ottiene status code 200 e la lista di 5 richieste di fruizione
+
+  @agreement_listing8
+  Scenario Outline: Restituisce un insieme vuoto di richieste di fruizione per una ricerca che non porta risultati
+    Given l'utente è un "admin" di "PA1"
+    Given un "admin" di "PA1" ha già creato 2 e-services in catalogo in stato PUBLISHED
+    When l'utente richiede una operazione di listing delle richieste di fruizione
+    Then si ottiene status code 200 e la lista di 0 richieste di fruizione
