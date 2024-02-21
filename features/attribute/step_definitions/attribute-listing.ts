@@ -41,7 +41,7 @@ When(
         q: this.TEST_SEED,
         limit,
         offset: 0,
-        kinds: [],
+        kinds: ["DECLARED", "CERTIFIED", "VERIFIED"],
       },
       getAuthorizationHeader(this.token)
     );
@@ -59,7 +59,7 @@ When(
         q: this.TEST_SEED,
         limit: 50,
         offset,
-        kinds: [],
+        kinds: ["DECLARED", "CERTIFIED", "VERIFIED"],
       },
       getAuthorizationHeader(this.token)
     );

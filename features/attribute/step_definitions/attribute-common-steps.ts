@@ -1,11 +1,7 @@
 import assert from "assert";
 import { Given, Then } from "@cucumber/cucumber";
 import { z } from "zod";
-import {
-  assertContextSchema,
-  getRandomInt,
-  getToken,
-} from "../../../utils/commons";
+import { assertContextSchema, getToken } from "../../../utils/commons";
 import { Role, TenantType } from "../../common-steps";
 import { AttributeKind } from "../../../api/models";
 import { dataPreparationService } from "../../../services/data-preparation.service";

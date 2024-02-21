@@ -64,4 +64,3 @@ Feature: Listing attributi
     Given un "admin" di "PA1" ha già creato 3 attributi "DECLARED"
     When l'utente richiede una operazione di listing degli attributi filtrando per keyword "unknown" all'interno del nome
     Then si ottiene status code 200 e la lista di 0 attributi
-  
