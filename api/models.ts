@@ -3245,31 +3245,6 @@ export namespace Tenants {
     export type ResponseBody = void;
   }
   /**
-   * @description Revoke a certified attribute to a Tenant by the requester Tenant
-   * @tags tenants
-   * @name RevokeCertifiedAttribute
-   * @request DELETE:/tenants/{tenantId}/attributes/certified/{attributeId}
-   * @secure
-   */
-  export namespace RevokeCertifiedAttribute {
-    export type RequestParams = {
-      /**
-       * Tenant id which attribute needs to be verified
-       * @format uuid
-       */
-      tenantId: string;
-      /**
-       * Attribute id to be revoked
-       * @format uuid
-       */
-      attributeId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = void;
-  }
-  /**
    * @description Update expirationDate for Verified Attribute of Tenant
    * @tags tenants
    * @name UpdateVerifiedAttribute
