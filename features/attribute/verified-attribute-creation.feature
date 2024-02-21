@@ -1,8 +1,6 @@
 @verified_attribute_creation
-
 Feature: Creazione attributo verificato
   Gli admin e gli operatori API di enti PA e GSP possono creare attributi verificati
-  # verificare se  i privati possono farlo
 
   @verified_attribute_creation1
   Scenario Outline: Un utente con sufficienti permessi di un ente autorizzato crea un attributo verificato
