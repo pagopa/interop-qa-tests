@@ -32,7 +32,7 @@ Given(
 
       return [eserviceId, descriptorId];
     };
-  
+
     this.publishedEservicesIds = await Promise.all(
       arr.map((_, i) => createEServiceWithPublishedDescriptor(i))
     );
@@ -48,36 +48,36 @@ Given(
       tokens: SessionTokens,
     });
     const token = getToken(this.tokens, consumer, "admin");
-    await Promise.all(this.publishedEservicesIds.map(([eserviceId, descriptorId]) => dataPreparationService.createAgreement(token, eserviceId,
-      descriptorId)));
+    await Promise.all(
+      this.publishedEservicesIds.map(([eserviceId, descriptorId]) =>
+        dataPreparationService.createAgreement(token, eserviceId, descriptorId)
+      )
+    );
   }
 );
 
 Given(
-  "{string} ha un agreement in stato {string} per un e-service di {string}",
-  async function (consumer: TenantType, agreementState: string, _producer: string) {
+  "{string} ha un agreement in stato {string} per l'e-service numero {int} di {string}",
+  async function (
+    consumer: TenantType,
+    agreementState: string,
+    eserviceIndex: number,
+    _producer: string
+  ) {
     assertContextSchema(this, {
       token: z.string(),
       publishedEservicesIds: z.array(z.tuple([z.string(), z.string()])),
       tokens: SessionTokens,
     });
     const token = getToken(this.tokens, consumer, "admin");
-    const [eserviceId, descriptorId] = this.publishedEservicesIds[0];
-    await dataPreparationService.createAgreementWithGivenState(token, agreementState, eserviceId, descriptorId);
-  }
-);
-
-Given(
-  "{string} ha un agreement in stato {string} per un altro e-service di {string}",
-  async function (consumer: TenantType, agreementState: string, _producer: string) {
-    assertContextSchema(this, {
-      token: z.string(),
-      publishedEservicesIds: z.array(z.tuple([z.string(), z.string()])),
-      tokens: SessionTokens,
-    });
-    const token = getToken(this.tokens, consumer, "admin");
-    const [eserviceId, descriptorId] = this.publishedEservicesIds[1];
-    await dataPreparationService.createAgreementWithGivenState(token, agreementState, eserviceId, descriptorId);
+    const [eserviceId, descriptorId] =
+      this.publishedEservicesIds[eserviceIndex];
+    await dataPreparationService.createAgreementWithGivenState(
+      token,
+      agreementState,
+      eserviceId,
+      descriptorId
+    );
   }
 );
 
@@ -88,7 +88,9 @@ When(
       token: z.string(),
       publishedEservicesIds: z.array(z.tuple([z.string(), z.string()])),
     });
-    const eservicesIds = this.publishedEservicesIds.map(([eserviceId]) => eserviceId);
+    const eservicesIds = this.publishedEservicesIds.map(
+      ([eserviceId]) => eserviceId
+    );
     this.response = await apiClient.agreements.getAgreements(
       {
         eservicesIds,
@@ -107,7 +109,9 @@ When(
       token: z.string(),
       publishedEservicesIds: z.array(z.tuple([z.string(), z.string()])),
     });
-    const eservicesIds = this.publishedEservicesIds.map(([eserviceId]) => eserviceId);
+    const eservicesIds = this.publishedEservicesIds.map(
+      ([eserviceId]) => eserviceId
+    );
     this.response = await apiClient.agreements.getAgreements(
       {
         eservicesIds,
@@ -127,13 +131,15 @@ When(
       tenantType: TenantType,
       publishedEservicesIds: z.array(z.tuple([z.string(), z.string()])),
     });
-    const eservicesIds = this.publishedEservicesIds.map(([eserviceId]) => eserviceId);
+    const eservicesIds = this.publishedEservicesIds.map(
+      ([eserviceId]) => eserviceId
+    );
     this.response = await apiClient.agreements.getAgreements(
       {
         eservicesIds,
         limit: 12,
         offset: 0,
-        producersIds: [getOrganizationId(this.tenantType)]
+        producersIds: [getOrganizationId(this.tenantType)],
       },
       getAuthorizationHeader(this.token)
     );
@@ -148,7 +154,9 @@ When(
       tenantType: TenantType,
       publishedEservicesIds: z.array(z.tuple([z.string(), z.string()])),
     });
-    const eservicesIds = this.publishedEservicesIds.map(([eserviceId]) => eserviceId);
+    const eservicesIds = this.publishedEservicesIds.map(
+      ([eserviceId]) => eserviceId
+    );
     this.response = await apiClient.agreements.getAgreements(
       {
         eservicesIds,
@@ -161,7 +169,6 @@ When(
   }
 );
 
-
 When(
   "l'utente richiede una operazione di listing delle richieste di fruizione per {int} specifici e-service",
   async function (numberEservices: number) {
@@ -170,12 +177,14 @@ When(
       tenantType: TenantType,
       publishedEservicesIds: z.array(z.tuple([z.string(), z.string()])),
     });
-    const eservicesIds = this.publishedEservicesIds.map(([eserviceId]) => eserviceId).slice(0, numberEservices);
+    const eservicesIds = this.publishedEservicesIds
+      .map(([eserviceId]) => eserviceId)
+      .slice(0, numberEservices);
     this.response = await apiClient.agreements.getAgreements(
       {
         eservicesIds,
         limit: 12,
-        offset: 0
+        offset: 0,
       },
       getAuthorizationHeader(this.token)
     );
@@ -183,14 +192,20 @@ When(
 );
 
 When(
-  "l'utente richiede una operazione di listing delle richieste di fruizione di {string} che sono in stato {string}",
-  async function (consumer: TenantType, agreementState: AgreementState) {
+  "l'utente richiede una operazione di listing delle richieste di fruizione di {string} che sono in stato {string} e {string}",
+  async function (
+    consumer: TenantType,
+    agreementState1: AgreementState,
+    agreementState2: AgreementState
+  ) {
     assertContextSchema(this, {
       token: z.string(),
       tenantType: TenantType,
       publishedEservicesIds: z.array(z.tuple([z.string(), z.string()])),
     });
-    const eservicesIds = this.publishedEservicesIds.map(([eserviceId]) => eserviceId);
+    const eservicesIds = this.publishedEservicesIds.map(
+      ([eserviceId]) => eserviceId
+    );
     this.response = await apiClient.agreements.getAgreements(
       {
         eservicesIds,
@@ -198,11 +213,11 @@ When(
         offset: 0,
         consumersIds: [getOrganizationId(consumer)],
         producersIds: [getOrganizationId(this.tenantType)],
-        states: [agreementState]
+        states: [agreementState1, agreementState2],
       },
       getAuthorizationHeader(this.token)
     );
-  },
+  }
 );
 
 Then(

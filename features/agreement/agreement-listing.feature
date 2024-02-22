@@ -49,10 +49,11 @@ Feature: Listing richieste di fruizione
   Scenario Outline: Restituisce le richieste di fruizione di uno specifico fruitore che sono in uno o più specifici stati
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA1" ha già creato 10 e-services in stato PUBLISHED
-    Given "GSP" ha un agreement in stato "ACTIVE" per un e-service di "PA1"
-    Given "GSP" ha un agreement in stato "DRAFT" per un altro e-service di "PA1"
-    When l'utente richiede una operazione di listing delle richieste di fruizione di "GSP" che sono in stato "ACTIVE"
-    Then si ottiene status code 200 e la lista di 1 richiesta di fruizione
+    Given "GSP" ha un agreement in stato "ACTIVE" per l'e-service numero 1 di "PA1"
+    Given "GSP" ha un agreement in stato "DRAFT" per l'e-service numero 2 di "PA1"
+    Given "GSP" ha un agreement in stato "SUSPENDED" per l'e-service numero 3 di "PA1"
+    When l'utente richiede una operazione di listing delle richieste di fruizione di "GSP" che sono in stato "ACTIVE" e "DRAFT"
+    Then si ottiene status code 200 e la lista di 2 richiesta di fruizione
 
   @agreement_listing7
   Scenario Outline: Restituisce le richieste di fruizione di uno specifico fruitore che possono essere aggiornate ad una nuova versione di e-service

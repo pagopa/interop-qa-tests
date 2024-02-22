@@ -263,7 +263,6 @@ export const dataPreparationService = {
     return agreementId;
   },
 
-
   async createAgreementWithGivenState(
     token: string,
     agreementState: string,
@@ -272,21 +271,28 @@ export const dataPreparationService = {
   ) {
     // agreement in state DRAFT
     const agreementId = await this.createAgreement(
-      token, eserviceId, descriptorId
-    )
-    
+      token,
+      eserviceId,
+      descriptorId
+    );
+
     if (agreementState === "DRAFT") {
       return agreementId;
     }
 
     // agreement in state ACTIVE
-    await this.submitAgreement(token, agreementId)
+    await this.submitAgreement(token, agreementId);
 
     if (agreementState === "ACTIVE") {
       return agreementId;
     }
 
-    return;
+    // agreement in state SUSPENDED
+    await this.suspendAgreement(token, agreementId);
+
+    if (agreementState === "SUSPENDED") {
+      return agreementId;
+    }
   },
 
   async submitAgreement(token: string, agreementId: string) {
@@ -305,6 +311,24 @@ export const dataPreparationService = {
           getAuthorizationHeader(token)
         ),
       (res) => res.data.state === "ACTIVE"
+    );
+  },
+
+  async suspendAgreement(token: string, agreementId: string) {
+    const response = await apiClient.agreements.suspendAgreement(
+      agreementId,
+      getAuthorizationHeader(token)
+    );
+
+    assertValidResponse(response);
+
+    await makePolling(
+      () =>
+        apiClient.agreements.getAgreementById(
+          agreementId,
+          getAuthorizationHeader(token)
+        ),
+      (res) => res.data.state === "SUSPENDED"
     );
   },
 
