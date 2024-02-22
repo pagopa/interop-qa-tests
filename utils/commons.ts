@@ -4,6 +4,7 @@ import { AxiosResponse } from "axios";
 import { CreatedResource } from "../api/models";
 import { TenantType, Role, SessionTokens } from "../features/common-steps";
 import { apiClient } from "../api";
+import "../configs/env";
 
 type RiskAnalysisTemplateType = "PA" | "Privato/GSP";
 
@@ -131,7 +132,7 @@ export function assertContextSchema<TSchema extends z.ZodRawShape>(
 
 export function getOrganizationId(tenantType: TenantType) {
   const file = JSON.parse(
-    Buffer.from(readFileSync(process.env.TENANTS_IDS_FILE_PATH!)).toString()
+    Buffer.from(readFileSync(process.env.TENANTS_IDS_FILE_PATH)).toString()
   );
   return file[tenantType].admin.organizationId;
 }
