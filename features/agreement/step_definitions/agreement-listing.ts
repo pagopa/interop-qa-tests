@@ -81,6 +81,47 @@ Given(
   }
 );
 
+Given(
+  "un {string} di {string} ha già pubblicato una nuova versione per {int} di questi e-service",
+  async function (
+    role: Role,
+    tenantType: TenantType,
+    descriptorsCount: number
+  ) {
+    assertContextSchema(this, {
+      publishedEservicesIds: z.array(z.tuple([z.string(), z.string()])),
+    });
+
+    const token = getToken(this.tokens, tenantType, role);
+    const eserviceIds = this.publishedEservicesIds
+      .slice(0, descriptorsCount)
+      .map(([eserviceId, _]) => eserviceId);
+
+    const publishNewDescriptor = async (eserviceId: string) => {
+      const descriptorId = await dataPreparationService.createDraftDescriptor(
+        token,
+        eserviceId
+      );
+
+      await dataPreparationService.addInterfaceToDescriptor(
+        token,
+        eserviceId,
+        descriptorId
+      );
+
+      await dataPreparationService.publishDescriptor(
+        token,
+        eserviceId,
+        descriptorId
+      );
+    };
+
+    await Promise.all(
+      eserviceIds.map((eserviceId) => publishNewDescriptor(eserviceId))
+    );
+  }
+);
+
 When(
   "l'utente richiede una operazione di listing limitata alle prime {int} richieste di fruizione",
   async function (limit: number) {
@@ -214,6 +255,28 @@ When(
         consumersIds: [getOrganizationId(consumer)],
         producersIds: [getOrganizationId(this.tenantType)],
         states: [agreementState1, agreementState2],
+      },
+      getAuthorizationHeader(this.token)
+    );
+  }
+);
+
+When(
+  "l'utente richiede una operazione di listing delle richieste di fruizione aggiornabili",
+  async function () {
+    assertContextSchema(this, {
+      token: z.string(),
+      publishedEservicesIds: z.array(z.tuple([z.string(), z.string()])),
+    });
+    const eservicesIds = this.publishedEservicesIds.map(
+      ([eserviceId]) => eserviceId
+    );
+    this.response = await apiClient.agreements.getAgreements(
+      {
+        eservicesIds,
+        limit: 12,
+        offset: 0,
+        showOnlyUpgradeable: true,
       },
       getAuthorizationHeader(this.token)
     );
