@@ -48,9 +48,16 @@ Given(
       tokens: SessionTokens,
     });
     const token = getToken(this.tokens, consumer, "admin");
-    await Promise.all(
+
+    const agreementsIds = await Promise.all(
       this.publishedEservicesIds.map(([eserviceId, descriptorId]) =>
         dataPreparationService.createAgreement(token, eserviceId, descriptorId)
+      )
+    );
+
+    await Promise.all(
+      agreementsIds.map((agreementId) =>
+        dataPreparationService.submitAgreement(token, agreementId)
       )
     );
   }
@@ -97,27 +104,14 @@ Given(
       .slice(0, descriptorsCount)
       .map(([eserviceId, _]) => eserviceId);
 
-    const publishNewDescriptor = async (eserviceId: string) => {
-      const descriptorId = await dataPreparationService.createDraftDescriptor(
-        token,
-        eserviceId
-      );
-
-      await dataPreparationService.addInterfaceToDescriptor(
-        token,
-        eserviceId,
-        descriptorId
-      );
-
-      await dataPreparationService.publishDescriptor(
-        token,
-        eserviceId,
-        descriptorId
-      );
-    };
-
     await Promise.all(
-      eserviceIds.map((eserviceId) => publishNewDescriptor(eserviceId))
+      eserviceIds.map((eserviceId) =>
+        dataPreparationService.createDescriptorWithGivenState({
+          eserviceId,
+          token,
+          descriptorState: "PUBLISHED",
+        })
+      )
     );
   }
 );

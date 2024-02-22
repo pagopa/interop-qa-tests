@@ -57,7 +57,7 @@ Feature: Listing richieste di fruizione
 
   @agreement_listing7
   Scenario Outline: Restituisce le richieste di fruizione di uno specifico fruitore che possono essere aggiornate ad una nuova versione di e-service
-    Given l'utente è un "admin" di "PA1"
+    Given l'utente è un "admin" di "GSP"
     Given un "admin" di "PA1" ha già creato 10 e-services in stato PUBLISHED
     Given "GSP" ha un agreement attivo per ciascun e-service di "PA1"
     Given un "admin" di "PA1" ha già pubblicato una nuova versione per 5 di questi e-service
