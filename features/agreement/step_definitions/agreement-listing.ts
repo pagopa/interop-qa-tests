@@ -3,6 +3,7 @@ import { Given, Then, When } from "@cucumber/cucumber";
 import { z } from "zod";
 import {
   assertContextSchema,
+  assertValidResponse,
   getAuthorizationHeader,
   getOrganizationId,
   getToken,
@@ -134,6 +135,7 @@ When(
       },
       getAuthorizationHeader(this.token)
     );
+    assertValidResponse(this.response);
   }
 );
 
@@ -271,6 +273,27 @@ When(
         limit: 12,
         offset: 0,
         showOnlyUpgradeable: true,
+      },
+      getAuthorizationHeader(this.token)
+    );
+  }
+);
+
+When(
+  "l'utente richiede una operazione di listing delle richieste di fruizione",
+  async function () {
+    assertContextSchema(this, {
+      token: z.string(),
+      publishedEservicesIds: z.array(z.tuple([z.string(), z.string()])),
+    });
+    const eservicesIds = this.publishedEservicesIds.map(
+      ([eserviceId]) => eserviceId
+    );
+    this.response = await apiClient.agreements.getAgreements(
+      {
+        eservicesIds,
+        limit: 12,
+        offset: 0,
       },
       getAuthorizationHeader(this.token)
     );
