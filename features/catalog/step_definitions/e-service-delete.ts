@@ -4,16 +4,17 @@ import { dataPreparationService } from "../../../services/data-preparation.servi
 import {
   assertContextSchema,
   getAuthorizationHeader,
+  getToken,
 } from "../../../utils/commons";
 import { apiClient } from "../../../api";
-import { Party, Role } from "./common-steps";
+import { Role, TenantType } from "../../common-steps";
 
 Given(
   "un {string} di {string} ha già creato un e-service senza descrittore",
-  async function (role: Role, party: Party) {
+  async function (role: Role, tenantType: TenantType) {
     assertContextSchema(this);
 
-    const token = this.tokens[party]![role]!;
+    const token = getToken(this.tokens, tenantType, role);
 
     this.eserviceId = await dataPreparationService.createEService(token);
   }

@@ -1,6 +1,6 @@
 @eservice_risk_analysis_addition
-Feature: Aggiunta di un'analisi del rischio ad un eservice
-  Tutti gli utenti autorizzati di enti erogatori possono aggiungere un'analisi del rischio all'eservice se è in mode RECEIVE
+Feature: Aggiunta di un'analisi del rischio ad un e-service
+  Tutti gli utenti autorizzati di enti erogatori possono aggiungere un'analisi del rischio all'e-service se è in mode RECEIVE
 
   @eservice_risk_analysis_addition1
   Scenario Outline: Per un e-service creato in modalità "RECEIVE", il quale non ha descrittori, è possibile inserire una nuova analisi del rischio. L'analisi del rischio deve essere ben formattata ma non necessariamente completamente compilata. La richiesta va a buon fine
