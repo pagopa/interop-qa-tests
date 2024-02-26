@@ -2,9 +2,9 @@
 Feature: Creazione nuova richiesta di fruizione
 
   @agreement_creation1
-  Scenario Outline: Un utente con sufficienti permessi, il cui ente rispetta i requisiti (attributi certificati), senza altre richieste di fruizione per un e-service, crea una nuova richiesta di fruizione in bozza per l’ultima versione disponibile di quell'e-service, la quale è in stato PUBLISHED. La richiesta va a buon fine
+  Scenario Outline: Un utente con sufficienti permessi (admin), il cui ente rispetta i requisiti (attributi certificati), senza altre richieste di fruizione per un e-service, crea una nuova richiesta di fruizione in bozza per l’ultima versione disponibile di quell'e-service, la quale è in stato PUBLISHED. La richiesta va a buon fine
     Given l'utente è un "<ruolo>" di "<ente>"
-    Given "<ente>" possiede un attributo certificato  # Leggere attributi certificati di ente e selezionarne uno da mettere in context
+    Given "<ente>" possiede un attributo certificato
     Given un "admin" di "PA2" ha già creato un e-service in stato "PUBLISHED" che richiede quell'attributo certificato con approvazione "AUTOMATIC"
     When l'utente crea una richiesta di fruizione in bozza per l'ultima versione di quell'e-service
     Then si ottiene status code <risultato>
@@ -12,20 +12,20 @@ Feature: Creazione nuova richiesta di fruizione
     Examples: 
       | ente    | ruolo        | risultato |
       | GSP     | admin        |       200 |
-      | GSP     | api          |       200 |
-      | GSP     | security     |       200 |
-      | GSP     | support      |       200 |
-      | GSP     | api,security |       200 |
+      | GSP     | api          |       403 |
+      | GSP     | security     |       403 |
+      | GSP     | support      |       403 |
+      | GSP     | api,security |       403 |
       | PA1     | admin        |       200 |
-      | PA1     | api          |       200 |
-      | PA1     | security     |       200 |
-      | PA1     | support      |       200 |
-      | PA1     | api,security |       200 |
+      | PA1     | api          |       403 |
+      | PA1     | security     |       403 |
+      | PA1     | support      |       403 |
+      | PA1     | api,security |       403 |
       | Privato | admin        |       200 |
-      | Privato | api          |       200 |
-      | Privato | security     |       200 |
-      | Privato | support      |       200 |
-      | Privato | api,security |       200 |
+      | Privato | api          |       403 |
+      | Privato | security     |       403 |
+      | Privato | support      |       403 |
+      | Privato | api,security |       403 |
 
   @agreement_creation2a
   Scenario Outline: Un utente con sufficienti permessi, il cui ente rispetta i requisiti (attributi certificati), con altre richieste di fruizione in stato REJECTED per un e-service, crea una nuova richiesta di fruizione in bozza per l’ultima versione disponibile di quell'e-service, la quale è in stato PUBLISHED. La richiesta va a buon fine.

@@ -12,6 +12,8 @@ import {
   EServiceDescriptorSeed,
   EServiceDescriptorState,
   EServiceRiskAnalysisSeed,
+  DescriptorAttributesSeed,
+  AgreementApprovalPolicy,
 } from "./../api/models";
 
 export const dataPreparationService = {
@@ -355,16 +357,21 @@ export const dataPreparationService = {
     eserviceId,
     descriptorState,
     withDocument = false,
+    attributes = { certified: [], declared: [], verified: [] },
+    agreementApprovalPolicy = "AUTOMATIC",
   }: {
     token: string;
     eserviceId: string;
     descriptorState: EServiceDescriptorState;
     withDocument?: boolean;
+    attributes?: DescriptorAttributesSeed;
+    agreementApprovalPolicy?: AgreementApprovalPolicy;
   }) {
     // 1. Create DRAFT descriptor
     const descriptorId = await dataPreparationService.createDraftDescriptor(
       token,
-      eserviceId
+      eserviceId,
+      { attributes, agreementApprovalPolicy }
     );
 
     // 1.1 add document to descriptor
