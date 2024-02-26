@@ -60,7 +60,6 @@ When(
       seed,
       getAuthorizationHeader(this.token)
     );
-    console.log(this.response);
     assertValidResponse(this.response);
   }
 );
