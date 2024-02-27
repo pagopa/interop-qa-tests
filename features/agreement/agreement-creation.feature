@@ -79,7 +79,7 @@ Feature: Creazione nuova richiesta di fruizione
     Given "<enteCertificatore>" ha già revocato quell'attributo a "<enteFruitore>"
     Given la richiesta di fruizione è passata in stato "MISSING_CERTIFIED_ATTRIBUTES"
     When l'utente crea una richiesta di fruizione in bozza per l'ultima versione di quell'e-service
-    Then si ottiene status code 400
+    Then si ottiene status code 409
 
     Examples:
       | enteFruitore | enteCertificatore | enteErogatore|
@@ -104,7 +104,7 @@ Feature: Creazione nuova richiesta di fruizione
   @agreement_creation7
   Scenario Outline: Un utente con sufficienti permessi, il cui ente NON rispetta i requisiti (attributi certificati), senza altre richieste di fruizione per un e-service; crea una nuova richiesta di fruizione in bozza per l’ultima versione disponibile di quell'e-service, la quale è in stato PUBLISHED. Ottiene un errore.
     Given l'utente è un "admin" di "<enteFruitore>"
-    Given "<enteCertificatore>" ha creato un attributo certificato senza assegnarlo all'ente  # Creazione di un attributo certificato self service e non assegnarlo
+    Given "<enteFruitore>" non possiede uno specifico attributo certificato
     Given un "admin" di "<enteErogatore>" ha già creato un e-service in stato "PUBLISHED" che richiede quell'attributo certificato con approvazione "AUTOMATIC"
     When l'utente crea una richiesta di fruizione in bozza per l'ultima versione di quell'e-service
     Then si ottiene status code 400
@@ -118,10 +118,10 @@ Feature: Creazione nuova richiesta di fruizione
     Given l'utente è un "admin" di "PA1"
     Given "PA1" possiede un attributo certificato
     Given un "admin" di "PA2" ha già creato un e-service in stato "PUBLISHED" che richiede quell'attributo certificato con approvazione "AUTOMATIC"
-    Given "PA1" ha un agreement in stato "ACTIVE" per quell'e-service
+    Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given un "admin" di "PA2" ha già pubblicato una nuova versione per quell'e-service
     When l'utente crea una richiesta di fruizione in bozza per l'ultima versione di quell'e-service
-    Then si ottiene status code 400
+    Then si ottiene status code 409
 
   # Reminder per implementazione:
   # 1 - "L’utente crea la richiesta di fruizione per l’ultima versione disponibile dell’e-service" -> usare l'unica versione senza crearne un'altra

@@ -556,12 +556,12 @@ export const dataPreparationService = {
     name?: string
   ) {
     let response: AxiosResponse<Attribute, unknown>;
-    const actualName = name ?? `new attribute ${getRandomInt()}`;
+    const actualName = name ?? `new_attribute_${getRandomInt()}`;
     switch (attributeKind) {
       case "CERTIFIED":
         response = await apiClient.certifiedAttributes.createCertifiedAttribute(
           {
-            description: "description test",
+            description: "description_test",
             name: actualName,
           },
           getAuthorizationHeader(token)
@@ -570,7 +570,7 @@ export const dataPreparationService = {
       case "VERIFIED":
         response = await apiClient.verifiedAttributes.createVerifiedAttribute(
           {
-            description: "description test",
+            description: "description_test",
             name: actualName,
           },
           getAuthorizationHeader(token)
@@ -579,7 +579,7 @@ export const dataPreparationService = {
       case "DECLARED":
         response = await apiClient.declaredAttributes.createDeclaredAttribute(
           {
-            description: "description test",
+            description: "description_test",
             name: actualName,
           },
           getAuthorizationHeader(token)

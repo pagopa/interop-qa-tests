@@ -12,6 +12,7 @@ import { Role, TenantType } from "../../common-steps";
 import { dataPreparationService } from "../../../services/data-preparation.service";
 import {
   AgreementApprovalPolicy,
+  AgreementState,
   EServiceDescriptorState,
 } from "../../../api/models";
 
@@ -109,12 +110,13 @@ Given(
       token: z.string(),
     });
     const token = getToken(this.tokens, consumer, "admin");
-    await dataPreparationService.createAgreementWithGivenState(
-      token,
-      agreementState,
-      this.eserviceId,
-      this.descriptorId
-    );
+    this.agreementId =
+      await dataPreparationService.createAgreementWithGivenState(
+        token,
+        agreementState,
+        this.eserviceId,
+        this.descriptorId
+      );
   }
 );
 
@@ -160,7 +162,7 @@ Given(
     const token = getToken(this.tokens, certifier, "admin");
 
     const tenantId = getOrganizationId(tenantType);
-    const attributeId = await dataPreparationService.createAttribute(
+    this.attributeId = await dataPreparationService.createAttribute(
       token,
       "CERTIFIED"
     );
@@ -168,7 +170,7 @@ Given(
     await dataPreparationService.assignCertifiedAttributeToTenant(
       token,
       tenantId,
-      attributeId
+      this.attributeId
     );
   }
 );
@@ -191,7 +193,7 @@ Given(
 
 Given(
   "la richiesta di fruizione è passata in stato {string}",
-  async function () {
+  async function (agreementState: AgreementState) {
     assertContextSchema(this, { agreementId: z.string(), token: z.string() });
     await makePolling(
       () =>
@@ -199,13 +201,49 @@ Given(
           this.agreementId,
           getAuthorizationHeader(this.token)
         ),
-      (res) => res.data.state === "MISSING_CERTIFIED_ATTRIBUTES"
+      (res) => res.data.state === agreementState
     );
+  }
+);
+
+Given(
+  "un {string} di {string} ha già pubblicato una nuova versione per quell'e-service",
+  async function (role: Role, tenantType: TenantType) {
+    assertContextSchema(this, {
+      eserviceId: z.string(),
+    });
+    const token = getToken(this.tokens, tenantType, role);
+    const response =
+      await dataPreparationService.createDescriptorWithGivenState({
+        token,
+        eserviceId: this.eserviceId,
+        descriptorState: "PUBLISHED",
+      });
+    this.descriptorId = response.descriptorId;
   }
 );
 
 When(
   "l'utente crea una richiesta di fruizione in bozza per l'ultima versione di quell'e-service",
+  async function () {
+    assertContextSchema(this, {
+      eserviceId: z.string(),
+      descriptorId: z.string(),
+      token: z.string(),
+    });
+
+    this.response = await apiClient.agreements.createAgreement(
+      {
+        eserviceId: this.eserviceId,
+        descriptorId: this.descriptorId,
+      },
+      getAuthorizationHeader(this.token)
+    );
+  }
+);
+
+When(
+  "l'utente crea una richiesta di fruizione in bozza per la penultima versione di quell'e-service",
   async function () {
     assertContextSchema(this, {
       eserviceId: z.string(),
