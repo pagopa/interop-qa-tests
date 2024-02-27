@@ -10,7 +10,7 @@ Feature: Listing richieste di fruizione lato erogatore
     Given "PA2" ha già una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given "GSP" ha già una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given "PRIVATO" ha già una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    When l'utente richiede una operazione di listing delle richieste di fruizione dei propri e-service limitata alle prime 3 
+    When l'utente richiede una operazione di listing delle richieste di fruizione dei propri e-service limitata alle prime 3
     Then si ottiene status code 200 e la lista di 3 richieste di fruizione
 
     Examples: 
