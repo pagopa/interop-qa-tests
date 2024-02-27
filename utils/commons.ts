@@ -4,6 +4,7 @@ import { AxiosResponse } from "axios";
 import { CreatedResource } from "../api/models";
 import { TenantType, Role, SessionTokens } from "../features/common-steps";
 import { apiClient } from "../api";
+import "../configs/env";
 
 type RiskAnalysisTemplateType = "PA" | "Privato/GSP";
 
@@ -98,11 +99,8 @@ export async function makePolling<TReturnType>(
   shouldStop: (data: Awaited<TReturnType>) => boolean,
   errorMessage: string = ""
 ) {
-  const MAX_POLLING_TRIES = 32;
-  const SLEEP_TIME = 100;
-
-  for (let i = 0; i < MAX_POLLING_TRIES; i++) {
-    await sleep(SLEEP_TIME);
+  for (let i = 0; i < process.env.MAX_POLLING_TRIES; i++) {
+    await sleep(process.env.POLLING_SLEEP_TIME);
     const result = await promise();
     if (shouldStop(result)) {
       return;
@@ -131,7 +129,7 @@ export function assertContextSchema<TSchema extends z.ZodRawShape>(
 
 export function getOrganizationId(tenantType: TenantType) {
   const file = JSON.parse(
-    Buffer.from(readFileSync(process.env.TENANTS_IDS_FILE_PATH!)).toString()
+    Buffer.from(readFileSync(process.env.TENANTS_IDS_FILE_PATH)).toString()
   );
   return file[tenantType].admin.organizationId;
 }

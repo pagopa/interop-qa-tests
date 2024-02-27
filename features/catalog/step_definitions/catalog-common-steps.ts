@@ -4,7 +4,7 @@ import { z } from "zod";
 import { EServiceDescriptorState } from "../../../api/models";
 import { dataPreparationService } from "../../../services/data-preparation.service";
 import { TenantType, Role } from "../../common-steps";
-import { assertContextSchema, getToken } from "./../../../utils/commons";
+import { assertContextSchema, getToken } from "../../../utils/commons";
 
 Then(
   "si ottiene status code {int} e la lista di {int} e-service(s)",
