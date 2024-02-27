@@ -312,7 +312,7 @@ export const dataPreparationService = {
   async submitAgreement(
     token: string,
     agreementId: string,
-    expectedState: "ACTIVE" | "PENDING"
+    expectedState: "ACTIVE" | "PENDING" = "ACTIVE"
   ) {
     const response = await apiClient.agreements.submitAgreement(
       agreementId,
