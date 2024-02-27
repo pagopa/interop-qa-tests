@@ -99,11 +99,8 @@ export async function makePolling<TReturnType>(
   shouldStop: (data: Awaited<TReturnType>) => boolean,
   errorMessage: string = ""
 ) {
-  const MAX_POLLING_TRIES = 32;
-  const SLEEP_TIME = 100;
-
-  for (let i = 0; i < MAX_POLLING_TRIES; i++) {
-    await sleep(SLEEP_TIME);
+  for (let i = 0; i < process.env.MAX_POLLING_TRIES; i++) {
+    await sleep(process.env.POLLING_SLEEP_TIME);
     const result = await promise();
     if (shouldStop(result)) {
       return;
