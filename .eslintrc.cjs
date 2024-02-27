@@ -24,7 +24,9 @@ module.exports = {
     "functional/no-let": "off",
     "no-console": "off",
     "sonarjs/no-identical-functions": "off",
-    "@typescript-eslint/no-non-null-assertion": "off"
+    "@typescript-eslint/no-non-null-assertion": "off",
+    "@typescript-eslint/no-empty-interface": "off",
+    "@typescript-eslint/no-namespace": "off"
   },
   ignorePatterns: [
     ".eslintrc.cjs",

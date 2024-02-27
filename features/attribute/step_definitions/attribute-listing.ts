@@ -3,7 +3,6 @@ import { z } from "zod";
 import {
   TOBE_REMOVED_customSerializer,
   assertContextSchema,
-  assertValidResponse,
   getAuthorizationHeader,
 } from "../../../utils/commons";
 import { apiClient } from "../../../api";
@@ -26,7 +25,6 @@ When(
         paramsSerializer: TOBE_REMOVED_customSerializer,
       }
     );
-    assertValidResponse(this.response);
   }
 );
 

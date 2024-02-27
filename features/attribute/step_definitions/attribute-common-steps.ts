@@ -16,16 +16,20 @@ Given(
   ) {
     assertContextSchema(this);
     const token = getToken(this.tokens, tenantType, role);
-    const attributeIds: string[] = [];
+
+    const promises = [];
+
     for (let i = 0; i < count; i++) {
-      const attributeId = await dataPreparationService.createAttribute(
-        token,
-        attributeKind,
-        `attribute-${i}-${this.TEST_SEED}-${attributeKind}`
+      promises.push(
+        dataPreparationService.createAttribute(
+          token,
+          attributeKind,
+          `attribute-${i}-${this.TEST_SEED}-${attributeKind}`
+        )
       );
-      attributeIds.push(attributeId);
     }
-    this.attributeId = attributeIds[0];
+
+    this.attributeId = (await Promise.all(promises))[0];
   }
 );
 
