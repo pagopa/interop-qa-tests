@@ -70,9 +70,9 @@ Feature: Lettura di un descrittore lato erogatore
     Then si ottiene status code <risultato>
 
     Examples: 
-      | statoVersione | risultato|
-      | PUBLISHED     | 403     |
-      | SUSPENDED     | 403     |
-      | DEPRECATED    | 403     |
-      | DRAFT         | 404     |
-      | ARCHIVED      | 403     |
+      | statoVersione | risultato |
+      | PUBLISHED     |       403 |
+      | SUSPENDED     |       403 |
+      | DEPRECATED    |       403 |
+      | DRAFT         |       404 |
+      | ARCHIVED      |       403 |
