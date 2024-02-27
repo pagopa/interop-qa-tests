@@ -10,6 +10,8 @@ export const Env = z.object({
   SESSION_TOKENS_DURATION_SECONDS: z.coerce.number(),
   TENANTS_IDS_FILE_PATH: z.string(),
   ST_VERBOSE_MODE: z.string().optional(),
+  MAX_POLLING_TRIES: z.coerce.number(),
+  POLLING_SLEEP_TIME: z.coerce.number(),
 });
 
 const parsedEnv = Env.safeParse(process.env);
