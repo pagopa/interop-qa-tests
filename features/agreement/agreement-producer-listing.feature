@@ -40,3 +40,32 @@ Feature: Listing richieste di fruizione lato erogatore
       | PENDING        |
       | ACTIVE         |
       | SUSPENDED      |
+
+  @agreement_producer_listing3
+  Scenario Outline: A fronte di 4 fruitori in db e una richiesta di offset 2, restituisce solo 2 risultati
+    Given l'utente è un "admin" di "PA1"
+    Given un "admin" di "PA1" ha già creato 1 e-service in stato PUBLISHED
+    Given "PA1" ha già una richiesta di fruizione in stato "ACTIVE" per quell'e-service
+    Given "PA2" ha già una richiesta di fruizione in stato "ACTIVE" per quell'e-service
+    Given "GSP" ha già una richiesta di fruizione in stato "ACTIVE" per quell'e-service
+    Given "PRIVATO" ha già una richiesta di fruizione in stato "ACTIVE" per quell'e-service
+    When l'utente richiede una operazione di listing delle richieste di fruizione dei propri e-service con offset 2
+    Then si ottiene status code 200 e la lista di 2 richieste di fruizione
+
+  @agreement_producer_listing4
+  Scenario Outline: Restituisce i fruitori il cui nome dell’ente contiene la keyword "Comune di Milano" all'interno del nome, con ricerca case insensitive
+    Given l'utente è un "admin" di "PA1"
+    Given un "admin" di "PA1" ha già creato 1 e-service in stato PUBLISHED
+    Given "PA1" ha già una richiesta di fruizione in stato "ACTIVE" per quell'e-service
+    Given "PA2" ha già una richiesta di fruizione in stato "ACTIVE" per quell'e-service
+    When l'utente richiede una operazione di listing delle richieste di fruizione dei propri e-service filtrando il nome dell'ente per la keyword "Comune di Milano"
+    Then si ottiene status code 200 e la lista di 1 richiesta di fruizione
+
+  @agreement_producer_listing5
+  Scenario Outline: Restituisce un insieme vuoto di fruitori per una ricerca che non porta risultati
+    Given l'utente è un "admin" di "PA1"
+    Given un "admin" di "PA1" ha già creato 1 e-service in stato PUBLISHED
+    Given "PA1" ha già una richiesta di fruizione in stato "ACTIVE" per quell'e-service
+    Given "PA2" ha già una richiesta di fruizione in stato "ACTIVE" per quell'e-service
+    When l'utente richiede una operazione di listing delle richieste di fruizione dei propri e-service filtrando il nome dell'ente per la keyword "unknown"
+    Then si ottiene status code 200 e la lista di 0 richieste di fruizione
