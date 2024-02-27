@@ -6,10 +6,10 @@ Feature: Listing richieste di fruizione lato erogatore
   Scenario Outline: A fronte di 4 fruitori, restituisce solo i primi 3 risultati
     Given l'utente è un "<ruolo>" di "<ente>"
     Given un "admin" di "<ente>" ha già creato 1 e-service in stato PUBLISHED
-    Given "PA1" ha già una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given "PA2" ha già una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given "GSP" ha già una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given "PRIVATO" ha già una richiesta di fruizione in stato "ACTIVE" per quell'e-service
+    Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
+    Given "PA2" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
+    Given "GSP" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
+    Given "PRIVATO" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     When l'utente richiede una operazione di listing dei fruitori dei propri e-service limitata ai primi 3
     Then si ottiene status code 200 e la lista di 3 fruitori
 
@@ -31,8 +31,8 @@ Feature: Listing richieste di fruizione lato erogatore
   Scenario Outline: Restituisce i fruitori con i quali l’erogatore ha almeno una richiesta di fruizione in qualsiasi stato NON DRAFT
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA1" ha già creato 1 e-service in stato PUBLISHED
-    Given "PA2" ha già una richiesta di fruizione in stato "<statoAgreement>" per quell'e-service
-    Given "PRIVATO" ha già una richiesta di fruizione in stato "<statoAgreement>" per quell'e-service
+    Given "PA2" ha una richiesta di fruizione in stato "<statoAgreement>" per quell'e-service
+    Given "PRIVATO" ha una richiesta di fruizione in stato "<statoAgreement>" per quell'e-service
     When l'utente richiede una operazione di listing dei fruitori dei propri e-service
     Then si ottiene status code 200 e la lista di 2 fruitori
 
@@ -46,10 +46,10 @@ Feature: Listing richieste di fruizione lato erogatore
   Scenario Outline: A fronte di 4 fruitori con i quali l’erogatore ha almeno una richiesta di fruizione e una richiesta di offset 2, restituisce solo 2 risultati
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA1" ha già creato 1 e-service in stato PUBLISHED
-    Given "PA1" ha già una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given "PA2" ha già una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given "GSP" ha già una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given "Privato" ha già una richiesta di fruizione in stato "ACTIVE" per quell'e-service
+    Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
+    Given "PA2" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
+    Given "GSP" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
+    Given "Privato" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     When l'utente richiede una operazione di listing dei fruitori dei propri e-service con offset 2
     Then si ottiene status code 200 e la lista di 2 fruitori
 
@@ -57,8 +57,8 @@ Feature: Listing richieste di fruizione lato erogatore
   Scenario Outline: Restituisce i fruitori il cui nome dell’ente contiene la keyword "Comune di Milano" all'interno del nome, con ricerca case insensitive
     Given l'utente è un "admin" di "PA2"
     Given un "admin" di "PA2" ha già creato 1 e-service in stato PUBLISHED
-    Given "GSP" ha già una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given "PA1" ha già una richiesta di fruizione in stato "ACTIVE" per quell'e-service
+    Given "GSP" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
+    Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     When l'utente richiede una operazione di listing dei fruitori dei propri e-service filtrando per la keyword "comune di Milano"
     Then si ottiene status code 200 e la lista di 1 fruitore
 
@@ -66,7 +66,7 @@ Feature: Listing richieste di fruizione lato erogatore
   Scenario Outline: Restituisce un insieme vuoto di fruitori per una ricerca che non porta risultati
     Given l'utente è un "admin" di "PA2"
     Given un "admin" di "PA2" ha già creato 1 e-service in stato PUBLISHED
-    Given "GSP" ha già una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given "PA1" ha già una richiesta di fruizione in stato "ACTIVE" per quell'e-service
+    Given "GSP" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
+    Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     When l'utente richiede una operazione di listing dei fruitori dei propri e-service filtrando per la keyword "unknown"
     Then si ottiene status code 200 e la lista di 0 fruitori
