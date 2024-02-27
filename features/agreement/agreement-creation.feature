@@ -122,7 +122,3 @@ Feature: Creazione nuova richiesta di fruizione
     Given un "admin" di "PA2" ha già pubblicato una nuova versione per quell'e-service
     When l'utente crea una richiesta di fruizione in bozza per l'ultima versione di quell'e-service
     Then si ottiene status code 409
-
-  # Reminder per implementazione:
-  # 1 - "L’utente crea la richiesta di fruizione per l’ultima versione disponibile dell’e-service" -> usare l'unica versione senza crearne un'altra
-  # 2 - Per gli attributi certificati, leggiamo quelli assegnati a un ente e usiamo quelli. Nel caso 4b serve crearlo e revocarlo. Nel caso 3 è indifferente "crearlo e non assegnarlo" o "leggere gli attributi certificati e vedere uno che non è dell'ente in questione"
