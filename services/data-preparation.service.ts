@@ -1,5 +1,6 @@
 import { readFileSync } from "fs";
 import { File } from "buffer";
+import { AxiosResponse } from "axios";
 import { apiClient } from "../api";
 import {
   getAuthorizationHeader,
@@ -14,6 +15,8 @@ import {
   EServiceRiskAnalysisSeed,
   DescriptorAttributesSeed,
   AgreementApprovalPolicy,
+  AttributeKind,
+  Attribute,
 } from "./../api/models";
 
 export const dataPreparationService = {
@@ -282,10 +285,13 @@ export const dataPreparationService = {
       return agreementId;
     }
 
-    // agreement in state ACTIVE
-    await this.submitAgreement(token, agreementId);
+    await this.submitAgreement(
+      token,
+      agreementId,
+      agreementState === "PENDING" ? agreementState : "ACTIVE"
+    );
 
-    if (agreementState === "ACTIVE") {
+    if (agreementState === "ACTIVE" || agreementState === "PENDING") {
       return agreementId;
     }
 
@@ -295,9 +301,19 @@ export const dataPreparationService = {
     if (agreementState === "SUSPENDED") {
       return agreementId;
     }
+
+    // agreement in state ARCHIVED
+    if (agreementState === "ARCHIVED") {
+      await this.archiveAgreement(token, agreementId);
+      return agreementId;
+    }
   },
 
-  async submitAgreement(token: string, agreementId: string) {
+  async submitAgreement(
+    token: string,
+    agreementId: string,
+    expectedState: "ACTIVE" | "PENDING"
+  ) {
     const response = await apiClient.agreements.submitAgreement(
       agreementId,
       {},
@@ -312,7 +328,7 @@ export const dataPreparationService = {
           agreementId,
           getAuthorizationHeader(token)
         ),
-      (res) => res.data.state === "ACTIVE"
+      (res) => res.data.state === expectedState
     );
   },
 
@@ -334,6 +350,24 @@ export const dataPreparationService = {
     );
   },
 
+  async archiveAgreement(token: string, agreementId: string) {
+    const response = await apiClient.agreements.archiveAgreement(
+      agreementId,
+      getAuthorizationHeader(token)
+    );
+
+    assertValidResponse(response);
+
+    await makePolling(
+      () =>
+        apiClient.agreements.getAgreementById(
+          agreementId,
+          getAuthorizationHeader(token)
+        ),
+      (res) => res.data.state === "ARCHIVED"
+    );
+  },
+
   async activateAgreement(token: string, agreementId: string) {
     const response = await apiClient.agreements.activateAgreement(
       agreementId,
@@ -349,6 +383,25 @@ export const dataPreparationService = {
           getAuthorizationHeader(token)
         ),
       (res) => res.data.state === "ACTIVE"
+    );
+  },
+
+  async rejectAgreement(token: string, agreementId: string) {
+    const response = await apiClient.agreements.rejectAgreement(
+      agreementId,
+      { reason: "Agreement rejected during QA" },
+      getAuthorizationHeader(token)
+    );
+
+    assertValidResponse(response);
+
+    await makePolling(
+      () =>
+        apiClient.agreements.getAgreementById(
+          agreementId,
+          getAuthorizationHeader(token)
+        ),
+      (res) => res.data.state === "REJECTED"
     );
   },
 
@@ -427,7 +480,11 @@ export const dataPreparationService = {
         descriptorId
       );
 
-      await dataPreparationService.submitAgreement(token, agreementId);
+      await dataPreparationService.submitAgreement(
+        token,
+        agreementId,
+        "ACTIVE"
+      );
     }
 
     // Create another DRAFT descriptor
@@ -491,5 +548,106 @@ export const dataPreparationService = {
       throw new Error("Risk analysis not found");
     }
     return riskAnalysisId;
+  },
+
+  async createAttribute(
+    token: string,
+    attributeKind: AttributeKind,
+    name?: string
+  ) {
+    let response: AxiosResponse<Attribute, unknown>;
+    const actualName = name ?? `new attribute ${getRandomInt()}`;
+    switch (attributeKind) {
+      case "CERTIFIED":
+        response = await apiClient.certifiedAttributes.createCertifiedAttribute(
+          {
+            description: "description test",
+            name: actualName,
+          },
+          getAuthorizationHeader(token)
+        );
+        break;
+      case "VERIFIED":
+        response = await apiClient.verifiedAttributes.createVerifiedAttribute(
+          {
+            description: "description test",
+            name: actualName,
+          },
+          getAuthorizationHeader(token)
+        );
+        break;
+      case "DECLARED":
+        response = await apiClient.declaredAttributes.createDeclaredAttribute(
+          {
+            description: "description test",
+            name: actualName,
+          },
+          getAuthorizationHeader(token)
+        );
+        break;
+      default:
+        throw new Error(`Invalid attributeKind ${attributeKind}`);
+    }
+    assertValidResponse(response);
+    await makePolling(
+      () =>
+        // we use getAttributes for polling and not getAttributeById because the former reads from event-sourcing, and the latter from readmodel
+        apiClient.attributes.getAttributes(
+          {
+            q: actualName,
+            limit: 1,
+            offset: 0,
+            kinds: [attributeKind],
+          },
+          getAuthorizationHeader(token)
+        ),
+      (res) => res.data.results.length > 0
+    );
+    return response.data.id;
+  },
+
+  async assignCertifiedAttributeToTenant(
+    token: string,
+    tenantId: string,
+    attributeId: string
+  ) {
+    await apiClient.tenants.addCertifiedAttribute(
+      tenantId,
+      {
+        id: attributeId,
+      },
+      getAuthorizationHeader(token)
+    );
+    await makePolling(
+      () =>
+        apiClient.tenants.getCertifiedAttributes(
+          tenantId,
+          getAuthorizationHeader(token)
+        ),
+      (res) => res.data.attributes.some((attr) => attr.id === attributeId)
+    );
+  },
+
+  async revokeCertifiedAttributeToTenant(
+    token: string,
+    tenantId: string,
+    attributeId: string
+  ) {
+    await apiClient.tenants.revokeCertifiedAttribute(
+      tenantId,
+      attributeId,
+      getAuthorizationHeader(token)
+    );
+    await makePolling(
+      () =>
+        apiClient.tenants.getCertifiedAttributes(
+          tenantId,
+          getAuthorizationHeader(token)
+        ),
+      (res) =>
+        res.data.attributes.some(
+          (attr) => attr.id === attributeId && attr.revocationTimestamp
+        )
+    );
   },
 };

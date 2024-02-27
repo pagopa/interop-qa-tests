@@ -32,7 +32,7 @@ Feature: Creazione nuova richiesta di fruizione
     Given l'utente è un "admin" di "PA1"
     Given "PA1" possiede un attributo certificato
     Given un "admin" di "PA2" ha già creato un e-service in stato "PUBLISHED" che richiede quell'attributo certificato con approvazione "MANUAL"
-    Given l'utente ha già inviato una richiesta di fruizione per quell'e-service
+    Given l'utente ha già creato e inviato una richiesta di fruizione per quell'e-service ed è in attesa di approvazione
     Given un "admin" di "PA2" ha già rifiutato quella richiesta di fruizione
     When l'utente crea una richiesta di fruizione in bozza per l'ultima versione di quell'e-service
     Then si ottiene status code 200
@@ -42,14 +42,14 @@ Feature: Creazione nuova richiesta di fruizione
     Given l'utente è un "admin" di "PA1"
     Given "PA1" possiede un attributo certificato
     Given un "admin" di "PA2" ha già creato un e-service in stato "PUBLISHED" che richiede quell'attributo certificato con approvazione "AUTOMATIC"
-    Given "PA1" ha un agreement in stato "ARCHIVED" per quell'e-service
+    Given "PA1" ha una richiesta di fruizione in stato "ARCHIVED" per quell'e-service
     When l'utente crea una richiesta di fruizione in bozza per l'ultima versione di quell'e-service
     Then si ottiene status code 200
 
   @agreement_creation3
   Scenario Outline: Un utente con sufficienti permessi, il cui ente NON rispetta i requisiti (attributi certificati), senza altre richieste di fruizione per un e-service, crea una nuova richiesta di fruizione in bozza per l’ultima versione disponibile di quell'e-service, la quale è in stato PUBLISHED; l’e-service è erogato dal suo stesso ente. La richiesta va a buon fine.
     Given l'utente è un "admin" di "PA1"
-    Given "PA2" ha creato un attributo certificato senza assegnarlo all'ente  # Creazione di un attributo certificato self service e non assegnarlo
+    Given "PA1" non possiede uno specifico attributo certificato
     Given un "admin" di "PA1" ha già creato un e-service in stato "PUBLISHED" che richiede quell'attributo certificato con approvazione "AUTOMATIC"
     When l'utente crea una richiesta di fruizione in bozza per l'ultima versione di quell'e-service
     Then si ottiene status code 200
@@ -58,24 +58,24 @@ Feature: Creazione nuova richiesta di fruizione
   Scenario Outline: Un utente con sufficienti permessi il cui ente rispetta i requisiti (attributi certificati), con una richiesta di fruizione in stato DRAFT, PENDING, ACTIVE o SUSPENDED per un e-service, crea una nuova richiesta di fruizione in bozza per l’ultima versione disponibile di quell'e-service, la quale è in stato PUBLISHED. Ottiene un errore.
     Given l'utente è un "admin" di "PA1"
     Given "PA1" possiede un attributo certificato
-    Given un "admin" di "PA2" ha già creato un e-service in stato "PUBLISHED" che richiede quell'attributo certificato con approvazione "AUTOMATIC"
-    Given "PA1" ha un agreement in stato "<statoAgreement>" per quell'e-service
+    Given un "admin" di "PA2" ha già creato un e-service in stato "PUBLISHED" che richiede quell'attributo certificato con approvazione "<tipoApprovazione>"
+    Given "PA1" ha una richiesta di fruizione in stato "<statoAgreement>" per quell'e-service
     When l'utente crea una richiesta di fruizione in bozza per l'ultima versione di quell'e-service
-    Then si ottiene status code 400
+    Then si ottiene status code 409
 
     Examples: 
-      | statoAgreement |
-      | DRAFT          |
-      | PENDING        |
-      | ACTIVE         |
-      | SUSPENDED      |
+      | statoAgreement | tipoApprovazione |
+      | DRAFT          |   AUTOMATIC      |
+      | PENDING        |   MANUAL         |
+      | ACTIVE         |   AUTOMATIC      |
+      | SUSPENDED      |   AUTOMATIC      |
 
   @agreement_creation4b
   Scenario Outline: Un utente con sufficienti permessi, il cui ente rispetta i requisiti (attributi certificati), con una richiesta di fruizione in stato MISSING_CERTIFIED_ATTRIBUTES per un e-service, crea una nuova richiesta di fruizione in bozza per l’ultima versione disponibile di quell'e-service, la quale è in stato PUBLISHED. Ottiene un errore.
     Given l'utente è un "admin" di "<enteFruitore>"
     Given "<enteCertificatore>" ha creato un attributo certificato e lo ha assegnato a "<enteFruitore>"
     Given un "admin" di "<enteErogatore>" ha già creato un e-service in stato "PUBLISHED" che richiede quell'attributo certificato con approvazione "AUTOMATIC"
-    Given "<enteFruitore>" ha un agreement in stato "DRAFT" per quell'e-service
+    Given "<enteFruitore>" ha una richiesta di fruizione in stato "DRAFT" per quell'e-service
     Given "<enteCertificatore>" ha già revocato quell'attributo a "<enteFruitore>"
     Given la richiesta di fruizione è passata in stato "MISSING_CERTIFIED_ATTRIBUTES"
     When l'utente crea una richiesta di fruizione in bozza per l'ultima versione di quell'e-service
