@@ -37,6 +37,8 @@ Given(
     this.publishedEservicesIds = await Promise.all(
       arr.map((_, i) => createEServiceWithPublishedDescriptor(i))
     );
+    this.eserviceId = this.publishedEservicesIds[0][0];
+    this.descriptorId = this.publishedEservicesIds[0][1];
   }
 );
 
