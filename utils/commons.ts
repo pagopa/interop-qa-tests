@@ -180,3 +180,21 @@ export async function uploadInterfaceDocument(
     getAuthorizationHeader(token)
   );
 }
+
+/**
+ * The `getAttributes` BFF endpoint parses the query string in a different way from
+ * the `paramsSerializer` function provided to the `axios` client.
+ * This function is TEMPORARY and should be removed as soon as the BFF endpoint is fixed.
+ *
+ * @deprecated
+ */
+export function TOBE_REMOVED_customSerializer(params: Record<string, unknown>) {
+  return Object.entries(params)
+    .filter(([, value]) => value !== undefined && value !== null)
+    .map(([key, value]) =>
+      Array.isArray(value)
+        ? value.map((v) => `${key}=${v}`).join("&")
+        : `${key}=${value}`
+    )
+    .join("&");
+}
