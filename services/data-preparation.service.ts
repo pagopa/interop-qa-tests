@@ -497,5 +497,6 @@ export const dataPreparationService = {
         ),
       (res) => res.data.results.length > 0
     );
+    return response.data.id;
   },
 };

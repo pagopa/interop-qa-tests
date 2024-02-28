@@ -29,7 +29,7 @@ Given(
       );
     }
 
-    await Promise.all(promises);
+    this.attributeId = (await Promise.all(promises))[0];
   }
 );
 
