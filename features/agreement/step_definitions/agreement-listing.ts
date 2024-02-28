@@ -14,35 +14,6 @@ import { TenantType, SessionTokens, Role } from "../../common-steps";
 import { AgreementState } from "../../../api/models";
 
 Given(
-  "un {string} di {string} ha già creato e pubblicato {int} e-service(s)",
-  async function (role: Role, tenantType: TenantType, totalEservices: number) {
-    assertContextSchema(this);
-    const token = getToken(this.tokens, tenantType, role);
-
-    const arr = new Array(totalEservices).fill(0);
-    const createEServiceWithPublishedDescriptor = async (i: number) => {
-      const eserviceId = await dataPreparationService.createEService(token, {
-        name: `eservice-${i}-${this.TEST_SEED}`,
-      });
-      const { descriptorId } =
-        await dataPreparationService.createDescriptorWithGivenState({
-          token,
-          eserviceId,
-          descriptorState: "PUBLISHED",
-        });
-
-      return [eserviceId, descriptorId];
-    };
-
-    this.publishedEservicesIds = await Promise.all(
-      arr.map((_, i) => createEServiceWithPublishedDescriptor(i))
-    );
-    this.eserviceId = this.publishedEservicesIds[0][0];
-    this.descriptorId = this.publishedEservicesIds[0][1];
-  }
-);
-
-Given(
   "{string} ha un agreement attivo per ciascun e-service di {string}",
   async function (consumer: TenantType, _producer: string) {
     assertContextSchema(this, {
