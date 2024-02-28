@@ -82,7 +82,7 @@ When(
       token: z.string(),
     });
     this.response = await apiClient.agreements.getAgreementConsumers(
-      { q: keyword, limit: 50, offset: 0 },
+      { q: encodeURIComponent(keyword), limit: 50, offset: 0 },
       getAuthorizationHeader(this.token)
     );
   }

@@ -45,7 +45,7 @@ Feature: Listing richieste di fruizione lato erogatore
   @agreement_producer_listing3
   Scenario Outline: A fronte di 4 fruitori con i quali l’erogatore ha almeno una richiesta di fruizione e una richiesta di offset 2, restituisce solo 2 risultati
     Given l'utente è un "admin" di "PA1"
-    Given un "admin" di "PA1" ha già creato 1 e-service in stato PUBLISHED
+    Given un "admin" di "PA1" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given "PA2" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given "GSP" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
@@ -56,7 +56,7 @@ Feature: Listing richieste di fruizione lato erogatore
   @agreement_producer_listing4
   Scenario Outline: Restituisce i fruitori il cui nome dell’ente contiene la keyword "Comune di Milano" all'interno del nome, con ricerca case insensitive
     Given l'utente è un "admin" di "PA2"
-    Given un "admin" di "PA2" ha già creato 1 e-service in stato PUBLISHED
+    Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
     Given "GSP" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     When l'utente richiede una operazione di listing dei fruitori dei propri e-service filtrando per la keyword "comune di Milano"
@@ -65,7 +65,7 @@ Feature: Listing richieste di fruizione lato erogatore
   @agreement_producer_listing5
   Scenario Outline: Restituisce un insieme vuoto di fruitori per una ricerca che non porta risultati
     Given l'utente è un "admin" di "PA2"
-    Given un "admin" di "PA2" ha già creato 1 e-service in stato PUBLISHED
+    Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
     Given "GSP" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     When l'utente richiede una operazione di listing dei fruitori dei propri e-service filtrando per la keyword "unknown"
