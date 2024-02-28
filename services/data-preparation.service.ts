@@ -1,5 +1,6 @@
 import { readFileSync } from "fs";
 import { File } from "buffer";
+import { AxiosResponse } from "axios";
 import { apiClient } from "../api";
 import {
   getAuthorizationHeader,
@@ -12,6 +13,8 @@ import {
   EServiceDescriptorSeed,
   EServiceDescriptorState,
   EServiceRiskAnalysisSeed,
+  AttributeKind,
+  Attribute,
 } from "./../api/models";
 
 export const dataPreparationService = {
@@ -434,5 +437,66 @@ export const dataPreparationService = {
       throw new Error("Risk analysis not found");
     }
     return riskAnalysisId;
+  },
+
+  async createAttribute(
+    token: string,
+    attributeKind: AttributeKind,
+    name?: string
+  ) {
+    let response: AxiosResponse<Attribute, unknown>;
+    const actualName = name ?? `new attribute ${getRandomInt()}`;
+
+    switch (attributeKind) {
+      case "CERTIFIED":
+        response = await apiClient.certifiedAttributes.createCertifiedAttribute(
+          {
+            description: "description test",
+            name: actualName,
+          },
+          getAuthorizationHeader(token)
+        );
+        break;
+
+      case "VERIFIED":
+        response = await apiClient.verifiedAttributes.createVerifiedAttribute(
+          {
+            description: "description test",
+            name: actualName,
+          },
+          getAuthorizationHeader(token)
+        );
+        break;
+
+      case "DECLARED":
+        response = await apiClient.declaredAttributes.createDeclaredAttribute(
+          {
+            description: "description test",
+            name: actualName,
+          },
+          getAuthorizationHeader(token)
+        );
+        break;
+
+      default:
+        throw new Error(`Invalid attributeKind ${attributeKind}`);
+    }
+    assertValidResponse(response);
+
+    await makePolling(
+      () =>
+        // we use getAttributes for polling and not getAttributeById because the former reads from event-sourcing, and the latter from readmodel
+        apiClient.attributes.getAttributes(
+          {
+            q: actualName,
+            limit: 1,
+            offset: 0,
+            kinds: [attributeKind],
+          },
+          getAuthorizationHeader(token)
+        ),
+      (res) => res.data.results.length > 0
+    );
+    return response.data.id;
   },
 };
