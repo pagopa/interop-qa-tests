@@ -70,20 +70,21 @@ Given(
 );
 
 Given(
-  "l'utente ha già creato e inviato una richiesta di fruizione per quell'e-service ed è in attesa di approvazione",
-  async function () {
+  "un {string} di {string} ha già creato e inviato una richiesta di fruizione per quell'e-service ed è in attesa di approvazione",
+  async function (role: Role, tenantType: TenantType) {
     assertContextSchema(this, {
       token: z.string(),
       eserviceId: z.string(),
       descriptorId: z.string(),
     });
+    const token = getToken(this.tokens, tenantType, role);
     this.agreementId = await dataPreparationService.createAgreement(
-      this.token,
+      token,
       this.eserviceId,
       this.descriptorId
     );
     await dataPreparationService.submitAgreement(
-      this.token,
+      token,
       this.agreementId,
       "PENDING"
     );
