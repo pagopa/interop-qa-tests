@@ -4,6 +4,7 @@ import { AxiosResponse } from "axios";
 import { CreatedResource } from "../api/models";
 import { TenantType, Role, SessionTokens } from "../features/common-steps";
 import { apiClient } from "../api";
+import "../configs/env";
 
 type RiskAnalysisTemplateType = "PA" | "Privato/GSP";
 
@@ -98,11 +99,8 @@ export async function makePolling<TReturnType>(
   shouldStop: (data: Awaited<TReturnType>) => boolean,
   errorMessage: string = ""
 ) {
-  const MAX_POLLING_TRIES = 32;
-  const SLEEP_TIME = 100;
-
-  for (let i = 0; i < MAX_POLLING_TRIES; i++) {
-    await sleep(SLEEP_TIME);
+  for (let i = 0; i < process.env.MAX_POLLING_TRIES; i++) {
+    await sleep(process.env.POLLING_SLEEP_TIME);
     const result = await promise();
     if (shouldStop(result)) {
       return;
@@ -131,7 +129,7 @@ export function assertContextSchema<TSchema extends z.ZodRawShape>(
 
 export function getOrganizationId(tenantType: TenantType) {
   const file = JSON.parse(
-    Buffer.from(readFileSync(process.env.TENANT_IDS_FILE_PATH!)).toString()
+    Buffer.from(readFileSync(process.env.TENANTS_IDS_FILE_PATH)).toString()
   );
   return file[tenantType].admin.organizationId;
 }
@@ -181,4 +179,22 @@ export async function uploadInterfaceDocument(
     },
     getAuthorizationHeader(token)
   );
+}
+
+/**
+ * The `getAttributes` BFF endpoint parses the query string in a different way from
+ * the `paramsSerializer` function provided to the `axios` client.
+ * This function is TEMPORARY and should be removed as soon as the BFF endpoint is fixed.
+ *
+ * @deprecated
+ */
+export function TOBE_REMOVED_customSerializer(params: Record<string, unknown>) {
+  return Object.entries(params)
+    .filter(([, value]) => value !== undefined && value !== null)
+    .map(([key, value]) =>
+      Array.isArray(value)
+        ? value.map((v) => `${key}=${v}`).join("&")
+        : `${key}=${value}`
+    )
+    .join("&");
 }

@@ -27,7 +27,7 @@ export type SessionTokens = z.infer<typeof SessionTokens>;
 
 BeforeAll(async function () {
   this.parameters.tokens = SessionTokens.parse(
-    await generateSessionTokens(process.env.TENANT_IDS_FILE_PATH)
+    await generateSessionTokens(process.env.TENANTS_IDS_FILE_PATH)
   );
 });
 
