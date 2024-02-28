@@ -75,7 +75,7 @@ Feature: Lettura richiesta di fruizione
 
   @agreement_read2c
   Scenario Outline: Per una richiesta di fruizione precedentemente creata dall’ente, la quale è in  stato MISSING_CERTIFIED_ATTRIBUTES, alla richiesta di lettura, va a buon fine
-    Given l'utente è un "admin" di "<fruitore>"
+    Given l'utente è un "admin" di "<enteFruitore>"
     Given "<enteCertificatore>" ha creato un attributo certificato e lo ha assegnato a "<enteFruitore>"
     Given un "admin" di "<enteErogatore>" ha già creato un e-service in stato "PUBLISHED" che richiede quell'attributo certificato con approvazione "AUTOMATIC"
     Given "<enteFruitore>" ha una richiesta di fruizione in stato "DRAFT" per quell'e-service
