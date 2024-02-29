@@ -7,13 +7,14 @@ import {
 import { apiClient } from "../../../api";
 
 When(
-  "l'utente richiede una operazione di lettura di quell'agreement",
+  "l'utente richiede una operazione di cancellazione della richiesta di fruizione",
   async function () {
     assertContextSchema(this, {
       token: z.string(),
       agreementId: z.string(),
     });
-    this.response = await apiClient.agreements.getAgreementById(
+
+    this.response = await apiClient.agreements.deleteAgreement(
       this.agreementId,
       getAuthorizationHeader(this.token)
     );
