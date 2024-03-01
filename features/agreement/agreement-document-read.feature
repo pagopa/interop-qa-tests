@@ -6,8 +6,7 @@ Tutti gli utenti autorizzati possono leggere un documento allegato alla richiest
   Scenario Outline: Un utente con sufficienti permessi, per una richiesta di fruizione precedentemente creata, la quale è in stato DRAFT, relativa a un e-service pubblicato dallo stesso ente, alla richiesta di lettura di un documento allegato, la richiesta va a buon fine.
     Given l'utente è un "<ruolo>" di "<ente>"
     Given un "admin" di "<ente>" ha già creato e pubblicato 1 e-service
-    Given un "<ruolo>" di "<ente>" ha già creato una richiesta di fruizione in stato DRAFT
-    Given l'utente ha già caricato un documento allegato a quella richiesta di fruizione
+    Given "<ruolo>" di "<ente>" ha già creato una richiesta di fruizione in stato "DRAFT" con un documento allegato
     When l'utente richiede una operazione di lettura del documento allegato a quella richiesta di fruizione
     Then si ottiene status code <risultato>
 
@@ -56,8 +55,7 @@ Tutti gli utenti autorizzati possono leggere un documento allegato alla richiest
     Given l'utente è un "admin" di "<enteFruitore>"
     Given "<enteCertificatore>" ha creato un attributo certificato e lo ha assegnato a "<enteFruitore>"
     Given un "admin" di "<enteErogatore>" ha già creato un e-service in stato "PUBLISHED" che richiede quell'attributo certificato con approvazione "AUTOMATIC"
-    Given "<enteFruitore>" ha una richiesta di fruizione in stato "DRAFT" per quell'e-service
-    Given l'utente ha già caricato un documento allegato a quella richiesta di fruizione
+    Given un "admin" di "<enteFruitore>" ha già creato una richiesta di fruizione in stato "<statoAgreement>" con un documento allegato
     Given "<enteCertificatore>" ha già revocato quell'attributo a "<enteFruitore>"
     Given la richiesta di fruizione è passata in stato "MISSING_CERTIFIED_ATTRIBUTES"
     When l'utente richiede una operazione di lettura del documento allegato a quella richiesta di fruizione
