@@ -6,7 +6,7 @@ Tutti gli utenti autorizzati possono clonare una richiesta di fruizione in stato
   Scenario Outline: Un utente con sufficienti permessi, clona una richiesta di fruizione in stato REJECTED. La richiesta va a buon fine.
     Given l'utente è un "<ruolo>" di "<ente>"
     Given un "admin" di "PA2" ha già creato un e-service in stato "PUBLISHED" con approvazione "MANUAL"
-    Given un "<ruolo>" di "<ente>" ha già creato e inviato una richiesta di fruizione per quell'e-service ed è in attesa di approvazione
+    Given un "admin" di "<ente>" ha già creato e inviato una richiesta di fruizione per quell'e-service ed è in attesa di approvazione
     Given un "admin" di "PA2" ha già rifiutato quella richiesta di fruizione
     When l'utente clona quella richiesta di fruizione
     Then si ottiene status code <risultato>
