@@ -35,7 +35,7 @@ Feature: Attivazione richiesta di fruizione
     Given "PA2" possiede un attributo dichiarato
     Given un "admin" di "PA1" ha già creato un e-service in stato "PUBLISHED" che richiede quegli attributi con approvazione "AUTOMATIC"
     Given "PA2" ha una richiesta di fruizione in stato "SUSPENDED" per quell'e-service
-    Given "PA1" ha già sospeso quella richiesta di fruizione
+    Given "PA1" ha già sospeso quella richiesta di fruizione #il polling va a buon fine già alla prima richiesta poichè era già in "SUSPENDED"
     When l'utente richiede una operazione di attivazione di quella richiesta di fruizione
     Then si ottiene status code 200
 

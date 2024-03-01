@@ -629,6 +629,55 @@ export const dataPreparationService = {
     );
   },
 
+  async assignVerifiedAttributeToTenant(
+    token: string,
+    tenantId: string,
+    verifierId: string,
+    attributeId: string
+  ) {
+    await apiClient.tenants.verifyVerifiedAttribute(
+      tenantId,
+      {
+        id: attributeId,
+      },
+      getAuthorizationHeader(token)
+    );
+    await makePolling(
+      () =>
+        apiClient.tenants.getVerifiedAttributes(
+          tenantId,
+          getAuthorizationHeader(token)
+        ),
+      (res) =>
+        res.data.attributes.some(
+          (attr) =>
+            attr.id === attributeId &&
+            !attr.revokedBy.some((revoker) => revoker.id === verifierId)
+        )
+    );
+  },
+
+  async declareDeclaredAttribute(
+    token: string,
+    tenantId: string,
+    attributeId: string
+  ) {
+    await apiClient.tenants.addDeclaredAttribute(
+      {
+        id: attributeId,
+      },
+      getAuthorizationHeader(token)
+    );
+    await makePolling(
+      () =>
+        apiClient.tenants.getDeclaredAttributes(
+          tenantId,
+          getAuthorizationHeader(token)
+        ),
+      (res) => res.data.attributes.some((attr) => attr.id === attributeId)
+    );
+  },
+
   async revokeCertifiedAttributeToTenant(
     token: string,
     tenantId: string,
