@@ -635,13 +635,15 @@ export const dataPreparationService = {
     verifierId: string,
     attributeId: string
   ) {
-    await apiClient.tenants.verifyVerifiedAttribute(
+    const response = await apiClient.tenants.verifyVerifiedAttribute(
       tenantId,
       {
         id: attributeId,
       },
       getAuthorizationHeader(token)
     );
+
+    assertValidResponse(response);
     await makePolling(
       () =>
         apiClient.tenants.getVerifiedAttributes(

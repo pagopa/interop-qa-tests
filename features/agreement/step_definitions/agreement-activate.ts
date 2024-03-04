@@ -15,44 +15,40 @@ import {
 import { dataPreparationService } from "../../../services/data-preparation.service";
 
 Given(
-  "{string} possiede un attributo verificato da {string}",
-  async function (consumer: TenantType, verifier: TenantType) {
+  "{string} crea un attributo verificato",
+  async function (consumer: TenantType) {
     assertContextSchema(this);
+
+    const token = getToken(this.tokens, consumer, "admin");
+
+    const attributeId = await dataPreparationService.createAttribute(
+      token,
+      "VERIFIED"
+    );
+
+    this.requiredVerifiedAttributes = [[attributeId]];
+  }
+);
+
+Given(
+  "{string} verifica l'attributo verificato a {string}",
+  async function (verifier: TenantType, consumer: TenantType) {
+    assertContextSchema(this, {
+      requiredVerifiedAttributes: z.array(z.array(z.string())),
+    });
+
+    const token = getToken(this.tokens, verifier, "admin");
     const consumerId = getOrganizationId(consumer);
     const verifierId = getOrganizationId(verifier);
-    const verifierToken = getToken(this.tokens, verifier, "admin");
 
-    const response = await apiClient.tenants.getVerifiedAttributes(
+    const attributeId = this.requiredVerifiedAttributes[0][0];
+
+    await dataPreparationService.assignVerifiedAttributeToTenant(
+      token,
       consumerId,
-      getAuthorizationHeader(verifierToken)
+      verifierId,
+      attributeId
     );
-    const { attributes } = response.data;
-
-    const verifiedAttributes = attributes.filter(
-      (attr) =>
-        attr.verifiedBy.some(
-          (verifier) => verifier.id === verifierId && !verifier.expirationDate
-        ) && !attr.revokedBy.some((revoker) => revoker.id === verifierId)
-    );
-
-    if (verifiedAttributes.length === 0) {
-      const attributeId = await dataPreparationService.createAttribute(
-        verifierToken,
-        "VERIFIED"
-      );
-
-      await dataPreparationService.assignVerifiedAttributeToTenant(
-        verifierToken,
-        consumerId,
-        verifierId,
-        attributeId
-      );
-
-      this.requiredVerifiedAttributes = [[attributeId]];
-      return;
-    }
-
-    this.requiredVerifiedAttributes = [[verifiedAttributes[0].id]];
   }
 );
 
