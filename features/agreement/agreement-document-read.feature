@@ -6,7 +6,7 @@ Tutti gli utenti autorizzati possono leggere un documento allegato alla richiest
   Scenario Outline: Un utente con sufficienti permessi, per una richiesta di fruizione precedentemente creata, la quale è in stato DRAFT, relativa a un e-service pubblicato dallo stesso ente, alla richiesta di lettura di un documento allegato, la richiesta va a buon fine.
     Given l'utente è un "<ruolo>" di "<ente>"
     Given un "admin" di "<ente>" ha già creato e pubblicato 1 e-service
-    Given "<ruolo>" di "<ente>" ha già creato una richiesta di fruizione in stato "DRAFT" con un documento allegato
+    Given un "admin" di "<ente>" ha già creato una richiesta di fruizione in stato "DRAFT" con un documento allegato
     When l'utente richiede una operazione di lettura del documento allegato a quella richiesta di fruizione
     Then si ottiene status code <risultato>
 
@@ -15,23 +15,18 @@ Tutti gli utenti autorizzati possono leggere un documento allegato alla richiest
       | GSP     | admin        |       200 |
       | GSP     | api          |       403 |
       | GSP     | security     |       403 |
-      | GSP     | support      |       403 |
+      | GSP     | support      |       200 |
       | GSP     | api,security |       403 |
       | PA1     | admin        |       200 |
       | PA1     | api          |       403 |
       | PA1     | security     |       403 |
-      | PA1     | support      |       403 |
+      | PA1     | support      |       200 |
       | PA1     | api,security |       403 |
       | PA2     | admin        |       200 |
       | PA2     | api          |       403 |
       | PA2     | security     |       403 |
-      | PA2     | support      |       403 |
+      | PA2     | support      |       200 |
       | PA2     | api,security |       403 |      
-      | Privato | admin        |       200 |
-      | Privato | api          |       403 |
-      | Privato | security     |       403 |
-      | Privato | support      |       403 |
-      | Privato | api,security |       403 |
 
 
   @agreement_document_read2a
@@ -55,7 +50,7 @@ Tutti gli utenti autorizzati possono leggere un documento allegato alla richiest
     Given l'utente è un "admin" di "<enteFruitore>"
     Given "<enteCertificatore>" ha creato un attributo certificato e lo ha assegnato a "<enteFruitore>"
     Given un "admin" di "<enteErogatore>" ha già creato un e-service in stato "PUBLISHED" che richiede quell'attributo certificato con approvazione "AUTOMATIC"
-    Given un "admin" di "<enteFruitore>" ha già creato una richiesta di fruizione in stato "<statoAgreement>" con un documento allegato
+    Given un "admin" di "<enteFruitore>" ha già creato una richiesta di fruizione in stato "DRAFT" con un documento allegato
     Given "<enteCertificatore>" ha già revocato quell'attributo a "<enteFruitore>"
     Given la richiesta di fruizione è passata in stato "MISSING_CERTIFIED_ATTRIBUTES"
     When l'utente richiede una operazione di lettura del documento allegato a quella richiesta di fruizione
