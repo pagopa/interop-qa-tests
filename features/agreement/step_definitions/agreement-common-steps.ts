@@ -1,8 +1,10 @@
+import { readFileSync } from "fs";
 import { Given } from "@cucumber/cucumber";
 import { z } from "zod";
 import { Role, TenantType } from "../../common-steps";
 import { dataPreparationService } from "../../../services/data-preparation.service";
 import { assertContextSchema, getToken } from "../../../utils/commons";
+import { AgreementState } from "../../../api/models";
 
 Given(
   "un {string} di {string} ha già creato e pubblicato {int} e-service(s)",
@@ -49,5 +51,29 @@ Given(
         this.eserviceId,
         this.descriptorId
       );
+  }
+);
+Given(
+  "un {string} di {string} ha già creato una richiesta di fruizione in stato {string} con un documento allegato",
+  async function (
+    role: Role,
+    consumer: TenantType,
+    agreementState: AgreementState
+  ) {
+    assertContextSchema(this, {
+      eserviceId: z.string(),
+      descriptorId: z.string(),
+      token: z.string(),
+    });
+    const token = getToken(this.tokens, consumer, role);
+    const [agreementId, documentId] =
+      await dataPreparationService.createAgreementWithGivenStateAndDocument(
+        token,
+        agreementState,
+        this.eserviceId,
+        this.descriptorId
+      );
+    this.agreementId = agreementId;
+    this.documentId = documentId;
   }
 );

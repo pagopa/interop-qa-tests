@@ -7,6 +7,7 @@ import {
   getRandomInt,
   makePolling,
   assertValidResponse,
+  sleep,
 } from "../utils/commons";
 import {
   EServiceSeed,
@@ -272,7 +273,8 @@ export const dataPreparationService = {
     token: string,
     agreementState: string,
     eserviceId: string,
-    descriptorId: string
+    descriptorId: string,
+    doc?: File
   ) {
     // agreement in state DRAFT
     const agreementId = await this.createAgreement(
@@ -280,6 +282,14 @@ export const dataPreparationService = {
       eserviceId,
       descriptorId
     );
+
+    if (doc) {
+      await dataPreparationService.addConsumerDocumentToAgreement(
+        token,
+        agreementId,
+        doc
+      );
+    }
 
     if (agreementState === "DRAFT") {
       return agreementId;
@@ -308,6 +318,54 @@ export const dataPreparationService = {
       await this.archiveAgreement(token, agreementId);
       return agreementId;
     }
+  },
+
+  async addConsumerDocumentToAgreement(
+    token: string,
+    agreementId: string,
+    doc: File
+  ) {
+    await apiClient.agreements.addAgreementConsumerDocument(
+      agreementId,
+      {
+        name: "documento-test-qa.pdf",
+        prettyName: "documento-test-qa",
+        doc,
+      },
+      getAuthorizationHeader(token)
+    );
+
+    await makePolling(
+      async () =>
+        await apiClient.agreements.getAgreementById(
+          agreementId,
+          getAuthorizationHeader(token)
+        ),
+      (res) => res.data.consumerDocuments.length > 0
+    );
+  },
+
+  async createAgreementWithGivenStateAndDocument(
+    token: string,
+    agreementState: string,
+    eserviceId: string,
+    descriptorId: string
+  ) {
+    const blobFile = new Blob([readFileSync("./data/dummy.pdf")]);
+    const doc = new File([blobFile], "documento-test-qa.pdf");
+    const agreementId = await this.createAgreementWithGivenState(
+      token,
+      agreementState,
+      eserviceId,
+      descriptorId,
+      doc
+    );
+    const agreement = await apiClient.agreements.getAgreementById(
+      agreementId!,
+      getAuthorizationHeader(token)
+    );
+    const documentId = agreement.data.consumerDocuments[0].id;
+    return [agreementId, documentId];
   },
 
   async submitAgreement(
