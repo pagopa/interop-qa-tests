@@ -297,7 +297,7 @@ export const dataPreparationService = {
     }
 
     // agreement in state SUSPENDED
-    await this.suspendAgreement(token, agreementId);
+    await this.suspendAgreement(token, agreementId, "CONSUMER");
 
     if (agreementState === "SUSPENDED") {
       return agreementId;
@@ -333,11 +333,20 @@ export const dataPreparationService = {
     );
   },
 
-  async suspendAgreement(token: string, agreementId: string) {
+  async suspendAgreement(
+    token: string,
+    agreementId: string,
+    suspendedBy: "PRODUCER" | "CONSUMER"
+  ) {
     const response = await apiClient.agreements.suspendAgreement(
       agreementId,
       getAuthorizationHeader(token)
     );
+
+    const suspendedByProperty =
+      suspendedBy === "PRODUCER"
+        ? "suspendedByProducer"
+        : "suspendedByConsumer";
 
     assertValidResponse(response);
 
@@ -347,7 +356,8 @@ export const dataPreparationService = {
           agreementId,
           getAuthorizationHeader(token)
         ),
-      (res) => res.data.state === "SUSPENDED"
+      (res) =>
+        Boolean(res.data.state === "SUSPENDED" && res.data[suspendedByProperty])
     );
   },
 

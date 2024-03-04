@@ -125,13 +125,31 @@ Given(
 );
 
 Given(
-  "un {string} di {string} ha già sospeso quella richiesta di fruizione",
-  async function (role: Role, tenantType: TenantType) {
+  "{string} ha già sospeso quella richiesta di fruizione come {string}",
+  async function (tenant: TenantType, suspendedBy: "PRODUCER" | "CONSUMER") {
     assertContextSchema(this, {
       agreementId: z.string(),
     });
-    const token = getToken(this.tokens, tenantType, role);
-    await dataPreparationService.suspendAgreement(token, this.agreementId);
+
+    const token = getToken(this.tokens, tenant, "admin");
+    await dataPreparationService.suspendAgreement(
+      token,
+      this.agreementId,
+      suspendedBy
+    );
+  }
+);
+
+Given(
+  "{string} ha già approvato quella richiesta di fruizione",
+  async function (tenantType: TenantType) {
+    assertContextSchema(this, {
+      agreementId: z.string(),
+    });
+
+    const token = getToken(this.tokens, tenantType, "admin");
+
+    await dataPreparationService.activateAgreement(token, this.agreementId);
   }
 );
 
