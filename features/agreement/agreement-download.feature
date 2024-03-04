@@ -4,9 +4,9 @@ Tutti gli utenti autorizzati possono scaricare l'attestazione di una richiesta d
 # Verificare tempi di risposta della generazione del pdf
 
   @agreement_download1a
-  Scenario Outline: Per una richiesta di fruizione precedentemente creata dall’ente, la quale è in stato ACTIVE, SUSPENDED o ARCHIVED, e che è stata in passato almeno in un momento ACTIVE, alla richiesta di download dell'attestazione della richiesta di fruizione da parte di un utente con sufficienti permessi, va a buon fine
+  Scenario Outline: Per una richiesta di fruizione precedentemente creata dall’ente, la quale è in stato ACTIVE, alla richiesta di download dell'attestazione della richiesta di fruizione da parte di un utente con sufficienti permessi, va a buon fine
     Given l'utente è un "<ruolo>" di "<ente>"
-    Given un "admin" di "PA2" ha già creato 1 e-service con un descrittore in stato "PUBLISHED" con approvazione "AUTOMATIC"
+    Given un "admin" di "PA2" ha già creato un e-service in stato "PUBLISHED" con approvazione "AUTOMATIC"
     Given "<ente>" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     When l'utente richiede una operazione di download dell'attestazione della richiesta di fruizione
     Then si ottiene status code <risultato>
@@ -14,17 +14,17 @@ Tutti gli utenti autorizzati possono scaricare l'attestazione di una richiesta d
     Examples: 
       | ente    | ruolo        | risultato |
       | GSP     | admin        |       200 |
-      | GSP     | api          |       200 |
+      | GSP     | api          |       403 |
       | GSP     | security     |       403 |
       | GSP     | support      |       403 |
-      | GSP     | api,security |       200 |
+      | GSP     | api,security |       403 |
       | PA1     | admin        |       200 |
-      | PA1     | api          |       200 |
+      | PA1     | api          |       403 |
       | PA1     | security     |       403 |
       | PA1     | support      |       403 |
-      | PA1     | api,security |       200 |
+      | PA1     | api,security |       403 |
       | Privato | admin        |       200 |
-      | Privato | api          |       200 |
+      | Privato | api          |       403 |
       | Privato | security     |       403 |
       | Privato | support      |       403 |
       | Privato | api,security |       403 |
@@ -32,7 +32,7 @@ Tutti gli utenti autorizzati possono scaricare l'attestazione di una richiesta d
   @agreement_download1b
   Scenario Outline: Per una richiesta di fruizione precedentemente creata dall’ente, la quale è in stato SUSPENDED o ARCHIVED, e che è stata in passato almeno in un momento ACTIVE, alla richiesta di download dell'attestazione della richiesta di fruizione sigillata da parte di un utente con sufficienti permessi, va a buon fine
     Given l'utente è un "admin" di "PA1"
-    Given un "admin" di "PA2" ha già creato 1 e-service con un descrittore in stato "PUBLISHED" con approvazione "AUTOMATIC"
+    Given un "admin" di "PA2" ha già creato un e-service in stato "PUBLISHED" con approvazione "AUTOMATIC"
     Given "PA1" ha una richiesta di fruizione in stato "<statoAgreement>" per quell'e-service
     When l'utente richiede una operazione di download dell'attestazione della richiesta di fruizione
     Then si ottiene status code 200
