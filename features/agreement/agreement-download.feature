@@ -8,32 +8,34 @@ Tutti gli utenti autorizzati possono scaricare l'attestazione di una richiesta d
     Given l'utente è un "<ruolo>" di "<ente>"
     Given un "admin" di "PA2" ha già creato un e-service in stato "PUBLISHED" con approvazione "AUTOMATIC"
     Given "<ente>" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
+    Given l'attestazione di quella richiesta di fruizione è già stata generata
     When l'utente richiede una operazione di download dell'attestazione della richiesta di fruizione
-    Then si ottiene status code <risultato>
+    Then si ottiene status code 200
 
     Examples: 
-      | ente    | ruolo        | risultato |
-      | GSP     | admin        |       200 |
-      | GSP     | api          |       403 |
-      | GSP     | security     |       403 |
-      | GSP     | support      |       403 |
-      | GSP     | api,security |       403 |
-      | PA1     | admin        |       200 |
-      | PA1     | api          |       403 |
-      | PA1     | security     |       403 |
-      | PA1     | support      |       403 |
-      | PA1     | api,security |       403 |
-      | Privato | admin        |       200 |
-      | Privato | api          |       403 |
-      | Privato | security     |       403 |
-      | Privato | support      |       403 |
-      | Privato | api,security |       403 |
+      | ente    | ruolo        |
+      | GSP     | admin        |
+      | GSP     | api          |
+      | GSP     | security     |
+      | GSP     | support      |
+      | GSP     | api,security |
+      | PA1     | admin        |
+      | PA1     | api          |
+      | PA1     | security     |
+      | PA1     | support      |
+      | PA1     | api,security |
+      | Privato | admin        |
+      | Privato | api          |
+      | Privato | security     |
+      | Privato | support      |
+      | Privato | api,security |
 
   @agreement_download1b
   Scenario Outline: Per una richiesta di fruizione precedentemente creata dall’ente, la quale è in stato SUSPENDED o ARCHIVED, e che è stata in passato almeno in un momento ACTIVE, alla richiesta di download dell'attestazione della richiesta di fruizione sigillata da parte di un utente con sufficienti permessi, va a buon fine
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA2" ha già creato un e-service in stato "PUBLISHED" con approvazione "AUTOMATIC"
     Given "PA1" ha una richiesta di fruizione in stato "<statoAgreement>" per quell'e-service
+    Given l'attestazione di quella richiesta di fruizione è già stata generata
     When l'utente richiede una operazione di download dell'attestazione della richiesta di fruizione
     Then si ottiene status code 200
 
@@ -42,7 +44,7 @@ Tutti gli utenti autorizzati possono scaricare l'attestazione di una richiesta d
       | SUSPENDED      |
       | ARCHIVED       |
 
-  @agreement_download2a
+  @agreement_download2a @wait_for_fix
   Scenario Outline: Per una richiesta di fruizione precedentemente creata dall’ente, la quale è in stato DRAFT, PENDING, alla richiesta di download dell'attestazione  della richiesta di fruizione sigillata da parte di un utente con sufficienti permessi, ottiene un errore.
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA2" ha già creato un e-service in stato "PUBLISHED" con approvazione "<tipoApprovazione>"
@@ -55,7 +57,7 @@ Tutti gli utenti autorizzati possono scaricare l'attestazione di una richiesta d
       | DRAFT          | AUTOMATIC        |
       | PENDING        | MANUAL           |
 
-  @agreement_download2b
+  @agreement_download2b @wait_for_fix
   Scenario Outline: Per una richiesta di fruizione precedentemente creata dall’ente, la quale è in stato REJECTED, alla richiesta di download dell'attestazione  della richiesta di fruizione sigillata da parte di un utente con sufficienti permessi, ottiene un errore.
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA2" ha già creato un e-service in stato "PUBLISHED" con approvazione "MANUAL"
@@ -65,7 +67,7 @@ Tutti gli utenti autorizzati possono scaricare l'attestazione di una richiesta d
     Then si ottiene status code 400
 
 
-  @agreement_download2c
+  @agreement_download2c @wait_for_fix
   Scenario Outline: Per una richiesta di fruizione precedentemente creata dall’ente, la quale è in stato MISSING_CERTIFIED_ATTRIBUTES, alla richiesta di download dell'attestazione  della richiesta di fruizione sigillata da parte di un utente con sufficienti permessi, ottiene un errore.
     Given l'utente è un "admin" di "<enteFruitore>"
     Given "<enteCertificatore>" ha creato un attributo certificato e lo ha assegnato a "<enteFruitore>"

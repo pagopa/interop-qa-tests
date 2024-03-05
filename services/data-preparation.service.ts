@@ -7,7 +7,6 @@ import {
   getRandomInt,
   makePolling,
   assertValidResponse,
-  sleep,
 } from "../utils/commons";
 import {
   EServiceSeed,
