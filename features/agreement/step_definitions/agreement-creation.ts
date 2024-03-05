@@ -2,6 +2,7 @@ import { Given, When } from "@cucumber/cucumber";
 import { z } from "zod";
 import {
   assertContextSchema,
+  assertValidResponse,
   getAuthorizationHeader,
   getOrganizationId,
   getToken,
@@ -26,6 +27,7 @@ Given(
       tenantId,
       getAuthorizationHeader(this.token)
     );
+    assertValidResponse(response);
     const { attributes } = response.data;
 
     const notRevokedAttributes = attributes.filter(
@@ -121,44 +123,22 @@ Given(
 );
 
 Given(
-  "{string} non possiede uno specifico attributo certificato",
-  async function (tenantType: TenantType) {
-    assertContextSchema(this, {
-      token: z.string(),
-    });
-    const tenantId = getOrganizationId(tenantType);
+  "{string} ha creato un attributo certificato e non lo ha assegnato a {string}",
+  async function (certifier: TenantType, _tenantType: TenantType) {
+    assertContextSchema(this);
+    const token = getToken(this.tokens, certifier, "admin");
 
-    const response = await apiClient.tenants.getCertifiedAttributes(
-      tenantId,
-      getAuthorizationHeader(this.token)
+    this.attributeId = await dataPreparationService.createAttribute(
+      token,
+      "CERTIFIED"
     );
-    const { attributes } = response.data;
-    const attributesSuperset = await apiClient.attributes.getAttributes(
-      {
-        limit: attributes.length + 1,
-        offset: 0,
-        kinds: ["CERTIFIED"],
-      },
-      getAuthorizationHeader(this.token)
-    );
-
-    const attributesIds = attributes.map((attr) => attr.id);
-    const attributesSupersetIds = attributesSuperset.data.results.map(
-      (attr) => attr.id
-    );
-
-    const missingAttributeId = attributesSupersetIds.find(
-      (attrId) => !attributesIds.includes(attrId)
-    );
-
-    this.attributeId = missingAttributeId;
   }
 );
 
 Given(
   "{string} ha creato un attributo certificato e lo ha assegnato a {string}",
   async function (certifier: TenantType, tenantType: TenantType) {
-    assertContextSchema(this, {});
+    assertContextSchema(this);
     const token = getToken(this.tokens, certifier, "admin");
 
     const tenantId = getOrganizationId(tenantType);
@@ -224,26 +204,7 @@ Given(
 );
 
 When(
-  "l'utente crea una richiesta di fruizione in bozza per l'ultima versione di quell'e-service",
-  async function () {
-    assertContextSchema(this, {
-      eserviceId: z.string(),
-      descriptorId: z.string(),
-      token: z.string(),
-    });
-
-    this.response = await apiClient.agreements.createAgreement(
-      {
-        eserviceId: this.eserviceId,
-        descriptorId: this.descriptorId,
-      },
-      getAuthorizationHeader(this.token)
-    );
-  }
-);
-
-When(
-  "l'utente crea una richiesta di fruizione in bozza per la penultima versione di quell'e-service",
+  "l'utente crea una richiesta di fruizione in bozza per (la penultima)(l'ultima) versione di quell'e-service",
   async function () {
     assertContextSchema(this, {
       eserviceId: z.string(),
