@@ -307,7 +307,7 @@ export const dataPreparationService = {
     }
 
     // agreement in state SUSPENDED
-    await this.suspendAgreement(token, agreementId);
+    await this.suspendAgreement(token, agreementId, "CONSUMER");
 
     if (agreementState === "SUSPENDED") {
       return agreementId;
@@ -391,11 +391,20 @@ export const dataPreparationService = {
     );
   },
 
-  async suspendAgreement(token: string, agreementId: string) {
+  async suspendAgreement(
+    token: string,
+    agreementId: string,
+    suspendedBy: "PRODUCER" | "CONSUMER"
+  ) {
     const response = await apiClient.agreements.suspendAgreement(
       agreementId,
       getAuthorizationHeader(token)
     );
+
+    const suspendedByProperty =
+      suspendedBy === "PRODUCER"
+        ? "suspendedByProducer"
+        : "suspendedByConsumer";
 
     assertValidResponse(response);
 
@@ -405,7 +414,8 @@ export const dataPreparationService = {
           agreementId,
           getAuthorizationHeader(token)
         ),
-      (res) => res.data.state === "SUSPENDED"
+      (res) =>
+        Boolean(res.data.state === "SUSPENDED" && res.data[suspendedByProperty])
     );
   },
 
@@ -680,6 +690,57 @@ export const dataPreparationService = {
     await makePolling(
       () =>
         apiClient.tenants.getCertifiedAttributes(
+          tenantId,
+          getAuthorizationHeader(token)
+        ),
+      (res) => res.data.attributes.some((attr) => attr.id === attributeId)
+    );
+  },
+
+  async assignVerifiedAttributeToTenant(
+    token: string,
+    tenantId: string,
+    verifierId: string,
+    attributeId: string
+  ) {
+    const response = await apiClient.tenants.verifyVerifiedAttribute(
+      tenantId,
+      {
+        id: attributeId,
+      },
+      getAuthorizationHeader(token)
+    );
+
+    assertValidResponse(response);
+    await makePolling(
+      () =>
+        apiClient.tenants.getVerifiedAttributes(
+          tenantId,
+          getAuthorizationHeader(token)
+        ),
+      (res) =>
+        res.data.attributes.some(
+          (attr) =>
+            attr.id === attributeId &&
+            !attr.revokedBy.some((revoker) => revoker.id === verifierId)
+        )
+    );
+  },
+
+  async declareDeclaredAttribute(
+    token: string,
+    tenantId: string,
+    attributeId: string
+  ) {
+    await apiClient.tenants.addDeclaredAttribute(
+      {
+        id: attributeId,
+      },
+      getAuthorizationHeader(token)
+    );
+    await makePolling(
+      () =>
+        apiClient.tenants.getDeclaredAttributes(
           tenantId,
           getAuthorizationHeader(token)
         ),
