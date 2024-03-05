@@ -153,6 +153,120 @@ Given(
   }
 );
 
+Given(
+  "due gruppi di due attributi certificati da {string}, dei quali {string} ne possiede uno per gruppo",
+  async function (certifier: TenantType, consumer: TenantType) {
+    assertContextSchema(this);
+    const consumerId = getOrganizationId(consumer);
+    const certifierToken = getToken(this.tokens, certifier, "admin");
+
+    const requiredCertifiedAttributes: string[][] = [];
+
+    for (let groupIdx = 0; groupIdx < 2; groupIdx++) {
+      requiredCertifiedAttributes.push([]);
+      for (let attrIdx = 0; attrIdx < 2; attrIdx++) {
+        const attributeId = await dataPreparationService.createAttribute(
+          certifierToken,
+          "CERTIFIED"
+        );
+
+        // Assign only one attribute in the attribute group
+        if (attrIdx % 2 === 0) {
+          await dataPreparationService.assignCertifiedAttributeToTenant(
+            certifierToken,
+            consumerId,
+            attributeId
+          );
+        }
+        requiredCertifiedAttributes[groupIdx].push(attributeId);
+      }
+    }
+
+    this.requiredCertifiedAttributes = requiredCertifiedAttributes;
+  }
+);
+
+Given(
+  "{string} crea due gruppi di due attributi verificati",
+  async function (tenant: TenantType) {
+    assertContextSchema(this);
+    const token = getToken(this.tokens, tenant, "admin");
+
+    const requiredVerifiedAttributes: string[][] = [];
+
+    for (let groupIdx = 0; groupIdx < 2; groupIdx++) {
+      requiredVerifiedAttributes.push([]);
+      for (let attrIdx = 0; attrIdx < 2; attrIdx++) {
+        const attributeId = await dataPreparationService.createAttribute(
+          token,
+          "VERIFIED"
+        );
+        requiredVerifiedAttributes[groupIdx].push(attributeId);
+      }
+    }
+
+    this.requiredVerifiedAttributes = requiredVerifiedAttributes;
+  }
+);
+
+Given(
+  "due gruppi di due attributi dichiarati, dei quali {string} ne possiede uno per gruppo",
+  async function (tenant: TenantType) {
+    assertContextSchema(this);
+    const tenantId = getOrganizationId(tenant);
+    const token = getToken(this.tokens, tenant, "admin");
+
+    const requiredDeclaredAttributes: string[][] = [];
+
+    for (let groupIdx = 0; groupIdx < 2; groupIdx++) {
+      requiredDeclaredAttributes.push([]);
+      for (let attrIdx = 0; attrIdx < 2; attrIdx++) {
+        const attributeId = await dataPreparationService.createAttribute(
+          token,
+          "DECLARED"
+        );
+
+        // Assign only one attribute in the attribute group
+        if (attrIdx % 2 === 0) {
+          await dataPreparationService.declareDeclaredAttribute(
+            token,
+            tenantId,
+            attributeId
+          );
+        }
+        requiredDeclaredAttributes[groupIdx].push(attributeId);
+      }
+    }
+
+    this.requiredDeclaredAttributes = requiredDeclaredAttributes;
+  }
+);
+
+Given(
+  "{string} verifica un attributo per ogni gruppo di attributi verificati a {string}",
+  async function (verifier: TenantType, consumer: TenantType) {
+    assertContextSchema(this, {
+      requiredVerifiedAttributes: z.array(z.array(z.string())),
+    });
+    const verifierToken = getToken(this.tokens, verifier, "admin");
+    const verifierId = getOrganizationId(verifier);
+    const consumerId = getOrganizationId(consumer);
+
+    const attributeIdsToVerify = this.requiredVerifiedAttributes.map(
+      (group) => group[0]
+    );
+
+    for (const attributeId of attributeIdsToVerify) {
+      await dataPreparationService.assignVerifiedAttributeToTenant(
+        verifierToken,
+        consumerId,
+        verifierId,
+        attributeId
+      );
+    }
+  }
+);
+
 When(
   "l'utente richiede una operazione di attivazione di quella richiesta di fruizione",
   async function () {
