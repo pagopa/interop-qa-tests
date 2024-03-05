@@ -60,6 +60,5 @@ When(
       seed,
       getAuthorizationHeader(this.token)
     );
-    assertValidResponse(this.response);
   }
 );

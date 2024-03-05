@@ -1,6 +1,7 @@
 import { readFileSync } from "fs";
 import { File } from "buffer";
 import { AxiosResponse } from "axios";
+import { AxiosResponse } from "axios";
 import { apiClient } from "../api";
 import {
   getAuthorizationHeader,
