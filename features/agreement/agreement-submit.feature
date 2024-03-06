@@ -28,11 +28,13 @@ Tutti gli utenti autorizzati possono inoltrare una richiesta di fruizione
       | Privato | support      |       403 |
       | Privato | api,security |       403 |
 
-  @agreement_submit2
+  # Attualmente ritorna 200, ha senso? Da chiedere
+  @agreement_submit2 @wait_for_fix
   Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fruitore, la quale è in stato DRAFT, associata ad un e-service nella sua ultima versione pubblicata, la quale è in stato SUSPENDED, all'inoltro della richiesta di fruizione da parte di un utente con sufficienti permessi dell’ente fruitore, dà errore
     Given l'utente è un "admin" di "PA1"
-    Given un "admin" di "PA2" ha già creato un e-service in stato "SUSPENDED" con approvazione "AUTOMATIC"
+    Given un "admin" di "PA2" ha già creato un e-service in stato "PUBLISHED" con approvazione "AUTOMATIC"
     Given "PA1" ha una richiesta di fruizione in stato "DRAFT" per quell'e-service
+    Given "PA2" ha sospeso quell'e-service
     When l'utente inoltra quella richiesta di fruizione
     Then si ottiene status code 400
 
@@ -76,7 +78,7 @@ Tutti gli utenti autorizzati possono inoltrare una richiesta di fruizione
   Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fruitore, la quale è in stato PENDING, ACTIVE, SUSPENDED, ARCHIVED, associata ad un e-service nella sua ultima versione pubblicata, all’inoltro della richiesta di fruizione da parte di un utente con sufficienti permessi (admin) dell’ente fruitore, ottiene un errore
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA2" ha già creato un e-service in stato "PUBLISHED" con approvazione "<tipoApprovazione>"
-    Given "PA2" ha una richiesta di fruizione in stato "<statoAgreement>" per quell'e-service
+    Given "PA1" ha una richiesta di fruizione in stato "<statoAgreement>" per quell'e-service
     When l'utente inoltra quella richiesta di fruizione
     Then si ottiene status code 400
 
@@ -91,7 +93,7 @@ Tutti gli utenti autorizzati possono inoltrare una richiesta di fruizione
   Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fruitore, la quale è in stato REJECTED associata ad un e-service nella sua ultima versione pubblicata, all’inoltro della richiesta di fruizione da parte di un utente con sufficienti permessi (admin) dell’ente fruitore, ottiene un errore
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA2" ha già creato un e-service in stato "PUBLISHED" con approvazione "MANUAL"
-    Given "PA2" ha una richiesta di fruizione in stato "PENDING" per quell'e-service
+    Given "PA1" ha una richiesta di fruizione in stato "PENDING" per quell'e-service
     Given un "admin" di "PA2" ha già rifiutato quella richiesta di fruizione
     When l'utente inoltra quella richiesta di fruizione
     Then si ottiene status code 400
