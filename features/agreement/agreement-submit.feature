@@ -28,7 +28,6 @@ Tutti gli utenti autorizzati possono inoltrare una richiesta di fruizione
       | Privato | support      |       403 |
       | Privato | api,security |       403 |
 
-  # Attualmente ritorna 200, ha senso? Da chiedere
   @agreement_submit2 @wait_for_fix
   Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fruitore, la quale è in stato DRAFT, associata ad un e-service nella sua ultima versione pubblicata, la quale è in stato SUSPENDED, all'inoltro della richiesta di fruizione da parte di un utente con sufficienti permessi dell’ente fruitore, dà errore
     Given l'utente è un "admin" di "PA1"
