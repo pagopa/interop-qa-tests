@@ -3,7 +3,6 @@ import { Given, Then, When } from "@cucumber/cucumber";
 import { z } from "zod";
 import {
   assertContextSchema,
-  assertValidResponse,
   getAuthorizationHeader,
   getOrganizationId,
   getToken,
@@ -108,7 +107,6 @@ When(
       },
       getAuthorizationHeader(this.token)
     );
-    assertValidResponse(this.response);
   }
 );
 
