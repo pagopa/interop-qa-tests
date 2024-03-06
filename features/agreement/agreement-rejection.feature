@@ -14,15 +14,15 @@ Feature: Rifiuto di una richiesta di fruizione
     Examples: 
       | ente | ruolo        | risultato |
       | GSP  | admin        |       200 |
-      | GSP  | api          |       400 |
-      | GSP  | security     |       400 |
-      | GSP  | support      |       400 |
-      | GSP  | api,security |       400 |
+      | GSP  | api          |       403 |
+      | GSP  | security     |       403 |
+      | GSP  | support      |       403 |
+      | GSP  | api,security |       403 |
       | PA1  | admin        |       200 |
-      | PA1  | api          |       400 |
-      | PA1  | security     |       400 |
-      | PA1  | support      |       400 |
-      | PA1  | api,security |       400 |
+      | PA1  | api          |       403 |
+      | PA1  | security     |       403 |
+      | PA1  | support      |       403 |
+      | PA1  | api,security |       403 |
 
   @agreement_rejection2
   Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fruitore, la quale è in stato PENDING, alla richiesta di rifiuto SENZA messaggio da parte di un utente con sufficienti permessi dell’ente erogatore, ottiene un errore (NB: verificare status code)
@@ -32,7 +32,7 @@ Feature: Rifiuto di una richiesta di fruizione
     When l'utente richiede una operazione di rifiuto di quella richiesta di fruizione senza messaggio
     Then si ottiene status code 400
 
-  @agreement_suspension3a
+  @agreement_rejection3a
   Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fruitore, la quale è in stato ACTIVE, SUSPENDED o ARCHIVED,alla richiesta di rifiuto con messaggio da parte di un utente con sufficienti permessi dell’ente erogatore, ottiene un errore
     Given l'utente è un "admin" di "PA2"
     Given un "admin" di "PA2" ha già creato un e-service in stato "PUBLISHED" con approvazione "AUTOMATIC"
@@ -46,7 +46,7 @@ Feature: Rifiuto di una richiesta di fruizione
       | SUSPENDED      |
       | ARCHIVED       |
 
-  @agreement_suspension3b
+  @agreement_rejection3b
   Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fruitore, la quale è in stato REJECTED,alla richiesta di rifiuto con messaggio da parte di un utente con sufficienti permessi dell’ente erogatore, ottiene un errore
     Given l'utente è un "admin" di "PA2"
     Given un "admin" di "PA2" ha già creato un e-service in stato "PUBLISHED" con approvazione "MANUAL"
