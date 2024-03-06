@@ -1,4 +1,3 @@
-import { readFileSync } from "fs";
 import { Given } from "@cucumber/cucumber";
 import { z } from "zod";
 import { Role, TenantType } from "../../common-steps";
