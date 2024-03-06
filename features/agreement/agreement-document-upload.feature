@@ -28,9 +28,8 @@ Tutti gli utenti autorizzati possono caricare un documento allegato alla richies
       | Privato | support      |       403 |
       | Privato | api,security |       403 |
 
-  # BUG: per adesso risulta possibile caricare documenti negli agreement in stato PENDING 
   @agreement_document_upload2a @wait_for_fix
-  Scenario Outline:  Un utente con sufficienti permessi, per una richiesta di fruizione precedentemente creata, la quale è in stato PENDING, ACTIVE, SUSPENDED, ARCHIVED, carica un documento associando un nome al documento (prettyName). Ottiene un errore.
+  Scenario Outline: Un utente con sufficienti permessi, per una richiesta di fruizione precedentemente creata, la quale è in stato PENDING, ACTIVE, SUSPENDED, ARCHIVED, carica un documento associando un nome al documento (prettyName). Ottiene un errore.
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA2" ha già creato un e-service in stato "PUBLISHED" con approvazione "<tipoApprovazione>"
     Given "PA1" ha una richiesta di fruizione in stato "<statoAgreement>" per quell'e-service
@@ -39,11 +38,10 @@ Tutti gli utenti autorizzati possono caricare un documento allegato alla richies
 
     Examples: 
       | statoAgreement | tipoApprovazione |
-      | PENDING        |   MANUAL         |
-      | ACTIVE         |   AUTOMATIC      |
-      | SUSPENDED      |   AUTOMATIC      |
-      | ARCHIVED       |   AUTOMATIC      |
-
+      | PENDING        | MANUAL           |
+      | ACTIVE         | AUTOMATIC        |
+      | SUSPENDED      | AUTOMATIC        |
+      | ARCHIVED       | AUTOMATIC        |
 
   @agreement_document_upload2b
   Scenario Outline: Un utente con sufficienti permessi, per una richiesta di fruizione precedentemente creata, la quale è in stato MISSING_CERTIFIED_ATTRIBUTES, carica un documento associando un nome al documento (prettyName). Ottiene un errore.
@@ -56,6 +54,6 @@ Tutti gli utenti autorizzati possono caricare un documento allegato alla richies
     When l'utente carica un documento allegato a quella richiesta di fruizione
     Then si ottiene status code 403
 
-    Examples:
-      | enteFruitore | enteCertificatore | enteErogatore|
-      | PA1          | PA2               | GSP          |
+    Examples: 
+      | enteFruitore | enteCertificatore | enteErogatore |
+      | PA1          | PA2               | GSP           |
