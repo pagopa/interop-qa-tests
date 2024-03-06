@@ -49,7 +49,7 @@ Feature: Creazione nuova richiesta di fruizione
   @agreement_creation3
   Scenario Outline: Un utente con sufficienti permessi, il cui ente NON rispetta i requisiti (attributi certificati), senza altre richieste di fruizione per un e-service, crea una nuova richiesta di fruizione in bozza per l’ultima versione disponibile di quell'e-service, la quale è in stato PUBLISHED; l’e-service è erogato dal suo stesso ente. La richiesta va a buon fine.
     Given l'utente è un "admin" di "PA1"
-    Given "PA1" non possiede uno specifico attributo certificato
+    Given "PA2" ha creato un attributo certificato e non lo ha assegnato a "PA1"
     Given un "admin" di "PA1" ha già creato un e-service in stato "PUBLISHED" che richiede quell'attributo certificato con approvazione "AUTOMATIC"
     When l'utente crea una richiesta di fruizione in bozza per l'ultima versione di quell'e-service
     Then si ottiene status code 200
@@ -65,10 +65,10 @@ Feature: Creazione nuova richiesta di fruizione
 
     Examples: 
       | statoAgreement | tipoApprovazione |
-      | DRAFT          |   AUTOMATIC      |
-      | PENDING        |   MANUAL         |
-      | ACTIVE         |   AUTOMATIC      |
-      | SUSPENDED      |   AUTOMATIC      |
+      | DRAFT          | AUTOMATIC        |
+      | PENDING        | MANUAL           |
+      | ACTIVE         | AUTOMATIC        |
+      | SUSPENDED      | AUTOMATIC        |
 
   @agreement_creation4b
   Scenario Outline: Un utente con sufficienti permessi, il cui ente rispetta i requisiti (attributi certificati), con una richiesta di fruizione in stato MISSING_CERTIFIED_ATTRIBUTES per un e-service, crea una nuova richiesta di fruizione in bozza per l’ultima versione disponibile di quell'e-service, la quale è in stato PUBLISHED. Ottiene un errore.
@@ -81,9 +81,9 @@ Feature: Creazione nuova richiesta di fruizione
     When l'utente crea una richiesta di fruizione in bozza per l'ultima versione di quell'e-service
     Then si ottiene status code 409
 
-    Examples:
-      | enteFruitore | enteCertificatore | enteErogatore|
-      | PA1          | PA2               | GSP          |
+    Examples: 
+      | enteFruitore | enteCertificatore | enteErogatore |
+      | PA1          | PA2               | GSP           |
 
   @agreement_creation5
   Scenario Outline: Un utente con sufficienti permessi, il cui ente rispetta i requisiti (attributi certificati), senza altre richieste di fruizione per un e-service, crea una nuova richiesta di fruizione in bozza per la penultima versione disponibile di quell'e-service, la quale è in stato DEPRECATED. Ottiene un errore.
@@ -104,17 +104,17 @@ Feature: Creazione nuova richiesta di fruizione
   @agreement_creation7
   Scenario Outline: Un utente con sufficienti permessi, il cui ente NON rispetta i requisiti (attributi certificati), senza altre richieste di fruizione per un e-service; crea una nuova richiesta di fruizione in bozza per l’ultima versione disponibile di quell'e-service, la quale è in stato PUBLISHED. Ottiene un errore.
     Given l'utente è un "admin" di "<enteFruitore>"
-    Given "<enteFruitore>" non possiede uno specifico attributo certificato
+    Given "<enteCertificatore>" ha creato un attributo certificato e non lo ha assegnato a "<enteFruitore>"
     Given un "admin" di "<enteErogatore>" ha già creato un e-service in stato "PUBLISHED" che richiede quell'attributo certificato con approvazione "AUTOMATIC"
     When l'utente crea una richiesta di fruizione in bozza per l'ultima versione di quell'e-service
     Then si ottiene status code 400
 
-    Examples:
-      | enteFruitore | enteCertificatore | enteErogatore|
-      | PA1          | PA2               | GSP          |
+    Examples: 
+      | enteFruitore | enteCertificatore | enteErogatore |
+      | PA1          | PA2               | GSP           |
 
   @agreement_creation8
-  Scenario Outline: Un utente con sufficienti permessi (admin), il cui ente rispetta i requisiti (attributi certificati), ha già una richiesta di fruizione per quell’e-service in stato ACTIVE. L’erogatore ha già creato una nuova versione dello stesso e-service, in stato PUBLISHED. L’utente del fruitore, crea una nuova bozza di richiesta di fruizione per questa nuova versione. Ottiene un errore.
+  Scenario Outline: Un utente con sufficienti permessi, il cui ente rispetta i requisiti (attributi certificati), ha già una richiesta di fruizione per quell’e-service in stato ACTIVE. L’erogatore ha già creato una nuova versione dello stesso e-service, in stato PUBLISHED. L’utente del fruitore, crea una nuova bozza di richiesta di fruizione per questa nuova versione. Ottiene un errore.
     Given l'utente è un "admin" di "PA1"
     Given "PA1" possiede un attributo certificato
     Given un "admin" di "PA2" ha già creato un e-service in stato "PUBLISHED" che richiede quell'attributo certificato con approvazione "AUTOMATIC"
