@@ -267,25 +267,25 @@ Given(
 
     const token = getToken(this.tokens, tenantType, role);
     const eserviceName = `e-service-${this.TEST_SEED}-${keyword}`;
-    const eserviceId = await dataPreparationService.createEService(token, {
+    this.eserviceId = await dataPreparationService.createEService(token, {
       name: eserviceName,
     });
 
-    const descriptorId = await dataPreparationService.createDraftDescriptor(
+    this.descriptorId = await dataPreparationService.createDraftDescriptor(
       token,
-      eserviceId
+      this.eserviceId
     );
 
     await dataPreparationService.addInterfaceToDescriptor(
       token,
-      eserviceId,
-      descriptorId
+      this.eserviceId,
+      this.descriptorId
     );
 
     await dataPreparationService.publishDescriptor(
       token,
-      eserviceId,
-      descriptorId
+      this.eserviceId,
+      this.descriptorId
     );
   }
 );

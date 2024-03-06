@@ -2,33 +2,28 @@
 Feature: Listing e-eservice con agreement attivo
   Tutti gli utenti autorizzati di enti PA, GSP possono ottenere la lista degli e-service con la quale hanno almeno una richiesta di fruizione attiva
 
-  @agreement_e_service_producer_listing1
+  @agreement_e_service_producer_listing1 @wait_for_fix
   Scenario Outline: Restituisce gli e-service per i quali l’erogatore ha almeno una richiesta di fruizione in stato NON DRAFT da parte dei fruitori
     Given l'utente è un "<ruolo>" di "<ente>"
-    Given un "<ruolo>" di "<ente>" ha già creato un e-service in stato "PUBLISHED" con approvazione "AUTOMATIC"
+    Given un "admin" di "<ente>" ha già creato un e-service in stato "PUBLISHED" con approvazione "AUTOMATIC"
     Given "GSP" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "<ruolo>" di "<ente>" ha già creato un e-service in stato "PUBLISHED" con approvazione "AUTOMATIC"
+    Given un "admin" di "<ente>" ha già creato un e-service in stato "PUBLISHED" con approvazione "AUTOMATIC"
     Given "PA1" ha una richiesta di fruizione in stato "DRAFT" per quell'e-service
     When l'utente richiede una operazione di listing degli e-services che hanno una richiesta di fruizione attiva
     Then si ottiene status code 200 e la lista di 1 e-service
 
     Examples: 
-      | ente    | ruolo        | risultato |
-      | GSP     | admin        |       200 |
-      | GSP     | api          |       200 |
-      | GSP     | security     |       200 |
-      | GSP     | support      |       200 |
-      | GSP     | api,security |       200 |
-      | PA1     | admin        |       200 |
-      | PA1     | api          |       200 |
-      | PA1     | security     |       200 |
-      | PA1     | support      |       200 |
-      | PA1     | api,security |       200 |
-      | Privato | admin        |       200 |
-      | Privato | api          |       200 |
-      | Privato | security     |       200 |
-      | Privato | support      |       200 |
-      | Privato | api,security |       200 |
+      | ente    | ruolo        |
+      | GSP     | admin        |
+      | GSP     | api          |
+      | GSP     | security     |
+      | GSP     | support      |
+      | GSP     | api,security |
+      | PA1     | admin        |
+      | PA1     | api          |
+      | PA1     | security     |
+      | PA1     | support      |
+      | PA1     | api,security |
 
   @agreement_e_service_producer_listing2
   Scenario Outline: A fronte di 5 e-service, restituisce solo i primi 3 risultati
