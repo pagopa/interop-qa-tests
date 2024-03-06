@@ -52,7 +52,7 @@ Tutti gli utenti autorizzati possono cancellare una richiesta di fruizione in st
     Then si ottiene status code 400
 
     Examples: 
-      | statoAgreement | tipoApprovazione | 
+      | statoAgreement | tipoApprovazione |
       | PENDING        | MANUAL           |
       | ACTIVE         | AUTOMATIC        |
       | SUSPENDED      | AUTOMATIC        |
