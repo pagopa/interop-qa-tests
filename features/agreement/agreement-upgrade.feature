@@ -7,7 +7,7 @@ Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fr
     Given un "admin" di "PA2" ha già creato un e-service in stato "PUBLISHED" con approvazione "AUTOMATIC"
     Given "<ente>" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given un "admin" di "PA2" ha già pubblicato una nuova versione per quell'e-service
-    When l'utente richiede un'operazione di upgrade per quella richiesta di fruizione
+    When l'utente richiede un'operazione di upgrade di quella richiesta di fruizione
     Then si ottiene status code 200
 
     Examples: 
@@ -34,7 +34,7 @@ Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fr
     Given un "admin" di "PA2" ha già creato un e-service in stato "PUBLISHED" con approvazione "AUTOMATIC"
     Given "PA1" ha una richiesta di fruizione in stato "SUSPENDED" per quell'e-service
     Given un "admin" di "PA2" ha già pubblicato una nuova versione per quell'e-service
-    When l'utente richiede un'operazione di upgrade per quella richiesta di fruizione
+    When l'utente richiede un'operazione di upgrade di quella richiesta di fruizione
     Then si ottiene status code 200
 
   
@@ -45,7 +45,7 @@ Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fr
     Given "<ente>" possiede un attributo certificato
     Given un "admin" di "PA2" ha già creato un e-service in stato "PUBLISHED" con approvazione "AUTOMATIC"
     Given "<ente>" ha una richiesta di fruizione in stato "statoAgreement" per quell'e-service
-    When l'utente richiede un'operazione di upgrade per quella richiesta di fruizione
+    When l'utente richiede un'operazione di upgrade di quella richiesta di fruizione
     Then si ottiene status code 400
 
     Examples:
@@ -60,7 +60,7 @@ Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fr
     Given un "admin" di "PA1" ha già creato e inviato una richiesta di fruizione per quell'e-service ed è in attesa di approvazione
     Given un "admin" di "PA2" ha già rifiutato quella richiesta di fruizione
     Given un "admin" di "PA2" ha già pubblicato una nuova versione per quell'e-service
-    When l'utente richiede un'operazione di upgrade per quella richiesta di fruizione
+    When l'utente richiede un'operazione di upgrade di quella richiesta di fruizione
     Then si ottiene status code 400
 
 
@@ -72,8 +72,8 @@ Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fr
     Given "<enteFruitore>" ha una richiesta di fruizione in stato "DRAFT" per quell'e-service
     Given "<enteCertificatore>" ha già revocato quell'attributo a "<enteFruitore>"
     Given la richiesta di fruizione è passata in stato "MISSING_CERTIFIED_ATTRIBUTES"
-    Given un "admin" di "<enteErogatore>" ha già pubblicato una nuova versione per quell'e-service uguale a quella precedente # TODO passare attributeId nella creazione del descrittore
-    When l'utente richiede un'operazione di upgrade per quella richiesta di fruizione
+    Given un "admin" di "<enteErogatore>" ha già pubblicato una nuova versione per quell'e-service richiedendo gli stessi attributi certificati
+    When l'utente richiede un'operazione di upgrade di quella richiesta di fruizione
     Then si ottiene status code 400
 
     Examples: 
@@ -103,7 +103,8 @@ Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fr
       Given l'utente è un "admin" di "PA1"
       Given un "admin" di "PA2" ha già creato un e-service in stato "PUBLISHED" con approvazione "AUTOMATIC"
       Given "PA1" ha una richiesta di fruizione in stato "<statoAgreement>" per quell'e-service
-      Given un "admin" di "PA2" ha già pubblicato una nuova versione per quell'e-service che richiede un attributo certificato che "PA1" non possiede
+      Given "<enteCertificatore>" ha creato un attributo certificato e non lo ha assegnato a "<enteFruitore>"
+      Given un "admin" di "PA2" ha già pubblicato una nuova versione per quell'e-service che richiede quell'attributo certificato
       When l'utente richiede una operazione di upgrade di quella richiesta di fruizione
       Then si ottiene status code 400
 
@@ -120,8 +121,7 @@ Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fr
       Given "PA1" ha una richiesta di fruizione in stato "<statoAgreement>" per quell'e-service
       Given un "admin" di "PA2" ha già pubblicato una nuova versione per quell'e-service che richiede un attributo dichiarato che "PA1" non possiede
       When l'utente richiede una operazione di upgrade di quella richiesta di fruizione
-      Then si ottiene status code 200 # TODO salvare il risultato di questa response in newAgreementId e usarlo dopo per fare getAgreementById
-      And è stata creata una nuova richiesta di fruizione in DRAFT
+      Then si ottiene status code 200 ed è stata creata una nuova richiesta di fruizione in DRAFT
 
   Examples:
       | statoAgreement |
@@ -137,8 +137,7 @@ Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fr
       Given un "admin" di "PA2" ha già pubblicato una nuova versione per quell'e-service
       Given un "admin" di "PA2" ha già pubblicato una nuova versione per quell'e-service
       When l'utente richiede una operazione di upgrade di quella richiesta di fruizione
-      Then si ottiene status code 200  # TODO salvare il risultato di questa response in newAgreementId e usarlo dopo per fare getAgreementById 
-      And la nuova richiesta di fruizione è associata alla versione 3 dell'eservice
+      Then si ottiene status code 200 e la nuova richiesta di fruizione è associata alla versione 3 dell'eservice
 
       Examples:
       | statoAgreement |
