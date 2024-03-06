@@ -1,12 +1,16 @@
-const common = [
+const commands = [
   "features/**/*.feature",
-  "--require-module ts-node/register", // typescript cucumber
   "--require ./features/**/step_definitions/**/*.ts",
   `--format-options '{"snippetInterface": "synchronous"}'`,
   "--format progress-bar",
   "--parallel 5",
-].join(" ");
+];
+
+// If we are running in a bun environment, we don't need to require ts-node since bun already does that
+if (!process.isBun) {
+  commands.push("--require-module ts-node/register");
+}
 
 module.exports = {
-  default: common,
+  default: commands.join(" "),
 };
