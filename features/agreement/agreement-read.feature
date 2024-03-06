@@ -11,17 +11,17 @@ Feature: Lettura richiesta di fruizione
     Then si ottiene status code 200
 
     Examples: 
-      | ente    | ruolo        |
-      | PA1     | admin        |
-      | PA1     | api          |
-      | PA1     | security     |
-      | PA1     | api,security |
-      | PA1     | support      |
-      | GSP     | admin        |
-      | GSP     | api          |
-      | GSP     | security     |
-      | GSP     | api,security |
-      | GSP     | support      |
+      | ente | ruolo        |
+      | PA1  | admin        |
+      | PA1  | api          |
+      | PA1  | security     |
+      | PA1  | api,security |
+      | PA1  | support      |
+      | GSP  | admin        |
+      | GSP  | api          |
+      | GSP  | security     |
+      | GSP  | api,security |
+      | GSP  | support      |
 
   @agreement_read2
   Scenario Outline: Per una richiesta di fruizione precedentemente creata dall’ente, la quale è in stato DRAFT, PENDING, ACTIVE, SUSPENDED o ARCHIVED, alla richiesta di lettura, va a buon fine
@@ -40,7 +40,7 @@ Feature: Lettura richiesta di fruizione
       | ARCHIVED       | AUTOMATIC        |
 
   @agreement_read3
-  Scenario Outline: Per una richiesta di fruizione precedentemente creata dall’ente, la quale è in  stato MISSING_CERTIFIED_ATTRIBUTES, alla richiesta di lettura, va a buon fine
+  Scenario Outline: Per una richiesta di fruizione precedentemente creata dall’ente, la quale è in stato MISSING_CERTIFIED_ATTRIBUTES, alla richiesta di lettura, va a buon fine
     Given l'utente è un "admin" di "<enteFruitore>"
     Given "<enteCertificatore>" ha creato un attributo certificato e lo ha assegnato a "<enteFruitore>"
     Given un "admin" di "<enteErogatore>" ha già creato un e-service in stato "PUBLISHED" che richiede quell'attributo certificato con approvazione "AUTOMATIC"
