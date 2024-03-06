@@ -5,6 +5,7 @@ import { apiClient } from "../../../api";
 import {
   assertContextSchema,
   getAuthorizationHeader,
+  getRandomInt,
   getToken,
 } from "../../../utils/commons";
 import { Role, TenantType } from "../../common-steps";
@@ -24,7 +25,9 @@ Given(
   ) {
     assertContextSchema(this);
     const token = getToken(this.tokens, tenantType, role);
-    this.eserviceId = await dataPreparationService.createEService(token);
+    this.eserviceId = await dataPreparationService.createEService(token, {
+      name: `e-service-${this.TEST_SEED}-${getRandomInt()}`,
+    });
     const response =
       await dataPreparationService.createDescriptorWithGivenState({
         token,
