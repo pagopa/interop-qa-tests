@@ -22,11 +22,6 @@ Feature: Lettura richiesta di fruizione
       | GSP     | security     |
       | GSP     | api,security |
       | GSP     | support      |
-      | Privato | admin        |
-      | Privato | api          |
-      | Privato | security     |
-      | Privato | api,security |
-      | Privato | support      |
 
   @agreement_read2
   Scenario Outline: Per una richiesta di fruizione precedentemente creata dall’ente, la quale è in stato (DRAFT, PENDING, ACTIVE, SUSPENDED, ARCHIVED), alla richiesta di lettura, va a buon fine
@@ -58,3 +53,11 @@ Feature: Lettura richiesta di fruizione
     Examples: 
       | enteFruitore | enteCertificatore | enteErogatore |
       | GSP          | PA2               | PA1           |
+
+  @agreement_read4
+  Scenario Outline: Per una richiesta di fruizione precedentemente creata dall’ente, la quale è in stato ACTIVE, alla richiesta di lettura da parte di un ente nè fruitore nè erogatore, va a buon fine
+    Given l'utente è un "admin" di "PA1"
+    Given un "admin" di "GSP" ha già creato un e-service in stato "PUBLISHED" con approvazione "AUTOMATIC"
+    Given "PA2" ha una richiesta di fruizione in stato "DRAFT" per quell'e-service
+    When l'utente richiede una operazione di lettura di quell'agreement
+    Then si ottiene status code 200
