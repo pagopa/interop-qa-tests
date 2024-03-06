@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "cucumber-js",
+    "bun:test": "bun --bun run cucumber-js",
     "test:tags": "cucumber-js --tags",
+    "bun:test:tags": "bun --bun run cucumber-js --tags",
     "lint": "tsc --noEmit && gherkin-lint . && eslint .",
     "generate-model": "node ./scripts/generate-api-models.mjs",
     "prepare": "husky"
