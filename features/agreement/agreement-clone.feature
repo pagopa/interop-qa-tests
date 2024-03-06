@@ -10,6 +10,7 @@ Tutti gli utenti autorizzati possono clonare una richiesta di fruizione in stato
     Given un "admin" di "PA2" ha già rifiutato quella richiesta di fruizione
     When l'utente clona quella richiesta di fruizione
     Then si ottiene status code <risultato>
+
     Examples: 
       | ente    | ruolo        | risultato |
       | GSP     | admin        |       200 |
@@ -38,12 +39,11 @@ Tutti gli utenti autorizzati possono clonare una richiesta di fruizione in stato
 
     Examples: 
       | statoAgreement | tipoApprovazione |
-      | DRAFT          |   AUTOMATIC      |
-      | PENDING        |   MANUAL         |
-      | ACTIVE         |   AUTOMATIC      |
-      | SUSPENDED      |   AUTOMATIC      |
-      | ARCHIVED       |   AUTOMATIC      |
-
+      | DRAFT          | AUTOMATIC        |
+      | PENDING        | MANUAL           |
+      | ACTIVE         | AUTOMATIC        |
+      | SUSPENDED      | AUTOMATIC        |
+      | ARCHIVED       | AUTOMATIC        |
 
   @agreement_clone2b
   Scenario Outline: Un utente con sufficienti permessi, clona una richiesta di fruizione in stato MISSING_CERTIFIED_ATTRIBUTES. Ottiene un errore.
@@ -56,6 +56,6 @@ Tutti gli utenti autorizzati possono clonare una richiesta di fruizione in stato
     When l'utente clona quella richiesta di fruizione
     Then si ottiene status code 400
 
-    Examples:
-      | enteFruitore | enteCertificatore | enteErogatore|
-      | PA1          | PA2               | GSP          |
+    Examples: 
+      | enteFruitore | enteCertificatore | enteErogatore |
+      | PA1          | PA2               | GSP           |
