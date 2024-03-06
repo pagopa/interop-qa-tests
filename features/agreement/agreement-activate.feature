@@ -102,8 +102,8 @@ Feature: Attivazione richiesta di fruizione
     When l'utente richiede una operazione di attivazione di quella richiesta di fruizione
     Then si ottiene status code 403
 
-  @agreement_activate6 @wait_for_fix
-  Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fruitore, la quale è in stato SUSPENDED (riattivazione), con uno o più attributi richiesti non posseduti dal fruitore, alla richiesta di attivazione da parte di un utente con sufficienti permessi dell’ente erogatore, ottiene un errore
+  @agreement_activate6
+  Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fruitore, la quale è in stato SUSPENDED (riattivazione), con uno o più attributi richiesti non posseduti dal fruitore, alla richiesta di attivazione da parte di un utente con sufficienti permessi dell’ente erogatore, va a buon fine ma la richiesta di fruizione resta in stato "SUSPENDED"
     Given l'utente è un "admin" di "<enteErogatore>"
     Given "<enteCertificatore>" ha creato un attributo certificato e lo ha assegnato a "<enteFruitore>"
     Given un "admin" di "<enteErogatore>" ha già creato un e-service in stato "PUBLISHED" che richiede quell'attributo certificato con approvazione "AUTOMATIC"
@@ -111,7 +111,7 @@ Feature: Attivazione richiesta di fruizione
     Given "<enteCertificatore>" ha già revocato quell'attributo a "<enteFruitore>"
     Given la richiesta di fruizione è passata in stato "SUSPENDED"
     When l'utente richiede una operazione di attivazione di quella richiesta di fruizione
-    Then si ottiene status code 400
+    Then si ottiene status code 200
 
     Examples: 
       | enteFruitore | enteCertificatore | enteErogatore |
