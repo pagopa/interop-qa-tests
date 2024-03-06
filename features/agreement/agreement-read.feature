@@ -24,7 +24,7 @@ Feature: Lettura richiesta di fruizione
       | GSP     | support      |
 
   @agreement_read2
-  Scenario Outline: Per una richiesta di fruizione precedentemente creata dall’ente, la quale è in stato (DRAFT, PENDING, ACTIVE, SUSPENDED, ARCHIVED), alla richiesta di lettura, va a buon fine
+  Scenario Outline: Per una richiesta di fruizione precedentemente creata dall’ente, la quale è in stato DRAFT, PENDING, ACTIVE, SUSPENDED o ARCHIVED, alla richiesta di lettura, va a buon fine
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA1" ha già creato un e-service in stato "PUBLISHED" con approvazione "<tipoApprovazione>"
     Given "GSP" ha una richiesta di fruizione in stato "<statoAgreement>" per quell'e-service
