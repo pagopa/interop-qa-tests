@@ -13,7 +13,7 @@ import { TenantType, SessionTokens, Role } from "../../common-steps";
 import { AgreementState } from "../../../api/models";
 
 Given(
-  "X {string} di {string} ha già creato e pubblicato {int} e-service(s)",
+  "un {string} di {string} ha già creato e pubblicato {int} e-service(s)",
   async function (role: Role, tenantType: TenantType, totalEservices: number) {
     assertContextSchema(this);
     const token = getToken(this.tokens, tenantType, role);
@@ -35,30 +35,6 @@ Given(
 
     this.publishedEservicesIds = await Promise.all(
       arr.map((_, i) => createEServiceWithPublishedDescriptor(i))
-    );
-  }
-);
-
-Given(
-  "{string} ha un agreement attivo per ciascun e-service di {string}",
-  async function (consumer: TenantType, _producer: string) {
-    assertContextSchema(this, {
-      token: z.string(),
-      publishedEservicesIds: z.array(z.tuple([z.string(), z.string()])),
-      tokens: SessionTokens,
-    });
-    const token = getToken(this.tokens, consumer, "admin");
-
-    const agreementsIds = await Promise.all(
-      this.publishedEservicesIds.map(([eserviceId, descriptorId]) =>
-        dataPreparationService.createAgreement(token, eserviceId, descriptorId)
-      )
-    );
-
-    await Promise.all(
-      agreementsIds.map((agreementId) =>
-        dataPreparationService.submitAgreement(token, agreementId)
-      )
     );
   }
 );
