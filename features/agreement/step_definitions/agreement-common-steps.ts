@@ -61,14 +61,16 @@ Given(
       token: z.string(),
     });
     const token = getToken(this.tokens, consumer, "admin");
-    this.agreementIds = this.publishedEservicesIds.map(
-      async ([eserviceId, descriptorId]) =>
-        await dataPreparationService.createAgreementWithGivenState(
+
+    this.agreementIds = await Promise.all(
+      this.publishedEservicesIds.map(([eserviceId, descriptorId]) =>
+        dataPreparationService.createAgreementWithGivenState(
           token,
           agreementState,
           eserviceId,
           descriptorId
         )
+      )
     );
   }
 );
