@@ -1,4 +1,4 @@
-name: QA-CI
+name: QA-CI3
 on:
   push:
     branches: Adding_CI_implementation
