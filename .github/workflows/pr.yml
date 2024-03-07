@@ -34,5 +34,7 @@ jobs:
           version: 8
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+      - name: run exit
+        run: exit 1
       - name: Check steps
         run: export DRY_RUN=true; pnpm bun:test -- --dry-run 1>&2 | if grep -q -e "undefined" -e "ambiguous"; then false; else true; fi
