@@ -7,7 +7,7 @@ Feature: Listing erogatori lato fruitore
     Given l'utente è un "<ruolo>" di "<ente>"
     Given un "admin" di "PA2" ha già creato e pubblicato 2 e-services
     Given "<ente>" ha una richiesta di fruizione in stato "ACTIVE" per ognuno di quegli e-services
-    When l'utente richiede una operazione di listing degli e-service per cui ha una richiesta di fruizione
+    When l'utente richiede una operazione di listing degli e-services per cui ha una richiesta di fruizione
     Then si ottiene status code 200 e la lista di 2 e-services
 
     Examples: 
@@ -28,7 +28,7 @@ Feature: Listing erogatori lato fruitore
     Given l'utente è un "<ruolo>" di "<ente>"
     Given un "admin" di "PA1" ha già creato e pubblicato 5 e-services
     Given "PA2" ha una richiesta di fruizione in stato "ACTIVE" per ognuno di quegli e-services
-    When l'utente richiede una operazione di listing degli e-service per cui ha una richiesta di fruizione limitata a 3
+    When l'utente richiede una operazione di listing degli e-services per cui ha una richiesta di fruizione limitata a 3
     Then si ottiene status code 200 e la lista di 3 e-service
 
   @agreement_consumer_listing3
@@ -36,7 +36,7 @@ Feature: Listing erogatori lato fruitore
     Given l'utente è un "<ruolo>" di "<ente>"
     Given un "admin" di "PA1" ha già creato e pubblicato 5 e-services
     Given "PA2" ha una richiesta di fruizione in stato "ACTIVE" per ognuno di quegli e-services
-    When l'utente richiede una operazione di listing degli e-service per cui ha una richiesta di fruizione con offset 2
+    When l'utente richiede una operazione di listing degli e-services per cui ha una richiesta di fruizione con offset 2
     Then si ottiene status code 200 e la lista di 3 e-service
 
   @agreement_consumer_listing4
@@ -44,7 +44,7 @@ Feature: Listing erogatori lato fruitore
     Given l'utente è un "admin" di "PA2"
     Given un "admin" di "PA1" ha già creato e pubblicato 2 e-services
     Given "PA2" ha una richiesta di fruizione in stato "ACTIVE" per ognuno di quegli e-services
-    When l'utente richiede una operazione di listing degli e-service per cui ha una richiesta di fruizione con keyword "test"
+    When l'utente richiede una operazione di listing degli e-services per cui ha una richiesta di fruizione con keyword "test"
     Then si ottiene status code 200 e la lista di 1 e-service
 
   @agreement_consumer_listing5
@@ -52,5 +52,5 @@ Feature: Listing erogatori lato fruitore
     Given l'utente è un "admin" di "PA2"
     Given un "admin" di "PA1" ha già creato e pubblicato 2 e-services
     Given "PA2" ha una richiesta di fruizione in stato "ACTIVE" per ognuno di quegli e-services
-    When l'utente richiede una operazione di listing degli e-service per cui ha una richiesta di fruizione con keyword "unknown"
+    When l'utente richiede una operazione di listing degli e-services per cui ha una richiesta di fruizione con keyword "unknown"
     Then si ottiene status code 200 e la lista di 0 e-service
