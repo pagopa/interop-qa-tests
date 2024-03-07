@@ -16,7 +16,9 @@ export const Env = z.object({
 
 const parsedEnv = Env.safeParse(process.env);
 
-if (!parsedEnv.success && !process.isBun) {
+const isDryRun = process.env.DRY_RUN === "true";
+
+if (!parsedEnv.success && !isDryRun) {
   const invalidEnvVars = parsedEnv.error.issues.flatMap((issue) => issue.path);
   console.error("Invalid or missing env vars: " + invalidEnvVars.join(", "));
   process.exit(1);
