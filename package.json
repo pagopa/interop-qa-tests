@@ -10,7 +10,8 @@
     "bun:test:tags": "bun --bun run cucumber-js --tags",
     "lint": "tsc --noEmit && gherkin-lint . && eslint .",
     "generate-model": "node ./scripts/generate-api-models.mjs",
-    "check-steps": "export DRY_RUN=true; ! pnpm bun:test -- --dry-run 1>&2  | grep -q -e 'undefined' -e 'ambiguous'"
+    "check-steps-pnpm": "export DRY_RUN=true; ! pnpm test -- --dry-run 1>&2  | grep -q -e 'undefined' -e 'ambiguous'",
+    "check-steps": "pnpm bun --bun run cucumber-js --dry-run 1>&2 | grep -q -e 'undefined' -e 'ambiguous'"
   },
   "keywords": [],
   "author": "",
