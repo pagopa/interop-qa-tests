@@ -13,7 +13,7 @@ import { TenantType, SessionTokens, Role } from "../../common-steps";
 import { AgreementState } from "../../../api/models";
 
 Given(
-  "X {string} di {string} ha già creato e pubblicato {int} e-service(s)",
+  "un {string} di {string} ha già creato e pubblicato {int} e-service(s)",
   async function (role: Role, tenantType: TenantType, totalEservices: number) {
     assertContextSchema(this);
     const token = getToken(this.tokens, tenantType, role);
