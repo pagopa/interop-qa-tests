@@ -21,15 +21,18 @@ jobs:
       - name: Lint
         run: pnpm lint
 
-  # Check-undefined/ambigous-steps:
-  #   name: Check undefined/ambigous steps
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - uses: oven-sh/setup-bun@v1
-  #       with:
-  #         bun-version: latest
-  #     - uses: pnpm/action-setup@v2
-  #       with:
-  #         run_install: true
-  #     - run: pnpm test
+  check-undefined-ambigous-steps:
+    name: Check undefined-ambigous steps
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+      - uses: pnpm/action-setup@v3
+        with:
+            version: 8
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Check steps
+        run: ! pnpm bun:test -- --dry-run 1>&2  | grep -q -e "undefined" -e "ambiguous"
