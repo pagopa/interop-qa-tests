@@ -1,7 +1,7 @@
-name: QA-CI3
+name: QA-CI
 on:
   push:
-    branches: Adding_CI_implementation
+    branches: [ Adding_CI_implementation ] 
   pull_request:
 
 jobs:
