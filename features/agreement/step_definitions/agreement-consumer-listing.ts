@@ -10,7 +10,6 @@ When(
   "l'utente richiede una operazione di listing degli e-services per cui ha una richiesta di fruizione",
   async function () {
     assertContextSchema(this, {
-      TEST_SEED: z.string(),
       token: z.string(),
     });
 
@@ -18,6 +17,8 @@ When(
       { q: this.TEST_SEED, offset: 0, limit: 50 },
       getAuthorizationHeader(this.token)
     );
+
+    console.log("risposta:", this.response);
   }
 );
 

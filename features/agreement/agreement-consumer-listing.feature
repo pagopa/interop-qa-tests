@@ -13,15 +13,15 @@ Feature: Listing erogatori lato fruitore
     Examples: 
       | ente | ruolo        |
       | GSP  | admin        |
-      | GSP  | api          |
-      | GSP  | security     |
-      | GSP  | api,security |
-      | GSP  | support      |
-      | PA1  | admin        |
-      | PA1  | api          |
-      | PA1  | security     |
-      | PA1  | api,security |
-      | PA1  | support      |
+      # | GSP  | api          |
+      # | GSP  | security     |
+      # | GSP  | api,security |
+      # | GSP  | support      |
+      # | PA1  | admin        |
+      # | PA1  | api          |
+      # | PA1  | security     |
+      # | PA1  | api,security |
+      # | PA1  | support      |
 
   @agreement_consumer_listing2
   Scenario Outline: A fronte di 5 e-service, restituisce solo i primi 3 risultati

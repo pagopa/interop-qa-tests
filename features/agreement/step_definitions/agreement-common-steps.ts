@@ -57,18 +57,17 @@ Given(
   "{string} ha una richiesta di fruizione in stato {string} per ognuno di quegli e-services",
   async function (consumer: TenantType, agreementState: string) {
     assertContextSchema(this, {
-      publishedEservicesIds: z.array(z.string()),
-      descriptorId: z.string(),
+      publishedEservicesIds: z.array(z.array(z.string())),
       token: z.string(),
     });
     const token = getToken(this.tokens, consumer, "admin");
     this.agreementIds = this.publishedEservicesIds.map(
-      async (id) =>
+      async ([eserviceId, descriptorId]) =>
         await dataPreparationService.createAgreementWithGivenState(
           token,
           agreementState,
-          id,
-          this.descriptorId
+          eserviceId,
+          descriptorId
         )
     );
   }
