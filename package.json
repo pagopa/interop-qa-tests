@@ -9,7 +9,8 @@
     "test:tags": "cucumber-js --tags",
     "bun:test:tags": "bun --bun run cucumber-js --tags",
     "lint": "tsc --noEmit && gherkin-lint . && eslint .",
-    "generate-model": "node ./scripts/generate-api-models.mjs"
+    "generate-model": "node ./scripts/generate-api-models.mjs",
+    "check-steps": "! pnpm bun:test -- --dry-run 1>&2  | grep -q -e 'undefined' -e 'ambiguous'"
   },
   "keywords": [],
   "author": "",

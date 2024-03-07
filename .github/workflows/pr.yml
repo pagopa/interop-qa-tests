@@ -35,4 +35,4 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: Check steps
-        run: bash ! pnpm bun:test -- --dry-run 1>&2  | grep -q -e "undefined" -e "ambiguous"
+        run: pnpm check-steps 
