@@ -64,6 +64,30 @@ Given(
 );
 
 Given(
+  "{string} ha un agreement attivo per ciascun e-service di {string}",
+  async function (consumer: TenantType, _producer: string) {
+    assertContextSchema(this, {
+      token: z.string(),
+      publishedEservicesIds: z.array(z.tuple([z.string(), z.string()])),
+      tokens: SessionTokens,
+    });
+    const token = getToken(this.tokens, consumer, "admin");
+
+    const agreementsIds = await Promise.all(
+      this.publishedEservicesIds.map(([eserviceId, descriptorId]) =>
+        dataPreparationService.createAgreement(token, eserviceId, descriptorId)
+      )
+    );
+
+    await Promise.all(
+      agreementsIds.map((agreementId) =>
+        dataPreparationService.submitAgreement(token, agreementId)
+      )
+    );
+  }
+);
+
+Given(
   "{string} ha un agreement in stato {string} per l'e-service numero {int} di {string}",
   async function (
     consumer: TenantType,
