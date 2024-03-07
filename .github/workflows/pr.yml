@@ -1,7 +1,8 @@
 name: QA-CI
 on:
   push:
-    branches: [ Adding_CI_implementation ] 
+    branches:
+      - main
   pull_request:
 
 jobs:
