@@ -29,5 +29,10 @@ jobs:
       - uses: oven-sh/setup-bun@v1
         with:
           bun-version: latest
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 8
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
       - name: Check steps
         run: export DRY_RUN=true; pnpm bun:test -- --dry-run 1>&2 | if grep -q -e "undefined" -e "ambiguous"; then false; else true; fi
