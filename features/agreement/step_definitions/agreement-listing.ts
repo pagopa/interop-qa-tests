@@ -67,7 +67,7 @@ Given(
 );
 
 Given(
-  "{string} ha un agreement attivo per ciascun e-service di {string}",
+  "{string} ha un X attivo per ciascun e-service di {string}",
   async function (consumer: TenantType, _producer: string) {
     assertContextSchema(this, {
       token: z.string(),
