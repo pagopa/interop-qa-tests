@@ -37,7 +37,7 @@ jobs:
       - name: Check steps
         run: |
           export DRY_RUN=true; 
-          pnpm bun:test -- --dry-run 2>&1 |
-          if grep -e "undefined" -e "ambiguous"; then 
+          pnpm bun:test -- --dry-run 2>&1 | cat |
+          if grep -q -e "undefined" -e "ambiguous"; then 
             exit 1
           fi
