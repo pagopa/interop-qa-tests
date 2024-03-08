@@ -1,5 +1,5 @@
 @agreement_e_service_producer_listing
-Feature: Listing e-eservice con agreement attivo
+Feature: Listing e-eservice con agreement attivo lato erogatore
   Tutti gli utenti autorizzati di enti PA, GSP possono ottenere la lista degli e-service con la quale hanno almeno una richiesta di fruizione attiva
 
   @agreement_e_service_producer_listing1 @wait_for_fix
@@ -13,17 +13,17 @@ Feature: Listing e-eservice con agreement attivo
     Then si ottiene status code 200 e la lista di 1 e-service
 
     Examples: 
-      | ente    | ruolo        |
-      | GSP     | admin        |
-      | GSP     | api          |
-      | GSP     | security     |
-      | GSP     | support      |
-      | GSP     | api,security |
-      | PA1     | admin        |
-      | PA1     | api          |
-      | PA1     | security     |
-      | PA1     | support      |
-      | PA1     | api,security |
+      | ente | ruolo        |
+      | GSP  | admin        |
+      | GSP  | api          |
+      | GSP  | security     |
+      | GSP  | support      |
+      | GSP  | api,security |
+      | PA1  | admin        |
+      | PA1  | api          |
+      | PA1  | security     |
+      | PA1  | support      |
+      | PA1  | api,security |
 
   @agreement_e_service_producer_listing2
   Scenario Outline: A fronte di 5 e-service, restituisce solo i primi 3 risultati
@@ -34,7 +34,7 @@ Feature: Listing e-eservice con agreement attivo
     Then si ottiene status code 200 e la lista di 3 e-service
 
   @agreement_e_service_producer_listing3
-  Scenario Outline: A fronte di 5 e-service in db e una richiesta di offset 2, restituisce solo 3 risultati 
+  Scenario Outline: A fronte di 5 e-service in db e una richiesta di offset 2, restituisce solo 3 risultati
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA1" ha già creato e pubblicato 5 e-services
     Given "GSP" ha un agreement attivo per ciascun e-service di "PA1"
