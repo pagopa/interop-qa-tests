@@ -39,6 +39,6 @@ jobs:
         run: |
           export DRY_RUN=true;
           pnpm bun:check-steps | tee /dev/stderr |
-          if grep -q -e "undefined" -e "ambiguous"; then 
+          if grep -q -e "undefined" -e "ambiguous" -e "UNUSED"; then 
             exit 1
           fi
