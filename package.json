@@ -11,7 +11,7 @@
     "lint": "tsc --noEmit && gherkin-lint . && eslint .",
     "generate-model": "node ./scripts/generate-api-models.mjs",
     "check-steps": "export DRY_RUN=true; pnpm test -- --dry-run",
-    "bun:check-steps": "export DRY_RUN=true; pnpm bun:test --dry-run",
+    "bun:check-steps": "export DRY_RUN=true; pnpm bun:test --dry-run"
   },
   "keywords": [],
   "author": "",
