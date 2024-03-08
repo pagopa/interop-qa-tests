@@ -1,5 +1,5 @@
 @agreement_producer_listing
-Feature: Listing richieste di fruizione lato erogatore
+Feature: Listing erogatori con richieste di fruizione
   Tutti gli utenti autorizzati di enti PA e GSP possono ottenere la lista delle richieste di fruizione dei propri e-service
 
   @agreement_producer_listing1
