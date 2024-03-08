@@ -42,3 +42,10 @@ jobs:
           if grep -q -e "undefined" -e "ambiguous" -e "UNUSED"; then 
             exit 1
           fi
+      - name: Check unused steps
+        run: |
+          export DRY_RUN=true;
+          pnpm bun:check-unused-steps |
+          if grep "UNUSED"; then 
+            exit 1
+          fi
