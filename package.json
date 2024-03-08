@@ -12,8 +12,6 @@
     "generate-model": "node ./scripts/generate-api-models.mjs",
     "check-steps": "export DRY_RUN=true; pnpm test -- --dry-run",
     "bun:check-steps": "export DRY_RUN=true; pnpm bun:test --dry-run",
-    "bun:check-unused-steps": "export DRY_RUN=true; pnpm bun:test --dry-run --format usage"
-
   },
   "keywords": [],
   "author": "",
