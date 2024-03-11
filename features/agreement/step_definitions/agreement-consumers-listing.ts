@@ -1,40 +1,11 @@
 import assert from "assert";
-import { Given, Then, When } from "@cucumber/cucumber";
+import { Then, When } from "@cucumber/cucumber";
 import { z } from "zod";
 import { apiClient } from "../../../api";
 import {
   assertContextSchema,
   getAuthorizationHeader,
-  getToken,
 } from "../../../utils/commons";
-import { Role, TenantType } from "../../common-steps";
-import {
-  AgreementApprovalPolicy,
-  EServiceDescriptorState,
-} from "../../../api/models";
-import { dataPreparationService } from "../../../services/data-preparation.service";
-
-Given(
-  "un {string} di {string} ha già creato un e-service in stato {string} con approvazione {string}",
-  async function (
-    role: Role,
-    tenantType: TenantType,
-    descriptorState: EServiceDescriptorState,
-    agreementApprovalPolicy: AgreementApprovalPolicy
-  ) {
-    assertContextSchema(this);
-    const token = getToken(this.tokens, tenantType, role);
-    this.eserviceId = await dataPreparationService.createEService(token);
-    const response =
-      await dataPreparationService.createDescriptorWithGivenState({
-        token,
-        eserviceId: this.eserviceId,
-        descriptorState,
-        agreementApprovalPolicy,
-      });
-    this.descriptorId = response.descriptorId;
-  }
-);
 
 When(
   "l'utente richiede una operazione di listing dei fruitori dei propri e-service limitata ai primi {int}",
@@ -68,8 +39,13 @@ When(
     assertContextSchema(this, {
       token: z.string(),
     });
-    this.response = await apiClient.agreements.getAgreementConsumers(
+    this.responseOffsetOne = await apiClient.agreements.getAgreementConsumers(
       { limit: 50, offset },
+      getAuthorizationHeader(this.token)
+    );
+
+    this.responseOffsetTwo = await apiClient.agreements.getAgreementConsumers(
+      { limit: 50, offset: offset + 1 },
       getAuthorizationHeader(this.token)
     );
   }
