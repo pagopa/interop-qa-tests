@@ -53,7 +53,7 @@ Given(
 
 Given(
   "un {string} di {string} ha già pubblicato una nuova versione per quell'e-service che richiede quell'attributo certificato",
-  async function (role: Role, tenantType: TenantType, _consumer: TenantType) {
+  async function (role: Role, tenantType: TenantType) {
     assertContextSchema(this, {
       token: z.string(),
       eserviceId: z.string(),
@@ -110,6 +110,38 @@ Given(
   }
 );
 
+Given(
+  "un {string} di {string} ha già pubblicato una nuova versione per quell'e-service che richiede un attributo certificato che {string} non possiede",
+  async function (role: Role, tenantType: TenantType, _consumer: TenantType) {
+    assertContextSchema(this, {
+      token: z.string(),
+      eserviceId: z.string(),
+    });
+
+    const token = getToken(this.tokens, tenantType, role);
+
+    const attributeId = await dataPreparationService.createAttribute(
+      token,
+      "CERTIFIED"
+    );
+
+    const response =
+      await dataPreparationService.createDescriptorWithGivenState({
+        token,
+        eserviceId: this.eserviceId,
+        descriptorState: "PUBLISHED",
+        attributes: {
+          certified: [
+            [{ id: attributeId, explicitAttributeVerification: true }],
+          ],
+          declared: [],
+          verified: [],
+        },
+      });
+    this.descriptorId = response.descriptorId;
+  }
+);
+
 Then(
   "si ottiene status code {int} ed è stata creata una nuova richiesta di fruizione in DRAFT",
   async function (statusCode: number) {
@@ -141,7 +173,7 @@ Then(
 
 Then(
   "si ottiene status code 200 e la nuova richiesta di fruizione è associata alla versione 3 dell'eservice",
-  async function (statusCode: number) {
+  async function () {
     assertContextSchema(this, {
       response: z.object({
         status: z.number(),
@@ -150,7 +182,7 @@ Then(
       descriptorId: z.string(),
     });
 
-    assert.equal(this.response.status, statusCode);
+    assert.equal(this.response.status, 200);
 
     await makePolling(
       () =>
