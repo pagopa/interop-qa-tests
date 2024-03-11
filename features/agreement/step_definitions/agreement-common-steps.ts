@@ -3,6 +3,32 @@ import { z } from "zod";
 import { Role, TenantType } from "../../common-steps";
 import { dataPreparationService } from "../../../services/data-preparation.service";
 import { assertContextSchema, getToken } from "../../../utils/commons";
+import {
+  EServiceDescriptorState,
+  AgreementApprovalPolicy,
+} from "../../../api/models";
+
+Given(
+  "un {string} di {string} ha già creato un e-service in stato {string} con approvazione {string}",
+  async function (
+    role: Role,
+    tenantType: TenantType,
+    descriptorState: EServiceDescriptorState,
+    agreementApprovalPolicy: AgreementApprovalPolicy
+  ) {
+    assertContextSchema(this);
+    const token = getToken(this.tokens, tenantType, role);
+    this.eserviceId = await dataPreparationService.createEService(token);
+    const response =
+      await dataPreparationService.createDescriptorWithGivenState({
+        token,
+        eserviceId: this.eserviceId,
+        descriptorState,
+        agreementApprovalPolicy,
+      });
+    this.descriptorId = response.descriptorId;
+  }
+);
 
 Given(
   "un {string} di {string} ha già creato e pubblicato {int} e-service(s)",
