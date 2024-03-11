@@ -21,19 +21,6 @@ When(
 );
 
 When(
-  "l'utente richiede una operazione di listing dei fruitori dei propri e-service",
-  async function () {
-    assertContextSchema(this, {
-      token: z.string(),
-    });
-    this.response = await apiClient.agreements.getAgreementConsumers(
-      { limit: 50, offset: 0 },
-      getAuthorizationHeader(this.token)
-    );
-  }
-);
-
-When(
   "l'utente richiede una operazione di listing dei fruitori dei propri e-service con offset {int}",
   async function (offset: number) {
     assertContextSchema(this, {
