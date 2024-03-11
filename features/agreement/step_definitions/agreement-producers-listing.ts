@@ -1,5 +1,5 @@
 import assert from "assert";
-import { Given, Then, When } from "@cucumber/cucumber";
+import { Then, When } from "@cucumber/cucumber";
 import { z } from "zod";
 import { apiClient } from "../../../api";
 import {
