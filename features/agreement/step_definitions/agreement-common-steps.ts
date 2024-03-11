@@ -7,7 +7,6 @@ import {
   AgreementState,
   AgreementApprovalPolicy,
   EServiceDescriptorState,
-  AgreementApprovalPolicy,
 } from "../../../api/models";
 
 Given(
