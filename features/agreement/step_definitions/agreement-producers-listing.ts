@@ -37,12 +37,12 @@ Given(
 );
 
 When(
-  "l'utente richiede una operazione di listing dei fruitori dei propri e-service limitata ai primi {int}",
+  "l'utente richiede una operazione di listing degli erogatori degli e-service per cui ha una richiesta di fruizione limitata ai primi {int}",
   async function (limit: number) {
     assertContextSchema(this, {
       token: z.string(),
     });
-    this.response = await apiClient.agreements.getAgreementConsumers(
+    this.response = await apiClient.agreements.getAgreementProducers(
       { limit, offset: 0 },
       getAuthorizationHeader(this.token)
     );
@@ -50,12 +50,12 @@ When(
 );
 
 When(
-  "l'utente richiede una operazione di listing dei fruitori dei propri e-service",
+  "l'utente richiede una operazione di listing degli erogatori degli e-service per cui ha una richiesta di fruizione",
   async function () {
     assertContextSchema(this, {
       token: z.string(),
     });
-    this.response = await apiClient.agreements.getAgreementConsumers(
+    this.response = await apiClient.agreements.getAgreementProducers(
       { limit: 50, offset: 0 },
       getAuthorizationHeader(this.token)
     );
@@ -63,17 +63,17 @@ When(
 );
 
 When(
-  "l'utente richiede una operazione di listing dei fruitori dei propri e-service con offset {int}",
+  "l'utente richiede una operazione di listing degli erogatori degli e-service per cui ha una richiesta di fruizione con offset {int}",
   async function (offset: number) {
     assertContextSchema(this, {
       token: z.string(),
     });
-    this.responseOffsetOne = await apiClient.agreements.getAgreementConsumers(
+    this.responseOffsetOne = await apiClient.agreements.getAgreementProducers(
       { limit: 50, offset },
       getAuthorizationHeader(this.token)
     );
 
-    this.responseOffsetTwo = await apiClient.agreements.getAgreementConsumers(
+    this.responseOffsetTwo = await apiClient.agreements.getAgreementProducers(
       { limit: 50, offset: offset + 1 },
       getAuthorizationHeader(this.token)
     );
@@ -81,12 +81,12 @@ When(
 );
 
 When(
-  "l'utente richiede una operazione di listing dei fruitori dei propri e-service filtrando per la keyword {string}",
+  "l'utente richiede una operazione di listing degli erogatori degli e-service per cui ha una richiesta di fruizione filtrando per la keyword {string}",
   async function (keyword: string) {
     assertContextSchema(this, {
       token: z.string(),
     });
-    this.response = await apiClient.agreements.getAgreementConsumers(
+    this.response = await apiClient.agreements.getAgreementProducers(
       { q: encodeURIComponent(keyword), limit: 50, offset: 0 },
       getAuthorizationHeader(this.token)
     );
@@ -94,7 +94,7 @@ When(
 );
 
 Then(
-  "si ottiene status code {int} e la lista di {int} fruitor(i)(e)",
+  "si ottiene status code {int} e la lista di {int} erogator(i)(e)",
   async function (statusCode: number, consumers: number) {
     assertContextSchema(this, {
       response: z.object({
