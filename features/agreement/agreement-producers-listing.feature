@@ -1,8 +1,8 @@
-@agreement_producer_listing
+@agreement_producers_listing
 Feature: Listing erogatori con richieste di fruizione
   Tutti gli utenti autorizzati di enti PA e GSP possono ottenere la lista delle richieste di fruizione dei propri e-service
 
-  @agreement_producer_listing1
+  @agreement_producers_listing1
   Scenario Outline: A fronte di 4 fruitori, restituisce solo i primi 3 risultati
     Given l'utente è un "<ruolo>" di "<ente>"
     Given un "admin" di "<ente>" ha già creato e pubblicato 1 e-service
@@ -26,7 +26,7 @@ Feature: Listing erogatori con richieste di fruizione
       | PA1  | api,security |
       | PA1  | support      |
       
-  @agreement_producer_listing2
+  @agreement_producers_listing2
   Scenario Outline: A fronte di 4 fruitori con i quali l’erogatore ha almeno una richiesta di fruizione e una richiesta di offset 2, restituisce solo 2 risultati
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA1" ha già creato e pubblicato 1 e-service
@@ -37,7 +37,7 @@ Feature: Listing erogatori con richieste di fruizione
     When l'utente richiede una operazione di listing dei fruitori dei propri e-service con offset 2
     Then si ottiene status code 200 con la corretta verifica dell'offset
 
-  @agreement_producer_listing3
+  @agreement_producers_listing3
   Scenario Outline: Restituisce un insieme vuoto di fruitori per una ricerca che non porta risultati
     Given l'utente è un "admin" di "PA2"
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
