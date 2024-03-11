@@ -117,38 +117,6 @@ Given(
   }
 );
 
-Given(
-  "un {string} di {string} ha già approvato la richiesta di agreement di ente_fruitore",
-  async function (role: Role, tenantType: TenantType) {
-    assertContextSchema(this, {
-      agreementId: z.string(),
-    });
-
-    const token = getToken(this.tokens, tenantType, role);
-
-    await dataPreparationService.activateAgreement(token, this.agreementId);
-  }
-);
-
-Given(
-  "un {string} di {string} ha già sospeso la versione dell'e-service che ente_fruitore ha sottoscritto",
-  async function (role: Role, tenantType: TenantType) {
-    assertContextSchema(this, {
-      agreementId: z.string(),
-      eserviceSubscribedId: z.string(),
-      descriptorSubscribedId: z.string(),
-    });
-
-    const token = getToken(this.tokens, tenantType, role);
-
-    await dataPreparationService.suspendDescriptor(
-      token,
-      this.eserviceSubscribedId,
-      this.descriptorSubscribedId
-    );
-  }
-);
-
 When(
   "l'utente richiede la lista di e-services per i quali ha almeno un agreement attivo",
   async function () {
