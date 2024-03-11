@@ -1,0 +1,51 @@
+name: QA-CI
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 8
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Lint
+        run: pnpm lint
+
+  check-steps:
+    name: Check steps
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 8
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Check undefined/ambiguous steps
+        run: |
+          export DRY_RUN=true;
+          pnpm bun:check-steps | tee /dev/stderr |
+          if grep -q -e "undefined" -e "ambiguous"; then 
+            exit 1
+          fi
+      - name: Check unused steps
+        run: |
+          export DRY_RUN=true;
+          pnpm bun:check-steps --format usage |
+          if grep "UNUSED"; then 
+            exit 1
+          fi
