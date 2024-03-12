@@ -46,3 +46,15 @@ Tests are labeled with the following special tags:
 
 - ```@wait_for_fix```: test bug affected, waiting for resolution, don't execute in test suite
 - ```@resource_intensive```: test resource consuming, to run only in environment with high performance
+
+How to run cucumber test suite without tagged tests:
+
+```shell
+pnpm test "not @wait-for-fix"
+```
+
+Or 
+
+```shell
+pnpm test "(not @wait-for-fix) and (not @resource_intensive)"
+```
