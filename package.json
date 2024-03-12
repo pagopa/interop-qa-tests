@@ -5,15 +5,15 @@
   "main": "index.js",
   "scripts": {
     "test": "cucumber-js",
-    "bun:test": "bun --bun run cucumber-js",
+    "bun:test": "bun --bun run cucumber-js -p bun",
     "test:tags": "cucumber-js --tags",
-    "bun:test:tags": "bun --bun run cucumber-js --tags",
+    "bun:test:tags": "pnpm bun:test --tags",
     "lint": "tsc --noEmit && gherkin-lint . && eslint .",
     "generate-model": "node ./scripts/generate-api-models.mjs",
     "check-steps": "export DRY_RUN=true; pnpm test -- --dry-run",
     "bun:check-steps": "export DRY_RUN=true; pnpm bun:test --dry-run",
-    "check-steps:usage": "export DRY_RUN=true; pnpm test -- --dry-run --format usage",
-    "bun:check-steps:usage": "export DRY_RUN=true; pnpm bun:test --dry-run --format usage"
+    "check-steps:usage": "export DRY_RUN=true; pnpm check-steps --format usage",
+    "bun:check-steps:usage": "export DRY_RUN=true; pnpm check-steps --format usage"
   },
   "keywords": [],
   "author": "",
