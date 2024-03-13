@@ -47,7 +47,7 @@ Feature: Listing erogatori con richieste di fruizione
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
     Given "GSP" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     When l'utente richiede una operazione di listing degli erogatori degli e-service per cui ha una richiesta di fruizione filtrando per la keyword "Comune di Milano"
-    Then si ottiene status code 200 e la lista di 1 erogatori
+    Then si ottiene status code 200 e la lista di 1 erogatore
 
   @agreement_producers_listing4
   Scenario Outline: Restituisce un insieme vuoto di erogatori per una ricerca che non porta risultati
