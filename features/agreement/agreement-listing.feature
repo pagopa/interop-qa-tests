@@ -73,7 +73,7 @@ Feature: Listing richieste di fruizione
     When l'utente richiede una operazione di listing delle richieste di fruizione di "GSP" che sono in stato "ACTIVE" e "DRAFT"
     Then si ottiene status code 200 e la lista di 2 richiesta di fruizione
 
-  @agreement_listing7 @wait_for_fix @PIN-4602
+  @agreement_listing7
   Scenario Outline: Restituisce le richieste di fruizione di uno specifico fruitore che possono essere aggiornate ad una nuova versione di e-service
     Given l'utente è un "admin" di "GSP"
     Given un "admin" di "PA1" ha già creato e pubblicato 10 e-services
