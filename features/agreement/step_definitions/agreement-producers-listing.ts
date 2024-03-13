@@ -97,9 +97,11 @@ Then(
     assert.equal(this.responseOffsetOne.status, 200);
     assert.equal(this.responseOffsetTwo.status, 200);
 
+    // due response (operazioni di listing) di cui: la prima ha offset 0, la seconda ha offset - 1
+    // il secondo elemento della seconda lista è uguale al primo elemento della prima
     assert.equal(
-      this.responseOffsetOne.data.results[1].id,
-      this.responseOffsetTwo.data.results[0].id
+      this.responseOffsetOne.data.results[0].id,
+      this.responseOffsetTwo.data.results[1].id
     );
   }
 );
