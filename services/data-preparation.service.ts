@@ -291,6 +291,7 @@ export const dataPreparationService = {
       agreementState === "PENDING" ? agreementState : "ACTIVE"
     );
 
+    // agreement in state ACTIVE o PENDING
     if (agreementState === "ACTIVE" || agreementState === "PENDING") {
       return agreementId;
     }
