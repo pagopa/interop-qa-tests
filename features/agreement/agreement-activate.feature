@@ -37,7 +37,6 @@ Feature: Attivazione richiesta di fruizione
     Given "PA1" verifica l'attributo verificato a "PA2"
     Given "PA1" ha già approvato quella richiesta di fruizione
     Given "PA1" ha già sospeso quella richiesta di fruizione come "PRODUCER"
-    Given "PA2" ha già sospeso quella richiesta di fruizione come "CONSUMER"
     When l'utente richiede una operazione di attivazione di quella richiesta di fruizione
     Then si ottiene status code 200
 
