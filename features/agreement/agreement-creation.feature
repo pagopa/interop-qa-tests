@@ -32,7 +32,7 @@ Feature: Creazione nuova richiesta di fruizione
     Given l'utente è un "admin" di "PA1"
     Given "PA1" possiede un attributo certificato
     Given un "admin" di "PA2" ha già creato un e-service in stato "PUBLISHED" che richiede quell'attributo certificato con approvazione "MANUAL"
-    Given l'utente ha già creato e inviato una richiesta di fruizione per quell'e-service ed è in attesa di approvazione
+    Given un "admin" di "PA1" ha già creato e inviato una richiesta di fruizione per quell'e-service ed è in attesa di approvazione
     Given un "admin" di "PA2" ha già rifiutato quella richiesta di fruizione
     When l'utente crea una richiesta di fruizione in bozza per l'ultima versione di quell'e-service
     Then si ottiene status code 200
