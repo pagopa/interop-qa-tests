@@ -16,6 +16,7 @@ export const Env = z.object({
 
 const parsedEnv = Env.safeParse(process.env);
 
+// TODO: rimuovere quando sarà disponibile ambiente QA
 const isDryRun = process.env.DRY_RUN === "true";
 
 if (!parsedEnv.success && !isDryRun) {
