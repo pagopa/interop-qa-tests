@@ -37,7 +37,7 @@ Feature: Listing e-services lato erogatore
     When l'utente richiede una operazione di listing sui propri e-services con offset 12
     Then si ottiene status code 200 e la lista di 3 e-services
 
-  @producer_listing4 @wait_for_fix @PIN-4543
+  @producer_listing4 @wait_for_fix @IMN-261
   Scenario Outline: Restituisce gli e-service erogati dall’ente fruiti da almeno uno dei fruitori specifici
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA1" ha già creato 2 e-services in catalogo in stato PUBLISHED o SUSPENDED e 1 in stato DRAFT

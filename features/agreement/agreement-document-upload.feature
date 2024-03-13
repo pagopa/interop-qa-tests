@@ -28,7 +28,7 @@ Tutti gli utenti autorizzati possono caricare un documento allegato alla richies
       | Privato | support      |       403 |
       | Privato | api,security |       403 |
 
-  @agreement_document_upload2a @wait_for_fix
+  @agreement_document_upload2a @wait_for_fix @IMN-311
   Scenario Outline: Un utente con sufficienti permessi, per una richiesta di fruizione precedentemente creata, la quale è in stato PENDING, ACTIVE, SUSPENDED, ARCHIVED, carica un documento associando un nome al documento (prettyName). Ottiene un errore.
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA2" ha già creato un e-service in stato "PUBLISHED" con approvazione "<tipoApprovazione>"
