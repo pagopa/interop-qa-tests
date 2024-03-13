@@ -15,7 +15,7 @@ When(
       token: z.string(),
     });
     this.response = await apiClient.producers.getProducerEServices(
-      { q: this.TEST_SEED, offset: 0, limit: 50 },
+      { q: encodeURIComponent(this.TEST_SEED), offset: 0, limit: 50 },
       getAuthorizationHeader(this.token)
     );
   }
@@ -28,7 +28,7 @@ When(
       token: z.string(),
     });
     this.response = await apiClient.producers.getProducerEServices(
-      { q: this.TEST_SEED, offset: 0, limit },
+      { q: encodeURIComponent(this.TEST_SEED), offset: 0, limit },
       getAuthorizationHeader(this.token)
     );
   }
@@ -41,7 +41,7 @@ When(
       token: z.string(),
     });
     this.response = await apiClient.producers.getProducerEServices(
-      { q: this.TEST_SEED, offset, limit: 12 },
+      { q: encodeURIComponent(this.TEST_SEED), offset, limit: 12 },
       getAuthorizationHeader(this.token)
     );
   }
@@ -55,7 +55,12 @@ When(
     });
     const consumerId = getOrganizationId(consumer);
     this.response = await apiClient.producers.getProducerEServices(
-      { q: this.TEST_SEED, consumersIds: [consumerId], offset: 0, limit: 12 },
+      {
+        q: encodeURIComponent(this.TEST_SEED),
+        consumersIds: [consumerId],
+        offset: 0,
+        limit: 12,
+      },
       getAuthorizationHeader(this.token)
     );
   }
@@ -68,7 +73,11 @@ When(
       token: z.string(),
     });
     this.response = await apiClient.producers.getProducerEServices(
-      { q: `${this.TEST_SEED}-${keyword}`, offset: 0, limit: 12 },
+      {
+        q: encodeURIComponent(`${this.TEST_SEED}-${keyword}`),
+        offset: 0,
+        limit: 12,
+      },
       getAuthorizationHeader(this.token)
     );
   }

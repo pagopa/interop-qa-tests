@@ -14,7 +14,7 @@ When(
     });
 
     this.response = await apiClient.producers.getAgreementEServiceProducers(
-      { q: this.TEST_SEED, limit: 50, offset: 0 },
+      { q: encodeURIComponent(this.TEST_SEED), limit: 50, offset: 0 },
       getAuthorizationHeader(this.token)
     );
   }
@@ -28,7 +28,7 @@ When(
     });
 
     this.response = await apiClient.producers.getAgreementEServiceProducers(
-      { q: this.TEST_SEED, limit, offset: 0 },
+      { q: encodeURIComponent(this.TEST_SEED), limit, offset: 0 },
       getAuthorizationHeader(this.token)
     );
   }
@@ -42,7 +42,7 @@ When(
     });
 
     this.response = await apiClient.producers.getAgreementEServiceProducers(
-      { q: this.TEST_SEED, limit: 10, offset },
+      { q: encodeURIComponent(this.TEST_SEED), limit: 10, offset },
       getAuthorizationHeader(this.token)
     );
   }
@@ -56,7 +56,11 @@ When(
     });
 
     this.response = await apiClient.producers.getAgreementEServiceProducers(
-      { q: `${this.TEST_SEED}-${keyword}`, limit: 10, offset: 0 },
+      {
+        q: encodeURIComponent(`${this.TEST_SEED}-${keyword}`),
+        limit: 10,
+        offset: 0,
+      },
       getAuthorizationHeader(this.token)
     );
   }

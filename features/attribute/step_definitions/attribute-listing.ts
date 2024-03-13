@@ -15,7 +15,7 @@ When(
     });
     this.response = await apiClient.attributes.getAttributes(
       {
-        q: this.TEST_SEED,
+        q: encodeURIComponent(this.TEST_SEED),
         limit: 50,
         offset: 0,
         kinds: ["DECLARED", "CERTIFIED", "VERIFIED"],
@@ -36,7 +36,7 @@ When(
     });
     this.response = await apiClient.attributes.getAttributes(
       {
-        q: this.TEST_SEED,
+        q: encodeURIComponent(this.TEST_SEED),
         limit,
         offset: 0,
         kinds: ["DECLARED", "CERTIFIED", "VERIFIED"],
@@ -54,7 +54,7 @@ When(
     });
     this.response = await apiClient.attributes.getAttributes(
       {
-        q: this.TEST_SEED,
+        q: encodeURIComponent(this.TEST_SEED),
         limit: 50,
         offset,
         kinds: ["DECLARED", "CERTIFIED", "VERIFIED"],
@@ -71,7 +71,7 @@ When(
     });
     this.response = await apiClient.attributes.getAttributes(
       {
-        q: this.TEST_SEED,
+        q: encodeURIComponent(this.TEST_SEED),
         limit: 50,
         offset: 0,
         kinds: ["CERTIFIED", "VERIFIED"],
@@ -91,7 +91,7 @@ When(
     });
     this.response = await apiClient.attributes.getAttributes(
       {
-        q: `${this.TEST_SEED}-${keyword}`,
+        q: encodeURIComponent(`${this.TEST_SEED}-${keyword}`),
         limit: 50,
         offset: 0,
         kinds: ["CERTIFIED", "DECLARED", "VERIFIED"],
