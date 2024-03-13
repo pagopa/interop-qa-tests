@@ -127,7 +127,7 @@ When(
       {
         limit: 12,
         offset: 0,
-        q: encodeURIComponent(this.TEST_SEED),
+        q: this.TEST_SEED,
         states: ["PUBLISHED", "SUSPENDED"],
         agreementStates: ["ACTIVE"],
       },
@@ -146,7 +146,7 @@ When(
       {
         limit: 12,
         offset: 0,
-        q: encodeURIComponent(this.TEST_SEED),
+        q: this.TEST_SEED,
         states: ["PUBLISHED", "SUSPENDED"],
       },
       getAuthorizationHeader(this.token)
@@ -164,7 +164,7 @@ When(
       {
         limit,
         offset: 0,
-        q: encodeURIComponent(this.TEST_SEED),
+        q: this.TEST_SEED,
         states: ["PUBLISHED", "SUSPENDED"],
       },
       getAuthorizationHeader(this.token)
@@ -182,7 +182,7 @@ When(
       {
         limit: 12,
         offset,
-        q: encodeURIComponent(this.TEST_SEED),
+        q: this.TEST_SEED,
         states: ["PUBLISHED", "SUSPENDED"],
       },
       getAuthorizationHeader(this.token)
@@ -201,7 +201,7 @@ When(
       {
         limit: 12,
         offset: 0,
-        q: encodeURIComponent(this.TEST_SEED),
+        q: this.TEST_SEED,
         states: ["PUBLISHED", "SUSPENDED"],
         producersIds: [producerId],
       },
@@ -220,7 +220,7 @@ When(
       {
         limit: 12,
         offset: 0,
-        q: encodeURIComponent(`${this.TEST_SEED}-${keyword}`),
+        q: `${this.TEST_SEED}-${keyword}`,
         states: ["PUBLISHED", "SUSPENDED"],
       },
       getAuthorizationHeader(this.token)
