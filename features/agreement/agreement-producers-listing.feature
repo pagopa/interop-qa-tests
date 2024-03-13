@@ -1,8 +1,6 @@
 @agreement_producers_listing @resource_intensive
 Feature: Listing erogatori con richieste di fruizione
   Tutti gli utenti autorizzati di enti PA e GSP possono ottenere la lista degli erogatori degli e-service per cui ha una richiesta di fruizione
-  # NOTA SULLA FEATURE
-  # i test falliscono se l'ambiente di esecuzione non ha sufficienti risorse per effettuare la query
   
   @agreement_producers_listing1
   Scenario Outline: A fronte di 3 erogatori, restituisce solo i primi 2 risultati
@@ -42,7 +40,7 @@ Feature: Listing erogatori con richieste di fruizione
     Then si ottiene status code 200 con la corretta verifica dell'offset
 
   @agreement_producers_listing3
-  Scenario Outline: Restituisce gli erogatori il cui nome dell’ente contiene la keyword "Comune di Milano" all'interno del nome, con ricerca case insensitive
+  Scenario Outline: Restituisce gli erogatori il cui nome dell’ente contiene la keyword "Comune di Milano" all'interno del nome, con ricerca case insensitive. In questo scenario il nome di PA1 è "Comune di Milano"
     Given l'utente è un "admin" di "GSP"
     Given un "admin" di "PA1" ha già creato e pubblicato 1 e-service
     Given "GSP" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
