@@ -22,10 +22,11 @@ Given(
   async function (tenantType: TenantType) {
     assertContextSchema(this);
     const tenantId = getOrganizationId(tenantType);
+    const token = getToken(this.tokens, tenantType, "admin");
 
     const response = await apiClient.tenants.getCertifiedAttributes(
       tenantId,
-      getAuthorizationHeader(this.token)
+      getAuthorizationHeader(token)
     );
     assertValidResponse(response);
     const { attributes } = response.data;
@@ -39,6 +40,7 @@ Given(
     }
 
     this.attributeId = notRevokedAttributes[0].id;
+    this.requiredCertifiedAttributes = [[notRevokedAttributes[0].id]];
   }
 );
 
