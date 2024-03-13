@@ -1,4 +1,4 @@
-@attribute_listing @wait-for-fix
+@attribute_listing @wait_for_fix
 Feature: Listing attributi
   Tutti gli utenti autenticati possono leggere la lista degli attributi
 
