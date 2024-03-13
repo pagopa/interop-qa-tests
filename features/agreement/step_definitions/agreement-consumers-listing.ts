@@ -32,7 +32,7 @@ When(
     );
 
     this.responseOffsetTwo = await apiClient.agreements.getAgreementConsumers(
-      { limit: 50, offset: offset + 1 },
+      { limit: 50, offset: offset - 1 },
       getAuthorizationHeader(this.token)
     );
   }
