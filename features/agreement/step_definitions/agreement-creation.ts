@@ -104,6 +104,25 @@ Given(
 );
 
 Given(
+  "{string} ha una richiesta di fruizione in stato {string} per quell'e-service",
+  async function (consumer: TenantType, agreementState: string) {
+    assertContextSchema(this, {
+      eserviceId: z.string(),
+      descriptorId: z.string(),
+      token: z.string(),
+    });
+    const token = getToken(this.tokens, consumer, "admin");
+    this.agreementId =
+      await dataPreparationService.createAgreementWithGivenState(
+        token,
+        agreementState,
+        this.eserviceId,
+        this.descriptorId
+      );
+  }
+);
+
+Given(
   "{string} ha creato un attributo certificato e non lo ha assegnato a {string}",
   async function (certifier: TenantType, _tenantType: TenantType) {
     assertContextSchema(this);
