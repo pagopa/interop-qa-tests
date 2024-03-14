@@ -64,14 +64,18 @@ Tutti gli utenti autorizzati possono inoltrare una richiesta di fruizione
 
   @agreement_submit6
   Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fruitore, la quale è in stato DRAFT, associata ad un e-service nella sua ultima versione pubblicata, la quale versione ha attivazione automatica delle richieste di fruizione, con tutti gli attributi richiesti certificati, tutti gli attributi richiesti dichiarati dal fruitore, e almeno un attributo verificato che il fruitore NON possiede, all’inoltro della richiesta di fruizione da parte di un utente con sufficienti permessi dell’ente fruitore, va a buon fine, e la richiesta di fruizione passa in stato PENDING
-    Given l'utente è un "admin" di "PA1"
-    Given "PA1" possiede un attributo certificato
-    Given "PA1" possiede un attributo dichiarato
-    Given "PA1" crea un attributo verificato
-    Given un "admin" di "PA2" ha già creato un e-service in stato "PUBLISHED" che richiede quegli attributi con approvazione "AUTOMATIC"
-    Given "PA1" ha una richiesta di fruizione in stato "DRAFT" per quell'e-service
+    Given l'utente è un "admin" di "<enteFruitore>"
+    Given "<enteCertificatore>" ha creato un attributo certificato e lo ha assegnato a "<enteFruitore>"
+    Given "<enteFruitore>" dichiara un attributo dichiarato
+    Given "<enteFruitore>" crea un attributo verificato
+    Given un "admin" di "<enteErogatore>" ha già creato un e-service in stato "PUBLISHED" che richiede quegli attributi con approvazione "AUTOMATIC"
+    Given "<enteFruitore>" ha una richiesta di fruizione in stato "DRAFT" per quell'e-service
     When l'utente inoltra quella richiesta di fruizione
     Then la richiesta di fruizione assume lo stato "PENDING"
+
+    Examples: 
+      | enteFruitore | enteCertificatore | enteErogatore |
+      | PA1          | PA2               | GSP           |
 
   @agreement_submit7a
   Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fruitore, la quale è in stato PENDING, ACTIVE, SUSPENDED, ARCHIVED, associata ad un e-service nella sua ultima versione pubblicata, all’inoltro della richiesta di fruizione da parte di un utente con sufficienti permessi (admin) dell’ente fruitore, ottiene un errore
