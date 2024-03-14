@@ -12,6 +12,7 @@ export const Env = z.object({
   ST_VERBOSE_MODE: z.string().optional(),
   MAX_POLLING_TRIES: z.coerce.number(),
   POLLING_SLEEP_TIME: z.coerce.number(),
+  CUCUMBER_OPTS_PARALLEL: z.coerce.number(),
 });
 
 const parsedEnv = Env.safeParse(process.env);
