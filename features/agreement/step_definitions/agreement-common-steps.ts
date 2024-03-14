@@ -83,28 +83,6 @@ Given(
 );
 
 Given(
-  "{string} ha una richiesta di fruizione in stato {string} per ognuno di quegli e-services",
-  async function (consumer: TenantType, agreementState: string) {
-    assertContextSchema(this, {
-      publishedEservicesIds: z.array(z.array(z.string())),
-      token: z.string(),
-    });
-    const token = getToken(this.tokens, consumer, "admin");
-
-    this.agreementIds = await Promise.all(
-      this.publishedEservicesIds.map(([eserviceId, descriptorId]) =>
-        dataPreparationService.createAgreementWithGivenState(
-          token,
-          agreementState,
-          eserviceId,
-          descriptorId
-        )
-      )
-    );
-  }
-);
-
-Given(
   "{string} ha creato un attributo certificato e lo ha assegnato a {string}",
   async function (certifier: TenantType, tenantType: TenantType) {
     assertContextSchema(this);
