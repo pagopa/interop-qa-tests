@@ -5,7 +5,7 @@ Feature: Lettura di un descrittore lato fruitore
   @descriptor_read_consumer1
   Scenario Outline: Per un e-service precedentemente creato da qualsiasi ente, il quale ha un solo descrittore in stato NON DRAFT (PUBLISHED, SUSPENDED, DEPRECATED, ARCHIVED), la richiesta per ottenere i dettagli della versione di e-service va a buon fine
     Given l'utente è un "<ruolo>" di "<ente>"
-    Given un "admin" di "PA1" ha già creato un e-service con un descrittore in stato "<statoVersione>"
+    Given un "admin" di "PA2" ha già creato un e-service con un descrittore in stato "<statoVersione>"
     When l'utente fruitore richiede la lettura di quel descrittore
     Then si ottiene status code 200
 
@@ -16,11 +16,11 @@ Feature: Lettura di un descrittore lato fruitore
       | GSP     | security     | PUBLISHED     |
       | GSP     | api,security | PUBLISHED     |
       | GSP     | support      | PUBLISHED     |
-      | PA2     | admin        | PUBLISHED     |
-      | PA2     | api          | PUBLISHED     |
-      | PA2     | security     | PUBLISHED     |
-      | PA2     | api,security | PUBLISHED     |
-      | PA2     | support      | PUBLISHED     |
+      | PA1     | admin        | PUBLISHED     |
+      | PA1     | api          | PUBLISHED     |
+      | PA1     | security     | PUBLISHED     |
+      | PA1     | api,security | PUBLISHED     |
+      | PA1     | support      | PUBLISHED     |
       | Privato | admin        | PUBLISHED     |
       | Privato | api          | PUBLISHED     |
       | Privato | security     | PUBLISHED     |
