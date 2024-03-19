@@ -1,7 +1,7 @@
-@purpose_update_draft_mode_deliver
+@purpose_update_draft_mode_receive
 Feature: Aggiornamento bozza nuova finalità in erogazione diretta
 
-  @purpose_update_draft_mode_deliver1
+  @purpose_update_draft_mode_receive1
   Scenario Outline: Un utente con sufficienti permessi (admin); il cui ente ha già una finalità in stato DRAFT per una versione di e-service, il quale ha mode = DELIVER, aggiorna una finalità con tutti i campi richiesti correttamente formattati. La richiesta va a buon fine.
     Given l'utente è un "<ruolo>" di "<ente>"
     Given un "admin" di "PA1" ha già creato un e-service in modalità "RECEIVE" con un descrittore in stato "DRAFT"
@@ -25,7 +25,7 @@ Feature: Aggiornamento bozza nuova finalità in erogazione diretta
       | GSP  | api,security |       403 |
       | GSP  | support      |       403 |
 
-  @purpose_update_draft_mode_deliver2
+  @purpose_update_draft_mode_receive2
   Scenario Outline: Un utente con sufficienti permessi (admin); il cui ente ha già una finalità in stato NON DRAFT (ACTIVE, SUSPENDED, WAITING_FOR_APPROVAL o ARCHIVED) per una versione di e-service, il quale ha mode = RECEIVE, aggiorna una finalità con tutti i campi richiesti correttamente formattati. Ottiene un errore (NB: verificare status code)
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA2" ha già creato un e-service in modalità "RECEIVE" con un descrittore in stato "DRAFT"
@@ -43,7 +43,7 @@ Feature: Aggiornamento bozza nuova finalità in erogazione diretta
       | WAITING_FOR_APPROVAL |
       | ARCHIVED             |
 
-  @purpose_update_draft_mode_deliver3
+  @purpose_update_draft_mode_receive3
   Scenario Outline: Un utente con sufficienti permessi (admin); il cui ente ha già una finalità in stato DRAFT per una versione di e-service, il quale ha mode = RECEIVE, aggiorna una finalità con tutti i campi richiesti correttamente formattati, con un riskAnalysisId che fa riferimento ad un'analisi del rischio in versione diversa da quella attualmente pubblicata (es. l’erogatore ha compilato la v1, la versione attuale è la v2). Ottiene un errore (NB: verificare status code).
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA2" ha già creato un e-service in modalità "RECEIVE" con un descrittore in stato "DRAFT"
