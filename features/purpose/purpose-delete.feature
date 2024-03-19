@@ -5,6 +5,7 @@ Feature: Cancellazione finalità
   Scenario Outline: Per una finalità precedentemente creata dall’ente, la quale prima versione è in stato DRAFT, alla richiesta di cancellazione da parte di un utente con sufficienti permessi (admin), va a buon fine
     Given l'utente è un "<ruolo>" di "<ente>"
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
+    Given "<ente>" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given un "<ruolo>" di "<ente>" ha già creato una finalità in stato "DRAFT" per quell'eservice
     When l'utente richiede la cancellazione della finalità
     Then si ottiene status code <risultato>
