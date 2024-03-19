@@ -803,4 +803,34 @@ export const dataPreparationService = {
       throw Error("unhandled");
     }
   },
+
+  async createPurposeForReceiveEservice(
+    token: string,
+    testSeed: string,
+    payload: {
+      eserviceId: string;
+      consumerId: string;
+      riskAnalysisId: string;
+    }
+  ) {
+    const response = await apiClient.reverse.createPurposeForReceiveEservice(
+      {
+        title: `purpose title - QA - ${testSeed} - ${getRandomInt()}`,
+        description: "description of the purpose - QA",
+        isFreeOfCharge: true,
+        freeOfChargeReason: "free of charge - QA",
+        dailyCalls: 5,
+        ...payload,
+      },
+      getAuthorizationHeader(token)
+    );
+
+    const purposeId = response.data.id;
+
+    await makePolling(
+      () =>
+        apiClient.purposes.getPurpose(purposeId, getAuthorizationHeader(token)),
+      (res) => res.status !== 404
+    );
+  },
 };
