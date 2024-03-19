@@ -1,5 +1,5 @@
 @purpose-read
-Feature: Aggiornamento bozza nuova finalità in erogazione diretta
+Feature: Lettura singola finalità
 
   @purpose-read1a
   Scenario Outline: Per una finalità precedentemente creata dal fruitore, la quale prima versione è in qualsiasi stato (DRAFT, WAITING_FOR_APPROVAL, ACTIVE, SUSPENDED, ARCHIVED), alla richiesta di lettura, va a buon fine
