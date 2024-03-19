@@ -61,10 +61,14 @@ Given(
     agreementApprovalPolicy: AgreementApprovalPolicy
   ) {
     assertContextSchema(this, {
-      requiredCertifiedAttributes: z.array(z.array(z.string())),
-      requiredDeclaredAttributes: z.array(z.array(z.string())),
-      requiredVerifiedAttributes: z.array(z.array(z.string())),
+      requiredCertifiedAttributes: z.array(z.array(z.string())).optional(),
+      requiredDeclaredAttributes: z.array(z.array(z.string())).optional(),
+      requiredVerifiedAttributes: z.array(z.array(z.string())).optional(),
     });
+
+    const requiredCertifiedAttributes = this.requiredCertifiedAttributes ?? [];
+    const requiredDeclaredAttributes = this.requiredDeclaredAttributes ?? [];
+    const requiredVerifiedAttributes = this.requiredVerifiedAttributes ?? [];
 
     const token = getToken(this.tokens, tenantType, role);
     this.eserviceId = await dataPreparationService.createEService(token);
@@ -74,19 +78,19 @@ Given(
         eserviceId: this.eserviceId,
         descriptorState,
         attributes: {
-          certified: this.requiredCertifiedAttributes.map((group) =>
+          certified: requiredCertifiedAttributes.map((group) =>
             group.map((attrId) => ({
               id: attrId,
               explicitAttributeVerification: true,
             }))
           ),
-          declared: this.requiredDeclaredAttributes.map((group) =>
+          declared: requiredDeclaredAttributes.map((group) =>
             group.map((attrId) => ({
               id: attrId,
               explicitAttributeVerification: true,
             }))
           ),
-          verified: this.requiredVerifiedAttributes.map((group) =>
+          verified: requiredVerifiedAttributes.map((group) =>
             group.map((attrId) => ({
               id: attrId,
               explicitAttributeVerification: true,
