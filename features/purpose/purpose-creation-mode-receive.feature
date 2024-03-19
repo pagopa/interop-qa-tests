@@ -32,7 +32,7 @@ Feature: Creazione finalità per e-service in erogazione inversa
     Given un "admin" di "GSP" ha già pubblicato quella versione di e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given l'utente ha già creato una finalità in stato "DRAFT" per quell'eservice associando quell'analisi del rischio creata dall'erogatore
-    When l'utente crea una nuova finalità per quell'e-service associando quella analisi del rischio creata dall'erogatore con tutti i campi richiesti correttamente formattati
+    When l'utente crea una nuova finalità con tutti i campi richiesti correttamente formattati per quell'e-service associando quella analisi del rischio creata dall'erogatore
     Then si ottiene status code 200
 
   @purpose_creation_receive3
@@ -67,7 +67,7 @@ Feature: Creazione finalità per e-service in erogazione inversa
   Scenario Outline: Un utente con sufficienti permessi (admin); il cui ente ha già una richiesta di fruizione in stato MISSING_CERTIFIED_ATTRIBUTES per un e-service, il quale ha mode = RECEIVE, crea una nuova finalità con tutti i campi richiesti correttamente formattati. Ottiene un errore (NB: verificare status code).
     Given l'utente è un "admin" di "<enteFruitore>"
     Given "<enteCertificatore>" ha creato un attributo certificato e lo ha assegnato a "<enteFruitore>"
-    Given un "admin" di "<enteErogatore>" ha già creato un e-service in modalità "RECEIVE" in stato "DRAFT" che richiede quell'attributo certificato con approvazione "AUTOMATIC"
+    Given un "admin" di "<enteErogatore>" ha già creato un e-service in modalità RECEIVE in stato DRAFT che richiede quell'attributo certificato con approvazione "AUTOMATIC"
     Given un "admin" di "GSP" ha già creato un'analisi del rischio per quell'e-service
     Given un "admin" di "GSP" ha già pubblicato quella versione di e-service
     Given "<enteFruitore>" ha una richiesta di fruizione in stato "DRAFT" per quell'e-service
@@ -83,7 +83,7 @@ Feature: Creazione finalità per e-service in erogazione inversa
   @purpose_creation_receive4c
   Scenario Outline: Un utente con sufficienti permessi (admin); il cui ente ha già una richiesta di fruizione in stato REJECTED per un e-service, il quale ha mode = RECEIVE, crea una nuova finalità con tutti i campi richiesti correttamente formattati. Ottiene un errore (NB: verificare status code).
     Given l'utente è un "admin" di "PA1"
-    Given un "admin" di "PA2" ha già creato un e-service in stato "DRAFT" in modalità "RECEIVE"  con approvazione "MANUAL"
+    Given un "admin" di "PA2" ha già creato un e-service in stato DRAFT in modalità RECEIVE con approvazione MANUAL
     Given un "admin" di "GSP" ha già creato un'analisi del rischio per quell'e-service
     Given un "admin" di "GSP" ha già pubblicato quella versione di e-service
     Given "PA1" ha una richiesta di fruizione in stato "PENDING" per quell'e-service
@@ -129,12 +129,13 @@ Feature: Creazione finalità per e-service in erogazione inversa
     Then si ottiene status code 400
 
   @purpose_creation_receive9
-  Scenario Outline: Un utente con sufficienti permessi (admin); il cui ente ha già una richiesta di fruizione in stato ACTIVE per una versione di e-service, il quale ha mode = RECEIVE, crea una nuova finalità con tutti i campi richiesti correttamente formattati; la cui analisi del rischio scelta come riskAnalysisId non sia più l’ultima versione disponibile di riskAnalysis sulla piattaforma (es. l'erogatore ha compilato la riskAnalysis in v1, ma la corrente è la v2). Ottiene un errore (NB: verificare status code). Nota da Ruggero: qui sappiamo che c'è un buco di analisi lato nostro, non sono sicuro ritorni errore e non so come è gestito il caso, verifichiamolo assieme
-    Given l'utente è un "admin" di "PA1"
-    Given un "admin" di "PA1" ha già creato un e-service in modalità "RECEIVE" con un descrittore in stato "DRAFT"
-    Given un "admin" di "PA1" ha già creato un'analisi del rischio per quell'e-service
-    Given un "admin" di "PA1" ha già pubblicato quella versione di e-service
-    Given "ente" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given viene pubblicata una nuova versione dell'analisi del rischio
-    When l'utente crea una nuova finalità per quell'e-service associando  l'analisi del rischio non aggiornata creata dall'erogatore con tutti i campi richiesti correttamente formattati
-    Then si ottiene status code 400
+  # Scenario Outline: Un utente con sufficienti permessi (admin); il cui ente ha già una richiesta di fruizione in stato ACTIVE per una versione di e-service, il quale ha mode = RECEIVE, crea una nuova finalità con tutti i campi richiesti correttamente formattati; la cui analisi del rischio scelta come riskAnalysisId non sia più l’ultima versione disponibile di riskAnalysis sulla piattaforma (es. l'erogatore ha compilato la riskAnalysis in v1, ma la corrente è la v2). Ottiene un errore (NB: verificare status code). Nota da Ruggero: qui sappiamo che c'è un buco di analisi lato nostro, non sono sicuro ritorni errore e non so come è gestito il caso, verifichiamolo assieme
+    #Given l'utente è un "admin" di "PA1"
+    #Given un "admin" di "PA1" ha già creato un e-service in modalità "RECEIVE" con un descrittore in stato "DRAFT"
+    #Given un "admin" di "PA1" ha già creato un'analisi del rischio per quell'e-service
+    #Given un "admin" di "PA1" ha già pubblicato quella versione di e-service
+    #Given "ente" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
+    #Given viene pubblicata una nuova versione dell'analisi del rischio
+    # Come gestire l'aggiunta di un nuovo template?
+    #When l'utente crea una nuova finalità per quell'e-service associando  l'analisi del rischio non aggiornata creata dall'erogatore con tutti i campi richiesti correttamente formattati
+    #Then si ottiene status code 400
