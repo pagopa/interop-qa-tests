@@ -38,25 +38,31 @@ When(
 );
 
 Given(
-  "l'utente ha già creato una finalità in stato {string} per quell'eservice",
-  async function (purposeState) {
+  "un {string} di {string} ha già creato {int} finalità in stato {string} per quell'eservice",
+  async function (
+    role: Role,
+    tenantType: TenantType,
+    n: number,
+    purposeState: string
+  ) {
     assertContextSchema(this, {
-      token: z.string(),
       eserviceId: z.string(),
-      tenantType: TenantType,
     });
 
-    const consumerId = getOrganizationId(this.tenantType);
+    const token = getToken(this.tokens, tenantType, role);
+    const consumerId = getOrganizationId(tenantType);
 
-    await dataPreparationService.createPurpose(
-      this.token,
-      purposeState,
-      this.TEST_SEED,
-      {
-        eserviceId: this.eserviceId,
-        consumerId,
-      }
-    );
+    for (let index = 0; index < n; index++) {
+      await dataPreparationService.createPurpose(
+        token,
+        purposeState,
+        this.TEST_SEED,
+        {
+          eserviceId: this.eserviceId,
+          consumerId,
+        }
+      );
+    }
   }
 );
 
