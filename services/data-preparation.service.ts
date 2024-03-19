@@ -769,4 +769,38 @@ export const dataPreparationService = {
         )
     );
   },
+
+  async createPurpose(
+    token: string,
+    purposeState: string,
+    testSeed: string,
+    payload: { eserviceId: string; consumerId: string }
+  ) {
+    if (purposeState === "DRAFT") {
+      const response = await apiClient.purposes.createPurpose(
+        {
+          title: `purpose title - QA - ${testSeed} - ${getRandomInt()}`,
+          description: "description of the purpose - QA",
+          isFreeOfCharge: true,
+          freeOfChargeReason: "free of charge - QA",
+          dailyCalls: 5,
+          ...payload,
+        },
+        getAuthorizationHeader(token)
+      );
+
+      const purposeId = response.data.id;
+
+      await makePolling(
+        () =>
+          apiClient.purposes.getPurpose(
+            purposeId,
+            getAuthorizationHeader(token)
+          ),
+        (res) => res.status !== 404
+      );
+    } else {
+      throw Error("unhandled");
+    }
+  },
 };
