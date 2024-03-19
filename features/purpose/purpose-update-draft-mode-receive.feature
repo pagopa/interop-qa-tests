@@ -1,5 +1,5 @@
 @purpose_update_draft_mode_receive
-Feature: Aggiornamento bozza nuova finalità in erogazione diretta
+Feature: Aggiornamento bozza nuova finalità in erogazione inversa
 
   @purpose_update_draft_mode_receive1
   Scenario Outline: Un utente con sufficienti permessi (admin); il cui ente ha già una finalità in stato DRAFT per una versione di e-service, il quale ha mode = DELIVER, aggiorna una finalità con tutti i campi richiesti correttamente formattati. La richiesta va a buon fine.
