@@ -26,7 +26,7 @@ Feature: Aggiornamento bozza nuova finalità in erogazione diretta
   Scenario Outline: Per una finalità precedentemente creata dal fruitore, la quale prima versione è in qualsiasi stato (DRAFT, WAITING_FOR_APPROVAL, ACTIVE, SUSPENDED, ARCHIVED), alla richiesta di lettura, va a buon fine
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
-    Given l'utente ha già creato una finalità in stato "<statoFinalita>" per quell'eservice
+    Given un "admin" di "PA1" ha già creato una finalità in stato "<statoFinalita>" per quell'eservice
     When l'utente richiede la lettura della finalità
     Then si ottiene status code 200
 
