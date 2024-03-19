@@ -2,7 +2,6 @@ import { Given, When } from "@cucumber/cucumber";
 import { z } from "zod";
 import {
   assertContextSchema,
-  assertValidResponse,
   getAuthorizationHeader,
   getOrganizationId,
   getToken,
@@ -16,33 +15,6 @@ import {
   AgreementState,
   EServiceDescriptorState,
 } from "../../../api/models";
-
-Given(
-  "{string} possiede un attributo certificato",
-  async function (tenantType: TenantType) {
-    assertContextSchema(this);
-    const tenantId = getOrganizationId(tenantType);
-    const token = getToken(this.tokens, tenantType, "admin");
-
-    const response = await apiClient.tenants.getCertifiedAttributes(
-      tenantId,
-      getAuthorizationHeader(token)
-    );
-    assertValidResponse(response);
-    const { attributes } = response.data;
-
-    const notRevokedAttributes = attributes.filter(
-      (attr) => !attr.revocationTimestamp
-    );
-
-    if (notRevokedAttributes.length === 0) {
-      throw new Error(`No certified attributes found for ${tenantType}`);
-    }
-
-    this.attributeId = notRevokedAttributes[0].id;
-    this.requiredCertifiedAttributes = [[notRevokedAttributes[0].id]];
-  }
-);
 
 Given(
   "un {string} di {string} ha già creato un e-service in stato {string} che richiede quell'attributo certificato con approvazione {string}",
@@ -115,26 +87,6 @@ Given(
     this.attributeId = await dataPreparationService.createAttribute(
       token,
       "CERTIFIED"
-    );
-  }
-);
-
-Given(
-  "{string} ha creato un attributo certificato e lo ha assegnato a {string}",
-  async function (certifier: TenantType, tenantType: TenantType) {
-    assertContextSchema(this);
-    const token = getToken(this.tokens, certifier, "admin");
-
-    const tenantId = getOrganizationId(tenantType);
-    this.attributeId = await dataPreparationService.createAttribute(
-      token,
-      "CERTIFIED"
-    );
-
-    await dataPreparationService.assignCertifiedAttributeToTenant(
-      token,
-      tenantId,
-      this.attributeId
     );
   }
 );

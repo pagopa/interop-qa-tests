@@ -53,31 +53,6 @@ Given(
 );
 
 Given(
-  "{string} possiede un attributo dichiarato",
-  async function (tenantType: TenantType) {
-    assertContextSchema(this);
-    const tenantId = getOrganizationId(tenantType);
-    const token = getToken(this.tokens, tenantType, "admin");
-
-    const response = await apiClient.tenants.getDeclaredAttributes(
-      tenantId,
-      getAuthorizationHeader(token)
-    );
-    const { attributes } = response.data;
-
-    const declaredAttributes = attributes.filter(
-      (attr) => !attr.revocationTimestamp
-    );
-
-    if (declaredAttributes.length === 0) {
-      throw new Error(`No declared attributes found for ${tenantType}`);
-    }
-
-    this.requiredDeclaredAttributes = [[declaredAttributes[0].id]];
-  }
-);
-
-Given(
   "un {string} di {string} ha già creato un e-service in stato {string} che richiede quegli attributi con approvazione {string}",
   async function (
     role: Role,
