@@ -10,6 +10,7 @@ import {
 import {
   EServiceDescriptorState,
   AgreementApprovalPolicy,
+  AgreementState,
 } from "../../../api/models";
 
 Given(
