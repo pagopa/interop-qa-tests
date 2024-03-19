@@ -45,7 +45,7 @@ jobs:
       - name: Check unused steps
         run: |
           export DRY_RUN=true;
-          pnpm bun:check-steps --format usage |
+          pnpm bun:check-steps:usage |
           if grep "UNUSED"; then 
             exit 1
           fi
