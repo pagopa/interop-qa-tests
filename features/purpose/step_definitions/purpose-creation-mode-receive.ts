@@ -12,6 +12,7 @@ import {
 } from "../../../utils/commons";
 import { dataPreparationService } from "../../../services/data-preparation.service";
 import { apiClient } from "../../../api";
+import { AgreementApprovalPolicy } from "../../../api/models";
 
 Given(
   "un {string} di {string} ha già creato un'analisi del rischio per quell'e-service",
@@ -101,7 +102,14 @@ Given(
 
 Given(
   "un {string} di {string} ha già creato un e-service in modalità RECEIVE in stato DRAFT che richiede quell'attributo certificato con approvazione {string}",
-  async function (role: Role, tenantType: TenantType) {
+  async function (
+    role: Role,
+    tenantType: TenantType,
+    approvalPolicy: AgreementApprovalPolicy
+  ) {
+    assertContextSchema(this, {
+      attributeId: z.string(),
+    });
     const token = getToken(this.tokens, tenantType, role);
     this.eserviceId = await dataPreparationService.createEService(token, {
       mode: "RECEIVE",
@@ -109,14 +117,33 @@ Given(
 
     this.descriptorId = await dataPreparationService.createDraftDescriptor(
       token,
-      this.eserviceId
+      this.eserviceId,
+      {
+        agreementApprovalPolicy: approvalPolicy,
+        attributes: {
+          certified: [
+            [
+              {
+                id: this.attributeId,
+                explicitAttributeVerification: true,
+              },
+            ],
+          ],
+          declared: [],
+          verified: [],
+        },
+      }
     );
   }
 );
 
 Given(
-  "un {string} di {string} ha già creato un e-service in stato DRAFT in modalità RECEIVE con approvazione MANUAL",
-  async function (role: Role, tenantType: TenantType) {
+  "un {string} di {string} ha già creato un e-service in stato DRAFT in modalità RECEIVE con approvazione {string}",
+  async function (
+    role: Role,
+    tenantType: TenantType,
+    approvalPolicy: AgreementApprovalPolicy
+  ) {
     assertContextSchema(this);
     const token = getToken(this.tokens, tenantType, role);
     this.eserviceId = await dataPreparationService.createEService(token, {
@@ -127,7 +154,7 @@ Given(
       token,
       this.eserviceId,
       {
-        agreementApprovalPolicy: "MANUAL",
+        agreementApprovalPolicy: approvalPolicy,
       }
     );
   }
