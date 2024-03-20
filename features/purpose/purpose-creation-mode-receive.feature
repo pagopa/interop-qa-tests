@@ -130,7 +130,7 @@ Feature: Creazione finalità per e-service in erogazione inversa
     Then si ottiene status code 400
 
   @purpose_creation_receive8
-  Scenario Outline: Un utente con sufficienti permessi (admin); il cui ente ha già una richiesta di fruizione in stato ACTIVE per una versione di e-service, il quale ha mode = RECEIVE, crea una nuova finalità con tutti i campi richiesti correttamente formattati, con in aggiunta una riskAnalysis formattata correttamente. Ottiene un errore (NB: verificare status code). Spiega: non è possibile inserire una riskAnalysis in un endpoint di erogazione inversa, va usato il riskAnalysisId di una delle riskAnalysis compilate dall'erogatore.
+  Scenario Outline: Un utente con sufficienti permessi (admin); il cui ente ha già una richiesta di fruizione in stato ACTIVE per una versione di e-service, il quale ha mode = RECEIVE, crea una nuova finalità con tutti i campi richiesti correttamente formattati, con in aggiunta un riskAnalysisId diverso da uno di quelli delle riskAnalysis create dall'erogatore. Ottiene un errore (NB: verificare status code).
     Given l'utente è un "admin" di "PA2"
     Given un "admin" di "PA1" ha già creato un e-service in modalità "RECEIVE" con un descrittore in stato "DRAFT"
     Given un "admin" di "PA1" ha già creato un'analisi del rischio per quell'e-service
