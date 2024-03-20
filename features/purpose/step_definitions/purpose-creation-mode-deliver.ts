@@ -48,12 +48,12 @@ Given(
     assertContextSchema(this, {
       eserviceId: z.string(),
     });
-
+    this.purposesIds = [];
     const token = getToken(this.tokens, tenantType, role);
     const consumerId = getOrganizationId(tenantType);
 
     for (let index = 0; index < n; index++) {
-      await dataPreparationService.createPurpose(
+      const purposeId = await dataPreparationService.createPurpose(
         token,
         purposeState,
         this.TEST_SEED,
@@ -62,7 +62,9 @@ Given(
           consumerId,
         }
       );
+      this.purposesIds.push(purposeId);
     }
+    this.purposeId = this.purposesIds[0];
   }
 );
 

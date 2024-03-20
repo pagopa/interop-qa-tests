@@ -799,6 +799,7 @@ export const dataPreparationService = {
           ),
         (res) => res.status !== 404
       );
+      return purposeId;
     } else {
       throw Error("unhandled");
     }
