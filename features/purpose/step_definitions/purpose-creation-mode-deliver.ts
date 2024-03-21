@@ -38,6 +38,56 @@ When(
 );
 
 Given(
+  "{string} ha già creato una finalità per quell'e-service con tutti i campi richiesti correttamente formattati",
+  async function (tenantType: TenantType) {
+    assertContextSchema(this, {
+      token: z.string(),
+      eserviceId: z.string(),
+    });
+
+    const consumerId = getOrganizationId(tenantType);
+
+    const { title } = await dataPreparationService.createPurpose(
+      this.token,
+      "DRAFT",
+      this.TEST_SEED,
+      {
+        eserviceId: this.eserviceId,
+        consumerId,
+      }
+    );
+
+    this.purposeTitle = title;
+  }
+);
+
+When(
+  "l'utente crea una nuova finalità per quell'e-service con tutti i campi richiesti correttamente formattati e lo stesso nome della precedente",
+  async function () {
+    assertContextSchema(this, {
+      token: z.string(),
+      eserviceId: z.string(),
+      tenantType: TenantType,
+      purposeTitle: z.string(),
+    });
+
+    const consumerId = getOrganizationId(this.tenantType);
+    this.response = await apiClient.purposes.createPurpose(
+      {
+        eserviceId: this.eserviceId,
+        consumerId,
+        title: this.purposeTitle,
+        description: "description of the purpose - QA",
+        isFreeOfCharge: true,
+        freeOfChargeReason: "free of charge - QA",
+        dailyCalls: 5,
+      },
+      getAuthorizationHeader(this.token)
+    );
+  }
+);
+
+Given(
   "un {string} di {string} ha già creato {int} finalità in stato {string} per quell'eservice",
   async function (
     role: Role,

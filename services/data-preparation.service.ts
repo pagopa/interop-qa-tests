@@ -775,11 +775,12 @@ export const dataPreparationService = {
     purposeState: string,
     testSeed: string,
     payload: { eserviceId: string; consumerId: string }
-  ) {
+  ): Promise<{ purposeId: string; title: string }> {
     if (purposeState === "DRAFT") {
+      const title = `purpose title - QA - ${testSeed} - ${getRandomInt()}`;
       const response = await apiClient.purposes.createPurpose(
         {
-          title: `purpose title - QA - ${testSeed} - ${getRandomInt()}`,
+          title,
           description: "description of the purpose - QA",
           isFreeOfCharge: true,
           freeOfChargeReason: "free of charge - QA",
@@ -799,7 +800,11 @@ export const dataPreparationService = {
           ),
         (res) => res.status !== 404
       );
-      return purposeId;
+
+      return {
+        purposeId,
+        title,
+      };
     } else {
       throw Error("unhandled");
     }
