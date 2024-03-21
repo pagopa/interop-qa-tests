@@ -102,6 +102,10 @@ Given(
     this.purposesIds = [];
     const token = getToken(this.tokens, tenantType, role);
     const consumerId = getOrganizationId(tenantType);
+    const { riskAnalysisForm } = getRiskAnalysis({
+      completed: true,
+      tenantType,
+    });
 
     for (let index = 0; index < n; index++) {
       const { purposeId } = await dataPreparationService.createPurpose(
@@ -111,6 +115,7 @@ Given(
         {
           eserviceId: this.eserviceId,
           consumerId,
+          riskAnalysisForm,
         }
       );
       this.purposesIds.push(purposeId);

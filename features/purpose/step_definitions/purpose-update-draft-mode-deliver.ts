@@ -40,9 +40,9 @@ When(
       tenantType: this.tenantType,
       completed: true,
     }).riskAnalysisForm;
-    // TODO
-    // TMP: check if this is correct!
-    riskAnalysisForm.version = "4.0";
+    riskAnalysisForm.version = (Number(riskAnalysisForm.version) + 1).toFixed(
+      1
+    );
     this.response = await apiClient.purposes.updatePurpose(
       this.purposeId,
       {

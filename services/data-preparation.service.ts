@@ -17,6 +17,7 @@ import {
   AgreementApprovalPolicy,
   AttributeKind,
   Attribute,
+  RiskAnalysisForm,
 } from "./../api/models";
 
 export const ESERVICE_DAILY_CALLS: Readonly<{
@@ -782,23 +783,31 @@ export const dataPreparationService = {
     token: string,
     purposeState: string,
     testSeed: string,
-    payload: { eserviceId: string; consumerId: string }
+    payload: {
+      eserviceId: string;
+      consumerId: string;
+      riskAnalysisForm?: RiskAnalysisForm;
+    }
   ): Promise<{ purposeId: string; title: string }> {
     const title = `purpose title - QA - ${testSeed} - ${getRandomInt()}`;
+    const dailyCalls =
+      purposeState === "WAITING_FOR_APPROVAL"
+        ? ESERVICE_DAILY_CALLS.perConsumer + 1
+        : ESERVICE_DAILY_CALLS.perConsumer - 1;
+
     const response = await apiClient.purposes.createPurpose(
       {
         title,
         description: "description of the purpose - QA",
         isFreeOfCharge: true,
         freeOfChargeReason: "free of charge - QA",
-        dailyCalls:
-          purposeState === "WAITING_FOR_APPROVAL"
-            ? ESERVICE_DAILY_CALLS.perConsumer + 1
-            : ESERVICE_DAILY_CALLS.perConsumer - 1,
+        dailyCalls,
         ...payload,
       },
       getAuthorizationHeader(token)
     );
+
+    assertValidResponse(response);
 
     const purposeId = response.data.id;
 
@@ -807,17 +816,96 @@ export const dataPreparationService = {
         apiClient.purposes.getPurpose(purposeId, getAuthorizationHeader(token)),
       (res) => res.status !== 404
     );
+
     if (purposeState === "DRAFT") {
       return {
         purposeId,
         title,
       };
     }
-    // To implemente other states
-    return {
+
+    const responsePurpose = await apiClient.purposes.getPurpose(
       purposeId,
-      title,
-    };
+      getAuthorizationHeader(token)
+    );
+    assertValidResponse(responsePurpose);
+
+    const versionId = responsePurpose.data.currentVersion!.id;
+    const responseActivatePurpose =
+      await apiClient.purposes.activatePurposeVersion(
+        purposeId,
+        versionId,
+        getAuthorizationHeader(token)
+      );
+    assertValidResponse(responseActivatePurpose);
+
+    await makePolling(
+      () =>
+        apiClient.purposes.getPurpose(purposeId, getAuthorizationHeader(token)),
+      (res) =>
+        purposeState === "WAITING_FOR_APPROVAL"
+          ? res.data.waitingForApprovalVersion?.state === "WAITING_FOR_APPROVAL"
+          : res.data.currentVersion?.state === "ACTIVE"
+    );
+
+    if (purposeState === "ACTIVE" || purposeState === "WAITING_FOR_APPROVAL") {
+      return {
+        purposeId,
+        title,
+      };
+    }
+
+    if (purposeState === "SUSPENDED") {
+      const responseSuspendPurpose =
+        await apiClient.purposes.suspendPurposeVersion(
+          purposeId,
+          versionId,
+          getAuthorizationHeader(token)
+        );
+      assertValidResponse(responseSuspendPurpose);
+
+      await makePolling(
+        () =>
+          apiClient.purposes.getPurpose(
+            purposeId,
+            getAuthorizationHeader(token)
+          ),
+        (res) => res.data.currentVersion?.state === "SUSPENDED"
+      );
+      return {
+        purposeId,
+        title,
+      };
+    }
+
+    if (purposeState === "ARCHIVED") {
+      const responseArchivePurpose =
+        await apiClient.purposes.archivePurposeVersion(
+          purposeId,
+          versionId,
+          getAuthorizationHeader(token)
+        );
+
+      assertValidResponse(responseArchivePurpose);
+
+      await makePolling(
+        () =>
+          apiClient.purposes.getPurpose(
+            purposeId,
+            getAuthorizationHeader(token)
+          ),
+        (res) => res.data.currentVersion?.state === "ARCHIVED"
+      );
+
+      return {
+        purposeId,
+        title,
+      };
+    }
+
+    throw new Error(
+      `${purposeState} is not a valid state for purpose. Valid states are: DRAFT, ACTIVE, SUSPENDED, ARCHIVED, WAITING_FOR_APPROVAL`
+    );
   },
 
   async createPurposeForReceiveEservice(
