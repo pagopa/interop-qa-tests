@@ -19,6 +19,14 @@ import {
   Attribute,
 } from "./../api/models";
 
+export const ESERVICE_DAILY_CALLS: Readonly<{
+  total: number;
+  perConsumer: number;
+}> = {
+  total: 100,
+  perConsumer: 10,
+};
+
 export const dataPreparationService = {
   async createEService(
     token: string,
@@ -64,8 +72,8 @@ export const dataPreparationService = {
       description: "Questo è un e-service di test",
       audience: ["api/v1"],
       voucherLifespan: 60,
-      dailyCallsPerConsumer: 10,
-      dailyCallsTotal: 100,
+      dailyCallsPerConsumer: ESERVICE_DAILY_CALLS.perConsumer,
+      dailyCallsTotal: ESERVICE_DAILY_CALLS.total,
       agreementApprovalPolicy: "AUTOMATIC",
       attributes: {
         certified: [],
@@ -775,39 +783,37 @@ export const dataPreparationService = {
     purposeState: string,
     testSeed: string,
     payload: { eserviceId: string; consumerId: string }
-  ): Promise<{ purposeId: string; title: string }> {
+  ): Promise<{ purposeId: string; title: string } | undefined> {
+    const title = `purpose title - QA - ${testSeed} - ${getRandomInt()}`;
+    const response = await apiClient.purposes.createPurpose(
+      {
+        title,
+        description: "description of the purpose - QA",
+        isFreeOfCharge: true,
+        freeOfChargeReason: "free of charge - QA",
+        dailyCalls:
+          purposeState === "WAITING_FOR_APPROVAL"
+            ? ESERVICE_DAILY_CALLS.perConsumer + 1
+            : ESERVICE_DAILY_CALLS.perConsumer - 1,
+        ...payload,
+      },
+      getAuthorizationHeader(token)
+    );
+
+    const purposeId = response.data.id;
+
+    await makePolling(
+      () =>
+        apiClient.purposes.getPurpose(purposeId, getAuthorizationHeader(token)),
+      (res) => res.status !== 404
+    );
     if (purposeState === "DRAFT") {
-      const title = `purpose title - QA - ${testSeed} - ${getRandomInt()}`;
-      const response = await apiClient.purposes.createPurpose(
-        {
-          title,
-          description: "description of the purpose - QA",
-          isFreeOfCharge: true,
-          freeOfChargeReason: "free of charge - QA",
-          dailyCalls: 5,
-          ...payload,
-        },
-        getAuthorizationHeader(token)
-      );
-
-      const purposeId = response.data.id;
-
-      await makePolling(
-        () =>
-          apiClient.purposes.getPurpose(
-            purposeId,
-            getAuthorizationHeader(token)
-          ),
-        (res) => res.status !== 404
-      );
-
       return {
         purposeId,
         title,
       };
-    } else {
-      throw Error("unhandled");
     }
+    // To implemente other states
   },
 
   async createPurposeForReceiveEservice(
@@ -825,7 +831,7 @@ export const dataPreparationService = {
         description: "description of the purpose - QA",
         isFreeOfCharge: true,
         freeOfChargeReason: "free of charge - QA",
-        dailyCalls: 5,
+        dailyCalls: ESERVICE_DAILY_CALLS.perConsumer - 1,
         ...payload,
       },
       getAuthorizationHeader(token)

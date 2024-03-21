@@ -6,6 +6,7 @@ import {
   getRiskAnalysis,
 } from "../../../utils/commons";
 import { apiClient } from "../../../api";
+import { ESERVICE_DAILY_CALLS } from "../../../services/data-preparation.service";
 
 When(
   "l'utente aggiorna quella finalità per quell'e-service in erogazione diretta",
@@ -21,7 +22,7 @@ When(
         description: "some new description",
         isFreeOfCharge: true,
         freeOfChargeReason: "some new free of charge reason",
-        dailyCalls: 5,
+        dailyCalls: ESERVICE_DAILY_CALLS.perConsumer - 1,
       },
       getAuthorizationHeader(this.token)
     );
@@ -49,7 +50,7 @@ When(
         description: "some new description",
         isFreeOfCharge: true,
         freeOfChargeReason: "some new free of charge reason",
-        dailyCalls: 5,
+        dailyCalls: ESERVICE_DAILY_CALLS.perConsumer - 1,
         riskAnalysisForm,
       },
       getAuthorizationHeader(this.token)

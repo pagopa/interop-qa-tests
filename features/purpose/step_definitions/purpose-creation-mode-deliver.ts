@@ -11,6 +11,7 @@ import {
 import { apiClient } from "../../../api";
 import { Role, TenantType } from "../../common-steps";
 import { dataPreparationService } from "../../../services/data-preparation.service";
+import { ESERVICE_DAILY_CALLS } from "./../../../services/data-preparation.service";
 
 When(
   "l'utente crea una nuova finalità per quell'e-service con tutti i campi richiesti correttamente formattati",
@@ -30,7 +31,7 @@ When(
         description: "description of the purpose - QA",
         isFreeOfCharge: true,
         freeOfChargeReason: "free of charge - QA",
-        dailyCalls: 5,
+        dailyCalls: ESERVICE_DAILY_CALLS.perConsumer - 1,
       },
       getAuthorizationHeader(this.token)
     );
@@ -80,7 +81,7 @@ When(
         description: "description of the purpose - QA",
         isFreeOfCharge: true,
         freeOfChargeReason: "free of charge - QA",
-        dailyCalls: 5,
+        dailyCalls: ESERVICE_DAILY_CALLS.perConsumer - 1,
       },
       getAuthorizationHeader(this.token)
     );
@@ -103,7 +104,7 @@ Given(
     const consumerId = getOrganizationId(tenantType);
 
     for (let index = 0; index < n; index++) {
-      const purposeId = await dataPreparationService.createPurpose(
+      const { purposeId } = await dataPreparationService.createPurpose(
         token,
         purposeState,
         this.TEST_SEED,
@@ -153,7 +154,7 @@ When(
         description: "description of the purpose - QA",
         isFreeOfCharge: true,
         freeOfChargeReason: undefined,
-        dailyCalls: 5,
+        dailyCalls: ESERVICE_DAILY_CALLS.perConsumer - 1,
       },
       getAuthorizationHeader(this.token)
     );
@@ -178,7 +179,7 @@ When(
         description: "description of the purpose - QA",
         isFreeOfCharge: true,
         freeOfChargeReason: "free of charge - QA",
-        dailyCalls: 5,
+        dailyCalls: ESERVICE_DAILY_CALLS.perConsumer - 1,
         riskAnalysisForm: getRiskAnalysis({
           tenantType: "PA1",
           completed: false,
@@ -214,7 +215,7 @@ When(
         description: "description of the purpose - QA",
         isFreeOfCharge: true,
         freeOfChargeReason: "free of charge - QA",
-        dailyCalls: 5,
+        dailyCalls: ESERVICE_DAILY_CALLS.perConsumer - 1,
         riskAnalysisForm: {
           ...riskAnalysisForm,
           version: outdatedVersion,
