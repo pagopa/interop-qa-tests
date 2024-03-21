@@ -14,16 +14,21 @@ Feature: Creazione finalità per e-service in erogazione inversa
 
     Examples: 
       | ente | ruolo        | risultato |
-      | PA1  | admin        |       200 |
-      | PA1  | api          |       403 |
-      | PA1  | security     |       403 |
-      | PA1  | api,security |       403 |
-      | PA1  | support      |       403 |
-      | GSP  | admin        |       200 |
-      | GSP  | api          |       403 |
-      | GSP  | security     |       403 |
-      | GSP  | api,security |       403 |
-      | GSP  | support      |       403 |
+      | PA1     | admin        |       200 |
+      | PA1     | api          |       403 |
+      | PA1     | security     |       403 |
+      | PA1     | api,security |       403 |
+      | PA1     | support      |       403 |
+      | GSP     | admin        |       200 |
+      | GSP     | api          |       403 |
+      | GSP     | security     |       403 |
+      | GSP     | api,security |       403 |
+      | GSP     | support      |       403 |
+      | Privato | admin        |       200 |
+      | Privato | api          |       403 |
+      | Privato | security     |       403 |
+      | Privato | api,security |       403 |
+      | Privato | support      |       403 |
 
   @purpose_creation_receive2
   Scenario Outline: Un utente con sufficienti permessi (admin); il cui ente ha già una richiesta di fruizione in stato ACTIVE per una versione di e-service, il quale ha mode = RECEIVE, e una finalità già in stato DRAFT per lo stesso e-service, crea una nuova finalità con tutti i campi richiesti correttamente formattati. La richiesta va a buon fine. Spiega: è possibile creare più finalità sulla stessa richiesta di fruizione
