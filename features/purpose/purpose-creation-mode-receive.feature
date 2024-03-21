@@ -139,15 +139,3 @@ Feature: Creazione finalità per e-service in erogazione inversa
     Given "PA2" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     When l'utente crea una nuova finalità per quell'e-service associando una analisi del rischio diversa da quelle create dall'erogatore
     Then si ottiene status code 400
-
-  @purpose_creation_receive9
-  # Scenario Outline: Un utente con sufficienti permessi (admin); il cui ente ha già una richiesta di fruizione in stato ACTIVE per una versione di e-service, il quale ha mode = RECEIVE, crea una nuova finalità con tutti i campi richiesti correttamente formattati; la cui analisi del rischio scelta come riskAnalysisId non sia più l’ultima versione disponibile di riskAnalysis sulla piattaforma (es. l'erogatore ha compilato la riskAnalysis in v1, ma la corrente è la v2). Ottiene un errore (NB: verificare status code). Nota da Ruggero: qui sappiamo che c'è un buco di analisi lato nostro, non sono sicuro ritorni errore e non so come è gestito il caso, verifichiamolo assieme
-    #Given l'utente è un "admin" di "PA1"
-    #Given un "admin" di "PA1" ha già creato un e-service in modalità "RECEIVE" con un descrittore in stato "DRAFT"
-    #Given un "admin" di "PA1" ha già creato un'analisi del rischio per quell'e-service
-    #Given un "admin" di "PA1" ha già pubblicato quella versione di e-service
-    #Given "ente" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    #Given viene pubblicata una nuova versione dell'analisi del rischio
-    # Come gestire l'aggiunta di un nuovo template?
-    #When l'utente crea una nuova finalità per quell'e-service associando  l'analisi del rischio non aggiornata creata dall'erogatore con tutti i campi richiesti correttamente formattati
-    #Then si ottiene status code 400
