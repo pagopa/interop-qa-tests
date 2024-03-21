@@ -783,7 +783,7 @@ export const dataPreparationService = {
     purposeState: string,
     testSeed: string,
     payload: { eserviceId: string; consumerId: string }
-  ): Promise<{ purposeId: string; title: string } | undefined> {
+  ): Promise<{ purposeId: string; title: string }> {
     const title = `purpose title - QA - ${testSeed} - ${getRandomInt()}`;
     const response = await apiClient.purposes.createPurpose(
       {
@@ -814,6 +814,10 @@ export const dataPreparationService = {
       };
     }
     // To implemente other states
+    return {
+      purposeId,
+      title,
+    };
   },
 
   async createPurposeForReceiveEservice(
