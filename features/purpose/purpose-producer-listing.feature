@@ -25,7 +25,7 @@ Feature: Listing finalità lato erogatore
 
   @purpose-producer-listing2
   Scenario Outline: A fronte di 15 finalità in db e una richiesta di offset 12, restituisce solo 3 risultati (scopo del test è verificare il corretto funzionamento del parametro offset)
-    Given l'utente è un "admin di "PA1"
+    Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA1" ha già creato e pubblicato 1 e-service
     Given "PA2" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given un "admin" di "PA2" ha già creato 15 finalità in stato "ACTIVE" per quell'eservice
