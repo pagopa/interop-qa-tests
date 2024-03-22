@@ -81,25 +81,26 @@ When(
 );
 
 Given(
-  "l'utente ha già creato una finalità in stato \"DRAFT\" per quell'eservice associando quell'analisi del rischio creata dall'erogatore",
-  async function () {
+  "un {string} di {string} ha già creato una finalità in stato \"DRAFT\" per quell'eservice associando quell'analisi del rischio creata dall'erogatore",
+  async function (role: Role, tenantType: TenantType) {
     assertContextSchema(this, {
-      token: z.string(),
       eserviceId: z.string(),
       riskAnalysisId: z.string(),
     });
+    const token = getToken(this.tokens, tenantType, role);
 
-    const consumerId = getOrganizationId(this.tenantType);
+    const consumerId = getOrganizationId(tenantType);
 
-    await dataPreparationService.createPurposeForReceiveEservice(
-      this.token,
-      this.TEST_SEED,
-      {
-        eserviceId: this.eserviceId,
-        consumerId,
-        riskAnalysisId: this.riskAnalysisId,
-      }
-    );
+    this.purposeId =
+      await dataPreparationService.createPurposeForReceiveEservice(
+        token,
+        this.TEST_SEED,
+        {
+          eserviceId: this.eserviceId,
+          consumerId,
+          riskAnalysisId: this.riskAnalysisId,
+        }
+      );
   }
 );
 
