@@ -88,15 +88,16 @@ Given(
 
     const consumerId = getOrganizationId(tenantType);
 
-    await dataPreparationService.createPurposeForReceiveEservice(
-      token,
-      this.TEST_SEED,
-      {
-        eserviceId: this.eserviceId,
-        consumerId,
-        riskAnalysisId: this.riskAnalysisId,
-      }
-    );
+    this.purposeId =
+      await dataPreparationService.createPurposeForReceiveEservice(
+        token,
+        this.TEST_SEED,
+        {
+          eserviceId: this.eserviceId,
+          consumerId,
+          riskAnalysisId: this.riskAnalysisId,
+        }
+      );
   }
 );
 

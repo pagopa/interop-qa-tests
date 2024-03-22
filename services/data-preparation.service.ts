@@ -830,7 +830,7 @@ export const dataPreparationService = {
       },
       getAuthorizationHeader(token)
     );
-
+    assertValidResponse(response);
     const purposeId = response.data.id;
 
     await makePolling(
@@ -838,5 +838,6 @@ export const dataPreparationService = {
         apiClient.purposes.getPurpose(purposeId, getAuthorizationHeader(token)),
       (res) => res.status !== 404
     );
+    return purposeId;
   },
 };
