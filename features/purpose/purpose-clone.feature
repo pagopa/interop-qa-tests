@@ -2,8 +2,7 @@
 Feature: Clonazione di una finalità (fruitore)
 
   @purpose-clone-1a
-  Scenario Outline: 
-Un utente con sufficienti permessi (admin); il cui ente ha già una finalità in stato ACTIVE, per una versione di e-service, il quale ha mode = RECEIVE, clona una finalità. La richiesta va a buon fine.
+  Scenario Outline: Un utente con sufficienti permessi (admin); il cui ente ha già una finalità in stato ACTIVE, per una versione di e-service, il quale ha mode = RECEIVE, clona una finalità. La richiesta va a buon fine.
 
     Given l'utente è un "<ruolo>" di "<ente>"
     Given un "admin" di "PA2" ha già creato un e-service in modalità "RECEIVE" con un descrittore in stato "DRAFT"
@@ -11,7 +10,7 @@ Un utente con sufficienti permessi (admin); il cui ente ha già una finalità in
     Given un "admin" di "PA2" ha già caricato un'interfaccia per quel descrittore
     Given un "admin" di "PA2" ha già pubblicato quella versione di e-service
     Given "<ente>" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "<ruolo>" di "<ente>" ha già creato 1 finalità in stato "ACTIVE" per quell'e-service
+    Given un "<ruolo>" di "<ente>" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
     When l'utente richiede una operazione di clonazione della finalità
     Then si ottiene status code <risultato>
 
@@ -29,8 +28,7 @@ Un utente con sufficienti permessi (admin); il cui ente ha già una finalità in
       | GSP  | support      |       403 |
 
   @purpose-clone-1b
-  Scenario Outline: 
-Un utente con sufficienti permessi (admin); il cui ente ha già una finalità in stato WAITING_FOR_APPROVAL o SUSPENDED per una versione di e-service, il quale ha mode = RECEIVE, clona una finalità. La richiesta va a buon fine.
+  Scenario Outline: Un utente con sufficienti permessi (admin); il cui ente ha già una finalità in stato WAITING_FOR_APPROVAL o SUSPENDED per una versione di e-service, il quale ha mode = RECEIVE, clona una finalità. La richiesta va a buon fine.
 
     Given l'utente è un "admin di "PA1"
     Given un "admin" di "PA2" ha già creato un e-service in modalità "RECEIVE" con un descrittore in stato "DRAFT"
@@ -38,7 +36,7 @@ Un utente con sufficienti permessi (admin); il cui ente ha già una finalità in
     Given un "admin" di "PA2" ha già caricato un'interfaccia per quel descrittore
     Given un "admin" di "PA2" ha già pubblicato quella versione di e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin di "PA1" ha già creato 1 finalità in stato "<statoFinalita>" per quell'e-service
+    Given un "admin" di "PA1" ha già creato 1 finalità in stato "<statoFinalita>" per quell'eservice
     When l'utente richiede una operazione di clonazione della finalità
     Then si ottiene status code 200
 
@@ -55,7 +53,7 @@ Un utente con sufficienti permessi (admin); il cui ente ha già una finalità in
     Given un "admin" di "PA2" ha già caricato un'interfaccia per quel descrittore
     Given un "admin" di "PA2" ha già pubblicato quella versione di e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin di "PA1" ha già creato 1 finalità in stato "<statoFinalita>" per quell'e-service
+    Given un "admin" di "PA1" ha già creato 1 finalità in stato "<statoFinalita>" per quell'eservice
     When l'utente richiede una operazione di clonazione della finalità
     Then si ottiene status code 400
 
@@ -69,7 +67,7 @@ Un utente con sufficienti permessi (admin); il cui ente ha già una finalità in
     Given l'utente è un "admin di "PA1"
     Given un "admin" di "PA2" ha già creato e pubblicato un e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin di "PA1" ha già creato 1 finalità in stato "<statoFinalita>" per quell'e-service
+    Given un "admin" di "PA1" ha già creato 1 finalità in stato "<statoFinalita>" per quell'eservice
     When l'utente richiede una operazione di clonazione della finalità
     Then si ottiene status code 400
 
