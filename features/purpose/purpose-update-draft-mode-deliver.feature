@@ -11,10 +11,10 @@ Feature: Aggiornamento bozza nuova finalità in erogazione diretta
     Then si ottiene status code 200
 
     Examples: 
-      | ente    | ruolo | risultato |
-      | PA1     | admin |       200 |
-      | GSP     | admin |       200 |
-      | Privato | admin |       200 |
+      | ente    | ruolo |
+      | PA1     | admin |
+      | GSP     | admin |
+      | Privato | admin |
 
   @purpose_update_draft_mode_deliver2
   Scenario Outline: Un utente con sufficienti permessi (admin); il cui ente ha già una finalità in stato NON DRAFT (ACTIVE, SUSPENDED, WAITING_FOR_APPROVAL o ARCHIVED) per una versione di e-service, il quale ha mode = DELIVER, aggiorna una finalità con tutti i campi richiesti correttamente formattati. Ottiene un errore (NB: verificare status code).
