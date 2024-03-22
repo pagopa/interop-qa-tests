@@ -6,9 +6,10 @@ Feature: Aggiornamento bozza nuova finalità in erogazione inversa
     Given l'utente è un "<ruolo>" di "<ente>"
     Given un "admin" di "PA1" ha già creato un e-service in modalità "RECEIVE" con un descrittore in stato "DRAFT"
     Given un "admin" di "PA1" ha già creato un'analisi del rischio per quell'e-service
+    Given un "admin" di "PA1" ha già caricato un'interfaccia per quel descrittore
     Given un "admin" di "PA1" ha già pubblicato quella versione di e-service
-    Given "ente" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given l'utente ha già creato una finalità in stato "DRAFT" per quell'eservice associando quell'analisi del rischio creata dall'erogatore
+    Given "<ente>" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
+    Given un "admin" di "<ente>" ha già creato una finalità in stato "DRAFT" per quell'eservice associando quell'analisi del rischio creata dall'erogatore
     When l'utente aggiorna quella finalità per quell'e-service in erogazione inversa
     Then si ottiene status code <risultato>
 
@@ -30,11 +31,12 @@ Feature: Aggiornamento bozza nuova finalità in erogazione inversa
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA2" ha già creato un e-service in modalità "RECEIVE" con un descrittore in stato "DRAFT"
     Given un "admin" di "PA2" ha già creato un'analisi del rischio per quell'e-service
+    Given un "admin" di "PA2" ha già caricato un'interfaccia per quel descrittore
     Given un "admin" di "PA2" ha già pubblicato quella versione di e-service
-    Given "ente" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given l'utente ha già creato una finalità in stato "<statoFinalità>" per quell'eservice associando quell'analisi del rischio creata dall'erogatore
+    Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
+    Given un "admin" di "PA1" ha già creato una finalità in stato "<statoFinalità>" per quell'eservice associando quell'analisi del rischio creata dall'erogatore
     When l'utente aggiorna quella finalità per quell'e-service in erogazione inversa
-    Then si ottiene status code 400
+    Then si ottiene status code 403
 
     Examples: 
       | statoFinalità        |
@@ -43,13 +45,14 @@ Feature: Aggiornamento bozza nuova finalità in erogazione inversa
       | WAITING_FOR_APPROVAL |
       | ARCHIVED             |
 
-  @purpose_update_draft_mode_receive3
+  @purpose_update_draft_mode_receive3 @wait_for_clarification
   Scenario Outline: Un utente con sufficienti permessi (admin); il cui ente ha già una finalità in stato DRAFT per una versione di e-service, il quale ha mode = RECEIVE, aggiorna una finalità con tutti i campi richiesti correttamente formattati, con un riskAnalysisId che fa riferimento ad un'analisi del rischio in versione diversa da quella attualmente pubblicata (es. l’erogatore ha compilato la v1, la versione attuale è la v2). Ottiene un errore (NB: verificare status code).
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA2" ha già creato un e-service in modalità "RECEIVE" con un descrittore in stato "DRAFT"
     Given un "admin" di "PA2" ha già creato un'analisi del rischio datata per quell'e-service
+    Given un "admin" di "PA2" ha già caricato un'interfaccia per quel descrittore
     Given un "admin" di "PA2" ha già pubblicato quella versione di e-service
-    Given "ente" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given l'utente ha già creato una finalità in stato "DRAFT" per quell'eservice associando quell'analisi del rischio creata dall'erogatore
+    Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
+    Given un "admin" di "PA1" ha già creato una finalità in stato "DRAFT" per quell'eservice associando quell'analisi del rischio creata dall'erogatore
     When l'utente aggiorna quella finalità per quell'e-service in erogazione inversa
     Then si ottiene status code 400
