@@ -65,7 +65,7 @@ Feature: Clonazione di una finalità (fruitore)
   @purpose-clone-3
   Scenario Outline: Un utente con sufficienti permessi (admin); il cui ente ha già una finalità in stato WAITING_FOR_APPROVAL, ACTIVE, o SUSPENDED per una versione di e-service, il quale ha mode = DELIVER, clona una finalità. La richiesta va a buon fine. Spiega: visto che ci sono problemi legati all’analisi del rischio in erogazione inversa, non è possibile clonare una finalità che faccia riferimento a un e-service in erogazione inversa. (Che vuol dire "spiega" sembra che tutti gli altri test siano implementati seguendo questa logica)
     Given l'utente è un "admin" di "PA1"
-    Given un "admin" di "PA2" ha già creato e pubblicato un e-service
+    Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given un "admin" di "PA1" ha già creato 1 finalità in stato "<statoFinalita>" per quell'eservice
     When l'utente richiede una operazione di clonazione della finalità
