@@ -10,8 +10,11 @@ import {
 } from "../../../utils/commons";
 import { apiClient } from "../../../api";
 import { Role, TenantType } from "../../common-steps";
-import { dataPreparationService } from "../../../services/data-preparation.service";
-import { ESERVICE_DAILY_CALLS } from "./../../../services/data-preparation.service";
+import {
+  dataPreparationService,
+  ESERVICE_DAILY_CALLS,
+} from "../../../services/data-preparation.service";
+import { PurposeVersionState } from "../../../api/models";
 
 When(
   "l'utente crea una nuova finalità per quell'e-service con tutti i campi richiesti correttamente formattati",
@@ -42,22 +45,24 @@ Given(
   "{string} ha già creato una finalità per quell'e-service con tutti i campi richiesti correttamente formattati",
   async function (tenantType: TenantType) {
     assertContextSchema(this, {
-      token: z.string(),
       eserviceId: z.string(),
     });
 
+    const token = getToken(this.tokens, tenantType, "admin");
     const consumerId = getOrganizationId(tenantType);
 
-    const { title } = await dataPreparationService.createPurpose(
-      this.token,
-      "DRAFT",
-      this.TEST_SEED,
-      {
+    const title = `purpose title - QA - ${this.TEST_SEED} - ${getRandomInt()}`;
+    this.purposeId = await dataPreparationService.createPurposeWithGivenState({
+      token,
+      testSeed: this.TEST_SEED,
+      eserviceMode: "DELIVER",
+      payload: {
+        title,
         eserviceId: this.eserviceId,
         consumerId,
-      }
-    );
-
+      },
+      purposeState: "DRAFT",
+    });
     this.purposeTitle = title;
   }
 );
@@ -94,12 +99,11 @@ Given(
     role: Role,
     tenantType: TenantType,
     n: number,
-    purposeState: string
+    purposeState: PurposeVersionState
   ) {
     assertContextSchema(this, {
       eserviceId: z.string(),
     });
-    this.purposesIds = [];
     const token = getToken(this.tokens, tenantType, role);
     const consumerId = getOrganizationId(tenantType);
     const { riskAnalysisForm } = getRiskAnalysis({
@@ -107,17 +111,20 @@ Given(
       tenantType,
     });
 
+    this.purposesIds = [];
     for (let index = 0; index < n; index++) {
-      const { purposeId } = await dataPreparationService.createPurpose(
-        token,
-        purposeState,
-        this.TEST_SEED,
-        {
-          eserviceId: this.eserviceId,
-          consumerId,
-          riskAnalysisForm,
-        }
-      );
+      const purposeId =
+        await dataPreparationService.createPurposeWithGivenState({
+          token,
+          testSeed: this.TEST_SEED,
+          eserviceMode: "DELIVER",
+          payload: {
+            eserviceId: this.eserviceId,
+            consumerId,
+            riskAnalysisForm,
+          },
+          purposeState,
+        });
       this.purposesIds.push(purposeId);
     }
     this.purposeId = this.purposesIds[0];

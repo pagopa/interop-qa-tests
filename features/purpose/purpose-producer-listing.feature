@@ -77,7 +77,7 @@ Restituisce le finalità che sono in uno o più specifici stati (es. ACTIVE e SU
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA1" ha già creato e pubblicato 1 e-service
     Given "PA2" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "PA2" ha già creato 1 finalità in stato "ACTIVE" per quell'e-service
+    Given un "admin" di "PA2" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
     Given "GSP" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given un "admin" di "GSP" ha già creato 1 finalità in stato "SUSPENDED" per quell'eservice
     When l'utente erogatore richiede una operazione di listing delle finalità in stato "<statoFinalita>"
