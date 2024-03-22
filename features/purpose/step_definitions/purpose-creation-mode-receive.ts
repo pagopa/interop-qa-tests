@@ -15,7 +15,10 @@ import {
   dataPreparationService,
 } from "../../../services/data-preparation.service";
 import { apiClient } from "../../../api";
-import { AgreementApprovalPolicy } from "../../../api/models";
+import {
+  AgreementApprovalPolicy,
+  PurposeVersionState,
+} from "../../../api/models";
 
 Given(
   "un {string} di {string} ha già creato un'analisi del rischio per quell'e-service",
@@ -81,26 +84,31 @@ When(
 );
 
 Given(
-  "un {string} di {string} ha già creato una finalità in stato \"DRAFT\" per quell'eservice associando quell'analisi del rischio creata dall'erogatore",
-  async function (role: Role, tenantType: TenantType) {
+  "un {string} di {string} ha già creato una finalità in stato {string} per quell'eservice associando quell'analisi del rischio creata dall'erogatore",
+  async function (
+    role: Role,
+    tenantType: TenantType,
+    purposeState: PurposeVersionState
+  ) {
     assertContextSchema(this, {
       eserviceId: z.string(),
       riskAnalysisId: z.string(),
     });
-    const token = getToken(this.tokens, tenantType, role);
 
+    const token = getToken(this.tokens, tenantType, role);
     const consumerId = getOrganizationId(tenantType);
 
-    this.purposeId =
-      await dataPreparationService.createPurposeForReceiveEservice(
-        token,
-        this.TEST_SEED,
-        {
-          eserviceId: this.eserviceId,
-          consumerId,
-          riskAnalysisId: this.riskAnalysisId,
-        }
-      );
+    this.purposeId = await dataPreparationService.createPurposeWithGivenState({
+      token,
+      testSeed: this.TEST_SEED,
+      payload: {
+        eserviceId: this.eserviceId,
+        consumerId,
+        riskAnalysisId: this.riskAnalysisId,
+      },
+      purposeState,
+      eserviceMode: "RECEIVE",
+    });
   }
 );
 
