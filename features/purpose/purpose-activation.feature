@@ -7,7 +7,8 @@ Feature: Attivazione e riattivazione di una finalità
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
     Given "<ente>" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given un "admin" di "<ente>" ha già creato 1 finalità in stato "SUSPENDED" per quell'eservice
-    When l'utente riattiva la finalità per quell'e-service # Implementare in modo da poter scrivere sia "riattiva" che "attiva"
+    When l'utente riattiva la finalità per quell'e-service
+    # Implementare in modo da poter scrivere sia "riattiva" che "attiva"
     Then si ottiene status code <risultato>
 
     Examples: 
@@ -62,7 +63,7 @@ Feature: Attivazione e riattivazione di una finalità
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given un "admin" di "PA1" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
     Given "PA2" ha già portato la finalità in stato "SUSPENDED"
-    Given "PA1" ha già richiesto la modifica della stima di carico per quella finalità, superando la soglia dell'erogatore
+    Given "PA1" ha già richiesto l'aggiornamento della stima di carico superando i limiti di quell'e-service
     When l'utente riattiva la finalità per quell'e-service
     Then si ottiene status code 200
 
@@ -72,9 +73,10 @@ Feature: Attivazione e riattivazione di una finalità
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given un "admin" di "PA1" ha già creato 1 finalità in stato "SUSPENDED" per quell'eservice
-    Given "PA1" ha già richiesto la modifica della stima di carico per quella finalità, superando la soglia dell'erogatore
+    Given "PA1" ha già richiesto l'aggiornamento della stima di carico superando i limiti di quell'e-service
     When l'utente riattiva la finalità per quell'e-service
-    Then si ottiene status code 200 e si verifica che la finalità sia in stato "WAITING_FOR_APPROVAL" # Controllare la waitingForApprovalVersion
+    Then si ottiene status code 200 e si verifica che la finalità sia in stato WAITING_FOR_APPROVAL
+    # Controllare la waitingForApprovalVersion
 
   @purpose_activation7
   Scenario Outline: Per una finalità precedentemente creata da un fruitore e che è in stato DRAFT, REJECTED o ARCHIVED, alla richiesta di attivazione da parte di un utente con sufficienti permessi (admin) dell’ente erogatore, ottiene un errore (NB: verificare status code)
