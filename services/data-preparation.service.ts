@@ -814,21 +814,17 @@ export const dataPreparationService = {
           : ESERVICE_DAILY_CALLS.perConsumer,
     };
 
+    const data = { ...defaultValues, ...payload };
+
     // 1. Check which mode the eservice is and call the correct endpoint
     if (eserviceMode === "RECEIVE") {
       response = await apiClient.reverse.createPurposeForReceiveEservice(
-        {
-          ...defaultValues,
-          ...(payload as PurposeEServiceSeed),
-        },
+        data as PurposeEServiceSeed,
         getAuthorizationHeader(token)
       );
     } else {
       response = await apiClient.purposes.createPurpose(
-        {
-          ...defaultValues,
-          ...(payload as PurposeSeed),
-        },
+        data as PurposeSeed,
         getAuthorizationHeader(token)
       );
     }
@@ -841,20 +837,11 @@ export const dataPreparationService = {
       (res) => res.status !== 404
     );
 
-    // 2. If the state required is DRAFT or WAITING_FOR_APPROVAL, poll until the purpose is in the desired state and return
-    if (purposeState === "WAITING_FOR_APPROVAL" || purposeState === "DRAFT") {
-      await makePolling(
-        () =>
-          apiClient.purposes.getPurpose(
-            purposeId,
-            getAuthorizationHeader(token)
-          ),
-        (res) => res.data.currentVersion?.state === purposeState
-      );
+    if (purposeState === "DRAFT") {
       return purposeId;
     }
 
-    // 3. In order to continue, we need the versionId of the current version of the purpose, so we get it
+    // 2. In order to continue, we need the versionId of the current version of the purpose, so we get it
     const versionId = (
       await apiClient.purposes.getPurpose(
         purposeId,
@@ -866,12 +853,28 @@ export const dataPreparationService = {
       throw new Error(`Purpose version for id ${purposeId} not found`);
     }
 
-    // 4. Activate the purpose version
-    await apiClient.purposes.activatePurposeVersion(
-      purposeId,
-      versionId,
-      getAuthorizationHeader(token)
-    );
+    // 3. Activate the purpose version
+    const activatePurposeReponse =
+      await apiClient.purposes.activatePurposeVersion(
+        purposeId,
+        versionId,
+        getAuthorizationHeader(token)
+      );
+    assertValidResponse(activatePurposeReponse);
+
+    // 4. If the state required is WAITING_FOR_APPROVAL, we need to wait until the purpose version is in that state and return the purposeId
+    if (purposeState === "WAITING_FOR_APPROVAL") {
+      await makePolling(
+        () =>
+          apiClient.purposes.getPurpose(
+            purposeId,
+            getAuthorizationHeader(token)
+          ),
+        (res) =>
+          res.data.waitingForApprovalVersion?.state === "WAITING_FOR_APPROVAL"
+      );
+      return purposeId;
+    }
 
     await makePolling(
       () =>
@@ -881,11 +884,13 @@ export const dataPreparationService = {
 
     // 5. If the state required is SUSPENDED call the endpoint to suspend the purpose version
     if (purposeState === "SUSPENDED") {
-      await apiClient.purposes.suspendPurposeVersion(
-        purposeId,
-        versionId,
-        getAuthorizationHeader(token)
-      );
+      const suspendPurposeResponse =
+        await apiClient.purposes.suspendPurposeVersion(
+          purposeId,
+          versionId,
+          getAuthorizationHeader(token)
+        );
+      assertValidResponse(suspendPurposeResponse);
       await makePolling(
         () =>
           apiClient.purposes.getPurpose(
@@ -898,11 +903,13 @@ export const dataPreparationService = {
 
     // 6. If the state required is ARCHIVED call the endpoint to archive the purpose version
     if (purposeState === "ARCHIVED") {
-      await apiClient.purposes.archivePurposeVersion(
-        purposeId,
-        versionId,
-        getAuthorizationHeader(token)
-      );
+      const archivePurposeResponse =
+        await apiClient.purposes.archivePurposeVersion(
+          purposeId,
+          versionId,
+          getAuthorizationHeader(token)
+        );
+      assertValidResponse(archivePurposeResponse);
       await makePolling(
         () =>
           apiClient.purposes.getPurpose(

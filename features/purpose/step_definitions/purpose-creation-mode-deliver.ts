@@ -104,7 +104,6 @@ Given(
     assertContextSchema(this, {
       eserviceId: z.string(),
     });
-    this.purposesIds = [];
     const token = getToken(this.tokens, tenantType, role);
     const consumerId = getOrganizationId(tenantType);
     const { riskAnalysisForm } = getRiskAnalysis({
@@ -112,18 +111,21 @@ Given(
       tenantType,
     });
 
+    this.purposesIds = [];
     for (let index = 0; index < n; index++) {
-      await dataPreparationService.createPurposeWithGivenState({
-        token,
-        testSeed: this.TEST_SEED,
-        eserviceMode: "DELIVER",
-        payload: {
-          eserviceId: this.eserviceId,
-          consumerId,
-          riskAnalysisForm,
-        },
-        purposeState,
-      });
+      const purposeId =
+        await dataPreparationService.createPurposeWithGivenState({
+          token,
+          testSeed: this.TEST_SEED,
+          eserviceMode: "DELIVER",
+          payload: {
+            eserviceId: this.eserviceId,
+            consumerId,
+            riskAnalysisForm,
+          },
+          purposeState,
+        });
+      this.purposesIds.push(purposeId);
     }
     this.purposeId = this.purposesIds[0];
   }
