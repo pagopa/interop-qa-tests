@@ -6,8 +6,8 @@ Feature: Listing finalità lato erogatore
     Given l'utente è un "<ruolo>" di "<ente>"
     Given un "admin" di "<ente>" ha già creato e pubblicato 1 e-service
     Given "PA2" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "PA2" ha già creato 20 finalità in stato "ACTIVE" per quell'e-service
-    When l'utente erogatore richiede una operazione di listing delle finalità limitata ai primi 12 finalità
+    Given un "admin" di "PA2" ha già creato 20 finalità in stato "ACTIVE" per quell'eservice
+    When l'utente erogatore richiede una operazione di listing delle finalità limitata alle prime 12 finalità
     Then si ottiene status code <risultato> e la lista di 12 finalità
 
     Examples: 
@@ -28,7 +28,7 @@ Feature: Listing finalità lato erogatore
     Given l'utente è un "admin di "PA1"
     Given un "admin" di "PA1" ha già creato e pubblicato 1 e-service
     Given "PA2" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "PA2" ha già creato 15 finalità in stato "ACTIVE" per quell'e-service
+    Given un "admin" di "PA2" ha già creato 15 finalità in stato "ACTIVE" per quell'eservice
     When l'utente erogatore richiede una operazione di listing delle finalità con offset 12
     Then si ottiene status code 200 e la lista di 3 finalità
 
@@ -38,8 +38,8 @@ Feature: Listing finalità lato erogatore
     Given un "admin" di "PA1" ha già creato e pubblicato 1 e-service
     Given "PA2" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given "GSP" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "PA2" ha già creato 2 finalità in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "GSP" ha già creato 2 finalità in stato "ACTIVE" per quell'e-service
+    Given un "admin" di "PA2" ha già creato 2 finalità in stato "ACTIVE" per quell'eservice
+    Given un "admin" di "GSP" ha già creato 2 finalità in stato "ACTIVE" per quell'eservice
     When l'utente erogatore richiede una operazione di listing delle finalità sui propri e-service
     Then si ottiene status code 200 e la lista di 4 finalità
 
@@ -51,8 +51,8 @@ Restituisce le finalità che hanno per fruitore uno o più specifici enti (scopo
     Given un "admin" di "PA1" ha già creato e pubblicato 1 e-service
     Given "PA2" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given "GSP" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "PA2" ha già creato 2 finalità in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "GSP" ha già creato 2 finalità in stato "ACTIVE" per quell'e-service
+    Given un "admin" di "PA2" ha già creato 2 finalità in stato "ACTIVE" per quell'eservice
+    Given un "admin" di "GSP" ha già creato 2 finalità in stato "ACTIVE" per quell'eservice
     When l'utente erogatore richiede una operazione di listing delle finalità filtrata per fruitore "PA2"
     Then si ottiene status code 200 e la lista di 2 finalità
 
@@ -63,10 +63,10 @@ Restituisce le finalità associate ad alcuni specifici e-service (scopo del test
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA1" ha già creato e pubblicato 1 e-service
     Given "PA2" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "PA2" ha già creato 1 finalità in stato "ACTIVE" per quell'e-service
+    Given un "admin" di "PA2" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
     Given un "admin" di "PA1" ha già creato e pubblicato 1 e-service
     Given "GSP" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "GSP" ha già creato 1 finalità in stato "ACTIVE" per quell'e-service
+    Given un "admin" di "GSP" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
     When l'utente erogatore richiede una operazione di listing delle finalità filtrata per il primo e-service
     Then si ottiene status code 200 e la lista di 1 finalità
 
@@ -79,7 +79,7 @@ Restituisce le finalità che sono in uno o più specifici stati (es. ACTIVE e SU
     Given "PA2" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given un "admin" di "PA2" ha già creato 1 finalità in stato "ACTIVE" per quell'e-service
     Given "GSP" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "GSP" ha già creato 1 finalità in stato "SUSPENDED" per quell'e-service
+    Given un "admin" di "GSP" ha già creato 1 finalità in stato "SUSPENDED" per quell'eservice
     When l'utente erogatore richiede una operazione di listing delle finalità in stato "<statoFinalita>"
     Then si ottiene status code 200 e la lista di 1 finalità
 
