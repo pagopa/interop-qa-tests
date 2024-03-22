@@ -11,6 +11,7 @@ import {
 import { apiClient } from "../../../api";
 import { Role, TenantType } from "../../common-steps";
 import { dataPreparationService } from "../../../services/data-preparation.service";
+import { ESERVICE_DAILY_CALLS } from "./../../../services/data-preparation.service";
 
 When(
   "l'utente crea una nuova finalità per quell'e-service con tutti i campi richiesti correttamente formattati",
@@ -30,7 +31,57 @@ When(
         description: "description of the purpose - QA",
         isFreeOfCharge: true,
         freeOfChargeReason: "free of charge - QA",
-        dailyCalls: 5,
+        dailyCalls: ESERVICE_DAILY_CALLS.perConsumer - 1,
+      },
+      getAuthorizationHeader(this.token)
+    );
+  }
+);
+
+Given(
+  "{string} ha già creato una finalità per quell'e-service con tutti i campi richiesti correttamente formattati",
+  async function (tenantType: TenantType) {
+    assertContextSchema(this, {
+      token: z.string(),
+      eserviceId: z.string(),
+    });
+
+    const consumerId = getOrganizationId(tenantType);
+
+    const { title } = await dataPreparationService.createPurpose(
+      this.token,
+      "DRAFT",
+      this.TEST_SEED,
+      {
+        eserviceId: this.eserviceId,
+        consumerId,
+      }
+    );
+
+    this.purposeTitle = title;
+  }
+);
+
+When(
+  "l'utente crea una nuova finalità per quell'e-service con tutti i campi richiesti correttamente formattati e lo stesso nome della precedente",
+  async function () {
+    assertContextSchema(this, {
+      token: z.string(),
+      eserviceId: z.string(),
+      tenantType: TenantType,
+      purposeTitle: z.string(),
+    });
+
+    const consumerId = getOrganizationId(this.tenantType);
+    this.response = await apiClient.purposes.createPurpose(
+      {
+        eserviceId: this.eserviceId,
+        consumerId,
+        title: this.purposeTitle,
+        description: "description of the purpose - QA",
+        isFreeOfCharge: true,
+        freeOfChargeReason: "free of charge - QA",
+        dailyCalls: ESERVICE_DAILY_CALLS.perConsumer - 1,
       },
       getAuthorizationHeader(this.token)
     );
@@ -48,21 +99,28 @@ Given(
     assertContextSchema(this, {
       eserviceId: z.string(),
     });
-
+    this.purposesIds = [];
     const token = getToken(this.tokens, tenantType, role);
     const consumerId = getOrganizationId(tenantType);
+    const { riskAnalysisForm } = getRiskAnalysis({
+      completed: true,
+      tenantType,
+    });
 
     for (let index = 0; index < n; index++) {
-      await dataPreparationService.createPurpose(
+      const { purposeId } = await dataPreparationService.createPurpose(
         token,
         purposeState,
         this.TEST_SEED,
         {
           eserviceId: this.eserviceId,
           consumerId,
+          riskAnalysisForm,
         }
       );
+      this.purposesIds.push(purposeId);
     }
+    this.purposeId = this.purposesIds[0];
   }
 );
 
@@ -101,7 +159,7 @@ When(
         description: "description of the purpose - QA",
         isFreeOfCharge: true,
         freeOfChargeReason: undefined,
-        dailyCalls: 5,
+        dailyCalls: ESERVICE_DAILY_CALLS.perConsumer - 1,
       },
       getAuthorizationHeader(this.token)
     );
@@ -126,7 +184,7 @@ When(
         description: "description of the purpose - QA",
         isFreeOfCharge: true,
         freeOfChargeReason: "free of charge - QA",
-        dailyCalls: 5,
+        dailyCalls: ESERVICE_DAILY_CALLS.perConsumer - 1,
         riskAnalysisForm: getRiskAnalysis({
           tenantType: "PA1",
           completed: false,
@@ -162,7 +220,7 @@ When(
         description: "description of the purpose - QA",
         isFreeOfCharge: true,
         freeOfChargeReason: "free of charge - QA",
-        dailyCalls: 5,
+        dailyCalls: ESERVICE_DAILY_CALLS.perConsumer - 1,
         riskAnalysisForm: {
           ...riskAnalysisForm,
           version: outdatedVersion,
