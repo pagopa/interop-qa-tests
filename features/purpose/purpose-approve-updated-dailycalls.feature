@@ -7,7 +7,7 @@ Feature: Approvazione dell’aggiornamento di una stima di carico
     Given un "admin" di "<ente>" ha già creato e pubblicato 1 e-service
     Given "PA2" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given un "admin" di "PA2" ha già creato 1 finalità in stato "<statoFinalità>" per quell'eservice
-    Given "PA2" ha già richiesto la modifica della stima di carico per quella finalità, superando la soglia dell'erogatore
+    Given "PA1" ha già richiesto l'aggiornamento della stima di carico superando i limiti di quell'e-service
     When l'utente inserisce una data stimata di approvazione di quell'aggiornamento della stima di carico
     Then si ottiene status code <risultato>
 
@@ -39,7 +39,7 @@ Feature: Approvazione dell’aggiornamento di una stima di carico
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given un "admin" di "PA1" ha già creato 1 finalità in stato "<statoFinalità>" per quell'eservice
-    Given "PA1" ha già richiesto la modifica della stima di carico per quella finalità, superando la soglia dell'erogatore
+    Given "PA1" ha già richiesto l'aggiornamento della stima di carico superando i limiti di quell'e-service
     When l'utente inserisce una data stimata di approvazione di quell'aggiornamento della stima di carico
     Then si ottiene status code 409
 
@@ -54,7 +54,7 @@ Feature: Approvazione dell’aggiornamento di una stima di carico
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given un "admin" di "PA1" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
-    Given "PA1" ha già richiesto la modifica della stima di carico per quella finalità, superando la soglia dell'erogatore
+    Given "PA1" ha già richiesto l'aggiornamento della stima di carico superando i limiti di quell'e-service
     Given "PA1" ha già portato la finalità in stato "ARCHIVED"
     When l'utente inserisce una data stimata di approvazione di quell'aggiornamento della stima di carico
     Then si ottiene status code 400
