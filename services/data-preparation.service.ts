@@ -17,6 +17,11 @@ import {
   AgreementApprovalPolicy,
   AttributeKind,
   Attribute,
+  PurposeVersionState,
+  EServiceMode,
+  CreatedResource,
+  PurposeSeed,
+  PurposeEServiceSeed,
 } from "./../api/models";
 
 export const dataPreparationService = {
@@ -770,43 +775,132 @@ export const dataPreparationService = {
     );
   },
 
-  async createPurpose(
-    token: string,
-    purposeState: string,
-    testSeed: string,
-    payload: { eserviceId: string; consumerId: string }
-  ): Promise<{ purposeId: string; title: string }> {
-    if (purposeState === "DRAFT") {
-      const title = `purpose title - QA - ${testSeed} - ${getRandomInt()}`;
-      const response = await apiClient.purposes.createPurpose(
+  async createPurposeWithGivenState<TEServiceMode extends EServiceMode>({
+    token,
+    testSeed,
+    eserviceMode,
+    payload,
+    purposeState,
+  }: {
+    token: string;
+    testSeed: string;
+    eserviceMode: TEServiceMode;
+    payload: TEServiceMode extends "DELIVER"
+      ? Partial<PurposeSeed> & { eserviceId: string; consumerId: string }
+      : Partial<PurposeEServiceSeed> & {
+          eserviceId: string;
+          consumerId: string;
+          riskAnalysisId: string;
+        };
+    purposeState: PurposeVersionState;
+  }) {
+    let response: AxiosResponse<CreatedResource, unknown>;
+    const defaultValues = {
+      title: `purpose title - QA - ${testSeed} - ${getRandomInt()}`,
+      description: "description of the purpose - QA",
+      isFreeOfCharge: true,
+      freeOfChargeReason: "free of charge - QA",
+      dailyCalls: purposeState === "WAITING_FOR_APPROVAL" ? 10 : 5,
+    };
+
+    // 1. Check which mode the eservice is and call the correct endpoint
+    if (eserviceMode === "RECEIVE") {
+      response = await apiClient.reverse.createPurposeForReceiveEservice(
         {
-          title,
-          description: "description of the purpose - QA",
-          isFreeOfCharge: true,
-          freeOfChargeReason: "free of charge - QA",
-          dailyCalls: 5,
-          ...payload,
+          ...defaultValues,
+          ...(payload as PurposeEServiceSeed),
         },
         getAuthorizationHeader(token)
       );
+    } else {
+      response = await apiClient.purposes.createPurpose(
+        {
+          ...defaultValues,
+          ...(payload as PurposeSeed),
+        },
+        getAuthorizationHeader(token)
+      );
+    }
+    assertValidResponse(response);
+    const purposeId = response.data.id;
 
-      const purposeId = response.data.id;
+    await makePolling(
+      () =>
+        apiClient.purposes.getPurpose(purposeId, getAuthorizationHeader(token)),
+      (res) => res.status !== 404
+    );
 
+    // 2. If the state required is DRAFT or WAITING_FOR_APPROVAL, poll until the purpose is in the desired state and return
+    if (purposeState === "WAITING_FOR_APPROVAL" || purposeState === "DRAFT") {
       await makePolling(
         () =>
           apiClient.purposes.getPurpose(
             purposeId,
             getAuthorizationHeader(token)
           ),
-        (res) => res.status !== 404
+        (res) => res.data.currentVersion?.state === purposeState
       );
-
-      return {
-        purposeId,
-        title,
-      };
-    } else {
-      throw Error("unhandled");
+      return purposeId;
     }
+
+    // 3. In order to continue, we need the versionId of the current version of the purpose, so we get it
+    const versionId = (
+      await apiClient.purposes.getPurpose(
+        purposeId,
+        getAuthorizationHeader(token)
+      )
+    ).data.currentVersion?.id;
+
+    if (!versionId) {
+      throw new Error(`Purpose version for id ${purposeId} not found`);
+    }
+
+    // 4. Activate the purpose version
+    await apiClient.purposes.activatePurposeVersion(
+      purposeId,
+      versionId,
+      getAuthorizationHeader(token)
+    );
+
+    await makePolling(
+      () =>
+        apiClient.purposes.getPurpose(purposeId, getAuthorizationHeader(token)),
+      (res) => res.data.currentVersion?.state === "ACTIVE"
+    );
+
+    // 5. If the state required is SUSPENDED call the endpoint to suspend the purpose version
+    if (purposeState === "SUSPENDED") {
+      await apiClient.purposes.suspendPurposeVersion(
+        purposeId,
+        versionId,
+        getAuthorizationHeader(token)
+      );
+      await makePolling(
+        () =>
+          apiClient.purposes.getPurpose(
+            purposeId,
+            getAuthorizationHeader(token)
+          ),
+        (res) => res.data.currentVersion?.state === "SUSPENDED"
+      );
+    }
+
+    // 6. If the state required is ARCHIVED call the endpoint to archive the purpose version
+    if (purposeState === "ARCHIVED") {
+      await apiClient.purposes.archivePurposeVersion(
+        purposeId,
+        versionId,
+        getAuthorizationHeader(token)
+      );
+      await makePolling(
+        () =>
+          apiClient.purposes.getPurpose(
+            purposeId,
+            getAuthorizationHeader(token)
+          ),
+        (res) => res.data.currentVersion?.state === "ARCHIVED"
+      );
+    }
+    return purposeId;
   },
 };
