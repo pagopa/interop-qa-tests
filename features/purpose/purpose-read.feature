@@ -1,11 +1,11 @@
 @purpose-read
-Feature: Aggiornamento bozza nuova finalità in erogazione diretta
+Feature: Lettura singola finalità
 
   @purpose-read1a
   Scenario Outline: Per una finalità precedentemente creata dal fruitore, la quale prima versione è in qualsiasi stato (DRAFT, WAITING_FOR_APPROVAL, ACTIVE, SUSPENDED, ARCHIVED), alla richiesta di lettura, va a buon fine
     Given l'utente è un "<ruolo>" di "<ente>"
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
-    Given l'utente ha già creato una finalità in stato "DRAFT" per quell'eservice
+    Given un "admin" di "<ente>" ha già creato 1 finalità in stato "DRAFT" per quell'eservice
     When l'utente richiede la lettura della finalità
     Then si ottiene status code <risultato>
 
@@ -26,7 +26,7 @@ Feature: Aggiornamento bozza nuova finalità in erogazione diretta
   Scenario Outline: Per una finalità precedentemente creata dal fruitore, la quale prima versione è in qualsiasi stato (DRAFT, WAITING_FOR_APPROVAL, ACTIVE, SUSPENDED, ARCHIVED), alla richiesta di lettura, va a buon fine
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
-    Given un "admin" di "PA1" ha già creato una finalità in stato "<statoFinalita>" per quell'eservice
+    Given un "admin" di "PA1" ha già creato 1 finalità in stato "<statoFinalita>" per quell'eservice
     When l'utente richiede la lettura della finalità
     Then si ottiene status code 200
 
@@ -42,7 +42,7 @@ Feature: Aggiornamento bozza nuova finalità in erogazione diretta
     Given l'utente è un "admin" di "PA2"
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "PA1" ha già creato una finalità in stato "<statoFinalita>" per quell'eservice
+    Given un "admin" di "PA1" ha già creato 1 finalità in stato "<statoFinalita>" per quell'eservice
     When l'utente richiede la lettura della finalità
     Then si ottiene status code 200
 
@@ -58,7 +58,7 @@ Feature: Aggiornamento bozza nuova finalità in erogazione diretta
     Given l'utente è un "admin" di "GSP"
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "PA1" ha già creato una finalità in stato "<statoFinalita>" per quell'eservice
+    Given un "admin" di "PA1" ha già creato 1 finalità in stato "<statoFinalita>" per quell'eservice
     When l'utente richiede la lettura della finalità
     Then si ottiene status code 400
 
