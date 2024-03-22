@@ -6,7 +6,7 @@ Feature: Sospensione di una finalità
     Given l'utente è un "<ruolo>" di "<ente>"
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
     Given "ente" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "<ruolo>" di "<ente>" ha già creato 1 finalità in stato "ACTIVE" per quell'e-service
+    Given un "<ruolo>" di "<ente>" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
     When un "<ruolo>" di "<ente>" sospende quella finalità
     Then si ottiene status code <risultato>
 
@@ -28,7 +28,7 @@ Feature: Sospensione di una finalità
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "PA1" ha già creato 1 finalità in stato "ACTIVE" per quell'e-service
+    Given un "admin" di "PA1" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
     When un "admin" di "PA2" sospende quella finalità
     Then si ottiene status code 200
 
@@ -37,7 +37,7 @@ Feature: Sospensione di una finalità
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA1" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "PA1" ha già creato 1 finalità in stato "ACTIVE" per quell'e-service
+    Given un "admin" di "PA1" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
     When un "admin" di "PA1" sospende quella finalità
     Then si ottiene status code 200
 
@@ -46,7 +46,7 @@ Feature: Sospensione di una finalità
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "PA1" ha già creato 1 finalità in stato "<statoFinalita>" per quell'e-service
+    Given un "admin" di "PA1" ha già creato 1 finalità in stato "<statoFinalita>" per quell'eservice
     When un "admin" di "PA1" sospende quella finalità
     Then si ottiene status code 400
 
