@@ -1,3 +1,3 @@
 import { When } from "@cucumber/cucumber";
 
-When("un {string} di {string}} sospende quella finalità", async function () {});
+When("l'utente sospende quella finalità", async function () {});
