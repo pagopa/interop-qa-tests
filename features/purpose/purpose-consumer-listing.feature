@@ -69,7 +69,7 @@ Feature: Lista delle finalità lato fruitore
   @purpose-consumer-listing6
   Scenario Outline: Restituisce le finalità che sono in uno o più specifici stati (es. ACTIVE e SUSPENDED, scopo del test è verificare che funzioni il filtro per states)
 
-    Given l'utente è un "admin di "PA1"
+    Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given un "admin" di "PA1" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
