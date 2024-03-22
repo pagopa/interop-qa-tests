@@ -45,7 +45,7 @@ Feature: Archiviazione di una finalità
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given un "admin" di "<ente>" ha già creato 1 finalità in stato "<statoFinalita>" per quell'eservice
-    Given l'utente ha già richiesto l'aggiornamento della stima di carico superando i limiti di quell'e-service
+    Given "PA1" ha già richiesto l'aggiornamento della stima di carico superando i limiti di quell'e-service
     When l'utente archivia quella finalità
     Then si ottiene status code 200
 
