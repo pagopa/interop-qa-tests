@@ -9,6 +9,7 @@ import {
   UpdateEServiceDescriptorQuotas,
   UpdateEServiceDescriptorSeed,
 } from "../../../api/models";
+import { ESERVICE_DAILY_CALLS } from "../../../services/data-preparation.service";
 
 When(
   "l'utente aggiorna alcuni parametri di quel descrittore",
@@ -22,8 +23,8 @@ When(
       description: "Questo è un e-service di test",
       audience: ["api/v1"],
       voucherLifespan: 60,
-      dailyCallsPerConsumer: 10,
-      dailyCallsTotal: 200,
+      dailyCallsPerConsumer: ESERVICE_DAILY_CALLS.perConsumer,
+      dailyCallsTotal: ESERVICE_DAILY_CALLS.total * 2,
       agreementApprovalPolicy: "AUTOMATIC",
       attributes: {
         certified: [],
@@ -50,8 +51,8 @@ When(
     });
     const seed: UpdateEServiceDescriptorQuotas = {
       voucherLifespan: 60,
-      dailyCallsPerConsumer: 10,
-      dailyCallsTotal: 200,
+      dailyCallsPerConsumer: ESERVICE_DAILY_CALLS.perConsumer,
+      dailyCallsTotal: ESERVICE_DAILY_CALLS.total * 2,
     };
     this.response = await apiClient.eservices.updateDescriptor(
       this.eserviceId,

@@ -10,8 +10,12 @@ import {
   getRiskAnalysis,
   getToken,
 } from "../../../utils/commons";
-import { dataPreparationService } from "../../../services/data-preparation.service";
+import {
+  ESERVICE_DAILY_CALLS,
+  dataPreparationService,
+} from "../../../services/data-preparation.service";
 import { apiClient } from "../../../api";
+import { AgreementApprovalPolicy } from "../../../api/models";
 
 Given(
   "un {string} di {string} ha già creato un'analisi del rischio per quell'e-service",
@@ -69,7 +73,7 @@ When(
         description: "description of the purpose - QA",
         isFreeOfCharge: true,
         freeOfChargeReason: "free of charge - QA",
-        dailyCalls: 5,
+        dailyCalls: ESERVICE_DAILY_CALLS.perConsumer - 1,
       },
       getAuthorizationHeader(this.token)
     );
@@ -77,31 +81,39 @@ When(
 );
 
 Given(
-  "l'utente ha già creato una finalità in stato \"DRAFT\" per quell'eservice associando quell'analisi del rischio creata dall'erogatore",
-  async function () {
+  "un {string} di {string} ha già creato una finalità in stato \"DRAFT\" per quell'eservice associando quell'analisi del rischio creata dall'erogatore",
+  async function (role: Role, tenantType: TenantType) {
     assertContextSchema(this, {
-      token: z.string(),
       eserviceId: z.string(),
       riskAnalysisId: z.string(),
     });
+    const token = getToken(this.tokens, tenantType, role);
 
-    const consumerId = getOrganizationId(this.tenantType);
+    const consumerId = getOrganizationId(tenantType);
 
-    await dataPreparationService.createPurposeForReceiveEservice(
-      this.token,
-      this.TEST_SEED,
-      {
-        eserviceId: this.eserviceId,
-        consumerId,
-        riskAnalysisId: this.riskAnalysisId,
-      }
-    );
+    this.purposeId =
+      await dataPreparationService.createPurposeForReceiveEservice(
+        token,
+        this.TEST_SEED,
+        {
+          eserviceId: this.eserviceId,
+          consumerId,
+          riskAnalysisId: this.riskAnalysisId,
+        }
+      );
   }
 );
 
 Given(
   "un {string} di {string} ha già creato un e-service in modalità RECEIVE in stato DRAFT che richiede quell'attributo certificato con approvazione {string}",
-  async function (role: Role, tenantType: TenantType) {
+  async function (
+    role: Role,
+    tenantType: TenantType,
+    approvalPolicy: AgreementApprovalPolicy
+  ) {
+    assertContextSchema(this, {
+      attributeId: z.string(),
+    });
     const token = getToken(this.tokens, tenantType, role);
     this.eserviceId = await dataPreparationService.createEService(token, {
       mode: "RECEIVE",
@@ -109,14 +121,33 @@ Given(
 
     this.descriptorId = await dataPreparationService.createDraftDescriptor(
       token,
-      this.eserviceId
+      this.eserviceId,
+      {
+        agreementApprovalPolicy: approvalPolicy,
+        attributes: {
+          certified: [
+            [
+              {
+                id: this.attributeId,
+                explicitAttributeVerification: true,
+              },
+            ],
+          ],
+          declared: [],
+          verified: [],
+        },
+      }
     );
   }
 );
 
 Given(
-  "un {string} di {string} ha già creato un e-service in stato DRAFT in modalità RECEIVE con approvazione MANUAL",
-  async function (role: Role, tenantType: TenantType) {
+  "un {string} di {string} ha già creato un e-service in stato DRAFT in modalità RECEIVE con approvazione {string}",
+  async function (
+    role: Role,
+    tenantType: TenantType,
+    approvalPolicy: AgreementApprovalPolicy
+  ) {
     assertContextSchema(this);
     const token = getToken(this.tokens, tenantType, role);
     this.eserviceId = await dataPreparationService.createEService(token, {
@@ -127,7 +158,7 @@ Given(
       token,
       this.eserviceId,
       {
-        agreementApprovalPolicy: "MANUAL",
+        agreementApprovalPolicy: approvalPolicy,
       }
     );
   }
@@ -147,7 +178,7 @@ When(
         description: "description of the purpose - QA",
         isFreeOfCharge: true,
         freeOfChargeReason: undefined,
-        dailyCalls: 5,
+        dailyCalls: ESERVICE_DAILY_CALLS.perConsumer - 1,
       },
       getAuthorizationHeader(this.token)
     );
@@ -168,7 +199,7 @@ When(
         description: "description of the purpose - QA",
         isFreeOfCharge: true,
         freeOfChargeReason: "free of charge - QA",
-        dailyCalls: 5,
+        dailyCalls: ESERVICE_DAILY_CALLS.perConsumer - 1,
       },
       getAuthorizationHeader(this.token)
     );
@@ -189,7 +220,7 @@ When(
         description: "description of the purpose - QA",
         isFreeOfCharge: true,
         freeOfChargeReason: "free of charge - QA",
-        dailyCalls: 5,
+        dailyCalls: ESERVICE_DAILY_CALLS.perConsumer - 1,
       },
       getAuthorizationHeader(this.token)
     );
