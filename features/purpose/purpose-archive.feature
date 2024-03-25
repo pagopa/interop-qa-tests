@@ -12,7 +12,7 @@ Feature: Archiviazione di una finalità
   Scenario Outline: Per una finalità precedentemente creata da un fruitore e attivata da un erogatore, la quale è in stato ACTIVE, alla richiesta di archiviazione da parte di un utente con sufficienti permessi (admin) dell’ente fruitore, va a buon fine
     Given l'utente è un "<ruolo>" di "<ente>"
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
-    Given "ente" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
+    Given "<ente>" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given un "admin" di "<ente>" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
     When l'utente archivia quella finalità
     Then si ottiene status code <risultato>
