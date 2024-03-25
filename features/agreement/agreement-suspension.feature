@@ -17,6 +17,7 @@ Feature: Sospensione richiesta di fruizione
       | PA1     | support      |       403 |
       | PA1     | api,security |       403 |
 
+
   @agreement_suspension2
   Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fruitore e attivata da un erogatore, la quale è in stato ACTIVE, alla richiesta di sospensione da parte di un utente con sufficienti permessi dell’ente erogatore, che non coincide con l’ente fruitore, va a buon fine
     Given l'utente è un "admin" di "PA1"
