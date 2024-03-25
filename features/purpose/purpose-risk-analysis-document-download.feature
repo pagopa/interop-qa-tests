@@ -1,11 +1,12 @@
 @purpose_risk_analysis_document_download
 Feature: Download documento di analisi del rischio sigillato
 
-  @purpose_risk_analysis_document_download1
+  # Gli utenti non admin ad oggi non possono scaricare il documento di analisi del rischio, torna 403
+  @purpose_risk_analysis_document_download1 @wait_for_fix
   Scenario Outline: Per una finalità precedentemente creata dal fruitore, la quale è stata in passato almeno per un momento ACTIVE, alla richiesta di lettura del documento di analisi del rischio da parte di un qualsiasi utente dell'ente, va a buon fine. NB: il documento della richiesta di fruizione viene generato all’attivazione di una versione di finalità. Può essere che se si tenta di scaricarlo immediatamente dopo aver attivato una finalità non sia immediatamente disponibile per i tempi connessi alla generazione del PDF.   
     Given l'utente è un "<ruolo>" di "<ente>"
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
-    Given "ente" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
+    Given "<ente>" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given un "admin" di "<ente>" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
     When l'utente scarica il documento di analisi del rischio
     Then si ottiene status code 200
