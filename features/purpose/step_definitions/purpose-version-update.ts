@@ -1,20 +1,58 @@
 import { Given, When } from "@cucumber/cucumber";
-
-Given(
-  "l'utente non ha finalità in stato WAITING_FOR_APPROVAL",
-  async function () {}
-);
+import { z } from "zod";
+import { apiClient } from "../../../api";
+import {
+  assertContextSchema,
+  assertValidResponse,
+  getAuthorizationHeader,
+  makePolling,
+} from "../../../utils/commons";
+import { ESERVICE_DAILY_CALLS } from "../../../services/data-preparation.service";
 
 When(
   "l'utente aggiorna la stima di carico per quella finalità",
-  async function () {}
+  async function () {
+    assertContextSchema(this, {
+      token: z.string(),
+      purposeId: z.string(),
+    });
+
+    this.response = await apiClient.purposes.createPurposeVersion(
+      this.purposeId,
+      {
+        dailyCalls: ESERVICE_DAILY_CALLS.perConsumer - 1,
+      },
+      getAuthorizationHeader(this.token)
+    );
+  }
 );
 
 Given(
-  "l'utente ha già una finalità in stato WAITING_FOR_APPROVAL",
+  "l'utente crea una versione nuova della finalità in stato WAITING_FOR_APPROVAL",
   async function () {
-    // TODO invece di implementare questo nuovo Given, valutare se riutilizzare questo:
-    // Given un "admin" di "PA1" ha già creato 1 finalità in stato "WAITING_FOR_APPROVAL" per quell'eservice
-    // TODO controllare se quel Given gestisce anche il WAITING_FOR_APPROVAL
+    assertContextSchema(this, {
+      token: z.string(),
+      purposeId: z.string(),
+    });
+
+    const response = await apiClient.purposes.createPurposeVersion(
+      this.purposeId,
+      {
+        dailyCalls: ESERVICE_DAILY_CALLS.perConsumer + 1,
+      },
+      getAuthorizationHeader(this.token)
+    );
+
+    assertValidResponse(response);
+
+    await makePolling(
+      () =>
+        apiClient.purposes.getPurpose(
+          this.purposeId,
+          getAuthorizationHeader(this.token)
+        ),
+      (res) =>
+        res.data.waitingForApprovalVersion?.state === "WAITING_FOR_APPROVAL"
+    );
   }
 );
