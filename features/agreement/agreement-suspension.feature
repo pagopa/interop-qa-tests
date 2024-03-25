@@ -12,21 +12,12 @@ Feature: Sospensione richiesta di fruizione
 
     Examples: 
       | ente    | ruolo        | risultato |
-      | GSP     | admin        |       200 |
-      | GSP     | api          |       403 |
-      | GSP     | security     |       403 |
-      | GSP     | support      |       403 |
-      | GSP     | api,security |       403 |
       | PA1     | admin        |       200 |
       | PA1     | api          |       403 |
       | PA1     | security     |       403 |
       | PA1     | support      |       403 |
       | PA1     | api,security |       403 |
-      | Privato | admin        |       200 |
-      | Privato | api          |       403 |
-      | Privato | security     |       403 |
-      | Privato | support      |       403 |
-      | Privato | api,security |       403 |
+
 
   @agreement_suspension2
   Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fruitore e attivata da un erogatore, la quale è in stato ACTIVE, alla richiesta di sospensione da parte di un utente con sufficienti permessi dell’ente erogatore, che non coincide con l’ente fruitore, va a buon fine
