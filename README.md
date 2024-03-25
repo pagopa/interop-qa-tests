@@ -1,3 +1,5 @@
+
+
 # interop-qa-tests
 
 ## ENVs
@@ -12,6 +14,7 @@ SESSION_TOKENS_DURATION_SECONDS=1800
 TENANTS_IDS_FILE_PATH="./data/dev/tenants-ids.json"
 MAX_POLLING_TRIES=32
 POLLING_SLEEP_TIME=100
+CUCUMBER_OPTS_PARALLEL=5
 ```
 
 ## Session tokens module
@@ -38,4 +41,53 @@ Output example:
     "api": "jwt..."
   }
 }
+```
+
+## Running test
+
+This test suite supports nodejs and [bun](https://bun.sh/docs) runtime. To run with bun simply use the prefix "bun" to npm script.
+
+To run all tests:
+
+```shell
+pnpm test
+```
+
+To run all tests with bun:
+
+```shell
+pnpm bun:test
+```
+
+### Test script
+
+```shell
+# Run all test, excluding test labeled with "special" tag: @wait_for_fix, @resouce_intensive
+pnpm test:ready
+```
+
+```shell
+# Run only tagged test
+pnpm test:tags "@some_useful_tag"
+```
+
+```shell
+# Run only specific module test, excluding special tag
+pnpm test:catalog
+```
+
+```shell
+# Run only test waiting for fix
+pnpm test:tags "@wait_for_fix"
+```
+
+
+### Validate feature file and step implementation
+
+```shell
+pnpm check-steps
+```
+
+```shell
+pnpm check-steps:usage
 ```
