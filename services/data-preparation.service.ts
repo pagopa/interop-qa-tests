@@ -811,7 +811,7 @@ export const dataPreparationService = {
       dailyCalls:
         purposeState === "WAITING_FOR_APPROVAL"
           ? ESERVICE_DAILY_CALLS.perConsumer + 1
-          : ESERVICE_DAILY_CALLS.perConsumer,
+          : 1,
     };
 
     const data = { ...defaultValues, ...payload };

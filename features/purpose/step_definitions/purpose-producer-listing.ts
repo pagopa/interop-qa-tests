@@ -1,3 +1,4 @@
+import assert from "assert";
 import { Given, Then, When } from "@cucumber/cucumber";
 import { z } from "zod";
 import {
@@ -13,8 +14,12 @@ When(
   async function (limit: number) {
     assertContextSchema(this, { token: z.string(), tenantType: TenantType });
     const producerId = getOrganizationId(this.tenantType);
-    await apiClient.producer.getProducerPurposes(
-      { producersIds: [producerId] },
+    this.response = await apiClient.producer.getProducerPurposes(
+      {
+        offset: 0,
+        limit,
+        producersIds: [producerId],
+      },
       getAuthorizationHeader(this.token)
     );
   }
@@ -22,7 +27,18 @@ When(
 
 Then(
   "si ottiene status code {int} e la lista di {int} finalità",
-  async function () {}
+  async function (statusCode: number, count: number) {
+    assertContextSchema(this, {
+      response: z.object({
+        status: z.number(),
+        data: z.object({
+          results: z.array(z.unknown()),
+        }),
+      }),
+    });
+    assert.equal(this.response.status, statusCode);
+    assert.equal(this.response.data.results.length, count);
+  }
 );
 
 When(

@@ -2,13 +2,13 @@
 Feature: Listing finalità lato erogatore
 
   @purpose-producer-listing1
-  Scenario Outline: A fronte di 20 finalità in db, restituisce solo i primi 12 risultati (scopo del test è verificare il corretto funzionamento del parametro limit)
+  Scenario Outline: A fronte di 5 finalità in db, restituisce solo i primi 3 risultati (scopo del test è verificare il corretto funzionamento del parametro limit)
     Given l'utente è un "<ruolo>" di "<ente>"
     Given un "admin" di "<ente>" ha già creato e pubblicato 1 e-service
     Given "PA2" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "PA2" ha già creato 20 finalità in stato "ACTIVE" per quell'eservice
-    When l'utente erogatore richiede una operazione di listing delle finalità limitata alle prime 12 finalità
-    Then si ottiene status code <risultato> e la lista di 12 finalità
+    Given un "admin" di "PA2" ha già creato 5 finalità in stato "ACTIVE" per quell'eservice
+    When l'utente erogatore richiede una operazione di listing delle finalità limitata alle prime 3 finalità
+    Then si ottiene status code <risultato> e la lista di 3 finalità
 
     Examples: 
       | ente | ruolo        | risultato |
