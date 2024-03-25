@@ -2,11 +2,15 @@ import { Given } from "@cucumber/cucumber";
 import { z } from "zod";
 import { Role, TenantType } from "../../common-steps";
 import { dataPreparationService } from "../../../services/data-preparation.service";
-import { assertContextSchema, getToken } from "../../../utils/commons";
 import {
-  AgreementState,
-  AgreementApprovalPolicy,
+  assertContextSchema,
+  getOrganizationId,
+  getToken,
+} from "../../../utils/commons";
+import {
   EServiceDescriptorState,
+  AgreementApprovalPolicy,
+  AgreementState,
 } from "../../../api/models";
 
 Given(
@@ -76,6 +80,48 @@ Given(
         this.eserviceId,
         this.descriptorId
       );
+  }
+);
+
+Given(
+  "{string} ha creato un attributo certificato e lo ha assegnato a {string}",
+  async function (certifier: TenantType, tenantType: TenantType) {
+    assertContextSchema(this);
+    const token = getToken(this.tokens, certifier, "admin");
+
+    const tenantId = getOrganizationId(tenantType);
+    this.attributeId = await dataPreparationService.createAttribute(
+      token,
+      "CERTIFIED"
+    );
+
+    await dataPreparationService.assignCertifiedAttributeToTenant(
+      token,
+      tenantId,
+      this.attributeId
+    );
+  }
+);
+
+Given(
+  "{string} dichiara un attributo dichiarato",
+  async function (tenantType: TenantType) {
+    assertContextSchema(this);
+    const tenantId = getOrganizationId(tenantType);
+    const token = getToken(this.tokens, tenantType, "admin");
+
+    const attributeId = await dataPreparationService.createAttribute(
+      token,
+      "DECLARED"
+    );
+
+    await dataPreparationService.declareDeclaredAttribute(
+      token,
+      tenantId,
+      attributeId
+    );
+
+    this.requiredDeclaredAttributes = [[attributeId]];
   }
 );
 
