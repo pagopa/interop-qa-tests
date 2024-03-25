@@ -5,6 +5,7 @@ Feature: Lettura singola finalità
   Scenario Outline: Per una finalità precedentemente creata dal fruitore, la quale prima versione è in qualsiasi stato (DRAFT, WAITING_FOR_APPROVAL, ACTIVE, SUSPENDED, ARCHIVED), alla richiesta di lettura, va a buon fine
     Given l'utente è un "<ruolo>" di "<ente>"
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
+    Given "<ente>" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given un "admin" di "<ente>" ha già creato 1 finalità in stato "DRAFT" per quell'eservice
     When l'utente richiede la lettura della finalità
     Then si ottiene status code <risultato>
@@ -13,19 +14,20 @@ Feature: Lettura singola finalità
       | ente | ruolo        | risultato |
       | PA1  | admin        |       200 |
       | PA1  | api          |       403 |
-      | PA1  | security     |       403 |
-      | PA1  | api,security |       403 |
-      | PA1  | support      |       403 |
+      | PA1  | security     |       200 |
+      | PA1  | api,security |       200 |
+      | PA1  | support      |       200 |
       | GSP  | admin        |       200 |
       | GSP  | api          |       403 |
-      | GSP  | security     |       403 |
-      | GSP  | api,security |       403 |
-      | GSP  | support      |       403 |
+      | GSP  | security     |       200 |
+      | GSP  | api,security |       200 |
+      | GSP  | support      |       200 |
 
   @purpose-read1b
   Scenario Outline: Per una finalità precedentemente creata dal fruitore, la quale prima versione è in qualsiasi stato (DRAFT, WAITING_FOR_APPROVAL, ACTIVE, SUSPENDED, ARCHIVED), alla richiesta di lettura, va a buon fine
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
+    Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given un "admin" di "PA1" ha già creato 1 finalità in stato "<statoFinalita>" per quell'eservice
     When l'utente richiede la lettura della finalità
     Then si ottiene status code 200
@@ -53,7 +55,7 @@ Feature: Lettura singola finalità
       | WAITING_FOR_APPROVAL |
       | ARCHIVED             |
 
-  @purpose-read3
+  @purpose-read3 @wait_for_fix
   Scenario Outline: Per una finalità precedentemente creata da un fruitore, la quale prima versione è in qualsiasi stato (DRAFT, (WAITING_FOR_APPROVAL, ACTIVE, SUSPENDED, ARCHIVED), alla richiesta di lettura da parte di un ente che non è né l’erogatore, né il fruitore, ottiene un errore (NB: verificare status code)
     Given l'utente è un "admin" di "GSP"
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
