@@ -12,5 +12,4 @@ When("l'utente richiede la cancellazione della finalità", async function () {
     this.purposeId,
     getAuthorizationHeader(this.token)
   );
-  console.log(this.response.data);
 });
