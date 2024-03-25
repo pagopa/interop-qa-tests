@@ -22,11 +22,22 @@ When("l'utente cancella il descrittore di quell'e-service", async function () {
   );
 });
 
-Then("quell'e-service è stato cancellato", async function () {
+Then("il descrittore è stato cancellato, ma l'eservice no", async function () {
   assertContextSchema(this, {
     token: z.string(),
     eserviceId: z.string(),
+    descriptorId: z.string(),
   });
+
+  await makePolling(
+    () =>
+      apiClient.producers.getProducerEServiceDescriptor(
+        this.eserviceId,
+        this.descriptorId,
+        getAuthorizationHeader(this.token)
+      ),
+    (res) => res.status === 404
+  );
 
   await makePolling(
     () =>
@@ -34,7 +45,7 @@ Then("quell'e-service è stato cancellato", async function () {
         this.eserviceId,
         getAuthorizationHeader(this.token)
       ),
-    (res) => res.status === 404
+    (res) => res.status !== 404
   );
 });
 
