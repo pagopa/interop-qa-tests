@@ -35,7 +35,7 @@ Feature: Sospensione richiesta di fruizione
     Then si ottiene status code 200
 
   @agreement_suspension4a
-  Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fruitore, la quale è in stato NON ACTIVE (PENDING, DRAFT, SUSPENDED, ARCHIVED), alla richiesta di sospensione da parte di un utente con sufficienti permessi, ottiene un errore
+  Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fruitore, la quale è in stato NON ACTIVE (PENDING, DRAFT, SUSPENDED, ARCHIVED), alla richiesta di sospensione da parte di un utente con sufficienti permessi, ottiene un errore. Nel caso in cui lo caso lo stato sia SUSPENDED il risultato sarà 200 per implementazione del pattern di idempotenza.
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA2" ha già creato un e-service in stato "PUBLISHED" con approvazione "<tipoApprovazione>"
     Given "PA1" ha una richiesta di fruizione in stato "<statoAgreement>" per quell'e-service
