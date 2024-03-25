@@ -6,6 +6,10 @@ import {
   getAuthorizationHeader,
 } from "../../../utils/commons";
 import { apiClient } from "../../../api";
+import {
+  ESERVICE_DAILY_CALLS,
+  dataPreparationService,
+} from "../../../services/data-preparation.service";
 
 When("l'utente scarica il documento di analisi del rischio", async function () {
   assertContextSchema(this, {
@@ -21,7 +25,8 @@ When("l'utente scarica il documento di analisi del rischio", async function () {
   assertValidResponse(getPurposeResponse);
 
   const purpose = getPurposeResponse.data;
-  const versionId = purpose.currentVersion?.id;
+  const versionId =
+    purpose.currentVersion?.id ?? purpose.waitingForApprovalVersion?.id;
   const riskAnalysisDocumentId =
     purpose.currentVersion?.riskAnalysisDocument?.id;
 
@@ -45,5 +50,15 @@ When("l'utente scarica il documento di analisi del rischio", async function () {
 
 Given(
   "l'utente ha già aggiornato finalità rispettando le stime di carico per quell'e-service",
-  async function () {}
+  async function () {
+    assertContextSchema(this, {
+      token: z.string(),
+      purposeId: z.string(),
+    });
+    await dataPreparationService.createNewPurposeVersion(
+      this.token,
+      this.purposeId,
+      { dailyCalls: ESERVICE_DAILY_CALLS.perConsumer - 1 }
+    );
+  }
 );

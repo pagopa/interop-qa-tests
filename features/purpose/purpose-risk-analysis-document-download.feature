@@ -35,7 +35,11 @@ Feature: Download documento di analisi del rischio sigillato
     When l'utente scarica il documento di analisi del rischio
     Then si ottiene status code 200
 
-  @purpose_risk_analysis_document_download3
+
+  # Quando la finalità è in stato DRAFT o WAITING_FOR_APPROVAL, l'utente non può scaricare il documento in quanto
+  # la purpose non possiede la versionId e il documentId del documento di analisi del rischio, che sono richiestai nel servizio di
+  # recupero della risk analysis. Questo due valori vengono generati solo quando la finalità passa dallo stato ACTIVE.
+  @purpose_risk_analysis_document_download3 @wait_for_clarification
   Scenario Outline: Per una finalità precedentemente creata dal fruitore, la quale non è mai stata ACTIVE (DRAFT o WAITING_FOR_APPROVAL), alla richiesta di lettura del documento di analisi del rischio da parte di un qualsiasi utente dell'ente, ottiene un errore (NB: verificare status code).
 
     Given l'utente è un "admin" di "PA1"
