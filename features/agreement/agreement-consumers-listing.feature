@@ -38,13 +38,13 @@ Feature: Listing fruitori con richieste di fruizione
     Then si ottiene status code 200 con la corretta verifica dell'offset
 
   @agreement_consumers_listing3
-  Scenario Outline: Restituisce un fruitoire il cui nome dell’ente contiene la keyword "Comune di Milano" all'interno del nome, con ricerca case insensitive
+  Scenario Outline: Restituisce un fruitore il cui nome dell’ente contiene la keyword "Comune di Milano" all'interno del nome, con ricerca case insensitive. In questo scenario il nome di PA1 è "Comune di Milano"
     Given l'utente è un "admin" di "PA2"
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given "GSP" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     When l'utente richiede una operazione di listing dei fruitori dei propri e-service filtrando per la keyword "Comune di Milano"
-    Then si ottiene status code 200 e la lista di 1 fruitori
+    Then si ottiene status code 200 e la lista di 1 fruitore
 
   @agreement_consumers_listing4
   Scenario Outline: Restituisce un insieme vuoto di fruitori per una ricerca che non porta risultati
