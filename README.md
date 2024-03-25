@@ -1,5 +1,3 @@
-
-
 # interop-qa-tests
 
 ## ENVs
@@ -47,8 +45,8 @@ Output example:
 
 Tests are labeled with the following special tags:
 
-- ```@wait_for_fix```: test bug affected, waiting for resolution, don't execute in test suite
-- ```@resource_intensive```: test resource consuming, to run only in environment with high performance
+- `@wait_for_fix`: test bug affected, waiting for resolution, don't execute in test suite
+- `@resource_intensive`: test resource consuming, to run only in environment with high performance
 
 ## Running test
 
@@ -87,7 +85,6 @@ pnpm test:catalog
 # Run only test waiting for fix
 pnpm test:tags "@wait_for_fix"
 ```
-
 
 ### Validate feature file and step implementation
 
