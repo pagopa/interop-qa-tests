@@ -4,9 +4,8 @@ Feature: Sospensione richiesta di fruizione
   @agreement_suspension1
   Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fruitore e attivata da un erogatore, la quale è in stato ACTIVE, alla richiesta di sospensione da parte di un utente con sufficienti permessi dell’ente fruitore, che non coincide con l’ente erogatore, va a buon fine
     Given l'utente è un "<ruolo>" di "<ente>"
-    Given un "admin" di "PA2" ha già creato un e-service in stato "PUBLISHED" con approvazione "MANUAL"
-    Given "<ente>" ha una richiesta di fruizione in stato "PENDING" per quell'e-service
-    Given "PA2" ha già attivato quella richiesta di fruizione
+    Given un "admin" di "PA2" ha già creato un e-service in stato "PUBLISHED" con approvazione "AUTOMATIC"
+    Given "<ente>" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     When l'utente richiede una operazione di sospensione di quella richiesta di fruizione
     Then si ottiene status code <risultato>
 
@@ -22,9 +21,8 @@ Feature: Sospensione richiesta di fruizione
   @agreement_suspension2
   Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fruitore e attivata da un erogatore, la quale è in stato ACTIVE, alla richiesta di sospensione da parte di un utente con sufficienti permessi dell’ente erogatore, che non coincide con l’ente fruitore, va a buon fine
     Given l'utente è un "admin" di "PA1"
-    Given un "admin" di "PA1" ha già creato un e-service in stato "PUBLISHED" con approvazione "MANUAL"
-    Given "PA2" ha una richiesta di fruizione in stato "PENDING" per quell'e-service
-    Given "PA1" ha già attivato quella richiesta di fruizione
+    Given un "admin" di "PA1" ha già creato un e-service in stato "PUBLISHED" con approvazione "AUTOMATIC"
+    Given "PA2" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     When l'utente richiede una operazione di sospensione di quella richiesta di fruizione
     Then si ottiene status code 200
 
@@ -32,7 +30,7 @@ Feature: Sospensione richiesta di fruizione
   Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fruitore e attivata da un erogatore, la quale è in stato ACTIVE, alla richiesta di sospensione da parte di un utente con sufficienti permessi dell’ente erogatore, che coincide con l’ente fruitore, va a buon fine
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA1" ha già creato un e-service in stato "PUBLISHED" con approvazione "AUTOMATIC"
-    Given "PA2" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
+    Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     When l'utente richiede una operazione di sospensione di quella richiesta di fruizione
     Then si ottiene status code 200
 
