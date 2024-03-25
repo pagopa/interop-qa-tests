@@ -3,11 +3,12 @@ import { z } from "zod";
 import { apiClient } from "../../../api";
 import {
   assertContextSchema,
-  assertValidResponse,
   getAuthorizationHeader,
-  makePolling,
 } from "../../../utils/commons";
-import { ESERVICE_DAILY_CALLS } from "../../../services/data-preparation.service";
+import {
+  ESERVICE_DAILY_CALLS,
+  dataPreparationService,
+} from "../../../services/data-preparation.service";
 
 When(
   "l'utente aggiorna la stima di carico per quella finalità",
@@ -34,25 +35,10 @@ Given(
       token: z.string(),
       purposeId: z.string(),
     });
-
-    const response = await apiClient.purposes.createPurposeVersion(
+    await dataPreparationService.createNewPurposeVersion(
+      this.token,
       this.purposeId,
-      {
-        dailyCalls: ESERVICE_DAILY_CALLS.perConsumer + 1,
-      },
-      getAuthorizationHeader(this.token)
-    );
-
-    assertValidResponse(response);
-
-    await makePolling(
-      () =>
-        apiClient.purposes.getPurpose(
-          this.purposeId,
-          getAuthorizationHeader(this.token)
-        ),
-      (res) =>
-        res.data.waitingForApprovalVersion?.state === "WAITING_FOR_APPROVAL"
+      { dailyCalls: ESERVICE_DAILY_CALLS.perConsumer + 1 }
     );
   }
 );
