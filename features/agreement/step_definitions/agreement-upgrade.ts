@@ -10,6 +10,7 @@ import {
 import { apiClient } from "../../../api";
 import { Role, TenantType } from "../../common-steps";
 import { dataPreparationService } from "../../../services/data-preparation.service";
+import { AttributeKind, DescriptorAttributeSeed } from "../../../api/models";
 
 When(
   "l'utente richiede un'operazione di upgrade di quella richiesta di fruizione",
@@ -52,8 +53,13 @@ Given(
 );
 
 Given(
-  "un {string} di {string} ha già pubblicato una nuova versione per quell'e-service che richiede un attributo dichiarato che {string} non possiede",
-  async function (role: Role, tenantType: TenantType, _consumer: TenantType) {
+  "un {string} di {string} ha già pubblicato una nuova versione per quell'e-service che richiede un attributo {string} che {string} non possiede",
+  async function (
+    role: Role,
+    tenantType: TenantType,
+    kind: AttributeKind,
+    _consumer: TenantType
+  ) {
     assertContextSchema(this, {
       token: z.string(),
       eserviceId: z.string(),
@@ -63,8 +69,12 @@ Given(
 
     const attributeId = await dataPreparationService.createAttribute(
       token,
-      "DECLARED"
+      kind
     );
+
+    const seed: DescriptorAttributeSeed[][] = [
+      [{ id: attributeId, explicitAttributeVerification: true }],
+    ];
 
     const response =
       await dataPreparationService.createDescriptorWithGivenState({
@@ -72,43 +82,9 @@ Given(
         eserviceId: this.eserviceId,
         descriptorState: "PUBLISHED",
         attributes: {
-          certified: [],
-          declared: [
-            [{ id: attributeId, explicitAttributeVerification: true }],
-          ],
-          verified: [],
-        },
-      });
-    this.descriptorId = response.descriptorId;
-  }
-);
-
-Given(
-  "un {string} di {string} ha già pubblicato una nuova versione per quell'e-service che richiede un attributo certificato che {string} non possiede",
-  async function (role: Role, tenantType: TenantType, _consumer: TenantType) {
-    assertContextSchema(this, {
-      token: z.string(),
-      eserviceId: z.string(),
-    });
-
-    const token = getToken(this.tokens, tenantType, role);
-
-    const attributeId = await dataPreparationService.createAttribute(
-      token,
-      "CERTIFIED"
-    );
-
-    const response =
-      await dataPreparationService.createDescriptorWithGivenState({
-        token,
-        eserviceId: this.eserviceId,
-        descriptorState: "PUBLISHED",
-        attributes: {
-          certified: [
-            [{ id: attributeId, explicitAttributeVerification: true }],
-          ],
-          declared: [],
-          verified: [],
+          certified: kind === "CERTIFIED" ? seed : [],
+          declared: kind === "DECLARED" ? seed : [],
+          verified: kind === "VERIFIED" ? seed : [],
         },
       });
     this.descriptorId = response.descriptorId;
