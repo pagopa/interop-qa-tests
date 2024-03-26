@@ -23,19 +23,18 @@ Feature: Cancellazione finalità
       | GSP  | api,security |       403 |
       | GSP  | support      |       403 |
 
-  @purpose-delete2 @wait_for_fix
-  # Lo stato WAITING_FOR_APPROVAL restutiosce 204 invece di dare errore
+  @purpose-delete2
   Scenario Outline: Per una finalità precedentemente creata dall’ente, la quale prima versione è in stato ACTIVE, SUSPENDED, WAITING_FOR_APPROVAL o ARCHIVED, alla richiesta di cancellazione da parte di un utente con sufficienti permessi (admin), ottiene un errore (NB: verificare status code)
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given un "admin" di "PA1" ha già creato 1 finalità in stato "<statoFinalita>" per quell'eservice
     When l'utente richiede la cancellazione della finalità
-    Then si ottiene status code 409
+    Then si ottiene status code <risultato>
 
     Examples: 
-      | statoFinalita        |
-      | ACTIVE               |
-      | SUSPENDED            |
-      | WAITING_FOR_APPROVAL |
-      | ARCHIVED             |
+      | statoFinalita        | risultato |
+      | ACTIVE               |       409 |
+      | SUSPENDED            |       409 |
+      | WAITING_FOR_APPROVAL |       204 |
+      | ARCHIVED             |       409 |

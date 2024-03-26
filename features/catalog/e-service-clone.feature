@@ -10,25 +10,19 @@ Feature: Clonazione di un e-service
     When l'utente clona quell'e-service
     Then si ottiene status code <risultato>
 
-    Examples: 
+    Examples: # Test sui ruoli
       | ente | ruolo        | statoDescrittore | risultato |
       | GSP  | admin        | PUBLISHED        |       200 |
-      | GSP  | admin        | SUSPENDED        |       200 |
       | GSP  | api          | PUBLISHED        |       200 |
-      | GSP  | api          | SUSPENDED        |       200 |
       | GSP  | security     | PUBLISHED        |       403 |
-      | GSP  | security     | SUSPENDED        |       403 |
       | GSP  | api,security | PUBLISHED        |       200 |
-      | GSP  | api,security | SUSPENDED        |       200 |
       | GSP  | support      | PUBLISHED        |       403 |
-      | GSP  | support      | SUSPENDED        |       403 |
       | PA1  | admin        | PUBLISHED        |       200 |
-      | PA1  | admin        | SUSPENDED        |       200 |
       | PA1  | api          | PUBLISHED        |       200 |
-      | PA1  | api          | SUSPENDED        |       200 |
       | PA1  | security     | PUBLISHED        |       403 |
-      | PA1  | security     | SUSPENDED        |       403 |
       | PA1  | api,security | PUBLISHED        |       200 |
-      | PA1  | api,security | SUSPENDED        |       200 |
       | PA1  | support      | PUBLISHED        |       403 |
-      | PA1  | support      | SUSPENDED        |       403 |
+    
+    Examples: # Test sugli stati
+      | ente | ruolo | statoDescrittore | risultato |
+      | PA1  | admin | SUSPENDED       |       200 |

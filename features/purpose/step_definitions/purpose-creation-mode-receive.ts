@@ -98,17 +98,20 @@ Given(
     const token = getToken(this.tokens, tenantType, role);
     const consumerId = getOrganizationId(tenantType);
 
-    this.purposeId = await dataPreparationService.createPurposeWithGivenState({
-      token,
-      testSeed: this.TEST_SEED,
-      payload: {
-        eserviceId: this.eserviceId,
-        consumerId,
-        riskAnalysisId: this.riskAnalysisId,
-      },
-      purposeState,
-      eserviceMode: "RECEIVE",
-    });
+    const { purposeId } =
+      await dataPreparationService.createPurposeWithGivenState({
+        token,
+        testSeed: this.TEST_SEED,
+        payload: {
+          eserviceId: this.eserviceId,
+          consumerId,
+          riskAnalysisId: this.riskAnalysisId,
+        },
+        purposeState,
+        eserviceMode: "RECEIVE",
+      });
+
+    this.purposeId = purposeId;
   }
 );
 
