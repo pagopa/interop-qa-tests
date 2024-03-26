@@ -56,7 +56,11 @@ When(
     });
 
     this.response = await apiClient.producers.getAgreementEServiceProducers(
-      { q: `${this.TEST_SEED}-${keyword}`, limit: 10, offset: 0 },
+      {
+        q: `${this.TEST_SEED}-${keyword}`,
+        limit: 10,
+        offset: 0,
+      },
       getAuthorizationHeader(this.token)
     );
   }
