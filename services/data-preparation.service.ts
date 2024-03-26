@@ -22,14 +22,15 @@ import {
   CreatedResource,
   PurposeSeed,
   PurposeEServiceSeed,
+  PurposeVersionSeed,
 } from "./../api/models";
 
 export const ESERVICE_DAILY_CALLS: Readonly<{
   total: number;
   perConsumer: number;
 }> = {
-  total: 100,
-  perConsumer: 10,
+  total: 1000,
+  perConsumer: 50,
 };
 
 export const dataPreparationService = {
@@ -783,6 +784,7 @@ export const dataPreparationService = {
     );
   },
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   async createPurposeWithGivenState<TEServiceMode extends EServiceMode>({
     token,
     testSeed,
@@ -811,7 +813,7 @@ export const dataPreparationService = {
       dailyCalls:
         purposeState === "WAITING_FOR_APPROVAL"
           ? ESERVICE_DAILY_CALLS.perConsumer + 1
-          : ESERVICE_DAILY_CALLS.perConsumer,
+          : 1,
     };
 
     const data = { ...defaultValues, ...payload };
@@ -829,40 +831,35 @@ export const dataPreparationService = {
       );
     }
     assertValidResponse(response);
+
     const purposeId = response.data.id;
+    let versionId = "";
 
     await makePolling(
       () =>
         apiClient.purposes.getPurpose(purposeId, getAuthorizationHeader(token)),
-      (res) => res.status !== 404
+      (res) => {
+        if (res.data.currentVersion?.id) {
+          versionId = res.data.currentVersion.id;
+        }
+        return res.status !== 404;
+      }
     );
 
     if (purposeState === "DRAFT") {
-      return purposeId;
+      return { purposeId, versionId };
     }
 
-    // 2. In order to continue, we need the versionId of the current version of the purpose, so we get it
-    const versionId = (
-      await apiClient.purposes.getPurpose(
-        purposeId,
-        getAuthorizationHeader(token)
-      )
-    ).data.currentVersion?.id;
-
-    if (!versionId) {
-      throw new Error(`Purpose version for id ${purposeId} not found`);
-    }
-
-    // 3. Activate the purpose version
-    const activatePurposeReponse =
+    // 2. Activate the purpose version
+    const activatePurposeResponse =
       await apiClient.purposes.activatePurposeVersion(
         purposeId,
         versionId,
         getAuthorizationHeader(token)
       );
-    assertValidResponse(activatePurposeReponse);
+    assertValidResponse(activatePurposeResponse);
 
-    // 4. If the state required is WAITING_FOR_APPROVAL, we need to wait until the purpose version is in that state and return the purposeId
+    // 3. If the state required is WAITING_FOR_APPROVAL, we need to wait until the purpose version is in that state and return the purposeId
     if (purposeState === "WAITING_FOR_APPROVAL") {
       await makePolling(
         () =>
@@ -870,19 +867,31 @@ export const dataPreparationService = {
             purposeId,
             getAuthorizationHeader(token)
           ),
-        (res) =>
-          res.data.waitingForApprovalVersion?.state === "WAITING_FOR_APPROVAL"
+        (res) => {
+          if (res.data.waitingForApprovalVersion?.id) {
+            versionId = res.data.waitingForApprovalVersion.id;
+          }
+          return (
+            res.data.waitingForApprovalVersion?.state === "WAITING_FOR_APPROVAL"
+          );
+        }
       );
-      return purposeId;
+      return { purposeId, versionId };
     }
 
     await makePolling(
       () =>
         apiClient.purposes.getPurpose(purposeId, getAuthorizationHeader(token)),
-      (res) => res.data.currentVersion?.state === "ACTIVE"
+      (res) => {
+        if (res.data.currentVersion?.state === "ACTIVE") {
+          versionId = res.data.currentVersion.id;
+          return true;
+        }
+        return false;
+      }
     );
 
-    // 5. If the state required is SUSPENDED call the endpoint to suspend the purpose version
+    // 4. If the state required is SUSPENDED call the endpoint to suspend the purpose version
     if (purposeState === "SUSPENDED") {
       const suspendPurposeResponse =
         await apiClient.purposes.suspendPurposeVersion(
@@ -897,11 +906,17 @@ export const dataPreparationService = {
             purposeId,
             getAuthorizationHeader(token)
           ),
-        (res) => res.data.currentVersion?.state === "SUSPENDED"
+        (res) => {
+          if (res.data.currentVersion?.state === "SUSPENDED") {
+            versionId = res.data.currentVersion.id;
+            return true;
+          }
+          return false;
+        }
       );
     }
 
-    // 6. If the state required is ARCHIVED call the endpoint to archive the purpose version
+    // 5. If the state required is ARCHIVED call the endpoint to archive the purpose version
     if (purposeState === "ARCHIVED") {
       const archivePurposeResponse =
         await apiClient.purposes.archivePurposeVersion(
@@ -916,9 +931,42 @@ export const dataPreparationService = {
             purposeId,
             getAuthorizationHeader(token)
           ),
-        (res) => res.data.currentVersion?.state === "ARCHIVED"
+        (res) => {
+          if (res.data.currentVersion?.state === "ARCHIVED") {
+            versionId = res.data.currentVersion.id;
+            return true;
+          }
+          return false;
+        }
       );
     }
-    return purposeId;
+    return { purposeId, versionId };
+  },
+
+  async createNewPurposeVersion(
+    token: string,
+    purposeId: string,
+    { dailyCalls }: PurposeVersionSeed
+  ) {
+    const response = await apiClient.purposes.createPurposeVersion(
+      purposeId,
+      { dailyCalls },
+      getAuthorizationHeader(token)
+    );
+
+    assertValidResponse(response);
+
+    const shouldWaitForApproval = dailyCalls > ESERVICE_DAILY_CALLS.perConsumer;
+
+    await makePolling(
+      () =>
+        apiClient.purposes.getPurpose(purposeId, getAuthorizationHeader(token)),
+      (res) =>
+        shouldWaitForApproval
+          ? res.data.waitingForApprovalVersion?.state === "WAITING_FOR_APPROVAL"
+          : res.data.currentVersion?.dailyCalls === dailyCalls
+    );
+
+    return response.data;
   },
 };

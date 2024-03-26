@@ -1,4 +1,4 @@
-@agreement_document_read
+@agreement_document_read @IMN-369
 Feature: Lettura di un documento allegato alla richiesta di fruizione
 Tutti gli utenti autorizzati possono leggere un documento allegato alla richiesta di fruizione
 
