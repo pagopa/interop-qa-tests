@@ -2,13 +2,13 @@
 Feature: Listing finalità lato erogatore
 
   @purpose-producer-listing1
-  Scenario Outline: A fronte di 20 finalità in db, restituisce solo i primi 12 risultati (scopo del test è verificare il corretto funzionamento del parametro limit)
+  Scenario Outline: A fronte di 5 finalità in db, restituisce solo i primi 3 risultati (scopo del test è verificare il corretto funzionamento del parametro limit)
     Given l'utente è un "<ruolo>" di "<ente>"
     Given un "admin" di "<ente>" ha già creato e pubblicato 1 e-service
     Given "PA2" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "PA2" ha già creato 20 finalità in stato "ACTIVE" per quell'eservice
-    When l'utente erogatore richiede una operazione di listing delle finalità limitata alle prime 12 finalità
-    Then si ottiene status code <risultato> e la lista di 12 finalità
+    Given un "admin" di "PA2" ha già creato 5 finalità in stato "ACTIVE" per quell'eservice
+    When l'utente erogatore richiede una operazione di listing delle finalità limitata alle prime 3 finalità
+    Then si ottiene status code <risultato> e la lista di 3 finalità
 
     Examples: 
       | ente | ruolo        | risultato |
@@ -44,8 +44,7 @@ Feature: Listing finalità lato erogatore
     Then si ottiene status code 200 e la lista di 4 finalità
 
   @purpose-producer-listing4
-  Scenario Outline: 
-Restituisce le finalità che hanno per fruitore uno o più specifici enti (scopo del test è verificare il corretto funzionamento del parametro consumerIds). NB: vengono escluse le finalità in stato DRAFT, anche qualora non fosse valorizzato il parametro states
+  Scenario Outline: Restituisce le finalità che hanno per fruitore uno o più specifici enti (scopo del test è verificare il corretto funzionamento del parametro consumerIds). NB: vengono escluse le finalità in stato DRAFT, anche qualora non fosse valorizzato il parametro states
 
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA1" ha già creato e pubblicato 1 e-service
@@ -57,8 +56,7 @@ Restituisce le finalità che hanno per fruitore uno o più specifici enti (scopo
     Then si ottiene status code 200 e la lista di 2 finalità
 
   @purpose-producer-listing5
-  Scenario Outline: 
-Restituisce le finalità associate ad alcuni specifici e-service (scopo del test è verificare che funzioni il filtro per e-servicesIds)
+  Scenario Outline: Restituisce le finalità associate ad alcuni specifici e-service (scopo del test è verificare che funzioni il filtro per e-servicesIds)
 
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA1" ha già creato e pubblicato 1 e-service
@@ -71,8 +69,7 @@ Restituisce le finalità associate ad alcuni specifici e-service (scopo del test
     Then si ottiene status code 200 e la lista di 1 finalità
 
   @purpose-producer-listing6
-  Scenario Outline: 
-Restituisce le finalità che sono in uno o più specifici stati (es. ACTIVE e SUSPENDED, scopo del test è verificare che funzioni il filtro per states)
+  Scenario Outline: Restituisce le finalità che sono in uno o più specifici stati (es. ACTIVE e SUSPENDED, scopo del test è verificare che funzioni il filtro per states)
 
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA1" ha già creato e pubblicato 1 e-service
@@ -89,8 +86,7 @@ Restituisce le finalità che sono in uno o più specifici stati (es. ACTIVE e SU
       | SUSPENDED     |
 
   @purpose-producer-listing7
-  Scenario Outline: 
-Restituisce le finalità che contengono la keyword "test" all'interno del nome, con ricerca case insensitive (scopo del test è verificare che funzioni il filtro q)
+  Scenario Outline: Restituisce le finalità che contengono la keyword "test" all'interno del nome, con ricerca case insensitive (scopo del test è verificare che funzioni il filtro q)
 
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA1" ha già creato e pubblicato 1 e-service
@@ -100,8 +96,7 @@ Restituisce le finalità che contengono la keyword "test" all'interno del nome, 
     Then si ottiene status code 200 e la lista di 1 finalità
 
   @purpose-producer-listing8
-  Scenario Outline: 
-Restituisce un insieme vuoto di finalità per una ricerca che non porta risultati (scopo del test è verificare che, se non ci sono risultati, il server risponda con 200 e array vuoto e non con un errore)
+  Scenario Outline: Restituisce un insieme vuoto di finalità per una ricerca che non porta risultati (scopo del test è verificare che, se non ci sono risultati, il server risponda con 200 e array vuoto e non con un errore)
 
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA1" ha già creato e pubblicato 1 e-service
