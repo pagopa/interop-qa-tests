@@ -39,7 +39,7 @@ Tutti gli utenti autorizzati possono archiviare una richiesta di fruizione in st
       | ACTIVE         |
       | SUSPENDED      |
 
-  @agreement_archive3a @wait_for_fix @PIN-4667
+  @agreement_archive3a
   Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fruitore e attivata da un erogatore, la quale è in stato DRAFT o ARCHIVED, alla richiesta di archiviazione da parte di un utente con sufficienti permessi dell’ente fruitore, ottiene un errore
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA2" ha già creato un e-service in stato "PUBLISHED" con approvazione "AUTOMATIC"
@@ -52,7 +52,7 @@ Tutti gli utenti autorizzati possono archiviare una richiesta di fruizione in st
       | DRAFT          |
       | ARCHIVED       |
 
-  @agreement_archive3b @wait_for_fix @PIN-4667
+  @agreement_archive3b
   Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fruitore e attivata da un erogatore, la quale è in stato PENDING alla richiesta di archiviazione da parte di un utente con sufficienti permessi dell’ente fruitore, ottiene un errore
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA2" ha già creato un e-service in stato "PUBLISHED" con approvazione "MANUAL"
@@ -60,7 +60,7 @@ Tutti gli utenti autorizzati possono archiviare una richiesta di fruizione in st
     When l'utente richiede una operazione di archiviazione della richiesta di fruizione
     Then si ottiene status code 400
 
-  @agreement_archive3c @wait_for_fix @PIN-4667
+  @agreement_archive3c
   Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fruitore e attivata da un erogatore, la quale è in stato REJECTED alla richiesta di archiviazione da parte di un utente con sufficienti permessi dell’ente fruitore, ottiene un errore (NB: verificare status code)
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA2" ha già creato un e-service in stato "PUBLISHED" con approvazione "MANUAL"
@@ -69,7 +69,7 @@ Tutti gli utenti autorizzati possono archiviare una richiesta di fruizione in st
     When l'utente richiede una operazione di archiviazione della richiesta di fruizione
     Then si ottiene status code 400
 
-  @agreement_archive3d @wait_for_fix @PIN-4667
+  @agreement_archive3d
   Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fruitore e attivata da un erogatore, la quale è in stato MISSING_CERTIFIED_ATTRIBUTES alla richiesta di archiviazione da parte di un utente con sufficienti permessi dell’ente fruitore, ottiene un errore (NB: verificare status code)
     Given l'utente è un "admin" di "<enteFruitore>"
     Given "<enteCertificatore>" ha creato un attributo certificato e lo ha assegnato a "<enteFruitore>"
