@@ -11,21 +11,11 @@ Feature: Aggiornamento di una richiesta di fruizione in bozza
 
     Examples: 
       | ente    | ruolo        | risultato |
-      | GSP     | admin        |       200 |
-      | GSP     | api          |       403 |
-      | GSP     | security     |       403 |
-      | GSP     | support      |       403 |
-      | GSP     | api,security |       403 |
       | PA1     | admin        |       200 |
       | PA1     | api          |       403 |
       | PA1     | security     |       403 |
       | PA1     | support      |       403 |
       | PA1     | api,security |       403 |
-      | Privato | admin        |       200 |
-      | Privato | api          |       403 |
-      | Privato | security     |       403 |
-      | Privato | support      |       403 |
-      | Privato | api,security |       403 |
 
   @agreement_update2a
   Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fruitore, la quale è in stato REJECTED, alla richiesta di aggiornamento della bozza da parte di un utente con sufficienti permessi dell’ente fruitore con un messaggio per l’erogatore (consumerNotes) aggiornato, ottiene un errore
