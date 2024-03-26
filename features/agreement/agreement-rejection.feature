@@ -54,3 +54,4 @@ Feature: Rifiuto di una richiesta di fruizione
     Given un "admin" di "PA2" ha già rifiutato quella richiesta di fruizione
     When l'utente richiede una operazione di rifiuto di quella richiesta di fruizione con messaggio
     Then si ottiene status code 400
+    
