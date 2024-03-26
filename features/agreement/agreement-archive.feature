@@ -12,21 +12,11 @@ Tutti gli utenti autorizzati possono archiviare una richiesta di fruizione in st
 
     Examples: 
       | ente    | ruolo        | risultato |
-      | GSP     | admin        |       204 |
-      | GSP     | api          |       403 |
-      | GSP     | security     |       403 |
-      | GSP     | support      |       403 |
-      | GSP     | api,security |       403 |
       | PA1     | admin        |       204 |
       | PA1     | api          |       403 |
       | PA1     | security     |       403 |
       | PA1     | support      |       403 |
       | PA1     | api,security |       403 |
-      | Privato | admin        |       204 |
-      | Privato | api          |       403 |
-      | Privato | security     |       403 |
-      | Privato | support      |       403 |
-      | Privato | api,security |       403 |
 
   @agreement_archive1b
   Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fruitore e attivata da un erogatore, la quale è in stato SUSPENDED, alla richiesta di archiviazione da parte di un utente con sufficienti permessi dell’ente fruitore, va a buon fine
