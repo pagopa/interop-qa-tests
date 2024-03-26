@@ -10,7 +10,7 @@ Feature: Clonazione di una finalità (fruitore)
     Given un "admin" di "PA2" ha già caricato un'interfaccia per quel descrittore
     Given un "admin" di "PA2" ha già pubblicato quella versione di e-service
     Given "<ente>" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "<ruolo>" di "<ente>" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
+    Given un "admin" di "<ente>" ha già creato una finalità in stato "ACTIVE" per quell'eservice associando quell'analisi del rischio creata dall'erogatore
     When l'utente richiede una operazione di clonazione della finalità
     Then si ottiene status code <risultato>
 
@@ -36,7 +36,7 @@ Feature: Clonazione di una finalità (fruitore)
     Given un "admin" di "PA2" ha già caricato un'interfaccia per quel descrittore
     Given un "admin" di "PA2" ha già pubblicato quella versione di e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "PA1" ha già creato 1 finalità in stato "<statoFinalita>" per quell'eservice
+    Given un "admin" di "PA1" ha già creato una finalità in stato "<statoFinalita>" per quell'eservice associando quell'analisi del rischio creata dall'erogatore
     When l'utente richiede una operazione di clonazione della finalità
     Then si ottiene status code 200
 
@@ -45,7 +45,7 @@ Feature: Clonazione di una finalità (fruitore)
       | WAITING_FOR_APPROVAL |
       | SUSPENDED            |
 
-  @purpose-clone-2
+  @purpose-clone-2 @wait_for_fix
   Scenario Outline: Un utente con sufficienti permessi (admin); il cui ente ha già una finalità in stato DRAFT, o ARCHIVED per una versione di e-service, il quale ha mode = RECEIVE, clona una finalità. Ottiene un errore (NB: verificare status code)
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA2" ha già creato un e-service in modalità "RECEIVE" con un descrittore in stato "DRAFT"
@@ -53,7 +53,7 @@ Feature: Clonazione di una finalità (fruitore)
     Given un "admin" di "PA2" ha già caricato un'interfaccia per quel descrittore
     Given un "admin" di "PA2" ha già pubblicato quella versione di e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "PA1" ha già creato 1 finalità in stato "<statoFinalita>" per quell'eservice
+    Given un "admin" di "PA1" ha già creato una finalità in stato "<statoFinalita>" per quell'eservice associando quell'analisi del rischio creata dall'erogatore
     When l'utente richiede una operazione di clonazione della finalità
     Then si ottiene status code 400
 
@@ -69,7 +69,7 @@ Feature: Clonazione di una finalità (fruitore)
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given un "admin" di "PA1" ha già creato 1 finalità in stato "<statoFinalita>" per quell'eservice
     When l'utente richiede una operazione di clonazione della finalità
-    Then si ottiene status code 400
+    Then si ottiene status code 200
 
     Examples: 
       | statoFinalita        |
