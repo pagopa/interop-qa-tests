@@ -52,33 +52,6 @@ Given(
 );
 
 Given(
-  "un {string} di {string} ha già pubblicato una nuova versione per quell'e-service che richiede quell'attributo certificato",
-  async function (role: Role, tenantType: TenantType) {
-    assertContextSchema(this, {
-      token: z.string(),
-      eserviceId: z.string(),
-      attributeId: z.string(),
-    });
-
-    const token = getToken(this.tokens, tenantType, role);
-    const response =
-      await dataPreparationService.createDescriptorWithGivenState({
-        token,
-        eserviceId: this.eserviceId,
-        descriptorState: "PUBLISHED",
-        attributes: {
-          certified: [
-            [{ id: this.attributeId, explicitAttributeVerification: true }],
-          ],
-          declared: [],
-          verified: [],
-        },
-      });
-    this.descriptorId = response.descriptorId;
-  }
-);
-
-Given(
   "un {string} di {string} ha già pubblicato una nuova versione per quell'e-service che richiede un attributo dichiarato che {string} non possiede",
   async function (role: Role, tenantType: TenantType, _consumer: TenantType) {
     assertContextSchema(this, {

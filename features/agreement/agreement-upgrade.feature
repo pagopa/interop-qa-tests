@@ -98,7 +98,7 @@ Feature: Upgrade di una richiesta di fruizione
     Given un "admin" di "GSP" ha già creato un e-service in stato "PUBLISHED" con approvazione "AUTOMATIC"
     Given "PA1" ha una richiesta di fruizione in stato "<statoAgreement>" per quell'e-service
     Given "PA2" ha creato un attributo certificato e non lo ha assegnato a "PA1"
-    Given un "admin" di "GSP" ha già pubblicato una nuova versione per quell'e-service che richiede quell'attributo certificato
+    Given un "admin" di "GSP" ha già pubblicato una nuova versione per quell'e-service richiedendo gli stessi attributi certificati
     When l'utente richiede un'operazione di upgrade di quella richiesta di fruizione
     Then si ottiene status code 400
 
@@ -108,7 +108,7 @@ Feature: Upgrade di una richiesta di fruizione
       | SUSPENDED      |
 
   @agreement_upgrade5
-  Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fruitore e attivata da un erogatore, la quale è in stato ACTIVE o SUSPENDED, e associata ad una versione di e-service antecedente all’ultima versione pubblicata, all'interno della nuova versione SONO cambiati gli attributi rispetto alla versione precedente, ed il fruitore non ne possegga uno o più tra quelli VERIFICATI e/o DICHIARATI, alla richiesta di aggiornamento da parte di un utente con sufficienti permessi dell’ente fruitore, va a buon fine
+  Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fruitore e attivata da un erogatore, la quale è in stato ACTIVE o SUSPENDED, e associata ad una versione di e-service antecedente all’ultima versione pubblicata, all'interno della nuova versione SONO cambiati gli attributi rispetto alla versione precedente, ed il fruitore non ne possegga uno o più tra quelli DICHIARATI, alla richiesta di aggiornamento da parte di un utente con sufficienti permessi dell’ente fruitore, va a buon fine
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA2" ha già creato un e-service in stato "PUBLISHED" con approvazione "AUTOMATIC"
     Given "PA1" ha una richiesta di fruizione in stato "<statoAgreement>" per quell'e-service
