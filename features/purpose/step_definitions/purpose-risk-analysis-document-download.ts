@@ -15,6 +15,7 @@ When("l'utente scarica il documento di analisi del rischio", async function () {
   assertContextSchema(this, {
     token: z.string(),
     purposeId: z.string(),
+    versionId: z.string(),
   });
 
   const getPurposeResponse = await apiClient.purposes.getPurpose(
@@ -25,14 +26,8 @@ When("l'utente scarica il documento di analisi del rischio", async function () {
   assertValidResponse(getPurposeResponse);
 
   const purpose = getPurposeResponse.data;
-  const versionId =
-    purpose.currentVersion?.id ?? purpose.waitingForApprovalVersion?.id;
   const riskAnalysisDocumentId =
     purpose.currentVersion?.riskAnalysisDocument?.id;
-
-  if (!versionId) {
-    throw new Error(`Purpose version for id ${this.purposeId} not found`);
-  }
 
   if (!riskAnalysisDocumentId) {
     throw new Error(
@@ -42,7 +37,7 @@ When("l'utente scarica il documento di analisi del rischio", async function () {
 
   this.response = await apiClient.purposes.getRiskAnalysisDocument(
     this.purposeId,
-    versionId,
+    this.versionId,
     riskAnalysisDocumentId,
     getAuthorizationHeader(this.token)
   );
