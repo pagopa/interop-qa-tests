@@ -829,40 +829,37 @@ export const dataPreparationService = {
       );
     }
     assertValidResponse(response);
+
     const purposeId = response.data.id;
+    let versionId: string | undefined;
 
     await makePolling(
       () =>
         apiClient.purposes.getPurpose(purposeId, getAuthorizationHeader(token)),
-      (res) => res.status !== 404
+      (res) => {
+        versionId = res.data.currentVersion?.id;
+        return res.status !== 404;
+      }
     );
-
-    if (purposeState === "DRAFT") {
-      return purposeId;
-    }
-
-    // 2. In order to continue, we need the versionId of the current version of the purpose, so we get it
-    const versionId = (
-      await apiClient.purposes.getPurpose(
-        purposeId,
-        getAuthorizationHeader(token)
-      )
-    ).data.currentVersion?.id;
 
     if (!versionId) {
       throw new Error(`Purpose version for id ${purposeId} not found`);
     }
 
-    // 3. Activate the purpose version
-    const activatePurposeReponse =
+    if (purposeState === "DRAFT") {
+      return { purposeId, versionId };
+    }
+
+    // 2. Activate the purpose version
+    const activatePurposeResponse =
       await apiClient.purposes.activatePurposeVersion(
         purposeId,
         versionId,
         getAuthorizationHeader(token)
       );
-    assertValidResponse(activatePurposeReponse);
+    assertValidResponse(activatePurposeResponse);
 
-    // 4. If the state required is WAITING_FOR_APPROVAL, we need to wait until the purpose version is in that state and return the purposeId
+    // 3. If the state required is WAITING_FOR_APPROVAL, we need to wait until the purpose version is in that state and return the purposeId
     if (purposeState === "WAITING_FOR_APPROVAL") {
       await makePolling(
         () =>
@@ -873,7 +870,7 @@ export const dataPreparationService = {
         (res) =>
           res.data.waitingForApprovalVersion?.state === "WAITING_FOR_APPROVAL"
       );
-      return purposeId;
+      return { purposeId, versionId };
     }
 
     await makePolling(
@@ -882,7 +879,7 @@ export const dataPreparationService = {
       (res) => res.data.currentVersion?.state === "ACTIVE"
     );
 
-    // 5. If the state required is SUSPENDED call the endpoint to suspend the purpose version
+    // 4. If the state required is SUSPENDED call the endpoint to suspend the purpose version
     if (purposeState === "SUSPENDED") {
       const suspendPurposeResponse =
         await apiClient.purposes.suspendPurposeVersion(
@@ -901,7 +898,7 @@ export const dataPreparationService = {
       );
     }
 
-    // 6. If the state required is ARCHIVED call the endpoint to archive the purpose version
+    // 5. If the state required is ARCHIVED call the endpoint to archive the purpose version
     if (purposeState === "ARCHIVED") {
       const archivePurposeResponse =
         await apiClient.purposes.archivePurposeVersion(
@@ -919,6 +916,6 @@ export const dataPreparationService = {
         (res) => res.data.currentVersion?.state === "ARCHIVED"
       );
     }
-    return purposeId;
+    return { purposeId, versionId };
   },
 };
