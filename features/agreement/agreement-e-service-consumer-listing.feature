@@ -1,6 +1,6 @@
 @agreement_e_service_consumer_listing
 Feature: Listing e-service con richieste di fruizione attive lato fruitore
-  Tutti gli utenti autorizzati di qualsiasi tipologia di ente possono ottenere la lista degli e-service con il quale hanno almeno una richiesta di fruizione attiva
+  Tutti gli utenti autorizzati di qualsiasi tipologia di ente possono ottenere la lista degli e-service per i quali hanno almeno una richiesta di fruizione attiva
 
   @agreement_e_service_consumer_listing1
   Scenario Outline: Restituisce gli e-service per i quali il fruitore ha almeno una richiesta di fruizione in qualsiasi stato
