@@ -26,6 +26,7 @@ When("l'utente scarica il documento di analisi del rischio", async function () {
   assertValidResponse(getPurposeResponse);
 
   const purpose = getPurposeResponse.data;
+
   const riskAnalysisDocumentId =
     purpose.currentVersion?.riskAnalysisDocument?.id;
 
@@ -41,6 +42,8 @@ When("l'utente scarica il documento di analisi del rischio", async function () {
     riskAnalysisDocumentId,
     getAuthorizationHeader(this.token)
   );
+
+  assertValidResponse(this.response);
 });
 
 Given(
@@ -50,10 +53,12 @@ Given(
       token: z.string(),
       purposeId: z.string(),
     });
-    await dataPreparationService.createNewPurposeVersion(
+    const { versionId } = await dataPreparationService.createNewPurposeVersion(
       this.token,
       this.purposeId,
       { dailyCalls: ESERVICE_DAILY_CALLS.perConsumer - 1 }
     );
+
+    this.versionId = versionId;
   }
 );
