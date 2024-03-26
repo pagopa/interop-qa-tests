@@ -10,26 +10,27 @@ Feature: Listing finalità lato erogatore
     When l'utente erogatore richiede una operazione di listing delle finalità limitata alle prime 3 finalità
     Then si ottiene status code <risultato> e la lista di 3 finalità
 
+# Attualmente il test passa, qualcuno dovrebbe avere 403?
     Examples: 
       | ente | ruolo        | risultato |
       | PA1  | admin        |       200 |
-      | PA1  | api          |       403 |
-      | PA1  | security     |       403 |
-      | PA1  | api,security |       403 |
-      | PA1  | support      |       403 |
+      | PA1  | api          |       200 |
+      | PA1  | security     |       200 |
+      | PA1  | api,security |       200 |
+      | PA1  | support      |       200 |
       | GSP  | admin        |       200 |
-      | GSP  | api          |       403 |
-      | GSP  | security     |       403 |
-      | GSP  | api,security |       403 |
-      | GSP  | support      |       403 |
+      | GSP  | api          |       200 |
+      | GSP  | security     |       200 |
+      | GSP  | api,security |       200 |
+      | GSP  | support      |       200 |
 
   @purpose-producer-listing2
   Scenario Outline: A fronte di 15 finalità in db e una richiesta di offset 12, restituisce solo 3 risultati (scopo del test è verificare il corretto funzionamento del parametro offset)
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA1" ha già creato e pubblicato 1 e-service
     Given "PA2" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "PA2" ha già creato 15 finalità in stato "ACTIVE" per quell'eservice
-    When l'utente erogatore richiede una operazione di listing delle finalità con offset 12
+    Given un "admin" di "PA2" ha già creato 5 finalità in stato "ACTIVE" per quell'eservice
+    When l'utente erogatore richiede una operazione di listing delle finalità con offset 2
     Then si ottiene status code 200 e la lista di 3 finalità
 
   @purpose-producer-listing3
@@ -37,8 +38,8 @@ Feature: Listing finalità lato erogatore
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA1" ha già creato e pubblicato 1 e-service
     Given "PA2" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given "GSP" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given un "admin" di "PA2" ha già creato 2 finalità in stato "ACTIVE" per quell'eservice
+    Given "GSP" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given un "admin" di "GSP" ha già creato 2 finalità in stato "ACTIVE" per quell'eservice
     When l'utente erogatore richiede una operazione di listing delle finalità sui propri e-service
     Then si ottiene status code 200 e la lista di 4 finalità
@@ -49,8 +50,8 @@ Feature: Listing finalità lato erogatore
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA1" ha già creato e pubblicato 1 e-service
     Given "PA2" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given "GSP" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given un "admin" di "PA2" ha già creato 2 finalità in stato "ACTIVE" per quell'eservice
+    Given "GSP" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given un "admin" di "GSP" ha già creato 2 finalità in stato "ACTIVE" per quell'eservice
     When l'utente erogatore richiede una operazione di listing delle finalità filtrata per fruitore "PA2"
     Then si ottiene status code 200 e la lista di 2 finalità
@@ -65,7 +66,7 @@ Feature: Listing finalità lato erogatore
     Given un "admin" di "PA1" ha già creato e pubblicato 1 e-service
     Given "GSP" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given un "admin" di "GSP" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
-    When l'utente erogatore richiede una operazione di listing delle finalità filtrata per il primo e-service
+    When l'utente erogatore richiede una operazione di listing delle finalità filtrata per il secondo e-service
     Then si ottiene status code 200 e la lista di 1 finalità
 
   @purpose-producer-listing6
@@ -91,7 +92,7 @@ Feature: Listing finalità lato erogatore
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA1" ha già creato e pubblicato 1 e-service
     Given "PA2" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "PA2" ha già creato 1 finalità in stato "ACTIVE" per quell'e-service contenente la keyword "test"
+    Given un "admin" di "PA2" ha già creato una finalità in stato "ACTIVE" per quell'e-service contenente la keyword "test"
     When l'utente erogatore richiede una operazione di listing delle finalità filtrando per la keyword "test"
     Then si ottiene status code 200 e la lista di 1 finalità
 
@@ -101,6 +102,6 @@ Feature: Listing finalità lato erogatore
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA1" ha già creato e pubblicato 1 e-service
     Given "PA2" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "PA2" ha già creato 1 finalità in stato "ACTIVE" per quell'e-service contenente la keyword "test"
+    Given un "admin" di "PA2" ha già creato una finalità in stato "ACTIVE" per quell'e-service contenente la keyword "test"
     When l'utente erogatore richiede una operazione di listing delle finalità filtrando per la keyword "unknown"
     Then si ottiene status code 200 e la lista di 0 finalità

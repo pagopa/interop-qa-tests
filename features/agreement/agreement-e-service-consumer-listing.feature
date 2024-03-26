@@ -1,6 +1,6 @@
 @agreement_e_service_consumer_listing
 Feature: Listing e-service con richieste di fruizione attive lato fruitore
-  Tutti gli utenti autorizzati di enti PA, GSP possono ottenere la lista degli e-service con la quale hanno almeno una richiesta di fruizione attiva
+  Tutti gli utenti autorizzati di qualsiasi tipologia di ente possono ottenere la lista degli e-service per i quali hanno almeno una richiesta di fruizione attiva
 
   @agreement_e_service_consumer_listing1
   Scenario Outline: Restituisce gli e-service per i quali il fruitore ha almeno una richiesta di fruizione in qualsiasi stato
@@ -11,17 +11,22 @@ Feature: Listing e-service con richieste di fruizione attive lato fruitore
     Then si ottiene status code 200 e la lista di 2 e-services
 
     Examples: 
-      | ente | ruolo        |
-      | GSP  | admin        |
-      | GSP  | api          |
-      | GSP  | security     |
-      | GSP  | api,security |
-      | GSP  | support      |
-      | PA1  | admin        |
-      | PA1  | api          |
-      | PA1  | security     |
-      | PA1  | api,security |
-      | PA1  | support      |
+      | ente    | ruolo        |
+      | GSP     | admin        |
+      | GSP     | api          |
+      | GSP     | security     |
+      | GSP     | api,security |
+      | GSP     | support      |
+      | PA1     | admin        |
+      | PA1     | api          |
+      | PA1     | security     |
+      | PA1     | api,security |
+      | PA1     | support      |
+      | Privato | admin        |
+      | Privato | api          |
+      | Privato | security     |
+      | Privato | support      |
+      | Privato | api,security |
 
   @agreement_e_service_consumer_listing2
   Scenario Outline: A fronte di 5 e-service, restituisce solo i primi 3 risultati
