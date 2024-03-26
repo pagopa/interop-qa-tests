@@ -5,9 +5,14 @@ import {
   assertContextSchema,
   getAuthorizationHeader,
   getOrganizationId,
+  getRandomInt,
+  getRiskAnalysis,
+  getToken,
 } from "../../../utils/commons";
 import { apiClient } from "../../../api";
-import { TenantType } from "../../common-steps";
+import { Role, TenantType } from "../../common-steps";
+import { PurposeVersionState } from "../../../api/models";
+import { dataPreparationService } from "../../../services/data-preparation.service";
 
 When(
   "l'utente erogatore richiede una operazione di listing delle finalità limitata alle prime {int} finalità",
@@ -43,35 +48,166 @@ Then(
 
 When(
   "l'utente erogatore richiede una operazione di listing delle finalità con offset {int}",
-  async function () {}
+  async function (offset: number) {
+    assertContextSchema(this, {
+      token: z.string(),
+      tenantType: TenantType,
+      eserviceId: z.string(),
+    });
+    const producerId = getOrganizationId(this.tenantType);
+    this.response = await apiClient.producer.getProducerPurposes(
+      {
+        eservicesIds: [this.eserviceId],
+        offset,
+        limit: 50,
+        producersIds: [producerId],
+      },
+      getAuthorizationHeader(this.token)
+    );
+  }
 );
 
 When(
   "l'utente erogatore richiede una operazione di listing delle finalità sui propri e-service",
-  async function () {}
+  async function () {
+    assertContextSchema(this, {
+      token: z.string(),
+      tenantType: TenantType,
+      eserviceId: z.string(),
+    });
+    const producerId = getOrganizationId(this.tenantType);
+    this.response = await apiClient.producer.getProducerPurposes(
+      {
+        eservicesIds: [this.eserviceId],
+        offset: 0,
+        limit: 50,
+        producersIds: [producerId],
+      },
+      getAuthorizationHeader(this.token)
+    );
+  }
 );
 
 When(
   "l'utente erogatore richiede una operazione di listing delle finalità filtrata per fruitore {string}",
-  async function () {}
+  async function (consumer: TenantType) {
+    assertContextSchema(this, {
+      token: z.string(),
+      tenantType: TenantType,
+      eserviceId: z.string(),
+    });
+    const producerId = getOrganizationId(this.tenantType);
+    const consumerId = getOrganizationId(consumer);
+    this.response = await apiClient.producer.getProducerPurposes(
+      {
+        eservicesIds: [this.eserviceId],
+        offset: 0,
+        limit: 50,
+        producersIds: [producerId],
+        consumersIds: [consumerId],
+      },
+      getAuthorizationHeader(this.token)
+    );
+  }
 );
 
 When(
-  "l'utente erogatore richiede una operazione di listing delle finalità filtrata per il primo e-service",
-  async function () {}
+  "l'utente erogatore richiede una operazione di listing delle finalità filtrata per il secondo e-service",
+  async function () {
+    assertContextSchema(this, {
+      token: z.string(),
+      tenantType: TenantType,
+      eserviceId: z.string(),
+    });
+    const producerId = getOrganizationId(this.tenantType);
+    this.response = await apiClient.producer.getProducerPurposes(
+      {
+        eservicesIds: [this.eserviceId],
+        offset: 0,
+        limit: 50,
+        producersIds: [producerId],
+      },
+      getAuthorizationHeader(this.token)
+    );
+  }
 );
 
 When(
   "l'utente erogatore richiede una operazione di listing delle finalità in stato {string}",
-  async function () {}
+  async function (purposeState: PurposeVersionState) {
+    assertContextSchema(this, {
+      token: z.string(),
+      tenantType: TenantType,
+      eserviceId: z.string(),
+    });
+    const producerId = getOrganizationId(this.tenantType);
+    this.response = await apiClient.producer.getProducerPurposes(
+      {
+        eservicesIds: [this.eserviceId],
+        offset: 0,
+        limit: 50,
+        states: [purposeState],
+        producersIds: [producerId],
+      },
+      getAuthorizationHeader(this.token)
+    );
+  }
 );
 
 Given(
-  "un {string} di {string} ha già creato {int} finalità in stato {string} per quell'e-service contenente la keyword {string}",
-  async function () {}
+  "un {string} di {string} ha già creato una finalità in stato {string} per quell'e-service contenente la keyword {string}",
+  async function (
+    role: Role,
+    tenantType: TenantType,
+    purposeState: PurposeVersionState,
+    keyword: string
+  ) {
+    assertContextSchema(this, {
+      eserviceId: z.string(),
+    });
+
+    const token = getToken(this.tokens, tenantType, "admin");
+    const consumerId = getOrganizationId(tenantType);
+
+    const { riskAnalysisForm } = getRiskAnalysis({
+      completed: true,
+      tenantType,
+    });
+
+    const title = `purpose ${this.TEST_SEED} - ${getRandomInt()} - ${keyword}`;
+    this.purposeId = await dataPreparationService.createPurposeWithGivenState({
+      token,
+      testSeed: this.TEST_SEED,
+      eserviceMode: "DELIVER",
+      payload: {
+        title,
+        eserviceId: this.eserviceId,
+        consumerId,
+        riskAnalysisForm,
+      },
+      purposeState,
+    });
+  }
 );
 
 When(
   "l'utente erogatore richiede una operazione di listing delle finalità filtrando per la keyword {string}",
-  async function () {}
+  async function (keyword: string) {
+    assertContextSchema(this, {
+      token: z.string(),
+      tenantType: TenantType,
+      eserviceId: z.string(),
+    });
+    const producerId = getOrganizationId(this.tenantType);
+    this.response = await apiClient.producer.getProducerPurposes(
+      {
+        q: keyword,
+        eservicesIds: [this.eserviceId],
+        offset: 0,
+        limit: 50,
+        producersIds: [producerId],
+      },
+      getAuthorizationHeader(this.token)
+    );
+  }
 );
