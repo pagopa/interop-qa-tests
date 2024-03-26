@@ -90,7 +90,7 @@ Feature: Upgrade di una richiesta di fruizione
       | PENDING        | MANUAL           |
       | DRAFT          | AUTOMATIC        |
       | ARCHIVED       | AUTOMATIC        |
-  #Il servizio torna status code = 500
+
 
   @agreement_upgrade4 @wait_for_fix
   Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fruitore e attivata da un erogatore, la quale è in stato ACTIVE o SUSPENDED, e associata ad una versione di e-service antecedente all’ultima versione pubblicata, all'interno della nuova versione SONO cambiati gli attributi rispetto alla versione precedente, ed il fruitore non ne possegga uno o più tra quelli CERTIFICATI, alla richiesta di aggiornamento da parte di un utente con sufficienti permessi dell’ente fruitore, ottiene un errore
@@ -135,7 +135,6 @@ Feature: Upgrade di una richiesta di fruizione
       | statoAgreement |
       | ACTIVE         |
       | SUSPENDED      |
-  #Il servizio torna status code = 500
 
   @agreement_upgrade7 @wait_for_fix
   Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fruitore e attivata da un erogatore, la quale è in stato ACTIVE o SUSPENDED, e associata ad una versione di e-service due indietro rispetto all’ultima versione pubblicata, all'interno della versione 2 non sono sono cambiati gli attributi rispetto alla versione 1; all'interno della versione 3 sono cambiati gli attributi rispetto alla versione 2 e il fruitore NON possiede almeno uno dei CERTIFICATI; alla richiesta di aggiornamento da parte di un utente con sufficienti permessi dell’ente fruitore, dà errore
