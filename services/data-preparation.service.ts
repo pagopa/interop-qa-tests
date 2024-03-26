@@ -28,8 +28,8 @@ export const ESERVICE_DAILY_CALLS: Readonly<{
   total: number;
   perConsumer: number;
 }> = {
-  total: 100,
-  perConsumer: 10,
+  total: 1000,
+  perConsumer: 50,
 };
 
 export const dataPreparationService = {
@@ -811,7 +811,7 @@ export const dataPreparationService = {
       dailyCalls:
         purposeState === "WAITING_FOR_APPROVAL"
           ? ESERVICE_DAILY_CALLS.perConsumer + 1
-          : ESERVICE_DAILY_CALLS.perConsumer,
+          : 1,
     };
 
     const data = { ...defaultValues, ...payload };
