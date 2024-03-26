@@ -8,7 +8,7 @@ Feature: Cancellazione di un descrittore
     Given un "admin" di "PA1" ha già creato un e-service con un descrittore in stato "DRAFT"
     When l'utente cancella il descrittore di quell'e-service
     Then si ottiene status code 204
-    Then quell'e-service è stato cancellato
+    Then il descrittore è stato cancellato, ma l'eservice no
 
   @descriptor_deletion2
   Scenario Outline: Per un e-service che ha più di un descrittore, l’ultimo dei quali è in stato DRAFT, la richiesta di cancellazione del descrittore cancella solo il descrittore stesso e non l’e-service del quale fa parte né nessuno degli altri descrittori dell’e-service

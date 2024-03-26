@@ -52,17 +52,19 @@ Given(
     const consumerId = getOrganizationId(tenantType);
 
     const title = `purpose title - QA - ${this.TEST_SEED} - ${getRandomInt()}`;
-    this.purposeId = await dataPreparationService.createPurposeWithGivenState({
-      token,
-      testSeed: this.TEST_SEED,
-      eserviceMode: "DELIVER",
-      payload: {
-        title,
-        eserviceId: this.eserviceId,
-        consumerId,
-      },
-      purposeState: "DRAFT",
-    });
+    const { purposeId } =
+      await dataPreparationService.createPurposeWithGivenState({
+        token,
+        testSeed: this.TEST_SEED,
+        eserviceMode: "DELIVER",
+        payload: {
+          title,
+          eserviceId: this.eserviceId,
+          consumerId,
+        },
+        purposeState: "DRAFT",
+      });
+    this.purposeId = purposeId;
     this.purposeTitle = title;
   }
 );
@@ -112,8 +114,9 @@ Given(
     });
 
     this.purposesIds = [];
+    this.versionIds = [];
     for (let index = 0; index < n; index++) {
-      const purposeId =
+      const { purposeId, versionId } =
         await dataPreparationService.createPurposeWithGivenState({
           token,
           testSeed: this.TEST_SEED,
@@ -126,8 +129,10 @@ Given(
           purposeState,
         });
       this.purposesIds.push(purposeId);
+      this.versionIds.push(versionId);
     }
     this.purposeId = this.purposesIds[0];
+    this.versionId = this.versionIds[0];
   }
 );
 
