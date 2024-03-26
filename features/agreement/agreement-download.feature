@@ -34,7 +34,7 @@ Tutti gli utenti autorizzati possono scaricare l'attestazione di una richiesta d
       | PA1  | admin | SUSPENDED      |
       | PA1  | admin | ARCHIVED       |
 
-  @agreement_download2a @wait_for_fix @PIN-4669
+  @agreement_download2a @wait_for_fix @IMN-305
   Scenario Outline: Per una richiesta di fruizione precedentemente creata dall’ente, la quale è in stato DRAFT, PENDING, alla richiesta di download dell'attestazione  della richiesta di fruizione sigillata da parte di un utente con sufficienti permessi, ottiene un errore.
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA2" ha già creato un e-service in stato "PUBLISHED" con approvazione "<tipoApprovazione>"
@@ -47,7 +47,7 @@ Tutti gli utenti autorizzati possono scaricare l'attestazione di una richiesta d
       | DRAFT          | AUTOMATIC        |
       | PENDING        | MANUAL           |
 
-  @agreement_download2b @wait_for_fix @PIN-4669
+  @agreement_download2b @wait_for_fix @IMN-305
   Scenario Outline: Per una richiesta di fruizione precedentemente creata dall’ente, la quale è in stato REJECTED, alla richiesta di download dell'attestazione  della richiesta di fruizione sigillata da parte di un utente con sufficienti permessi, ottiene un errore.
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA2" ha già creato un e-service in stato "PUBLISHED" con approvazione "MANUAL"
@@ -56,7 +56,7 @@ Tutti gli utenti autorizzati possono scaricare l'attestazione di una richiesta d
     When l'utente richiede una operazione di download dell'attestazione della richiesta di fruizione
     Then si ottiene status code 400
 
-  @agreement_download2c @wait_for_fix @PIN-4669
+  @agreement_download2c @wait_for_fix @IMN-305
   Scenario Outline: Per una richiesta di fruizione precedentemente creata dall’ente, la quale è in stato MISSING_CERTIFIED_ATTRIBUTES, alla richiesta di download dell'attestazione  della richiesta di fruizione sigillata da parte di un utente con sufficienti permessi, ottiene un errore.
     Given l'utente è un "admin" di "<enteFruitore>"
     Given "<enteCertificatore>" ha creato un attributo certificato e lo ha assegnato a "<enteFruitore>"

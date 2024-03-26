@@ -1,7 +1,6 @@
 import { When } from "@cucumber/cucumber";
 import { z } from "zod";
 import {
-  TOBE_REMOVED_customSerializer,
   assertContextSchema,
   getAuthorizationHeader,
 } from "../../../utils/commons";
@@ -22,7 +21,6 @@ When(
       },
       {
         ...getAuthorizationHeader(this.token),
-        paramsSerializer: TOBE_REMOVED_customSerializer,
       }
     );
   }
@@ -78,7 +76,6 @@ When(
       },
       {
         ...getAuthorizationHeader(this.token),
-        paramsSerializer: TOBE_REMOVED_customSerializer,
       }
     );
   }

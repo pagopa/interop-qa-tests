@@ -1,4 +1,4 @@
-@attribute_listing @wait_for_fix
+@attribute_listing @wait_for_fix @IMN-347
 Feature: Listing attributi
   Tutti gli utenti autenticati possono leggere la lista degli attributi
 
