@@ -1,5 +1,6 @@
 @agreement_activate
 Feature: Attivazione richiesta di fruizione
+  Tutti gli utenti autorizzati di enti PA e GSP possono attivare una richiesta di fruizione
 
   @agreement_activate1 @resource_intensive
   Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fruitore, la quale è in stato PENDING (prima attivazione), con tutti gli attributi richiesti certificati, tutti gli attributi richiesti dichiarati dal fruitore, e tutti gli attributi richiesti verificati dall’erogatore, alla richiesta di attivazione da parte di un utente con sufficienti permessi dell’ente erogatore, va a buon fine
