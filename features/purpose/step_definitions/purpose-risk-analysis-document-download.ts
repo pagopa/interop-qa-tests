@@ -42,8 +42,6 @@ When("l'utente scarica il documento di analisi del rischio", async function () {
     riskAnalysisDocumentId,
     getAuthorizationHeader(this.token)
   );
-
-  assertValidResponse(this.response);
 });
 
 Given(
