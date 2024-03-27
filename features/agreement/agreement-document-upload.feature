@@ -1,6 +1,6 @@
 @agreement_document_upload
 Feature: Caricamento di un documento allegato alla richiesta di fruizione
-Tutti gli utenti autorizzati possono caricare un documento allegato alla richiesta di fruizione in stato DRAFT
+  Tutti gli utenti autorizzati possono caricare un documento allegato alla richiesta di fruizione in stato DRAFT
 
   @agreement_document_upload1
   Scenario Outline: Un utente con sufficienti permessi, per una richiesta di fruizione precedentemente creata, la quale è in stato DRAFT, carica un documento associando un nome al documento (prettyName). La richiesta va a buon fine.
