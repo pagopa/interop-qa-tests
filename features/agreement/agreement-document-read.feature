@@ -1,6 +1,6 @@
 @agreement_document_read @IMN-369
 Feature: Lettura di un documento allegato alla richiesta di fruizione
-Tutti gli utenti autorizzati possono leggere un documento allegato alla richiesta di fruizione
+  Tutti gli utenti autorizzati possono leggere un documento allegato alla richiesta di fruizione
 
   @agreement_document_read1
   Scenario Outline: Un utente con sufficienti permessi, per una richiesta di fruizione precedentemente creata, la quale è in stato DRAFT, relativa a un e-service pubblicato dallo stesso ente, alla richiesta di lettura di un documento allegato, la richiesta va a buon fine.
@@ -22,11 +22,6 @@ Tutti gli utenti autorizzati possono leggere un documento allegato alla richiest
       | PA1  | security     |       403 |
       | PA1  | support      |       200 |
       | PA1  | api,security |       403 |
-      | PA2  | admin        |       200 |
-      | PA2  | api          |       403 |
-      | PA2  | security     |       403 |
-      | PA2  | support      |       200 |
-      | PA2  | api,security |       403 |
 
   @agreement_document_read2a
   Scenario Outline: Un utente con sufficienti permessi, per una richiesta di fruizione precedentemente creata, la quale è in stato PENDING, ACTIVE, SUSPENDED, ARCHIVED, alla richiesta di lettura di un documento allegato, la richiesta va a buon fine.

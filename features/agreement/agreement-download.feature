@@ -1,6 +1,6 @@
 @agreement_download
 Feature: Download attestazione richiesta di fruizione sigillata
-Tutti gli utenti autorizzati possono scaricare l'attestazione di una richiesta di fruizione in stato ACTIVE, SUSPENDED o ARCHIVED.
+  Tutti gli utenti autorizzati possono scaricare l'attestazione di una richiesta di fruizione in stato ACTIVE, SUSPENDED o ARCHIVED.
 
   @agreement_download1a
   Scenario Outline: Per una richiesta di fruizione precedentemente creata dall’ente, la quale è in stato ACTIVE, alla richiesta di download dell'attestazione della richiesta di fruizione da parte di un utente con sufficienti permessi, va a buon fine

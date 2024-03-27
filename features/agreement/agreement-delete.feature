@@ -1,6 +1,6 @@
 @agreement_delete
 Feature: Cancellazione richiesta di fruizione
-Tutti gli utenti autorizzati possono cancellare una richiesta di fruizione in stato DRAFT o MISSING_CERTIFIED_ATTRIBUTES
+  Tutti gli utenti autorizzati possono cancellare una richiesta di fruizione in stato DRAFT o MISSING_CERTIFIED_ATTRIBUTES
 
   @agreement_delete1a
   Scenario Outline: Per una richiesta di fruizione precedentemente creata dall’ente, la quale è in stato DRAFT, alla richiesta di cancellazione da parte di un utente con sufficienti permessi, va a buon fine

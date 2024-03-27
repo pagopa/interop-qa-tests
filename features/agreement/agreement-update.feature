@@ -1,5 +1,6 @@
 @agreement_update
 Feature: Aggiornamento di una richiesta di fruizione in bozza
+  Tutti gli utenti autorizzati possono aggiornare una propria richiesta di fruizione in bozza con un messaggio
 
   @agreement_update1
   Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fruitore, la quale è in stato DRAFT, alla richiesta di aggiornamento della bozza da parte di un utente con sufficienti permessi dell’ente fruitore con un messaggio per l’erogatore (consumerNotes) aggiornato, va a buon fine
@@ -16,6 +17,15 @@ Feature: Aggiornamento di una richiesta di fruizione in bozza
       | PA1     | security     |       403 |
       | PA1     | support      |       403 |
       | PA1     | api,security |       403 |
+      | GSP     | admin        |       200 |
+      | GSP     | api          |       403 |
+      | GSP     | security     |       403 |
+      | GSP     | support      |       403 |
+      | GSP     | api,security |       403 |
+      | Privato | admin        |       200 |
+      | Privato | api          |       403 |
+      | Privato | security     |       403 |
+      | Privato | support      |       403 |
 
   @agreement_update2a
   Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fruitore, la quale è in stato REJECTED, alla richiesta di aggiornamento della bozza da parte di un utente con sufficienti permessi dell’ente fruitore con un messaggio per l’erogatore (consumerNotes) aggiornato, ottiene un errore
