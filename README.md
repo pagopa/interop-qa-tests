@@ -41,7 +41,7 @@ Output example:
 }
 ```
 
-## Tags
+## Tags
 
 Tests are labeled with the following special tags:
 
