@@ -1,6 +1,6 @@
 @agreement_clone
 Feature: Clonazione di una richiesta di fruizione.
-Tutti gli utenti autorizzati possono clonare una richiesta di fruizione in stato REJECTED
+  Tutti gli utenti autorizzati possono clonare una richiesta di fruizione in stato REJECTED
 
   @agreement_clone1
   Scenario Outline: Un utente con sufficienti permessi, clona una richiesta di fruizione in stato REJECTED. La richiesta va a buon fine.
