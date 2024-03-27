@@ -34,4 +34,4 @@ Feature: Download documento di analisi del rischio sigillato
     Given un "admin" di "PA1" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
     Given l'utente ha già aggiornato finalità rispettando le stime di carico per quell'e-service
     When l'utente scarica il documento di analisi del rischio
-    Then si ottiene status code 200
+    Then si ottiene status code 200 e un documento diverso

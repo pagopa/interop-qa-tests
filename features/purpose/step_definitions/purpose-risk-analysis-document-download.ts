@@ -1,4 +1,5 @@
-import { Given, When } from "@cucumber/cucumber";
+import assert from "assert";
+import { Given, Then, When } from "@cucumber/cucumber";
 import { z } from "zod";
 import {
   assertContextSchema,
@@ -26,6 +27,8 @@ When("l'utente scarica il documento di analisi del rischio", async function () {
   assertValidResponse(getPurposeResponse);
 
   const purpose = getPurposeResponse.data;
+
+  this.purposeVersions = purpose.versions;
 
   const riskAnalysisDocumentId =
     purpose.currentVersion?.riskAnalysisDocument?.id;
@@ -58,5 +61,30 @@ Given(
     );
 
     this.versionId = versionId;
+  }
+);
+
+Then(
+  "si ottiene status code {int} e un documento diverso",
+  async function (statusCode: number) {
+    assertContextSchema(this, {
+      response: z.object({
+        status: z.number(),
+      }),
+      purposeVersions: z.array(
+        z.object({
+          riskAnalysisDocument: z.object({ id: z.string() }),
+        })
+      ),
+    });
+
+    assert.equal(this.response.status, statusCode);
+
+    const length = this.purposeVersions.length;
+
+    assert.notEqual(
+      this.purposeVersions[length - 1].riskAnalysisDocument.id,
+      this.purposeVersions[length - 2].riskAnalysisDocument.id
+    );
   }
 );
