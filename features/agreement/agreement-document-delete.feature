@@ -1,6 +1,6 @@
 @agreement_document_delete
 Feature: Cancellazione di un documento allegato alla richiesta di fruizione
-Tutti gli utenti autorizzati possono cancellare un documento allegato alla richiesta di fruizione in stato DRAFT
+  Tutti gli utenti autorizzati possono cancellare un documento allegato alla richiesta di fruizione in stato DRAFT
 
   @agreement_document_delete1
   Scenario Outline: Un utente con sufficienti permessi, per una richiesta di fruizione precedentemente creata, la quale è in stato DRAFT, cancella un documento associato alla richiesta di fruizione. La richiesta va a buon fine.
@@ -29,7 +29,7 @@ Tutti gli utenti autorizzati possono cancellare un documento allegato alla richi
       | Privato | api,security |       403 |
 
   @agreement_document_delete2a @wait_for_fix @IMN-310
-  Scenario Outline:  Un utente con sufficienti permessi, per una richiesta di fruizione precedentemente creata, la quale è in stato PENDING, ACTIVE, SUSPENDED, ARCHIVED, cancella un documento associato alla richiesta di fruizione. Ottiene un errore.
+  Scenario Outline: Un utente con sufficienti permessi, per una richiesta di fruizione precedentemente creata, la quale è in stato PENDING, ACTIVE, SUSPENDED, ARCHIVED, cancella un documento associato alla richiesta di fruizione. Ottiene un errore.
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA2" ha già creato un e-service in stato "PUBLISHED" con approvazione "<tipoApprovazione>"
     Given un "admin" di "PA1" ha già creato una richiesta di fruizione in stato "<statoAgreement>" con un documento allegato
