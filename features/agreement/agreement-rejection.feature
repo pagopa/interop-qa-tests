@@ -1,5 +1,6 @@
 @agreement_rejection
 Feature: Rifiuto di una richiesta di fruizione
+  Tutti gli utenti autorizzati di enti PA e GSP possono rifiutare una richiesta di fruizione verso un proprio e-service
 
   @agreement_rejection1
   Scenario Outline: 
@@ -54,4 +55,3 @@ Feature: Rifiuto di una richiesta di fruizione
     Given un "admin" di "PA2" ha già rifiutato quella richiesta di fruizione
     When l'utente richiede una operazione di rifiuto di quella richiesta di fruizione con messaggio
     Then si ottiene status code 400
-    
