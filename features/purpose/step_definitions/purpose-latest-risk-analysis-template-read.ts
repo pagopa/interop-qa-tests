@@ -6,6 +6,6 @@ When(
 );
 
 Then(
-  "si ottiene status code {int} e la versione ottenuta è la {string}",
+  "si ottiene status code {int} e il template in versione {string}",
   async function (statusCode: number, expectedVersion: string) {}
 );

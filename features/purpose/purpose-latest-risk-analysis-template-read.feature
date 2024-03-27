@@ -5,7 +5,7 @@ Feature: Lettura del template di analisi del rischio più recente
   Scenario Outline: Per una richiesta di lettura del template di analisi del rischio da parte di un ente PA, alla richiesta di lettura, ottiene l'ultima versione di analisi del rischio dedicata alle PA
     Given l'utente è un "<ruolo>" di "<ente>"
     When l'utente richiede il template dell'analisi del rischio
-    Then si ottiene status code <risultato> e la versione ottenuta è la "3.0"
+    Then si ottiene status code <risultato> e il template in versione "2.0"
 
     Examples: 
       | ente    | ruolo        | risultato |
@@ -20,7 +20,7 @@ Feature: Lettura del template di analisi del rischio più recente
   Scenario Outline: Per una richiesta di lettura del template di analisi del rischio da parte di un ente GSP o Privato, alla richiesta di lettura, ottiene l'ultima versione di analisi del rischio dedicata ai Privati
     Given l'utente è un "<ruolo>" di "<ente>"
     When l'utente richiede il template dell'analisi del rischio
-    Then si ottiene status code <risultato> e la versione ottenuta è la "2.0"
+    Then si ottiene status code <risultato> e il template in versione "2.0"
 
     Examples: 
       | ente     | ruolo        | risultato |
