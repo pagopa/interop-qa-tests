@@ -834,7 +834,7 @@ export const dataPreparationService = {
 
     const purposeId = response.data.id;
     let currentVersionId = "";
-    let waitingForApprovalVersionId = "";
+    let versionId = "";
 
     await makePolling(
       () =>
@@ -870,14 +870,14 @@ export const dataPreparationService = {
           ),
         (res) => {
           if (res.data.waitingForApprovalVersion?.id) {
-            waitingForApprovalVersionId = res.data.waitingForApprovalVersion.id;
+            versionId = res.data.waitingForApprovalVersion.id;
           }
           return (
             res.data.waitingForApprovalVersion?.state === "WAITING_FOR_APPROVAL"
           );
         }
       );
-      return { purposeId, waitingForApprovalVersionId };
+      return { purposeId, versionId };
     }
 
     await makePolling(

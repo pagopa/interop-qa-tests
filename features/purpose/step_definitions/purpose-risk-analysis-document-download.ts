@@ -53,12 +53,13 @@ Given(
       token: z.string(),
       purposeId: z.string(),
     });
-    const { versionId } = await dataPreparationService.createNewPurposeVersion(
-      this.token,
-      this.purposeId,
-      { dailyCalls: ESERVICE_DAILY_CALLS.perConsumer - 1 }
-    );
+    const { currentVersionId } =
+      await dataPreparationService.createNewPurposeVersion(
+        this.token,
+        this.purposeId,
+        { dailyCalls: ESERVICE_DAILY_CALLS.perConsumer - 1 }
+      );
 
-    this.versionId = versionId;
+    this.versionId = currentVersionId;
   }
 );
