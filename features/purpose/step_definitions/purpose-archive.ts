@@ -35,11 +35,12 @@ Given(
 
     const token = getToken(this.tokens, tenant, "admin");
 
-    const { versionId } = await dataPreparationService.createNewPurposeVersion(
-      token,
-      this.purposeId,
-      { dailyCalls: ESERVICE_DAILY_CALLS.perConsumer + 1 }
-    );
-    this.versionId = versionId;
+    const { waitingForApprovalVersionId } =
+      await dataPreparationService.createNewPurposeVersion(
+        token,
+        this.purposeId,
+        { dailyCalls: ESERVICE_DAILY_CALLS.perConsumer + 1 }
+      );
+    this.versionId = waitingForApprovalVersionId;
   }
 );
