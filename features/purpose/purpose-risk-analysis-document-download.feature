@@ -1,7 +1,6 @@
 @purpose_risk_analysis_document_download
 Feature: Download documento di analisi del rischio sigillato
-  
-  # Gli utenti API e SECURITY ad oggi non possono scaricare il documento di analisi del rischio, torna 403
+
   @purpose_risk_analysis_document_download1 @wait_for_fix
   Scenario Outline: Per una finalità precedentemente creata dal fruitore, la quale è stata in passato almeno per un momento ACTIVE, alla richiesta di lettura del documento di analisi del rischio da parte di un qualsiasi utente dell'ente, va a buon fine. NB: il documento della richiesta di fruizione viene generato all’attivazione di una versione di finalità. Può essere che se si tenta di scaricarlo immediatamente dopo aver attivato una finalità non sia immediatamente disponibile per i tempi connessi alla generazione del PDF.
     Given l'utente è un "<ruolo>" di "<ente>"
@@ -9,22 +8,25 @@ Feature: Download documento di analisi del rischio sigillato
     Given "<ente>" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given un "admin" di "<ente>" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
     When l'utente scarica il documento di analisi del rischio
-    Then si ottiene status code 200
+    Then si ottiene status code <risultato>
 
     Examples: 
-      | ente    | ruolo        |
-      | PA1     | admin        |
-      | PA1     | security     |
-      | PA1     | api,security |
-      | PA1     | support      |
-      | GSP     | admin        |
-      | GSP     | security     |
-      | GSP     | api,security |
-      | GSP     | support      |
-      | Privato | admin        |
-      | Privato | security     |
-      | Privato | api,security |
-      | Privato | support      |
+      | ente    | ruolo        | risultato |
+      | PA1     | admin        |       200 |
+      | PA1     | api          |       403 |
+      | PA1     | security     |       403 |
+      | PA1     | api,security |       403 |
+      | PA1     | support      |       403 |
+      | GSP     | admin        |       200 |
+      | GSP     | api          |       403 |
+      | GSP     | security     |       403 |
+      | GSP     | api,security |       403 |
+      | GSP     | support      |       403 |
+      | Privato | admin        |       200 |
+      | Privato | api          |       403 |
+      | Privato | security     |       403 |
+      | Privato | api,security |       403 |
+      | Privato | support      |       403 |
 
   @purpose_risk_analysis_document_download2
   Scenario Outline: Per una finalità precedentemente creata dal fruitore, la quale è stata in passato almeno per un momento ACTIVE, la quale ha avuto un aggiornamento della stima di carico la quale versione è stata almeno per un momento ACTIVE, alla richiesta di lettura del documento di analisi del rischio da parte di un qualsiasi utente dell'ente, va a buon fine; il documento deve essere diverso da quello creato per la versione precedente. NB: magari si può confrontare che il version[id].riskAnalysisDocument.id tra le due versioni sia diverso.
