@@ -948,7 +948,11 @@ export const dataPreparationService = {
     token: string,
     purposeId: string,
     { dailyCalls }: PurposeVersionSeed
-  ) {
+  ): Promise<{
+    purposeId: string;
+    currentVersionId: string | undefined;
+    waitingForApprovalVersionId: string | undefined;
+  }> {
     const response = await apiClient.purposes.createPurposeVersion(
       purposeId,
       { dailyCalls },
@@ -982,5 +986,39 @@ export const dataPreparationService = {
       currentVersionId,
       waitingForApprovalVersionId,
     };
+  },
+
+  async archivePurpose(token: string, purposeId: string, versionId: string) {
+    const response = await apiClient.purposes.archivePurposeVersion(
+      purposeId,
+      versionId,
+      getAuthorizationHeader(token)
+    );
+
+    assertValidResponse(response);
+
+    await makePolling(
+      () =>
+        apiClient.purposes.getPurpose(purposeId, getAuthorizationHeader(token)),
+      (res) => res.data.currentVersion?.state === "ARCHIVED"
+    );
+    return response.data;
+  },
+
+  async suspendPurpose(token: string, purposeId: string, versionId: string) {
+    const response = await apiClient.purposes.suspendPurposeVersion(
+      purposeId,
+      versionId,
+      getAuthorizationHeader(token)
+    );
+
+    assertValidResponse(response);
+
+    await makePolling(
+      () =>
+        apiClient.purposes.getPurpose(purposeId, getAuthorizationHeader(token)),
+      (res) => res.data.currentVersion?.state === "SUSPENDED"
+    );
+    return response.data;
   },
 };
