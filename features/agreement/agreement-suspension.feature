@@ -1,5 +1,6 @@
 @agreement_suspension
 Feature: Sospensione richiesta di fruizione
+  Tutti gli utenti autorizzati possono sospendere una richiesta di fruizione
 
   @agreement_suspension1
   Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fruitore e attivata da un erogatore, la quale è in stato ACTIVE, alla richiesta di sospensione da parte di un utente con sufficienti permessi dell’ente fruitore, che non coincide con l’ente erogatore, va a buon fine
@@ -16,7 +17,16 @@ Feature: Sospensione richiesta di fruizione
       | PA1     | security     |       403 |
       | PA1     | support      |       403 |
       | PA1     | api,security |       403 |
-
+      | GSP     | admin        |       200 |
+      | GSP     | api          |       403 |
+      | GSP     | security     |       403 |
+      | GSP     | support      |       403 |
+      | GSP     | api,security |       403 |
+      | Privato | admin        |       200 |
+      | Privato | api          |       403 |
+      | Privato | security     |       403 |
+      | Privato | support      |       403 |
+      | Privato | api,security |       403 |
 
   @agreement_suspension2
   Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fruitore e attivata da un erogatore, la quale è in stato ACTIVE, alla richiesta di sospensione da parte di un utente con sufficienti permessi dell’ente erogatore, che non coincide con l’ente fruitore, va a buon fine
