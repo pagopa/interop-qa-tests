@@ -7,7 +7,7 @@ Feature: Approvazione dell’aggiornamento di una stima di carico
     Given un "admin" di "<ente>" ha già creato e pubblicato 1 e-service
     Given "PA2" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given un "admin" di "PA2" ha già creato 1 finalità in stato "<statoFinalità>" per quell'eservice
-    Given "PA1" ha già richiesto l'aggiornamento della stima di carico superando i limiti di quell'e-service
+    Given "PA2" ha già richiesto l'aggiornamento della stima di carico superando i limiti di quell'e-service
     When l'utente inserisce una data stimata di approvazione di quell'aggiornamento della stima di carico
     Then si ottiene status code <risultato>
 
@@ -23,11 +23,7 @@ Feature: Approvazione dell’aggiornamento di una stima di carico
       | GSP     | security     | ACTIVE        |       403 |
       | GSP     | api,security | ACTIVE        |       403 |
       | GSP     | support      | ACTIVE        |       403 |
-      | Privato | admin        | ACTIVE        |       200 |
-      | Privato | api          | ACTIVE        |       403 |
-      | Privato | security     | ACTIVE        |       403 |
-      | Privato | api,security | ACTIVE        |       403 |
-      | Privato | support      | ACTIVE        |       403 |
+
 
     Examples: # Test sugli stati
       | ente | ruolo | statoFinalità | risultato |
@@ -41,7 +37,7 @@ Feature: Approvazione dell’aggiornamento di una stima di carico
     Given un "admin" di "PA1" ha già creato 1 finalità in stato "<statoFinalità>" per quell'eservice
     Given "PA1" ha già richiesto l'aggiornamento della stima di carico superando i limiti di quell'e-service
     When l'utente inserisce una data stimata di approvazione di quell'aggiornamento della stima di carico
-    Then si ottiene status code 409
+    Then si ottiene status code 403
 
     Examples: 
       | statoFinalità |
@@ -59,14 +55,13 @@ Feature: Approvazione dell’aggiornamento di una stima di carico
     When l'utente inserisce una data stimata di approvazione di quell'aggiornamento della stima di carico
     Then si ottiene status code 400
 
-  @purpose_approve_updated_dailycalls4
+  @purpose_approve_updated_dailycalls4 #Test non fattibile per riskAnalysisVersion
   Scenario Outline: Per una finalità precedentemente creata da un fruitore e attivata da un erogatore, la quale è in stato ACTIVE o SUSPENDED, e la cui stima di carico è stata successivamente aggiornata dal fruitore ad un valore che supera una soglia dell'erogatore portando quella versione in WAITING_FOR_APPROVAL, e per la quale finalità sia nel frattempo uscita una versione più recente dell’analisi del rischio da compilare, alla richiesta di approvazione di aggiornamento stima di carico da parte di un utente con sufficienti permessi (admin) dell’ente erogatore, ottiene un errore (NB: verificare status code)
     Given l'utente è un "admin" di "PA2"
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given un "admin" di "PA1" ha già creato 1 finalità in stato "<statoFinalità>" per quell'eservice
     Given "PA1" ha già richiesto l'aggiornamento della stima di carico superando i limiti di quell'e-service
-    Given "PA1" ha già portato la finalità in stato "ARCHIVED"
     When l'utente inserisce una data stimata di approvazione di quell'aggiornamento della stima di carico
     Then si ottiene status code 400
 

@@ -1,5 +1,6 @@
 @agreement_creation
 Feature: Creazione nuova richiesta di fruizione
+  Tutti gli utenti autorizzati possono ottenere la lista dei fruitori dei propri e-service
 
   @agreement_creation1
   Scenario Outline: Un utente con sufficienti permessi (admin), il cui ente rispetta i requisiti (attributi certificati), senza altre richieste di fruizione per un e-service, crea una nuova richiesta di fruizione in bozza per l’ultima versione disponibile di quell'e-service, la quale è in stato PUBLISHED. La richiesta va a buon fine
