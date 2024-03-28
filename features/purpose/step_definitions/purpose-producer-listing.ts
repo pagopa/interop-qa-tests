@@ -175,18 +175,20 @@ Given(
     });
 
     const title = `purpose ${this.TEST_SEED} - ${getRandomInt()} - ${keyword}`;
-    this.purposeId = await dataPreparationService.createPurposeWithGivenState({
-      token,
-      testSeed: this.TEST_SEED,
-      eserviceMode: "DELIVER",
-      payload: {
-        title,
-        eserviceId: this.eserviceId,
-        consumerId,
-        riskAnalysisForm,
-      },
-      purposeState,
-    });
+    const { purposeId } =
+      await dataPreparationService.createPurposeWithGivenState({
+        token,
+        testSeed: this.TEST_SEED,
+        eserviceMode: "DELIVER",
+        payload: {
+          title,
+          eserviceId: this.eserviceId,
+          consumerId,
+          riskAnalysisForm,
+        },
+        purposeState,
+      });
+    this.purposeId = purposeId;
   }
 );
 

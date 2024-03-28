@@ -7,7 +7,7 @@ Feature: Sospensione di una finalità
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
     Given "<ente>" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given un "admin" di "<ente>" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
-    When l'utente sospende quella finalità
+    When l'utente sospende quella finalità in stato "ACTIVE"
     Then si ottiene status code <risultato>
 
     Examples: 
@@ -29,7 +29,7 @@ Feature: Sospensione di una finalità
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given un "admin" di "PA1" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
-    When l'utente sospende quella finalità
+    When l'utente sospende quella finalità in stato "ACTIVE"
     Then si ottiene status code 200
 
   @purpose_suspend3
@@ -38,7 +38,7 @@ Feature: Sospensione di una finalità
     Given un "admin" di "PA1" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given un "admin" di "PA1" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
-    When l'utente sospende quella finalità
+    When l'utente sospende quella finalità in stato "ACTIVE"
     Then si ottiene status code 200
 
 
@@ -50,7 +50,7 @@ Feature: Sospensione di una finalità
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given un "admin" di "PA1" ha già creato 1 finalità in stato "<statoFinalita>" per quell'eservice
-    When l'utente sospende quella finalità
+    When l'utente sospende quella finalità in stato "<statoFinalita>"
     Then si ottiene status code 400
 
     Examples: 
