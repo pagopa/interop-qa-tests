@@ -5,44 +5,40 @@ import {
   assertContextSchema,
   assertValidResponse,
   getAuthorizationHeader,
+  getToken,
 } from "../../../utils/commons";
 import { apiClient } from "../../../api";
 import {
   ESERVICE_DAILY_CALLS,
   dataPreparationService,
 } from "../../../services/data-preparation.service";
+import { TenantType } from "../../common-steps";
 
 When("l'utente scarica il documento di analisi del rischio", async function () {
   assertContextSchema(this, {
     token: z.string(),
     purposeId: z.string(),
     versionId: z.string(),
+    tenantType: TenantType,
   });
+
+  // Only admin has access to the risk analysis document
+  const authorizedToken = getToken(this.tokens, this.tenantType, "admin");
 
   const getPurposeResponse = await apiClient.purposes.getPurpose(
     this.purposeId,
-    getAuthorizationHeader(this.token)
+    getAuthorizationHeader(authorizedToken)
   );
 
   assertValidResponse(getPurposeResponse);
 
   const purpose = getPurposeResponse.data;
-
   this.purposeVersions = purpose.versions;
-
-  const riskAnalysisDocumentId =
-    purpose.currentVersion?.riskAnalysisDocument?.id;
-
-  if (!riskAnalysisDocumentId) {
-    throw new Error(
-      `Risk analysis document for purpose id ${this.purposeId} not found`
-    );
-  }
 
   this.response = await apiClient.purposes.getRiskAnalysisDocument(
     this.purposeId,
     this.versionId,
-    riskAnalysisDocumentId,
+    purpose.currentVersion?.riskAnalysisDocument?.id || "",
     getAuthorizationHeader(this.token)
   );
 });
