@@ -1,6 +1,6 @@
 @purpose_creation_receive
 Feature: Creazione finalità per e-service in erogazione inversa
-  Tutti gli utenti admin di enti PA o GSP possono creare una nuova finalità per un e-service in modalità RECEIVE.
+  Tutti gli utenti admin di enti PA o GSP possono creare una nuova finalità per un e-service in erogazione inversa.
 
   @purpose_creation_receive1
   Scenario Outline: Un utente con sufficienti permessi (admin); il cui ente ha già una richiesta di fruizione in stato ACTIVE per una versione di e-service, il quale ha mode = RECEIVE, crea una nuova finalità con tutti i campi richiesti correttamente formattati. La richiesta va a buon fine.
