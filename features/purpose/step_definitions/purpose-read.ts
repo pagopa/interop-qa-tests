@@ -1,4 +1,5 @@
-import { When } from "@cucumber/cucumber";
+import assert from "assert";
+import { Then, When } from "@cucumber/cucumber";
 import { z } from "zod";
 import {
   assertContextSchema,
@@ -12,4 +13,18 @@ When("l'utente richiede la lettura della finalità", async function () {
     this.purposeId,
     getAuthorizationHeader(this.token)
   );
+});
+
+Then("si ottiene status code 200 ma non l'analisi del rischio", function () {
+  assertContextSchema(this, {
+    response: z.object({
+      status: z.number(),
+      data: z.object({
+        riskAnalysis: z.unknown(),
+      }),
+    }),
+  });
+
+  assert.equal(this.response.status, 200);
+  assert.equal(this.response.data.riskAnalysis, undefined);
 });
