@@ -14,7 +14,7 @@ Feature: Archiviazione di una finalità
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
     Given "<ente>" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given un "admin" di "<ente>" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
-    When l'utente archivia quella finalità
+    When l'utente archivia quella finalità in stato "ACTIVE"
     Then si ottiene status code <risultato>
 
     Examples: 
@@ -36,7 +36,7 @@ Feature: Archiviazione di una finalità
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given un "admin" di "PA1" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
-    When l'utente archivia quella finalità
+    When l'utente archivia quella finalità in stato "ACTIVE"
     Then si ottiene status code 200
 
 
@@ -48,7 +48,7 @@ Feature: Archiviazione di una finalità
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given un "admin" di "PA1" ha già creato 1 finalità in stato "<statoFinalita>" per quell'eservice
     Given "PA1" ha già richiesto l'aggiornamento della stima di carico superando i limiti di quell'e-service
-    When l'utente archivia quella finalità
+    When l'utente archivia quella finalità in stato "WAITING_FOR_APPROVAL"
     Then si ottiene status code 200
 
     Examples: 
@@ -57,15 +57,15 @@ Feature: Archiviazione di una finalità
       | SUSPENDED     |
 
 
-  # Ci risulta che è possibile archiviare una finalità in stato ACTIVE o SUSPENDED, verificato anche nel frontend. nel test viene restituito errore 500
+  # Ci risulta che è possibile archiviare una finalità in stato ACTIVE o SUSPENDED, verificato anche nel frontend. nel test l'archiviazione va a buon fine in entrambi i casi.
   @purpose_archive3 @wait_for_clarification
   Scenario Outline: Per una finalità precedentemente creata da un fruitore e attivata da un erogatore, la quale è in stato ACTIVE o SUSPENDED, alla richiesta di archiviazione da parte di un utente con sufficienti permessi (admin) dell’ente erogatore, ottiene un errore
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given un "admin" di "PA1" ha già creato 1 finalità in stato "<statoFinalita>" per quell'eservice
-    When l'utente archivia quella finalità
-    Then si ottiene status code 400
+    When l'utente archivia quella finalità in stato "<statoFinalita>"
+    Then si ottiene status code 200
 
     Examples: 
       | statoFinalita |
@@ -81,7 +81,7 @@ Feature: Archiviazione di una finalità
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given un "admin" di "PA1" ha già creato 1 finalità in stato "<statoFinalita>" per quell'eservice
-    When l'utente archivia quella finalità
+    When l'utente archivia quella finalità in stato "<statoFinalita>"
     Then si ottiene status code 400
 
     Examples: 

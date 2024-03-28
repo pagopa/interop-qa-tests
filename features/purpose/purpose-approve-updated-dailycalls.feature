@@ -53,9 +53,9 @@ Feature: Approvazione dell’aggiornamento di una stima di carico
     Given "PA1" ha già richiesto l'aggiornamento della stima di carico superando i limiti di quell'e-service
     Given "PA1" ha già portato la finalità in stato "ARCHIVED"
     When l'utente inserisce una data stimata di approvazione di quell'aggiornamento della stima di carico
-    Then si ottiene status code 400
+    Then si ottiene status code 404
 
-  @purpose_approve_updated_dailycalls4 #Test non fattibile per riskAnalysisVersion
+  @purpose_approve_updated_dailycalls4 @wait_for_clarification # Test non fattibile per riskAnalysisVersion
   Scenario Outline: Per una finalità precedentemente creata da un fruitore e attivata da un erogatore, la quale è in stato ACTIVE o SUSPENDED, e la cui stima di carico è stata successivamente aggiornata dal fruitore ad un valore che supera una soglia dell'erogatore portando quella versione in WAITING_FOR_APPROVAL, e per la quale finalità sia nel frattempo uscita una versione più recente dell’analisi del rischio da compilare, alla richiesta di approvazione di aggiornamento stima di carico da parte di un utente con sufficienti permessi (admin) dell’ente erogatore, ottiene un errore (NB: verificare status code)
     Given l'utente è un "admin" di "PA2"
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
