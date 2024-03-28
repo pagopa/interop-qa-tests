@@ -11,13 +11,13 @@ When(
   async function () {
     assertContextSchema(this, {
       purposeId: z.string(),
-      versionId: z.string(),
+      waitingForApprovalVersionId: z.string(),
       token: z.string(),
     });
 
     this.response = await apiClient.purposes.deletePurposeVersion(
       this.purposeId,
-      this.versionId,
+      this.waitingForApprovalVersionId,
       getAuthorizationHeader(this.token)
     );
   }
