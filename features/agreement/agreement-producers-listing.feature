@@ -1,7 +1,7 @@
 @agreement_producers_listing @resource_intensive
 Feature: Listing erogatori con richieste di fruizione
-  Tutti gli utenti autorizzati di enti PA e GSP possono ottenere la lista degli erogatori degli e-service per cui ha una richiesta di fruizione
-  
+  Tutti gli utenti autorizzati possono ottenere la lista degli erogatori degli e-service per cui hanno una richiesta di fruizione
+
   @agreement_producers_listing1
   Scenario Outline: A fronte di 3 erogatori, restituisce solo i primi 2 risultati
     Given l'utente è un "<ruolo>" di "<ente>"
@@ -15,17 +15,22 @@ Feature: Listing erogatori con richieste di fruizione
     Then si ottiene status code 200 e la lista di 2 erogatori
 
     Examples: 
-      | ente | ruolo        |
-      | GSP  | admin        |
-      | GSP  | api          |
-      | GSP  | security     |
-      | GSP  | api,security |
-      | GSP  | support      |
-      | PA1  | admin        |
-      | PA1  | api          |
-      | PA1  | security     |
-      | PA1  | api,security |
-      | PA1  | support      |
+      | ente    | ruolo        |
+      | GSP     | admin        |
+      | GSP     | api          |
+      | GSP     | security     |
+      | GSP     | api,security |
+      | GSP     | support      |
+      | PA1     | admin        |
+      | PA1     | api          |
+      | PA1     | security     |
+      | PA1     | api,security |
+      | PA1     | support      |
+      | Privato | admin        |
+      | Privato | api          |
+      | Privato | security     |
+      | Privato | support      |
+      | Privato | api,security |
 
   @agreement_producers_listing2
   Scenario Outline: A fronte di 3 erogatori con i quali il fruitore ha almeno una richiesta di fruizione e una richiesta di offset 2, restituisce solo 1 risultato

@@ -10,7 +10,6 @@ Feature: Listing finalità lato erogatore
     When l'utente erogatore richiede una operazione di listing delle finalità limitata alle prime 3 finalità
     Then si ottiene status code <risultato> e la lista di 3 finalità
 
-# Attualmente il test passa, qualcuno dovrebbe avere 403?
     Examples: 
       | ente | ruolo        | risultato |
       | PA1  | admin        |       200 |
@@ -46,7 +45,6 @@ Feature: Listing finalità lato erogatore
 
   @purpose-producer-listing4
   Scenario Outline: Restituisce le finalità che hanno per fruitore uno o più specifici enti (scopo del test è verificare il corretto funzionamento del parametro consumerIds). NB: vengono escluse le finalità in stato DRAFT, anche qualora non fosse valorizzato il parametro states
-
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA1" ha già creato e pubblicato 1 e-service
     Given "PA2" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
@@ -58,7 +56,6 @@ Feature: Listing finalità lato erogatore
 
   @purpose-producer-listing5
   Scenario Outline: Restituisce le finalità associate ad alcuni specifici e-service (scopo del test è verificare che funzioni il filtro per e-servicesIds)
-
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA1" ha già creato e pubblicato 1 e-service
     Given "PA2" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
@@ -71,7 +68,6 @@ Feature: Listing finalità lato erogatore
 
   @purpose-producer-listing6
   Scenario Outline: Restituisce le finalità che sono in uno o più specifici stati (es. ACTIVE e SUSPENDED, scopo del test è verificare che funzioni il filtro per states)
-
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA1" ha già creato e pubblicato 1 e-service
     Given "PA2" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
@@ -88,7 +84,6 @@ Feature: Listing finalità lato erogatore
 
   @purpose-producer-listing7
   Scenario Outline: Restituisce le finalità che contengono la keyword "test" all'interno del nome, con ricerca case insensitive (scopo del test è verificare che funzioni il filtro q)
-
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA1" ha già creato e pubblicato 1 e-service
     Given "PA2" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
@@ -98,7 +93,6 @@ Feature: Listing finalità lato erogatore
 
   @purpose-producer-listing8
   Scenario Outline: Restituisce un insieme vuoto di finalità per una ricerca che non porta risultati (scopo del test è verificare che, se non ci sono risultati, il server risponda con 200 e array vuoto e non con un errore)
-
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA1" ha già creato e pubblicato 1 e-service
     Given "PA2" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
