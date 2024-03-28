@@ -1,5 +1,6 @@
 @agreement_read
 Feature: Lettura richiesta di fruizione
+  Tutti gli utenti autorizzati possono leggere le richieste di fruizione che hanno creato
 
   @agreement_read1
   Scenario Outline: Per una richiesta di fruizione precedentemente creata dall’ente, la quale è in stato REJECTED, alla richiesta di lettura, va a buon fine
@@ -11,17 +12,21 @@ Feature: Lettura richiesta di fruizione
     Then si ottiene status code 200
 
     Examples: 
-      | ente | ruolo        |
-      | PA1  | admin        |
-      | PA1  | api          |
-      | PA1  | security     |
-      | PA1  | api,security |
-      | PA1  | support      |
-      | GSP  | admin        |
-      | GSP  | api          |
-      | GSP  | security     |
-      | GSP  | api,security |
-      | GSP  | support      |
+      | ente    | ruolo        |
+      | PA1     | admin        |
+      | PA1     | api          |
+      | PA1     | security     |
+      | PA1     | api,security |
+      | PA1     | support      |
+      | GSP     | admin        |
+      | GSP     | api          |
+      | GSP     | security     |
+      | GSP     | api,security |
+      | GSP     | support      |
+      | Privato | admin        |
+      | Privato | api          |
+      | Privato | security     |
+      | Privato | api,security |
 
   @agreement_read2
   Scenario Outline: Per una richiesta di fruizione precedentemente creata dall’ente, la quale è in stato DRAFT, PENDING, ACTIVE, SUSPENDED o ARCHIVED, alla richiesta di lettura, va a buon fine
