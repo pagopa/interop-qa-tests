@@ -1,7 +1,8 @@
-@purpose-read
+@purpose_read
 Feature: Lettura singola finalità
+  Tutti gli utenti autorizzati possono leggere una finalità.
 
-  @purpose-read1
+  @purpose_read1
   Scenario Outline: Per una finalità precedentemente creata dal fruitore, la quale prima versione è in qualsiasi stato (DRAFT, WAITING_FOR_APPROVAL, ACTIVE, SUSPENDED, ARCHIVED), alla richiesta di lettura, va a buon fine
     Given l'utente è un "<ruolo>" di "<ente>"
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
@@ -30,7 +31,7 @@ Feature: Lettura singola finalità
       | PA1  | admin | ARCHIVED             |       200 |
       | PA1  | admin | DRAFT                |       200 |
 
-  @purpose-read2
+  @purpose_read2
   Scenario Outline: Per una finalità precedentemente creata da un fruitore, la quale prima versione è in stato NON DRAFT (WAITING_FOR_APPROVAL, ACTIVE, SUSPENDED, ARCHIVED), alla richiesta di lettura da parte dell’erogatore, va a buon fine
     Given l'utente è un "admin" di "PA2"
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
@@ -46,14 +47,14 @@ Feature: Lettura singola finalità
       | WAITING_FOR_APPROVAL |
       | ARCHIVED             |
 
-  @purpose-read3 @wait_for_fix
-  Scenario Outline: Per una finalità precedentemente creata da un fruitore, la quale prima versione è in qualsiasi stato (DRAFT, (WAITING_FOR_APPROVAL, ACTIVE, SUSPENDED, ARCHIVED), alla richiesta di lettura da parte di un ente che non è né l’erogatore, né il fruitore, ottiene un errore (NB: verificare status code)
+  @purpose_read3 @resource_intensive
+  Scenario Outline: Per una finalità precedentemente creata da un fruitore, la quale prima versione è in qualsiasi stato (DRAFT, (WAITING_FOR_APPROVAL, ACTIVE, SUSPENDED, ARCHIVED), alla richiesta di lettura da parte di un ente che non è né l'erogatore, né il fruitore, va a buon fine ma non ottiene l'analisi del rischio
     Given l'utente è un "admin" di "GSP"
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given un "admin" di "PA1" ha già creato 1 finalità in stato "<statoFinalita>" per quell'eservice
     When l'utente richiede la lettura della finalità
-    Then si ottiene status code 400
+    Then si ottiene status code 200 ma non l'analisi del rischio
 
     Examples: 
       | statoFinalita        |
