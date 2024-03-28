@@ -1,4 +1,5 @@
-import { Given, When } from "@cucumber/cucumber";
+import assert from "assert";
+import { Given, Then, When } from "@cucumber/cucumber";
 import { z } from "zod";
 import {
   assertContextSchema,
@@ -27,6 +28,8 @@ When("l'utente scarica il documento di analisi del rischio", async function () {
 
   const purpose = getPurposeResponse.data;
 
+  this.purposeVersions = purpose.versions;
+
   const riskAnalysisDocumentId =
     purpose.currentVersion?.riskAnalysisDocument?.id;
 
@@ -42,8 +45,6 @@ When("l'utente scarica il documento di analisi del rischio", async function () {
     riskAnalysisDocumentId,
     getAuthorizationHeader(this.token)
   );
-
-  assertValidResponse(this.response);
 });
 
 Given(
@@ -53,12 +54,38 @@ Given(
       token: z.string(),
       purposeId: z.string(),
     });
-    const { versionId } = await dataPreparationService.createNewPurposeVersion(
-      this.token,
-      this.purposeId,
-      { dailyCalls: ESERVICE_DAILY_CALLS.perConsumer - 1 }
-    );
+    const { currentVersionId } =
+      await dataPreparationService.createNewPurposeVersion(
+        this.token,
+        this.purposeId,
+        { dailyCalls: ESERVICE_DAILY_CALLS.perConsumer - 1 }
+      );
 
-    this.versionId = versionId;
+    this.versionId = currentVersionId;
+  }
+);
+
+Then(
+  "si ottiene status code {int} e un documento diverso",
+  async function (statusCode: number) {
+    assertContextSchema(this, {
+      response: z.object({
+        status: z.number(),
+      }),
+      purposeVersions: z.array(
+        z.object({
+          riskAnalysisDocument: z.object({ id: z.string() }),
+        })
+      ),
+    });
+
+    assert.equal(this.response.status, statusCode);
+
+    const length = this.purposeVersions.length;
+
+    assert.notEqual(
+      this.purposeVersions[length - 1].riskAnalysisDocument.id,
+      this.purposeVersions[length - 2].riskAnalysisDocument.id
+    );
   }
 );
