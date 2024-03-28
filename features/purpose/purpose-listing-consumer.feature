@@ -1,7 +1,8 @@
 @purpose_consumer_listing
 Feature: Lista delle finalità lato fruitore
+  Tutti gli utenti possono ottenere la lista delle finalità di cui sono fruitori
 
-  @purpose_consumer_listing1a
+  @purpose_consumer_listing1 @wait_for_fix @IMN-398
   Scenario Outline: A fronte di 5 finalità in db, restituisce solo i primi 3 risultati (scopo del test è verificare il corretto funzionamento del parametro limit)
     Given l'utente è un "<ruolo>" di "<ente>"
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
@@ -11,31 +12,22 @@ Feature: Lista delle finalità lato fruitore
     Then si ottiene status code <risultato> e la lista di 3 finalità
 
     Examples: 
-      | ente | ruolo        | risultato |
-      | PA1  | admin        |       200 |
-      | PA1  | security     |       200 |
-      | PA1  | api,security |       200 |
-      | PA1  | support      |       200 |
-      | GSP  | admin        |       200 |
-      | GSP  | security     |       200 |
-      | GSP  | api,security |       200 |
-      | GSP  | support      |       200 |
-
-
-# In caso di 403 non si può ottenere la lista delle finalità, ma solo lo status code
-  @purpose_consumer_listing1b
-  Scenario Outline: A fronte di 5 finalità in db, restituisce solo i primi 3 risultati (scopo del test è verificare il corretto funzionamento del parametro limit)
-    Given l'utente è un "<ruolo>" di "<ente>"
-    Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
-    Given "<ente>" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "<ente>" ha già creato 5 finalità in stato "ACTIVE" per quell'eservice
-    When l'utente fruitore richiede una operazione di listing delle finalità limitata ai primi 3 risultati
-    Then si ottiene status code <risultato>
-
-    Examples: 
-      | ente | ruolo        | risultato |
-      | PA1  | api          |       403 |
-      | GSP  | api          |       403 |
+      | ente    | ruolo        | risultato |
+      | PA1     | admin        |       200 |
+      | PA1     | api          |       200 |
+      | PA1     | security     |       200 |
+      | PA1     | api,security |       200 |
+      | PA1     | support      |       200 |
+      | GSP     | admin        |       200 |
+      | GSP     | api          |       200 |
+      | GSP     | security     |       200 |
+      | GSP     | api,security |       200 |
+      | GSP     | support      |       200 |
+      | Privato | admin        |       200 |
+      | Privato | api          |       200 |
+      | Privato | security     |       200 |
+      | Privato | api,security |       200 |
+      | Privato | support      |       200 |
 
   @purpose_consumer_listing2
   Scenario Outline: A fronte di 15 finalità in db e una richiesta di offset 12, restituisce solo 3 risultati (scopo del test è verificare il corretto funzionamento del parametro offset)
