@@ -1,6 +1,6 @@
 @purpose_listing_producer
 Feature: Listing finalità lato erogatore
-  Tutti gli utenti di enti PA e GSP possono ottenere la lista di finalità.
+  Tutti gli utenti di enti PA e GSP possono ottenere la lista di finalità di cui sono erogatori.
 
   @purpose_listing_producer1
   Scenario Outline: A fronte di 5 finalità in db, restituisce solo i primi 3 risultati (scopo del test è verificare il corretto funzionamento del parametro limit)
