@@ -5,6 +5,7 @@ import { dataPreparationService } from "../../../services/data-preparation.servi
 import {
   assertContextSchema,
   getOrganizationId,
+  getRandomInt,
   getToken,
 } from "../../../utils/commons";
 import {
@@ -44,7 +45,7 @@ Given(
     const arr = new Array(totalEservices).fill(0);
     const createEServiceWithPublishedDescriptor = async (i: number) => {
       const eserviceId = await dataPreparationService.createEService(token, {
-        name: `eservice-${i}-${this.TEST_SEED}`,
+        name: `eservice-${i}-${this.TEST_SEED}-${getRandomInt()}`,
       });
       const { descriptorId } =
         await dataPreparationService.createDescriptorWithGivenState({
