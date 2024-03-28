@@ -18,7 +18,7 @@ When("l'utente scarica il documento di analisi del rischio", async function () {
   assertContextSchema(this, {
     token: z.string(),
     purposeId: z.string(),
-    versionId: z.string(),
+    currentVersionId: z.string(),
     tenantType: TenantType,
   });
 
@@ -37,7 +37,7 @@ When("l'utente scarica il documento di analisi del rischio", async function () {
 
   this.response = await apiClient.purposes.getRiskAnalysisDocument(
     this.purposeId,
-    this.versionId,
+    this.currentVersionId,
     purpose.currentVersion?.riskAnalysisDocument?.id || "",
     getAuthorizationHeader(this.token)
   );
@@ -50,13 +50,14 @@ Given(
       token: z.string(),
       purposeId: z.string(),
     });
-    const { versionId } = await dataPreparationService.createNewPurposeVersion(
-      this.token,
-      this.purposeId,
-      { dailyCalls: ESERVICE_DAILY_CALLS.perConsumer - 1 }
-    );
+    const { currentVersionId } =
+      await dataPreparationService.createNewPurposeVersion(
+        this.token,
+        this.purposeId,
+        { dailyCalls: ESERVICE_DAILY_CALLS.perConsumer - 1 }
+      );
 
-    this.versionId = versionId;
+    this.currentVersionId = currentVersionId;
   }
 );
 
