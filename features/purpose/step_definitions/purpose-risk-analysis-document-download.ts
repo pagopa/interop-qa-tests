@@ -16,7 +16,7 @@ When("l'utente scarica il documento di analisi del rischio", async function () {
   assertContextSchema(this, {
     token: z.string(),
     purposeId: z.string(),
-    versionId: z.string(),
+    currentVersionId: z.string(),
   });
 
   const getPurposeResponse = await apiClient.purposes.getPurpose(
@@ -41,7 +41,7 @@ When("l'utente scarica il documento di analisi del rischio", async function () {
 
   this.response = await apiClient.purposes.getRiskAnalysisDocument(
     this.purposeId,
-    this.versionId,
+    this.currentVersionId,
     riskAnalysisDocumentId,
     getAuthorizationHeader(this.token)
   );
@@ -61,7 +61,7 @@ Given(
         { dailyCalls: ESERVICE_DAILY_CALLS.perConsumer - 1 }
       );
 
-    this.versionId = currentVersionId;
+    this.currentVersionId = currentVersionId;
   }
 );
 

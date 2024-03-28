@@ -114,9 +114,10 @@ Given(
     });
 
     this.purposesIds = [];
-    this.versionIds = [];
+    this.currentVersionIds = [];
+    this.waitingForApprovalVersionIds = [];
     for (let index = 0; index < n; index++) {
-      const { purposeId, versionId } =
+      const { purposeId, currentVersionId, waitingForApprovalVersionId } =
         await dataPreparationService.createPurposeWithGivenState({
           token,
           testSeed: this.TEST_SEED,
@@ -129,10 +130,12 @@ Given(
           purposeState,
         });
       this.purposesIds.push(purposeId);
-      this.versionIds.push(versionId);
+      this.currentVersionIds.push(currentVersionId);
+      this.waitingForApprovalVersionIds.push(waitingForApprovalVersionId);
     }
     this.purposeId = this.purposesIds[0];
-    this.versionId = this.versionIds[0];
+    this.currentVersionId = this.currentVersionIds[0];
+    this.waitingForApprovalVersionId = this.waitingForApprovalVersionIds[0];
   }
 );
 
