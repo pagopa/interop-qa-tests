@@ -10,7 +10,10 @@ import {
   getRiskAnalysis,
   getToken,
 } from "../../../utils/commons";
-import { dataPreparationService } from "../../../services/data-preparation.service";
+import {
+  ESERVICE_DAILY_CALLS,
+  dataPreparationService,
+} from "../../../services/data-preparation.service";
 import { apiClient } from "../../../api";
 import {
   AgreementApprovalPolicy,
@@ -73,7 +76,7 @@ When(
         description: "description of the purpose - QA",
         isFreeOfCharge: true,
         freeOfChargeReason: "free of charge - QA",
-        dailyCalls: 5,
+        dailyCalls: ESERVICE_DAILY_CALLS.perConsumer - 1,
       },
       getAuthorizationHeader(this.token)
     );
@@ -95,17 +98,20 @@ Given(
     const token = getToken(this.tokens, tenantType, role);
     const consumerId = getOrganizationId(tenantType);
 
-    this.purposeId = await dataPreparationService.createPurposeWithGivenState({
-      token,
-      testSeed: this.TEST_SEED,
-      payload: {
-        eserviceId: this.eserviceId,
-        consumerId,
-        riskAnalysisId: this.riskAnalysisId,
-      },
-      purposeState,
-      eserviceMode: "RECEIVE",
-    });
+    const { purposeId } =
+      await dataPreparationService.createPurposeWithGivenState({
+        token,
+        testSeed: this.TEST_SEED,
+        payload: {
+          eserviceId: this.eserviceId,
+          consumerId,
+          riskAnalysisId: this.riskAnalysisId,
+        },
+        purposeState,
+        eserviceMode: "RECEIVE",
+      });
+
+    this.purposeId = purposeId;
   }
 );
 
@@ -183,7 +189,7 @@ When(
         description: "description of the purpose - QA",
         isFreeOfCharge: true,
         freeOfChargeReason: undefined,
-        dailyCalls: 5,
+        dailyCalls: ESERVICE_DAILY_CALLS.perConsumer - 1,
       },
       getAuthorizationHeader(this.token)
     );
@@ -204,7 +210,7 @@ When(
         description: "description of the purpose - QA",
         isFreeOfCharge: true,
         freeOfChargeReason: "free of charge - QA",
-        dailyCalls: 5,
+        dailyCalls: ESERVICE_DAILY_CALLS.perConsumer - 1,
       },
       getAuthorizationHeader(this.token)
     );
@@ -225,7 +231,7 @@ When(
         description: "description of the purpose - QA",
         isFreeOfCharge: true,
         freeOfChargeReason: "free of charge - QA",
-        dailyCalls: 5,
+        dailyCalls: ESERVICE_DAILY_CALLS.perConsumer - 1,
       },
       getAuthorizationHeader(this.token)
     );
