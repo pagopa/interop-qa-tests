@@ -3,7 +3,7 @@ Feature: Lettura singola finalità
   Tutti gli utenti possono leggere una finalità, l'analisi del rischio è disponibile solo per admin fruitori o erogatori di quella finalità.
 
   @purpose_read1 @wait_for_fix @IMN-396
-  Scenario Outline: Per una finalità precedentemente creata dal fruitore, la quale prima versione è in qualsiasi stato (DRAFT, WAITING_FOR_APPROVAL, ACTIVE, SUSPENDED, ARCHIVED), alla richiesta di lettura, va a buon fine
+  Scenario Outline: Per una finalità precedentemente creata dal fruitore, la quale prima versione è in qualsiasi stato (DRAFT, WAITING_FOR_APPROVAL, ACTIVE, SUSPENDED, ARCHIVED), alla richiesta di lettura, va a buon fine, l’analisi del rischio è disponibile solo per gli admin
     Given l'utente è un "<ruolo>" di "<ente>"
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
     Given "<ente>" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
