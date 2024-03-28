@@ -1,7 +1,8 @@
 @purpose_clone
 Feature: Clonazione di una finalità (fruitore)
+  Tutti gli utenti admin possono clonare una propria finalità
 
-  @purpose_clone1a
+  @purpose_clone1
   Scenario Outline: Un utente con sufficienti permessi (admin); il cui ente ha già una finalità in stato ACTIVE, per una versione di e-service, il quale ha mode = RECEIVE, clona una finalità. La richiesta va a buon fine.
     Given l'utente è un "<ruolo>" di "<ente>"
     Given un "admin" di "PA2" ha già creato un e-service in modalità "RECEIVE" con un descrittore in stato "DRAFT"
@@ -14,17 +15,22 @@ Feature: Clonazione di una finalità (fruitore)
     Then si ottiene status code <risultato>
 
     Examples: # Test sui ruoli
-      | ente | ruolo        | statoFinalità | risultato |
-      | PA1  | admin        | ACTIVE        |       200 |
-      | PA1  | api          | ACTIVE        |       403 |
-      | PA1  | security     | ACTIVE        |       403 |
-      | PA1  | api,security | ACTIVE        |       403 |
-      | PA1  | support      | ACTIVE        |       403 |
-      | GSP  | admin        | ACTIVE        |       200 |
-      | GSP  | api          | ACTIVE        |       403 |
-      | GSP  | security     | ACTIVE        |       403 |
-      | GSP  | api,security | ACTIVE        |       403 |
-      | GSP  | support      | ACTIVE        |       403 |
+      | ente    | ruolo        | statoFinalità | risultato |
+      | PA1     | admin        | ACTIVE        |       200 |
+      | PA1     | api          | ACTIVE        |       403 |
+      | PA1     | security     | ACTIVE        |       403 |
+      | PA1     | api,security | ACTIVE        |       403 |
+      | PA1     | support      | ACTIVE        |       403 |
+      | GSP     | admin        | ACTIVE        |       200 |
+      | GSP     | api          | ACTIVE        |       403 |
+      | GSP     | security     | ACTIVE        |       403 |
+      | GSP     | api,security | ACTIVE        |       403 |
+      | GSP     | support      | ACTIVE        |       403 |
+      | Privato | admin        | ACTIVE        |       200 |
+      | Privato | api          | ACTIVE        |       403 |
+      | Privato | security     | ACTIVE        |       403 |
+      | Privato | api,security | ACTIVE        |       403 |
+      | Privato | support      | ACTIVE        |       403 |
 
     Examples: # Test sugli stati
       | ente | ruolo | statoFinalità        | risultato |
