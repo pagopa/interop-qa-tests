@@ -11,20 +11,28 @@ import {
   ESERVICE_DAILY_CALLS,
   dataPreparationService,
 } from "../../../services/data-preparation.service";
+import { PurposeVersionState } from "../../../api/models";
 
-When("l'utente archivia quella finalità", async function () {
-  assertContextSchema(this, {
-    token: z.string(),
-    purposeId: z.string(),
-    versionId: z.string(),
-  });
-
-  this.response = await apiClient.purposes.archivePurposeVersion(
-    this.purposeId,
-    this.versionId,
-    getAuthorizationHeader(this.token)
-  );
-});
+When(
+  "l'utente archivia quella finalità in stato {string}",
+  async function (state: PurposeVersionState) {
+    assertContextSchema(this, {
+      token: z.string(),
+      purposeId: z.string(),
+      currentVersionId: z.string().optional(),
+      waitingForApprovalVersionId: z.string().optional(),
+    });
+    const versionId =
+      state === "WAITING_FOR_APPROVAL"
+        ? this.waitingForApprovalVersionId
+        : this.currentVersionId;
+    this.response = await apiClient.purposes.archivePurposeVersion(
+      this.purposeId,
+      versionId!,
+      getAuthorizationHeader(this.token)
+    );
+  }
+);
 
 Given(
   "{string} ha già richiesto l'aggiornamento della stima di carico superando i limiti di quell'e-service",
@@ -41,6 +49,6 @@ Given(
         this.purposeId,
         { dailyCalls: ESERVICE_DAILY_CALLS.perConsumer + 1 }
       );
-    this.versionId = waitingForApprovalVersionId;
+    this.waitingForApprovalVersionId = waitingForApprovalVersionId;
   }
 );

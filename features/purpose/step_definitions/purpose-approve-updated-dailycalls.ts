@@ -15,13 +15,13 @@ When(
   async function () {
     assertContextSchema(this, {
       purposeId: z.string(),
-      versionId: z.string(),
+      waitingForApprovalVersionId: z.string(),
       token: z.string(),
     });
     this.response =
       await apiClient.purposes.updateWaitingForApprovalPurposeVersion(
         this.purposeId,
-        this.versionId,
+        this.waitingForApprovalVersionId,
         {
           expectedApprovalDate: new Date(
             new Date().setDate(new Date().getDate() + 1)
@@ -40,7 +40,7 @@ Given(
   ) {
     assertContextSchema(this, {
       purposeId: z.string(),
-      versionId: z.string(),
+      currentVersionId: z.string(),
     });
     const token = getToken(this.tokens, tenantType, "admin");
     switch (desiredPurposeState) {
@@ -48,7 +48,7 @@ Given(
         await dataPreparationService.archivePurpose(
           token,
           this.purposeId,
-          this.versionId
+          this.currentVersionId
         );
         break;
 
@@ -56,7 +56,7 @@ Given(
         await dataPreparationService.suspendPurpose(
           token,
           this.purposeId,
-          this.versionId
+          this.currentVersionId
         );
         break;
       default:
