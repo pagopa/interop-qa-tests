@@ -1,11 +1,13 @@
+import assert from "assert";
 import {
   setDefaultTimeout,
   BeforeAll,
   Before,
   Given,
+  Then,
 } from "@cucumber/cucumber";
 import { z } from "zod";
-import { getRandomInt, getToken } from "../utils/commons";
+import { assertContextSchema, getRandomInt, getToken } from "../utils/commons";
 import { generateSessionTokens } from "../utils/session-tokens";
 
 // Increase duration of every step with the following timeout (Default is 5000 milliseconds)
@@ -44,3 +46,13 @@ Given(
     this.tenantType = tenantType;
   }
 );
+
+Then("si ottiene status code {int}", function (statusCode: number) {
+  assertContextSchema(this, {
+    response: z.object({
+      status: z.number(),
+    }),
+  });
+
+  assert.equal(this.response.status, statusCode);
+});
