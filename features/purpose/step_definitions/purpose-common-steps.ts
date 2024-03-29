@@ -2,7 +2,10 @@ import assert from "assert";
 import { Given, Then } from "@cucumber/cucumber";
 import { z } from "zod";
 import { PurposeVersionState } from "../../../api/models";
-import { ESERVICE_DAILY_CALLS, dataPreparationService } from "../../../services/data-preparation.service";
+import {
+  ESERVICE_DAILY_CALLS,
+  dataPreparationService,
+} from "../../../services/data-preparation.service";
 import {
   assertContextSchema,
   getToken,
@@ -206,5 +209,38 @@ Given(
         { dailyCalls: ESERVICE_DAILY_CALLS.perConsumer + 1 }
       );
     this.waitingForApprovalVersionId = waitingForApprovalVersionId;
+  }
+);
+
+Given(
+  "{string} ha già portato la finalità in stato {string}",
+  async function (
+    tenantType: TenantType,
+    desiredPurposeState: PurposeVersionState
+  ) {
+    assertContextSchema(this, {
+      purposeId: z.string(),
+      currentVersionId: z.string(),
+    });
+    const token = getToken(this.tokens, tenantType, "admin");
+    switch (desiredPurposeState) {
+      case "ARCHIVED":
+        await dataPreparationService.archivePurpose(
+          token,
+          this.purposeId,
+          this.currentVersionId
+        );
+        break;
+
+      case "SUSPENDED":
+        await dataPreparationService.suspendPurpose(
+          token,
+          this.purposeId,
+          this.currentVersionId
+        );
+        break;
+      default:
+        throw Error("To be implemented");
+    }
   }
 );

@@ -7,7 +7,7 @@ Feature: Attivazione e riattivazione di una finalità
     Given l'utente è un "<ruolo>" di "<ente>"
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
     Given "<ente>" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "<ente>" ha già creato 1 finalità in stato "SUSPENDED" per quell'eservice
+    Given "<ente>" ha già creato 1 finalità in stato "SUSPENDED" per quell'eservice
     When l'utente riattiva la finalità in stato "SUSPENDED" per quell'e-service
     Then si ottiene status code <risultato>
 
@@ -34,7 +34,7 @@ Feature: Attivazione e riattivazione di una finalità
     Given l'utente è un "admin" di "PA2"
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "PA1" ha già creato 1 finalità in stato "SUSPENDED" per quell'eservice
+    Given "PA1" ha già creato 1 finalità in stato "SUSPENDED" per quell'eservice
     When l'utente riattiva la finalità in stato "SUSPENDED" per quell'e-service
     Then si ottiene status code 200 e la finalità in stato "SUSPENDED"
 
@@ -43,7 +43,7 @@ Feature: Attivazione e riattivazione di una finalità
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "PA1" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
+    Given "PA1" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
     When l'utente riattiva la finalità in stato "ACTIVE" per quell'e-service
     Then si ottiene status code 403
 
@@ -52,7 +52,7 @@ Feature: Attivazione e riattivazione di una finalità
     Given l'utente è un "admin" di "PA2"
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "PA1" ha già creato 1 finalità in stato "WAITING_FOR_APPROVAL" per quell'eservice
+    Given "PA1" ha già creato 1 finalità in stato "WAITING_FOR_APPROVAL" per quell'eservice
     When l'utente attiva la finalità in stato "WAITING_FOR_APPROVAL" per quell'e-service
     Then si ottiene status code 200
 
@@ -61,7 +61,7 @@ Feature: Attivazione e riattivazione di una finalità
     Given l'utente è un "admin" di "PA2"
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "PA1" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
+    Given "PA1" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
     Given "PA2" ha già portato la finalità in stato "SUSPENDED"
     Given "PA1" ha già richiesto l'aggiornamento della stima di carico superando i limiti di quell'e-service
     When l'utente riattiva la finalità in stato "SUSPENDED" per quell'e-service
@@ -72,7 +72,7 @@ Feature: Attivazione e riattivazione di una finalità
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "PA1" ha già creato 1 finalità in stato "SUSPENDED" per quell'eservice
+    Given "PA1" ha già creato 1 finalità in stato "SUSPENDED" per quell'eservice
     Given "PA1" ha già richiesto l'aggiornamento della stima di carico superando i limiti di quell'e-service
     When l'utente riattiva la finalità in stato "SUSPENDED" per quell'e-service
     Then si ottiene status code 200 e la finalità in stato "WAITING_FOR_APPROVAL"
@@ -82,7 +82,7 @@ Feature: Attivazione e riattivazione di una finalità
     Given l'utente è un "admin" di "PA2"
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "PA1" ha già creato 1 finalità in stato "<statoFinalità>" per quell'eservice
+    Given "PA1" ha già creato 1 finalità in stato "<statoFinalità>" per quell'eservice
     When l'utente attiva la finalità in stato "<statoFinalità>" per quell'e-service
     Then si ottiene status code 403
 
