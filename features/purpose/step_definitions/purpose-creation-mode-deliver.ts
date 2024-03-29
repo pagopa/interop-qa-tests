@@ -120,23 +120,6 @@ Given(
   }
 );
 
-Given(
-  "un {string} di {string} ha già sospeso quell'e-service",
-  async function (role: Role, tenantType: TenantType) {
-    assertContextSchema(this, {
-      eserviceId: z.string(),
-      descriptorId: z.string(),
-    });
-
-    const token = getToken(this.tokens, tenantType, role);
-    await dataPreparationService.suspendDescriptor(
-      token,
-      this.eserviceId,
-      this.descriptorId
-    );
-  }
-);
-
 When(
   "l'utente crea una nuova finalità per quell'e-service con tutti i campi richiesti correttamente formattati, in modalità gratuita senza specificare una ragione",
   async function () {
