@@ -983,4 +983,30 @@ export const dataPreparationService = {
       waitingForApprovalVersionId,
     };
   },
+
+  async rejectPurposeVersion(
+    token: string,
+    purposeId: string,
+    versionId: string
+  ) {
+    const response = await apiClient.purposes.rejectPurposeVersion(
+      purposeId,
+      versionId,
+      {
+        rejectionReason: "Testing QA purposes",
+      },
+      getAuthorizationHeader(token)
+    );
+
+    assertValidResponse(response);
+
+    await makePolling(
+      () =>
+        apiClient.purposes.getPurpose(purposeId, getAuthorizationHeader(token)),
+      (res) => {
+        console.log("res:", JSON.stringify(res.data)); // TODO: remove
+        return res.data.waitingForApprovalVersion?.state === "REJECTED";
+      }
+    );
+  },
 };
