@@ -1,5 +1,6 @@
 @purpose_activation
 Feature: Attivazione e riattivazione di una finalità
+  Tutti gli utenti admin possono attivare o riattivare una propria finalità
 
   @purpose_activation1
   Scenario Outline: Per una finalità precedentemente creata da un fruitore e attivata da un erogatore, la quale è stata successivamente portata in stato SUSPENDED, alla richiesta di riattivazione da parte di un utente con sufficienti permessi (admin) dell’ente che ha sospeso la finalità, va a buon fine
@@ -44,7 +45,7 @@ Feature: Attivazione e riattivazione di una finalità
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given un "admin" di "PA1" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
     When l'utente riattiva la finalità in stato "ACTIVE" per quell'e-service
-    Then si ottiene status code 403 
+    Then si ottiene status code 403
 
   @purpose_activation4
   Scenario Outline: Per una finalità precedentemente creata da un fruitore, la quale è sopra soglia ed è passata da DRAFT a WAITING_FOR_APPROVAL, alla richiesta di attivazione da parte di un utente con sufficienti permessi (admin) dell’ente erogatore, va a buon fine
