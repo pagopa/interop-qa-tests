@@ -9,6 +9,11 @@
  * ---------------------------------------------------------------
  */
 
+/** models the reject payload for this purpose version. */
+export interface RejectPurposeVersionPayload {
+  rejectionReason: string;
+}
+
 export interface GoogleSAMLPayload {
   /** SAML response */
   SAMLResponse: string;
@@ -818,7 +823,7 @@ export interface PurposeVersionResource {
 }
 
 /** Purpose State */
-export type PurposeVersionState = "ACTIVE" | "DRAFT" | "SUSPENDED" | "WAITING_FOR_APPROVAL" | "ARCHIVED";
+export type PurposeVersionState = "ACTIVE" | "DRAFT" | "SUSPENDED" | "REJECTED" | "WAITING_FOR_APPROVAL" | "ARCHIVED";
 
 export interface User {
   /** @format uuid */
@@ -1457,6 +1462,11 @@ export interface GetProducerEServicesParams {
 export interface GetAgreementEServiceProducersParams {
   /** Query to filter EServices by name */
   q?: string;
+  /**
+   * comma separated sequence of states
+   * @default []
+   */
+  states?: AgreementState[];
   /**
    * @format int32
    * @min 0
@@ -2859,6 +2869,11 @@ export namespace Producers {
       /** Query to filter EServices by name */
       q?: string;
       /**
+       * comma separated sequence of states
+       * @default []
+       */
+      states?: AgreementState[];
+      /**
        * @format int32
        * @min 0
        */
@@ -3527,6 +3542,28 @@ export namespace Purposes {
       "X-Correlation-Id": string;
     };
     export type ResponseBody = File;
+  }
+  /**
+   * @description reject the purpose version by id
+   * @tags purposes
+   * @name RejectPurposeVersion
+   * @summary Reject Purpose Version
+   * @request POST:/purposes/{purposeId}/versions/{versionId}/reject
+   * @secure
+   */
+  export namespace RejectPurposeVersion {
+    export type RequestParams = {
+      /** @format uuid */
+      purposeId: string;
+      /** @format uuid */
+      versionId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = RejectPurposeVersionPayload;
+    export type RequestHeaders = {
+      "X-Correlation-Id": string;
+    };
+    export type ResponseBody = void;
   }
   /**
    * @description archives the purpose version by id
@@ -6065,6 +6102,30 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         path: `/purposes/${purposeId}/versions/${versionId}/documents/${documentId}`,
         method: "GET",
         secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description reject the purpose version by id
+     *
+     * @tags purposes
+     * @name RejectPurposeVersion
+     * @summary Reject Purpose Version
+     * @request POST:/purposes/{purposeId}/versions/{versionId}/reject
+     * @secure
+     */
+    rejectPurposeVersion: (
+      purposeId: string,
+      versionId: string,
+      data: RejectPurposeVersionPayload,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, Problem>({
+        path: `/purposes/${purposeId}/versions/${versionId}/reject`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
         ...params,
       }),
 

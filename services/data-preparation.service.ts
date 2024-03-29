@@ -988,6 +988,29 @@ export const dataPreparationService = {
     };
   },
 
+  async rejectPurposeVersion(
+    token: string,
+    purposeId: string,
+    versionId: string
+  ) {
+    const response = await apiClient.purposes.rejectPurposeVersion(
+      purposeId,
+      versionId,
+      {
+        rejectionReason: "Testing QA purposes",
+      },
+      getAuthorizationHeader(token)
+    );
+
+    assertValidResponse(response);
+
+    await makePolling(
+      () =>
+        apiClient.purposes.getPurpose(purposeId, getAuthorizationHeader(token)),
+      (res) => res.data.currentVersion?.state === "REJECTED"
+    );
+  },
+
   async archivePurpose(token: string, purposeId: string, versionId: string) {
     const response = await apiClient.purposes.archivePurposeVersion(
       purposeId,
