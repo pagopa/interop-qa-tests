@@ -8,7 +8,7 @@ import {
   getOrganizationId,
   getRiskAnalysis,
 } from "../../../utils/commons";
-import { TenantType } from "../../common-steps";
+import { Role, TenantType } from "../../common-steps";
 
 Given(
   "{string} ha già creato {int} finalità in stato {string} per quell'eservice",
@@ -44,5 +44,55 @@ Given(
       this.purposesIds.push(purposeId);
     }
     this.purposeId = this.purposesIds[0];
+  }
+);
+
+Given(
+  "un {string} di {string} ha già pubblicato quella versione di e-service",
+  async function (role: Role, tenantType: TenantType) {
+    assertContextSchema(this, {
+      eserviceId: z.string(),
+      descriptorId: z.string(),
+    });
+
+    const token = getToken(this.tokens, tenantType, role);
+
+    await dataPreparationService.publishDescriptor(
+      token,
+      this.eserviceId,
+      this.descriptorId
+    );
+  }
+);
+
+Given(
+  "un {string} di {string} ha già creato una finalità in stato {string} per quell'eservice associando quell'analisi del rischio creata dall'erogatore",
+  async function (
+    role: Role,
+    tenantType: TenantType,
+    purposeState: PurposeVersionState
+  ) {
+    assertContextSchema(this, {
+      eserviceId: z.string(),
+      riskAnalysisId: z.string(),
+    });
+
+    const token = getToken(this.tokens, tenantType, role);
+    const consumerId = getOrganizationId(tenantType);
+
+    const { purposeId } =
+      await dataPreparationService.createPurposeWithGivenState({
+        token,
+        testSeed: this.TEST_SEED,
+        payload: {
+          eserviceId: this.eserviceId,
+          consumerId,
+          riskAnalysisId: this.riskAnalysisId,
+        },
+        purposeState,
+        eserviceMode: "RECEIVE",
+      });
+
+    this.purposeId = purposeId;
   }
 );
