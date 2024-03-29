@@ -1,17 +1,13 @@
-import { Given, When } from "@cucumber/cucumber";
+import { When } from "@cucumber/cucumber";
 import { z } from "zod";
 import {
   assertContextSchema,
   getAuthorizationHeader,
   getOrganizationId,
-  getRandomInt,
-  getRiskAnalysis,
-  getToken,
 } from "../../../utils/commons";
 import { apiClient } from "../../../api";
 import { TenantType } from "../../common-steps";
 import { PurposeVersionState } from "../../../api/models";
-import { dataPreparationService } from "../../../services/data-preparation.service";
 
 When(
   "l'utente erogatore richiede una operazione di listing delle finalità limitata alle prime {int} finalità",
@@ -134,41 +130,6 @@ When(
       },
       getAuthorizationHeader(this.token)
     );
-  }
-);
-
-Given(
-  "{string} ha già creato una finalità in stato {string} per quell'e-service contenente la keyword {string}",
-  async function (
-    tenantType: TenantType,
-    purposeState: PurposeVersionState,
-    keyword: string
-  ) {
-    assertContextSchema(this, {
-      eserviceId: z.string(),
-    });
-
-    const token = getToken(this.tokens, tenantType, "admin");
-    const consumerId = getOrganizationId(tenantType);
-
-    const { riskAnalysisForm } = getRiskAnalysis({
-      completed: true,
-      tenantType,
-    });
-
-    const title = `purpose ${this.TEST_SEED} - ${getRandomInt()} - ${keyword}`;
-    this.purposeId = await dataPreparationService.createPurposeWithGivenState({
-      token,
-      testSeed: this.TEST_SEED,
-      eserviceMode: "DELIVER",
-      payload: {
-        title,
-        eserviceId: this.eserviceId,
-        consumerId,
-        riskAnalysisForm,
-      },
-      purposeState,
-    });
   }
 );
 
