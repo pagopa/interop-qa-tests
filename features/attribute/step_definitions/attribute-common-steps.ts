@@ -7,15 +7,14 @@ import { AttributeKind } from "../../../api/models";
 import { dataPreparationService } from "../../../services/data-preparation.service";
 
 Given(
-  "un {string} di {string} ha già creato {int} attribut(i)(o) {string}",
+  "{string} ha già creato {int} attribut(i)(o) {string}",
   async function (
-    role: Role,
     tenantType: TenantType,
     count: number,
     attributeKind: AttributeKind
   ) {
     assertContextSchema(this);
-    const token = getToken(this.tokens, tenantType, role);
+    const token = getToken(this.tokens, tenantType, "admin");
 
     const promises = [];
 
@@ -34,15 +33,14 @@ Given(
 );
 
 Given(
-  "un {string} di {string} ha già creato un attributo {string} con nome che contiene {string}",
+  "{string} ha già creato un attributo {string} con nome che contiene {string}",
   async function (
-    role: Role,
     tenantType: TenantType,
     attributeKind: AttributeKind,
     keyword: string
   ) {
     assertContextSchema(this);
-    const token = getToken(this.tokens, tenantType, role);
+    const token = getToken(this.tokens, tenantType, "admin");
     await dataPreparationService.createAttribute(
       token,
       attributeKind,
