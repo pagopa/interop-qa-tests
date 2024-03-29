@@ -8,6 +8,7 @@ import {
   getToken,
   getOrganizationId,
   getRiskAnalysis,
+  getRandomInt,
 } from "../../../utils/commons";
 import { Role, TenantType } from "../../common-steps";
 
@@ -129,5 +130,40 @@ Then(
     });
     assert.equal(this.response.status, statusCode);
     assert.equal(this.response.data.results.length, count);
+  }
+);
+
+Given(
+  "{string} ha già creato una finalità in stato {string} per quell'e-service contenente la keyword {string}",
+  async function (
+    tenantType: TenantType,
+    purposeState: PurposeVersionState,
+    keyword: string
+  ) {
+    assertContextSchema(this, {
+      eserviceId: z.string(),
+    });
+
+    const token = getToken(this.tokens, tenantType, "admin");
+    const consumerId = getOrganizationId(tenantType);
+
+    const { riskAnalysisForm } = getRiskAnalysis({
+      completed: true,
+      tenantType,
+    });
+
+    const title = `purpose ${this.TEST_SEED} - ${getRandomInt()} - ${keyword}`;
+    this.purposeId = await dataPreparationService.createPurposeWithGivenState({
+      token,
+      testSeed: this.TEST_SEED,
+      eserviceMode: "DELIVER",
+      payload: {
+        title,
+        eserviceId: this.eserviceId,
+        consumerId,
+        riskAnalysisForm,
+      },
+      purposeState,
+    });
   }
 );
