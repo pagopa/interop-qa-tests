@@ -28,7 +28,7 @@ Feature: Creazione finalità per e-service in erogazione diretta
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "PA1" ha già creato 1 finalità in stato "DRAFT" per quell'eservice
+    Given "PA1" ha già creato 1 finalità in stato "DRAFT" per quell'eservice
     When l'utente crea una nuova finalità per quell'e-service con tutti i campi richiesti correttamente formattati
     Then si ottiene status code 200
 
@@ -37,7 +37,7 @@ Feature: Creazione finalità per e-service in erogazione diretta
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "PA2" ha già sospeso quell'e-service
+    Given "PA2" ha già sospeso quell'e-service
     When l'utente crea una nuova finalità per quell'e-service con tutti i campi richiesti correttamente formattati
     Then si ottiene status code 200
 

@@ -9,9 +9,8 @@ import {
   getToken,
 } from "../../../utils/commons";
 import { apiClient } from "../../../api";
-import { Role, TenantType } from "../../common-steps";
+import { TenantType } from "../../common-steps";
 import { dataPreparationService } from "../../../services/data-preparation.service";
-import { PurposeVersionState } from "../../../api/models";
 
 When(
   "l'utente crea una nuova finalità per quell'e-service con tutti i campi richiesti correttamente formattati",
@@ -86,53 +85,6 @@ When(
         dailyCalls: 5,
       },
       getAuthorizationHeader(this.token)
-    );
-  }
-);
-
-Given(
-  "un {string} di {string} ha già creato {int} finalità in stato {string} per quell'eservice",
-  async function (
-    role: Role,
-    tenantType: TenantType,
-    n: number,
-    purposeState: PurposeVersionState
-  ) {
-    assertContextSchema(this, {
-      eserviceId: z.string(),
-    });
-
-    const token = getToken(this.tokens, tenantType, role);
-    const consumerId = getOrganizationId(tenantType);
-
-    for (let index = 0; index < n; index++) {
-      await dataPreparationService.createPurposeWithGivenState({
-        token,
-        testSeed: this.TEST_SEED,
-        eserviceMode: "DELIVER",
-        payload: {
-          eserviceId: this.eserviceId,
-          consumerId,
-        },
-        purposeState,
-      });
-    }
-  }
-);
-
-Given(
-  "un {string} di {string} ha già sospeso quell'e-service",
-  async function (role: Role, tenantType: TenantType) {
-    assertContextSchema(this, {
-      eserviceId: z.string(),
-      descriptorId: z.string(),
-    });
-
-    const token = getToken(this.tokens, tenantType, role);
-    await dataPreparationService.suspendDescriptor(
-      token,
-      this.eserviceId,
-      this.descriptorId
     );
   }
 );
