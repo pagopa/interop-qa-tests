@@ -24,7 +24,7 @@ When("l'utente inoltra quella richiesta di fruizione", async function () {
 });
 
 Given(
-  "{string} ha sospeso quell'e-service",
+  "{string} ha già sospeso quell'e-service",
   async function (tenant: TenantType) {
     assertContextSchema(this, {
       eserviceId: z.string(),
