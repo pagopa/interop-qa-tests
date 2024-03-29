@@ -1,5 +1,6 @@
 @purpose_version_create
 Feature: Creazione di una nuova versione di finalità
+  Tutti gli utenti admin di un ente fruitore può richiedere un cambio di piano aggiornando le dailyCalls
 
   @purpose_version_create1
   Scenario Outline: Un utente con sufficienti permessi; il cui ente ha già una finalità in stato ACTIVE o SUSPENDED e non ha versioni in stato WAITING_FOR_APPROVAL per una versione di e-service, aggiorna la stima di carico di una finalità. La richiesta va a buon fine.
@@ -46,9 +47,8 @@ Feature: Creazione di una nuova versione di finalità
       | statoFinalita |
       | ACTIVE        |
       | SUSPENDED     |
-      
-  # Attualmente è possibile creare una nuova versione della finalità anche se è in stato ARCHIVED
-  @purpose_version_create3 @wait_for_fix
+
+  @purpose_version_create3 @wait_for_fix @IMN-400
   Scenario Outline: Un utente con sufficienti permessi; il cui ente ha già una finalità in stato DRAFT, WAITING_FOR_APPROVAL o ARCHIVED per una versione di e-service, aggiorna la stima di carico di una finalità. Ottiene un errore
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
