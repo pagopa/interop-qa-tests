@@ -7,7 +7,7 @@ Feature: Sospensione di una finalità
     Given l'utente è un "<ruolo>" di "<ente>"
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
     Given "<ente>" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "<ente>" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
+    Given "<ente>" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
     When l'utente sospende quella finalità in stato "ACTIVE"
     Then si ottiene status code <risultato>
 
@@ -34,7 +34,7 @@ Feature: Sospensione di una finalità
     Given l'utente è un "admin" di "PA2"
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "PA1" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
+    Given "PA1" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
     When l'utente sospende quella finalità in stato "ACTIVE"
     Then si ottiene status code 200
 
@@ -43,7 +43,7 @@ Feature: Sospensione di una finalità
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA1" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "PA1" ha già creato 1 finalità in stato "<statoFinalita>" per quell'eservice
+    Given "PA1" ha già creato 1 finalità in stato "<statoFinalita>" per quell'eservice
     When l'utente sospende quella finalità in stato "<statoFinalita>"
     Then si ottiene status code 200
 
@@ -57,7 +57,7 @@ Feature: Sospensione di una finalità
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "PA1" ha già creato 1 finalità in stato "<statoFinalita>" per quell'eservice
+    Given "PA1" ha già creato 1 finalità in stato "<statoFinalita>" per quell'eservice
     When l'utente sospende quella finalità in stato "<statoFinalita>"
     Then si ottiene status code 403
 
@@ -72,7 +72,7 @@ Feature: Sospensione di una finalità
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "PA1" ha già creato 1 finalità in stato "WAITING_FOR_APPROVAL" per quell'eservice
+    Given "PA1" ha già creato 1 finalità in stato "WAITING_FOR_APPROVAL" per quell'eservice
     Given "PA2" ha già rifiutato l'aggiornamento della stima di carico per quella finalità
     When l'utente sospende quella finalità in stato "REJECTED"
     Then si ottiene status code 400

@@ -7,7 +7,7 @@ Feature: Listing finalità lato erogatore
     Given l'utente è un "<ruolo>" di "<ente>"
     Given un "admin" di "<ente>" ha già creato e pubblicato 1 e-service
     Given "PA2" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "PA2" ha già creato 5 finalità in stato "ACTIVE" per quell'eservice
+    Given "PA2" ha già creato 5 finalità in stato "ACTIVE" per quell'eservice
     When l'utente erogatore richiede una operazione di listing delle finalità limitata alle prime 3 finalità
     Then si ottiene status code <risultato> e la lista di 3 finalità
 
@@ -29,7 +29,7 @@ Feature: Listing finalità lato erogatore
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA1" ha già creato e pubblicato 1 e-service
     Given "PA2" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "PA2" ha già creato 5 finalità in stato "ACTIVE" per quell'eservice
+    Given "PA2" ha già creato 5 finalità in stato "ACTIVE" per quell'eservice
     When l'utente erogatore richiede una operazione di listing delle finalità con offset 2
     Then si ottiene status code 200 e la lista di 3 finalità
 
@@ -38,9 +38,9 @@ Feature: Listing finalità lato erogatore
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA1" ha già creato e pubblicato 1 e-service
     Given "PA2" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "PA2" ha già creato 2 finalità in stato "ACTIVE" per quell'eservice
+    Given "PA2" ha già creato 2 finalità in stato "ACTIVE" per quell'eservice
     Given "GSP" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "GSP" ha già creato 2 finalità in stato "ACTIVE" per quell'eservice
+    Given "GSP" ha già creato 2 finalità in stato "ACTIVE" per quell'eservice
     When l'utente erogatore richiede una operazione di listing delle finalità sui propri e-service
     Then si ottiene status code 200 e la lista di 4 finalità
 
@@ -49,9 +49,9 @@ Feature: Listing finalità lato erogatore
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA1" ha già creato e pubblicato 1 e-service
     Given "PA2" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "PA2" ha già creato 2 finalità in stato "ACTIVE" per quell'eservice
+    Given "PA2" ha già creato 2 finalità in stato "ACTIVE" per quell'eservice
     Given "GSP" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "GSP" ha già creato 2 finalità in stato "ACTIVE" per quell'eservice
+    Given "GSP" ha già creato 2 finalità in stato "ACTIVE" per quell'eservice
     When l'utente erogatore richiede una operazione di listing delle finalità filtrata per fruitore "PA2"
     Then si ottiene status code 200 e la lista di 2 finalità
 
@@ -60,10 +60,10 @@ Feature: Listing finalità lato erogatore
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA1" ha già creato e pubblicato 1 e-service
     Given "PA2" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "PA2" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
+    Given "PA2" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
     Given un "admin" di "PA1" ha già creato e pubblicato 1 e-service
     Given "GSP" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "GSP" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
+    Given "GSP" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
     When l'utente erogatore richiede una operazione di listing delle finalità filtrata per il secondo e-service
     Then si ottiene status code 200 e la lista di 1 finalità
 
@@ -72,9 +72,9 @@ Feature: Listing finalità lato erogatore
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA1" ha già creato e pubblicato 1 e-service
     Given "PA2" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "PA2" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
+    Given "PA2" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
     Given "GSP" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "GSP" ha già creato 1 finalità in stato "SUSPENDED" per quell'eservice
+    Given "GSP" ha già creato 1 finalità in stato "SUSPENDED" per quell'eservice
     When l'utente erogatore richiede una operazione di listing delle finalità in stato "<statoFinalita>"
     Then si ottiene status code 200 e la lista di 1 finalità
 
@@ -88,7 +88,7 @@ Feature: Listing finalità lato erogatore
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA1" ha già creato e pubblicato 1 e-service
     Given "PA2" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "PA2" ha già creato una finalità in stato "ACTIVE" per quell'e-service contenente la keyword "test"
+    Given "PA2" ha già creato una finalità in stato "ACTIVE" per quell'e-service contenente la keyword "test"
     When l'utente erogatore richiede una operazione di listing delle finalità filtrando per la keyword "test"
     Then si ottiene status code 200 e la lista di 1 finalità
 
@@ -97,6 +97,6 @@ Feature: Listing finalità lato erogatore
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA1" ha già creato e pubblicato 1 e-service
     Given "PA2" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "PA2" ha già creato una finalità in stato "ACTIVE" per quell'e-service contenente la keyword "test"
+    Given "PA2" ha già creato una finalità in stato "ACTIVE" per quell'e-service contenente la keyword "test"
     When l'utente erogatore richiede una operazione di listing delle finalità filtrando per la keyword "unknown"
     Then si ottiene status code 200 e la lista di 0 finalità

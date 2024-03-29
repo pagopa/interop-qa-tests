@@ -7,7 +7,7 @@ Feature: Creazione di una nuova versione di finalità
     Given l'utente è un "<ruolo>" di "<ente>"
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
     Given "<ente>" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "<ente>" ha già creato 1 finalità in stato "<statoFinalità>" per quell'eservice
+    Given "<ente>" ha già creato 1 finalità in stato "<statoFinalità>" per quell'eservice
     When l'utente aggiorna la stima di carico per quella finalità
     Then si ottiene status code <risultato>
 
@@ -38,7 +38,7 @@ Feature: Creazione di una nuova versione di finalità
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "PA1" ha già creato 1 finalità in stato "<statoFinalita>" per quell'eservice
+    Given "PA1" ha già creato 1 finalità in stato "<statoFinalita>" per quell'eservice
     Given l'utente crea una versione nuova della finalità in stato WAITING_FOR_APPROVAL
     When l'utente aggiorna la stima di carico per quella finalità
     Then si ottiene status code 409
@@ -53,7 +53,7 @@ Feature: Creazione di una nuova versione di finalità
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "PA1" ha già creato 1 finalità in stato "<statoFinalita>" per quell'eservice
+    Given "PA1" ha già creato 1 finalità in stato "<statoFinalita>" per quell'eservice
     When l'utente aggiorna la stima di carico per quella finalità
     Then si ottiene status code 409
 
