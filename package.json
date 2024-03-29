@@ -20,6 +20,8 @@
     "bun:test:attribute": "pnpm cucumber:bun -p attribute -p onlyReady",
     "test:agreement": "pnpm cucumber:node -p agreement -p onlyReady",
     "bun:test:agreement": "pnpm cucumber:bun -p agreement -p onlyReady",
+    "test:purpose": "pnpm cucumber:node -p purpose -p onlyReady",
+    "bun:test:purpose": "pnpm cucumber:bun -p purpose -p onlyReady",    
     "check-steps": "pnpm test -- -p validate",
     "bun:check-steps": "pnpm bun:test -p validate",
     "check-steps:usage": "pnpm check-steps --format usage",
