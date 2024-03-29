@@ -68,18 +68,14 @@ Given(
 );
 
 Given(
-  "un {string} di {string} ha già creato una finalità in stato {string} per quell'eservice associando quell'analisi del rischio creata dall'erogatore",
-  async function (
-    role: Role,
-    tenantType: TenantType,
-    purposeState: PurposeVersionState
-  ) {
+  "{string} ha già creato una finalità in stato {string} per quell'eservice associando quell'analisi del rischio creata dall'erogatore",
+  async function (tenantType: TenantType, purposeState: PurposeVersionState) {
     assertContextSchema(this, {
       eserviceId: z.string(),
       riskAnalysisId: z.string(),
     });
 
-    const token = getToken(this.tokens, tenantType, role);
+    const token = getToken(this.tokens, tenantType, "admin");
     const consumerId = getOrganizationId(tenantType);
 
     const { purposeId } =

@@ -39,7 +39,7 @@ Feature: Creazione finalità per e-service in erogazione inversa
     Given un "admin" di "GSP" ha già caricato un'interfaccia per quel descrittore
     Given un "admin" di "GSP" ha già pubblicato quella versione di e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "PA1" ha già creato una finalità in stato "DRAFT" per quell'eservice associando quell'analisi del rischio creata dall'erogatore
+    Given "PA1" ha già creato una finalità in stato "DRAFT" per quell'eservice associando quell'analisi del rischio creata dall'erogatore
     When l'utente crea una nuova finalità con tutti i campi richiesti correttamente formattati per quell'e-service associando quella analisi del rischio creata dall'erogatore
     Then si ottiene status code 200
 
