@@ -7,7 +7,6 @@ import {
   getAuthorizationHeader,
   getOrganizationId,
   getRandomInt,
-  getRiskAnalysis,
   getToken,
 } from "../../../utils/commons";
 import {
@@ -16,24 +15,6 @@ import {
 } from "../../../services/data-preparation.service";
 import { apiClient } from "../../../api";
 import { AgreementApprovalPolicy } from "../../../api/models";
-
-Given(
-  "un {string} di {string} ha già creato un'analisi del rischio per quell'e-service",
-  async function (role: Role, tenantType: TenantType) {
-    assertContextSchema(this, {
-      eserviceId: z.string(),
-    });
-
-    const token = getToken(this.tokens, tenantType, role);
-
-    this.riskAnalysisId =
-      await dataPreparationService.addRiskAnalysisToEService(
-        token,
-        this.eserviceId,
-        getRiskAnalysis({ completed: true, tenantType })
-      );
-  }
-);
 
 When(
   "l'utente crea una nuova finalità con tutti i campi richiesti correttamente formattati per quell'e-service associando quella analisi del rischio creata dall'erogatore",

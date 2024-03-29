@@ -96,3 +96,21 @@ Given(
     this.purposeId = purposeId;
   }
 );
+
+Given(
+  "un {string} di {string} ha già creato un'analisi del rischio per quell'e-service",
+  async function (role: Role, tenantType: TenantType) {
+    assertContextSchema(this, {
+      eserviceId: z.string(),
+    });
+
+    const token = getToken(this.tokens, tenantType, role);
+
+    this.riskAnalysisId =
+      await dataPreparationService.addRiskAnalysisToEService(
+        token,
+        this.eserviceId,
+        getRiskAnalysis({ completed: true, tenantType })
+      );
+  }
+);
