@@ -24,7 +24,7 @@ When(
       waitingForApprovalVersionId: z.string().optional(),
     });
     const versionId =
-      state === "WAITING_FOR_APPROVAL" || state === "REJECTED"
+      state === "WAITING_FOR_APPROVAL"
         ? this.waitingForApprovalVersionId
         : this.currentVersionId;
     this.response = await apiClient.purposes.archivePurposeVersion(
@@ -51,23 +51,5 @@ Given(
         { dailyCalls: ESERVICE_DAILY_CALLS.perConsumer + 1 }
       );
     this.waitingForApprovalVersionId = waitingForApprovalVersionId;
-  }
-);
-
-Given(
-  "{string} ha già rifiutato l'aggiornamento della stima di carico per quella finalità",
-  async function (tenant: TenantType) {
-    assertContextSchema(this, {
-      purposeId: z.string(),
-      waitingForApprovalVersionId: z.string(),
-    });
-
-    const token = getToken(this.tokens, tenant, "admin");
-
-    await dataPreparationService.rejectPurposeVersion(
-      token,
-      this.purposeId,
-      this.waitningForApprovalVersionId
-    );
   }
 );
