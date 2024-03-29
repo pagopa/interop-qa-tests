@@ -8,7 +8,7 @@ import {
   makePolling,
 } from "../../../utils/commons";
 import { apiClient } from "../../../api";
-import { Role, TenantType } from "../../common-steps";
+import { TenantType } from "../../common-steps";
 import { dataPreparationService } from "../../../services/data-preparation.service";
 import {
   AgreementApprovalPolicy,
