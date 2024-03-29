@@ -171,3 +171,21 @@ Given(
     this.purposeId = purposeId;
   }
 );
+
+Given(
+  "{string} ha già rifiutato l'aggiornamento della stima di carico per quella finalità",
+  async function (tenant: TenantType) {
+    assertContextSchema(this, {
+      purposeId: z.string(),
+      waitingForApprovalVersionId: z.string(),
+    });
+
+    const token = getToken(this.tokens, tenant, "admin");
+
+    await dataPreparationService.rejectPurposeVersion(
+      token,
+      this.purposeId,
+      this.waitingForApprovalVersionId
+    );
+  }
+);
