@@ -7,7 +7,7 @@ Feature: Lettura singola finalità
     Given l'utente è un "<ruolo>" di "<ente>"
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
     Given "<ente>" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "<ente>" ha già creato 1 finalità in stato "<statoFinalità>" per quell'eservice
+    Given "<ente>" ha già creato 1 finalità in stato "<statoFinalità>" per quell'eservice
     When l'utente richiede la lettura della finalità
     Then si ottiene status code <risultato> ma l'analisi del rischio solo per admin
 
@@ -41,7 +41,7 @@ Feature: Lettura singola finalità
     Given l'utente è un "admin" di "PA2"
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "PA1" ha già creato 1 finalità in stato "<statoFinalita>" per quell'eservice
+    Given "PA1" ha già creato 1 finalità in stato "<statoFinalita>" per quell'eservice
     When l'utente richiede la lettura della finalità
     Then si ottiene status code 200
 
@@ -57,7 +57,7 @@ Feature: Lettura singola finalità
     Given l'utente è un "admin" di "GSP"
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "PA1" ha già creato 1 finalità in stato "<statoFinalita>" per quell'eservice
+    Given "PA1" ha già creato 1 finalità in stato "<statoFinalita>" per quell'eservice
     When l'utente richiede la lettura della finalità
     Then si ottiene status code 200 ma non l'analisi del rischio
 
