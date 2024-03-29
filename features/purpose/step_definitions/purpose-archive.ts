@@ -2,7 +2,6 @@ import { Given, When } from "@cucumber/cucumber";
 import { z } from "zod";
 import {
   assertContextSchema,
-  assertValidResponse,
   getAuthorizationHeader,
   getToken,
 } from "../../../utils/commons";
