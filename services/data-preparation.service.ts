@@ -1004,7 +1004,7 @@ export const dataPreparationService = {
       () =>
         apiClient.purposes.getPurpose(purposeId, getAuthorizationHeader(token)),
       (res) => {
-        console.log("res:", JSON.stringify(res.data));
+        console.log("res:", JSON.stringify(res.data)); // TODO: remove
         return res.data.waitingForApprovalVersion?.state === "REJECTED";
       }
     );

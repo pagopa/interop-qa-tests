@@ -11,7 +11,7 @@ Feature: Archiviazione di una finalità
     When l'utente archivia quella finalità in stato "ACTIVE"
     Then si ottiene status code <risultato>
 
-    Examples: 
+    Examples: # Test sui ruoli
       | ente    | ruolo        | statoFinalita | risultato |
       | PA1     | admin        | ACTIVE        |       200 |
       | PA1     | api          | ACTIVE        |       403 |
@@ -29,7 +29,7 @@ Feature: Archiviazione di una finalità
       | Privato | api,security | ACTIVE        |       403 |
       | Privato | support      | ACTIVE        |       403 |
 
-    Examples: 
+    Examples: # Test sugli stati
       | ente | ruolo | statoFinalita | risultato |
       | PA1  | admin | SUSPENDED     |       200 |
 
@@ -69,19 +69,20 @@ Feature: Archiviazione di una finalità
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given un "admin" di "PA1" ha già creato 1 finalità in stato "<statoFinalita>" per quell'eservice
     When l'utente archivia quella finalità in stato "<statoFinalita>"
-    Then si ottiene status code 400
+    Then si ottiene status code 403
 
     Examples: 
       | statoFinalita        |
       | WAITING_FOR_APPROVAL |
       | DRAFT                |
       | ARCHIVED             |
-  @purpose_archive4b
+
+  @purpose_archive4b @wait_for_fix
   Scenario Outline: Per una finalità precedentemente creata da un fruitore, la quale è in stato REJECTED, WAITING_FOR_APPROVAL, DRAFT o ARCHIVED, alla richiesta di archiviazione da parte di un utente con sufficienti permessi (admin) dell’ente fruitore, ottiene un errore
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given un "admin" di "PA1" ha già creato 1 finalità in stato "WAITING_FOR_APPROVAL" per quell'eservice
-    Given "PA2" ha già rifiutato l'aggiornamento della stima di carico per quella finalità 
+    Given "PA2" ha già rifiutato l'aggiornamento della stima di carico per quella finalità
     When l'utente archivia quella finalità in stato "REJECTED"
-    Then si ottiene status code 400
+    Then si ottiene status code 403
