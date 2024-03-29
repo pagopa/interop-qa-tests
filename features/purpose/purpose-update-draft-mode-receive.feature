@@ -10,7 +10,7 @@ Feature: Aggiornamento bozza nuova finalità in erogazione inversa
     Given un "admin" di "PA1" ha già caricato un'interfaccia per quel descrittore
     Given un "admin" di "PA1" ha già pubblicato quella versione di e-service
     Given "<ente>" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "<ente>" ha già creato una finalità in stato "DRAFT" per quell'eservice associando quell'analisi del rischio creata dall'erogatore
+    Given "<ente>" ha già creato una finalità in stato "DRAFT" per quell'eservice associando quell'analisi del rischio creata dall'erogatore
     When l'utente aggiorna quella finalità per quell'e-service in erogazione inversa
     Then si ottiene status code <risultato>
 
@@ -40,7 +40,7 @@ Feature: Aggiornamento bozza nuova finalità in erogazione inversa
     Given un "admin" di "PA2" ha già caricato un'interfaccia per quel descrittore
     Given un "admin" di "PA2" ha già pubblicato quella versione di e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "PA1" ha già creato una finalità in stato "<statoFinalità>" per quell'eservice associando quell'analisi del rischio creata dall'erogatore
+    Given "PA1" ha già creato una finalità in stato "<statoFinalità>" per quell'eservice associando quell'analisi del rischio creata dall'erogatore
     When l'utente aggiorna quella finalità per quell'e-service in erogazione inversa
     Then si ottiene status code 403
 
