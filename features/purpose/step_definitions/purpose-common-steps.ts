@@ -1,4 +1,5 @@
-import { Given } from "@cucumber/cucumber";
+import assert from "assert";
+import { Given, Then } from "@cucumber/cucumber";
 import { z } from "zod";
 import { PurposeVersionState } from "../../../api/models";
 import { dataPreparationService } from "../../../services/data-preparation.service";
@@ -112,5 +113,21 @@ Given(
         this.eserviceId,
         getRiskAnalysis({ completed: true, tenantType })
       );
+  }
+);
+
+Then(
+  "si ottiene status code {int} e la lista di {int} finalità",
+  async function (statusCode: number, count: number) {
+    assertContextSchema(this, {
+      response: z.object({
+        status: z.number(),
+        data: z.object({
+          results: z.array(z.unknown()),
+        }),
+      }),
+    });
+    assert.equal(this.response.status, statusCode);
+    assert.equal(this.response.data.results.length, count);
   }
 );

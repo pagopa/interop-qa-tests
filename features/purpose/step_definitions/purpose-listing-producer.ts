@@ -1,5 +1,4 @@
-import assert from "assert";
-import { Given, Then, When } from "@cucumber/cucumber";
+import { Given, When } from "@cucumber/cucumber";
 import { z } from "zod";
 import {
   assertContextSchema,
@@ -27,22 +26,6 @@ When(
       },
       getAuthorizationHeader(this.token)
     );
-  }
-);
-
-Then(
-  "si ottiene status code {int} e la lista di {int} finalità",
-  async function (statusCode: number, count: number) {
-    assertContextSchema(this, {
-      response: z.object({
-        status: z.number(),
-        data: z.object({
-          results: z.array(z.unknown()),
-        }),
-      }),
-    });
-    assert.equal(this.response.status, statusCode);
-    assert.equal(this.response.data.results.length, count);
   }
 );
 
