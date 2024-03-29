@@ -2,7 +2,7 @@ import assert from "assert";
 import { Given, Then } from "@cucumber/cucumber";
 import { z } from "zod";
 import { PurposeVersionState } from "../../../api/models";
-import { dataPreparationService } from "../../../services/data-preparation.service";
+import { ESERVICE_DAILY_CALLS, dataPreparationService } from "../../../services/data-preparation.service";
 import {
   assertContextSchema,
   getToken,
@@ -187,5 +187,24 @@ Given(
       this.purposeId,
       this.waitingForApprovalVersionId
     );
+  }
+);
+
+Given(
+  "{string} ha già richiesto l'aggiornamento della stima di carico superando i limiti di quell'e-service",
+  async function (tenant: TenantType) {
+    assertContextSchema(this, {
+      purposeId: z.string(),
+    });
+
+    const token = getToken(this.tokens, tenant, "admin");
+
+    const { waitingForApprovalVersionId } =
+      await dataPreparationService.createNewPurposeVersion(
+        token,
+        this.purposeId,
+        { dailyCalls: ESERVICE_DAILY_CALLS.perConsumer + 1 }
+      );
+    this.waitingForApprovalVersionId = waitingForApprovalVersionId;
   }
 );
