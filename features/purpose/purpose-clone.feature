@@ -10,7 +10,7 @@ Feature: Clonazione di una finalità
     Given un "admin" di "PA2" ha già caricato un'interfaccia per quel descrittore
     Given un "admin" di "PA2" ha già pubblicato quella versione di e-service
     Given "<ente>" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "<ente>" ha già creato una finalità in stato "<statoFinalità>" per quell'eservice associando quell'analisi del rischio creata dall'erogatore
+    Given "<ente>" ha già creato una finalità in stato "<statoFinalità>" per quell'eservice associando quell'analisi del rischio creata dall'erogatore
     When l'utente richiede una operazione di clonazione della finalità
     Then si ottiene status code <risultato>
 
@@ -45,7 +45,7 @@ Feature: Clonazione di una finalità
     Given un "admin" di "PA2" ha già caricato un'interfaccia per quel descrittore
     Given un "admin" di "PA2" ha già pubblicato quella versione di e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "PA1" ha già creato una finalità in stato "<statoFinalita>" per quell'eservice associando quell'analisi del rischio creata dall'erogatore
+    Given "PA1" ha già creato una finalità in stato "<statoFinalita>" per quell'eservice associando quell'analisi del rischio creata dall'erogatore
     When l'utente richiede una operazione di clonazione della finalità
     Then si ottiene status code 409
 
@@ -59,7 +59,7 @@ Feature: Clonazione di una finalità
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given un "admin" di "PA1" ha già creato 1 finalità in stato "<statoFinalita>" per quell'eservice
+    Given "PA1" ha già creato 1 finalità in stato "<statoFinalita>" per quell'eservice
     When l'utente richiede una operazione di clonazione della finalità
     Then si ottiene status code 200
 

@@ -9,7 +9,6 @@ import {
 import { z } from "zod";
 import { assertContextSchema, getRandomInt, getToken } from "../utils/commons";
 import { generateSessionTokens } from "../utils/session-tokens";
-import { dataPreparationService } from "../services/data-preparation.service";
 
 // Increase duration of every step with the following timeout (Default is 5000 milliseconds)
 setDefaultTimeout(5 * 60 * 1000);
@@ -57,21 +56,3 @@ Then("si ottiene status code {int}", function (statusCode: number) {
 
   assert.equal(this.response.status, statusCode);
 });
-
-Given(
-  "{string} ha già rifiutato l'aggiornamento della stima di carico per quella finalità",
-  async function (tenant: TenantType) {
-    assertContextSchema(this, {
-      purposeId: z.string(),
-      waitingForApprovalVersionId: z.string(),
-    });
-
-    const token = getToken(this.tokens, tenant, "admin");
-
-    await dataPreparationService.rejectPurposeVersion(
-      token,
-      this.purposeId,
-      this.waitingForApprovalVersionId
-    );
-  }
-);
