@@ -10,7 +10,7 @@ import {
   getToken,
 } from "../../../utils/commons";
 import { apiClient } from "../../../api";
-import { Role, TenantType } from "../../common-steps";
+import { TenantType } from "../../common-steps";
 import { PurposeVersionState } from "../../../api/models";
 import { dataPreparationService } from "../../../services/data-preparation.service";
 
@@ -155,9 +155,8 @@ When(
 );
 
 Given(
-  "un {string} di {string} ha già creato una finalità in stato {string} per quell'e-service contenente la keyword {string}",
+  "{string} ha già creato una finalità in stato {string} per quell'e-service contenente la keyword {string}",
   async function (
-    role: Role,
     tenantType: TenantType,
     purposeState: PurposeVersionState,
     keyword: string
