@@ -77,7 +77,7 @@ Feature: Archiviazione di una finalità
       | DRAFT                |
       | ARCHIVED             |
 
-  @purpose_archive4b @wait_for_fix
+  @purpose_archive4b
   Scenario Outline: Per una finalità precedentemente creata da un fruitore, la quale è in stato REJECTED, WAITING_FOR_APPROVAL, DRAFT o ARCHIVED, alla richiesta di archiviazione da parte di un utente con sufficienti permessi (admin) dell’ente fruitore, ottiene un errore
     Given l'utente è un "admin" di "PA1"
     Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
@@ -85,4 +85,4 @@ Feature: Archiviazione di una finalità
     Given un "admin" di "PA1" ha già creato 1 finalità in stato "WAITING_FOR_APPROVAL" per quell'eservice
     Given "PA2" ha già rifiutato l'aggiornamento della stima di carico per quella finalità
     When l'utente archivia quella finalità in stato "REJECTED"
-    Then si ottiene status code 403
+    Then si ottiene status code 400
