@@ -1,8 +1,8 @@
-@purpose-latest-risk-analysis-template-read
+@purpose_latest_risk_analysis_template_read
 Feature: Lettura del template di analisi del rischio più recente
   Tutti gli utenti possono leggere il template dell'analisi del rischio, specifico per il proprio ente, di una propria finalità
 
-  @purpose-latest-risk-analysis-template-read1 @wait_for_fix @IMN-405
+  @purpose_latest_risk_analysis_template_read1 @wait_for_fix @IMN-405
   Scenario Outline: Per una richiesta di lettura del template di analisi del rischio da parte di un ente, alla richiesta di lettura, ottiene l'ultima versione di analisi del rischio dedicata a quel tipo specifico di ente
     Given l'utente è un "<ruolo>" di "<ente>"
     When l'utente richiede il template dell'analisi del rischio
