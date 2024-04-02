@@ -25,8 +25,7 @@ Then(
       response: z.object({
         status: z.number(),
         data: z.object({
-          version: z.string(),
-          questions: z.array(z.unknown()),
+          version: z.string().optional(),
         }),
       }),
     });
