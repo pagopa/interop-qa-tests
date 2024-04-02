@@ -1,5 +1,4 @@
-import assert from "assert";
-import { Then, When } from "@cucumber/cucumber";
+import { When } from "@cucumber/cucumber";
 import { z } from "zod";
 import {
   assertContextSchema,
