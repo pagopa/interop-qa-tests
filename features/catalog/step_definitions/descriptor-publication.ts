@@ -19,7 +19,7 @@ Given(
       descriptorId: z.string(),
     });
 
-    const token = getToken(this.tokens, tenantType);
+    const token = await getToken(tenantType);
 
     await dataPreparationService.addInterfaceToDescriptor(
       token,
@@ -37,7 +37,7 @@ Given(
     descriptorState: EServiceDescriptorState
   ) {
     assertContextSchema(this);
-    const token = getToken(this.tokens, tenantType);
+    const token = await getToken(tenantType);
     this.eserviceId = await dataPreparationService.createEService(token, {
       mode,
     });

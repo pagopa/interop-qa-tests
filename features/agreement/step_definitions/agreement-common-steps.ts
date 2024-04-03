@@ -21,7 +21,7 @@ Given(
     agreementApprovalPolicy: AgreementApprovalPolicy
   ) {
     assertContextSchema(this);
-    const token = getToken(this.tokens, tenantType);
+    const token = await getToken(tenantType);
     this.eserviceId = await dataPreparationService.createEService(token);
     const response =
       await dataPreparationService.createDescriptorWithGivenState({
@@ -38,7 +38,7 @@ Given(
   "{string} ha già creato e pubblicato {int} e-service(s)",
   async function (tenantType: TenantType, totalEservices: number) {
     assertContextSchema(this);
-    const token = getToken(this.tokens, tenantType);
+    const token = await getToken(tenantType);
 
     const arr = new Array(totalEservices).fill(0);
     const createEServiceWithPublishedDescriptor = async (i: number) => {
@@ -71,7 +71,7 @@ Given(
       descriptorId: z.string(),
       token: z.string(),
     });
-    const token = getToken(this.tokens, consumer);
+    const token = await getToken(consumer);
     this.agreementId =
       await dataPreparationService.createAgreementWithGivenState(
         token,
@@ -86,7 +86,7 @@ Given(
   "{string} ha creato un attributo certificato e lo ha assegnato a {string}",
   async function (certifier: TenantType, tenantType: TenantType) {
     assertContextSchema(this);
-    const token = getToken(this.tokens, certifier);
+    const token = await getToken(certifier);
 
     const tenantId = getOrganizationId(tenantType);
     this.attributeId = await dataPreparationService.createAttribute(
@@ -107,7 +107,7 @@ Given(
   async function (tenantType: TenantType) {
     assertContextSchema(this);
     const tenantId = getOrganizationId(tenantType);
-    const token = getToken(this.tokens, tenantType);
+    const token = await getToken(tenantType);
 
     const attributeId = await dataPreparationService.createAttribute(
       token,
@@ -131,7 +131,7 @@ Given(
       publishedEservicesIds: z.array(z.array(z.string())),
       token: z.string(),
     });
-    const token = getToken(this.tokens, consumer);
+    const token = await getToken(consumer);
 
     this.agreementIds = await Promise.all(
       this.publishedEservicesIds.map(([eserviceId, descriptorId]) =>
@@ -154,7 +154,7 @@ Given(
       descriptorId: z.string(),
       token: z.string(),
     });
-    const token = getToken(this.tokens, consumer);
+    const token = await getToken(consumer);
     const [agreementId, documentId] =
       await dataPreparationService.createAgreementWithGivenStateAndDocument(
         token,

@@ -19,7 +19,7 @@ Given(
   async function (consumer: TenantType) {
     assertContextSchema(this);
 
-    const token = getToken(this.tokens, consumer);
+    const token = await getToken(consumer);
 
     const attributeId = await dataPreparationService.createAttribute(
       token,
@@ -37,7 +37,7 @@ Given(
       requiredVerifiedAttributes: z.array(z.array(z.string())),
     });
 
-    const token = getToken(this.tokens, verifier);
+    const token = await getToken(verifier);
     const consumerId = getOrganizationId(consumer);
     const verifierId = getOrganizationId(verifier);
 
@@ -69,7 +69,7 @@ Given(
     const requiredDeclaredAttributes = this.requiredDeclaredAttributes ?? [];
     const requiredVerifiedAttributes = this.requiredVerifiedAttributes ?? [];
 
-    const token = getToken(this.tokens, tenantType);
+    const token = await getToken(tenantType);
     this.eserviceId = await dataPreparationService.createEService(token);
     const response =
       await dataPreparationService.createDescriptorWithGivenState({
@@ -109,7 +109,7 @@ Given(
       agreementId: z.string(),
     });
 
-    const token = getToken(this.tokens, tenant);
+    const token = await getToken(tenant);
     await dataPreparationService.suspendAgreement(
       token,
       this.agreementId,
@@ -125,7 +125,7 @@ Given(
       agreementId: z.string(),
     });
 
-    const token = getToken(this.tokens, tenantType);
+    const token = await getToken(tenantType);
 
     await dataPreparationService.activateAgreement(token, this.agreementId);
   }
@@ -136,7 +136,7 @@ Given(
   async function (certifier: TenantType, consumer: TenantType) {
     assertContextSchema(this);
     const consumerId = getOrganizationId(consumer);
-    const certifierToken = getToken(this.tokens, certifier);
+    const certifierToken = await getToken(certifier);
 
     const requiredCertifiedAttributes: string[][] = [];
 
@@ -168,7 +168,7 @@ Given(
   "{string} crea due gruppi di due attributi verificati",
   async function (tenant: TenantType) {
     assertContextSchema(this);
-    const token = getToken(this.tokens, tenant);
+    const token = await getToken(tenant);
 
     const requiredVerifiedAttributes: string[][] = [];
 
@@ -192,7 +192,7 @@ Given(
   async function (tenant: TenantType) {
     assertContextSchema(this);
     const tenantId = getOrganizationId(tenant);
-    const token = getToken(this.tokens, tenant);
+    const token = await getToken(tenant);
 
     const requiredDeclaredAttributes: string[][] = [];
 
@@ -226,7 +226,7 @@ Given(
     assertContextSchema(this, {
       requiredVerifiedAttributes: z.array(z.array(z.string())),
     });
-    const verifierToken = getToken(this.tokens, verifier);
+    const verifierToken = await getToken(verifier);
     const verifierId = getOrganizationId(verifier);
     const consumerId = getOrganizationId(consumer);
 

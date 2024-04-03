@@ -30,7 +30,7 @@ Given(
   ) {
     assertContextSchema(this);
 
-    const token = getToken(this.tokens, tenantType);
+    const token = await getToken(tenantType);
 
     this.eserviceId = await dataPreparationService.createEService(token);
 
@@ -53,7 +53,7 @@ Given(
   ) {
     assertContextSchema(this);
 
-    const token = getToken(this.tokens, tenantType);
+    const token = await getToken(tenantType);
 
     this.eserviceId = await dataPreparationService.createEService(token);
 

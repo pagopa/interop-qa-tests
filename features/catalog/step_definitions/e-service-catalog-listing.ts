@@ -19,7 +19,7 @@ Given(
   ) {
     assertContextSchema(this);
 
-    const token = getToken(this.tokens, tenantType);
+    const token = await getToken(tenantType);
     const SUSPENDED_ESERVICES = Math.floor(countEservices / 2);
     const PUBLISHED_ESERVICES = countEservices - SUSPENDED_ESERVICES;
     const DRAFT_ESERVICES = countDraftEservices;
@@ -99,7 +99,7 @@ Given(
       publishedEservicesIds: z.array(z.tuple([z.string(), z.string()])),
       tokens: SessionTokens,
     });
-    const token = getToken(this.tokens, consumer);
+    const token = await getToken(consumer);
     const [eserviceId, descriptorId] = this.publishedEservicesIds[0];
 
     const agreementId = await dataPreparationService.createAgreement(
@@ -232,7 +232,7 @@ Given(
   async function (tenantType: TenantType, keyword: string) {
     assertContextSchema(this);
 
-    const token = getToken(this.tokens, tenantType);
+    const token = await getToken(tenantType);
     const eserviceName = `e-service-${this.TEST_SEED}-${keyword}`;
     this.eserviceId = await dataPreparationService.createEService(token, {
       name: eserviceName,

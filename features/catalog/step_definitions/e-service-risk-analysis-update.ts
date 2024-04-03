@@ -16,7 +16,7 @@ Given(
     assertContextSchema(this, {
       eserviceId: z.string(),
     });
-    const token = getToken(this.tokens, tenantType);
+    const token = await getToken(tenantType);
     this.riskAnalysisId =
       await dataPreparationService.addRiskAnalysisToEService(
         token,
