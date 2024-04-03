@@ -137,7 +137,7 @@ export function getOrganizationId(tenantType: TenantType) {
 export function getToken(
   tokens: SessionTokens,
   tenantType: TenantType,
-  role: Role
+  role: Role = "admin"
 ) {
   const token = tokens[tenantType]?.[role];
   if (!token) {

@@ -14,7 +14,7 @@ Given(
     attributeKind: AttributeKind
   ) {
     assertContextSchema(this);
-    const token = getToken(this.tokens, tenantType, "admin");
+    const token = getToken(this.tokens, tenantType);
 
     const promises = [];
 
@@ -40,7 +40,7 @@ Given(
     keyword: string
   ) {
     assertContextSchema(this);
-    const token = getToken(this.tokens, tenantType, "admin");
+    const token = getToken(this.tokens, tenantType);
     await dataPreparationService.createAttribute(
       token,
       attributeKind,

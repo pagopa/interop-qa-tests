@@ -20,7 +20,7 @@ Given(
       eserviceId: z.string(),
     });
 
-    const token = getToken(this.tokens, tenantType, "admin");
+    const token = getToken(this.tokens, tenantType);
 
     const { descriptorId } =
       await dataPreparationService.createDescriptorWithGivenState({

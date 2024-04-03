@@ -19,7 +19,7 @@ Given(
       descriptorId: z.string(),
     });
 
-    const token = getToken(this.tokens, tenantType, "admin");
+    const token = getToken(this.tokens, tenantType);
 
     await dataPreparationService.addInterfaceToDescriptor(
       token,
@@ -37,7 +37,7 @@ Given(
     descriptorState: EServiceDescriptorState
   ) {
     assertContextSchema(this);
-    const token = getToken(this.tokens, tenantType, "admin");
+    const token = getToken(this.tokens, tenantType);
     this.eserviceId = await dataPreparationService.createEService(token, {
       mode,
     });

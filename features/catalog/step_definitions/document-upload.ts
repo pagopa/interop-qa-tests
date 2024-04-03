@@ -15,7 +15,7 @@ Given(
   async function (tenantType: TenantType, technology: EServiceTechnology) {
     assertContextSchema(this);
 
-    const token = getToken(this.tokens, tenantType, "admin");
+    const token = getToken(this.tokens, tenantType);
 
     const eserviceId = await dataPreparationService.createEService(token, {
       technology,
