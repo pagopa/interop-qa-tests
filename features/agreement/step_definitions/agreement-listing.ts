@@ -9,7 +9,7 @@ import {
 } from "../../../utils/commons";
 import { apiClient } from "../../../api";
 import { dataPreparationService } from "../../../services/data-preparation.service";
-import { TenantType, SessionTokens } from "../../common-steps";
+import { TenantType } from "../../common-steps";
 import { AgreementState } from "../../../api/models";
 
 Given(
@@ -18,7 +18,6 @@ Given(
     assertContextSchema(this, {
       token: z.string(),
       publishedEservicesIds: z.array(z.tuple([z.string(), z.string()])),
-      tokens: SessionTokens,
     });
     const token = await getToken(consumer);
 
@@ -47,7 +46,6 @@ Given(
     assertContextSchema(this, {
       token: z.string(),
       publishedEservicesIds: z.array(z.tuple([z.string(), z.string()])),
-      tokens: SessionTokens,
     });
     const token = await getToken(consumer);
     const [eserviceId, descriptorId] =

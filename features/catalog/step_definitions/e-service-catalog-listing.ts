@@ -8,7 +8,7 @@ import {
   getToken,
 } from "../../../utils/commons";
 import { dataPreparationService } from "../../../services/data-preparation.service";
-import { TenantType, SessionTokens } from "../../common-steps";
+import { TenantType } from "../../common-steps";
 
 Given(
   "{string} ha già creato {int} e-services in catalogo in stato PUBLISHED o SUSPENDED e {int} in stato DRAFT",
@@ -97,7 +97,6 @@ Given(
     assertContextSchema(this, {
       token: z.string(),
       publishedEservicesIds: z.array(z.tuple([z.string(), z.string()])),
-      tokens: SessionTokens,
     });
     const token = await getToken(consumer);
     const [eserviceId, descriptorId] = this.publishedEservicesIds[0];
