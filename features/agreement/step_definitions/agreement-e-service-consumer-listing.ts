@@ -24,7 +24,6 @@ When(
   "l'utente richiede una operazione di listing degli e-services per cui ha una richiesta di fruizione limitata a {int}",
   async function (limit: number) {
     assertContextSchema(this, {
-      TEST_SEED: z.string(),
       token: z.string(),
     });
 
@@ -39,7 +38,6 @@ When(
   "l'utente richiede una operazione di listing degli e-services per cui ha una richiesta di fruizione con offset {int}",
   async function (offset: number) {
     assertContextSchema(this, {
-      TEST_SEED: z.string(),
       token: z.string(),
     });
 
@@ -54,7 +52,6 @@ When(
   "l'utente richiede una operazione di listing degli e-services per cui ha una richiesta di fruizione con keyword {string}",
   async function (keyword: string) {
     assertContextSchema(this, {
-      TEST_SEED: z.string(),
       token: z.string(),
     });
 
