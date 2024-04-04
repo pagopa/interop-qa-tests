@@ -80,7 +80,6 @@ Given(
 Given(
   "{string} ha creato un attributo certificato e non lo ha assegnato a {string}",
   async function (certifier: TenantType, _tenantType: TenantType) {
-    assertContextSchema(this);
     const token = await getToken(certifier);
 
     this.attributeId = await dataPreparationService.createAttribute(

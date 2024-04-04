@@ -28,8 +28,6 @@ Given(
     tenantType: TenantType,
     descriptorState: EServiceDescriptorState
   ) {
-    assertContextSchema(this);
-
     const token = await getToken(tenantType);
 
     this.eserviceId = await dataPreparationService.createEService(token);
@@ -51,8 +49,6 @@ Given(
     tenantType: TenantType,
     descriptorState: EServiceDescriptorState
   ) {
-    assertContextSchema(this);
-
     const token = await getToken(tenantType);
 
     this.eserviceId = await dataPreparationService.createEService(token);

@@ -20,7 +20,6 @@ Given(
     descriptorState: EServiceDescriptorState,
     agreementApprovalPolicy: AgreementApprovalPolicy
   ) {
-    assertContextSchema(this);
     const token = await getToken(tenantType);
     this.eserviceId = await dataPreparationService.createEService(token);
     const response =
@@ -85,7 +84,6 @@ Given(
 Given(
   "{string} ha creato un attributo certificato e lo ha assegnato a {string}",
   async function (certifier: TenantType, tenantType: TenantType) {
-    assertContextSchema(this);
     const token = await getToken(certifier);
 
     const tenantId = getOrganizationId(tenantType);
@@ -105,7 +103,6 @@ Given(
 Given(
   "{string} dichiara un attributo dichiarato",
   async function (tenantType: TenantType) {
-    assertContextSchema(this);
     const tenantId = getOrganizationId(tenantType);
     const token = await getToken(tenantType);
 

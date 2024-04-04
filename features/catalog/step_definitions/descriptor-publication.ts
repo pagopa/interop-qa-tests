@@ -36,7 +36,6 @@ Given(
     mode: EServiceMode,
     descriptorState: EServiceDescriptorState
   ) {
-    assertContextSchema(this);
     const token = await getToken(tenantType);
     this.eserviceId = await dataPreparationService.createEService(token, {
       mode,

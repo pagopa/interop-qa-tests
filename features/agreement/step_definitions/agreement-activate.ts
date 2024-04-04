@@ -17,8 +17,6 @@ import { dataPreparationService } from "../../../services/data-preparation.servi
 Given(
   "{string} crea un attributo verificato",
   async function (consumer: TenantType) {
-    assertContextSchema(this);
-
     const token = await getToken(consumer);
 
     const attributeId = await dataPreparationService.createAttribute(
@@ -134,7 +132,6 @@ Given(
 Given(
   "due gruppi di due attributi certificati da {string}, dei quali {string} ne possiede uno per gruppo",
   async function (certifier: TenantType, consumer: TenantType) {
-    assertContextSchema(this);
     const consumerId = getOrganizationId(consumer);
     const certifierToken = await getToken(certifier);
 
@@ -167,7 +164,6 @@ Given(
 Given(
   "{string} crea due gruppi di due attributi verificati",
   async function (tenant: TenantType) {
-    assertContextSchema(this);
     const token = await getToken(tenant);
 
     const requiredVerifiedAttributes: string[][] = [];
@@ -190,7 +186,6 @@ Given(
 Given(
   "due gruppi di due attributi dichiarati, dei quali {string} ne possiede uno per gruppo",
   async function (tenant: TenantType) {
-    assertContextSchema(this);
     const tenantId = getOrganizationId(tenant);
     const token = await getToken(tenant);
 
