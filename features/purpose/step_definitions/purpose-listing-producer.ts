@@ -165,7 +165,7 @@ Given(
       eserviceId: z.string(),
     });
 
-    const token = getToken(this.tokens, tenantType, "admin");
+    const token = await getToken(tenantType);
     const consumerId = getOrganizationId(tenantType);
 
     const { riskAnalysisForm } = getRiskAnalysis({
