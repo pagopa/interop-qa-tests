@@ -104,7 +104,7 @@ Feature: Creazione finalità per e-service in erogazione inversa
     Then si ottiene status code 400
 
   @purpose_creation_receive5
-  Scenario Outline: Un utente con sufficienti permessi (admin); il cui ente NON ha già una richiesta di fruizione per una versione di e-service, il quale ha mode = RECEIVE, crea una nuova finalità con tutti i campi richiesti correttamente formattati. Ottiene un errore (NB: verificare status code).
+  Scenario Outline: Un utente con sufficienti permessi (admin); il cui ente NON ha già una richiesta di fruizione per una versione di e-service, il quale ha mode = RECEIVE, crea una nuova finalità con tutti i campi richiesti correttamente formattati. Ottiene un errore.
     Given l'utente è un "admin" di "PA2"
     Given "PA1" ha già creato un e-service in modalità "RECEIVE" con un descrittore in stato "DRAFT"
     Given "PA1" ha già creato un'analisi del rischio per quell'e-service
@@ -125,7 +125,7 @@ Feature: Creazione finalità per e-service in erogazione inversa
     Then si ottiene status code 400
 
   @purpose_creation_receive7
-  Scenario Outline: Un utente con sufficienti permessi (admin); il cui ente ha già una richiesta di fruizione in stato ACTIVE per una versione di e-service, il quale ha mode = RECEIVE, crea una nuova finalità con tutti i campi richiesti correttamente formattati ma senza riskAnalysisId. Ottiene un errore (NB: verificare status code).
+  Scenario Outline: Un utente con sufficienti permessi (admin); il cui ente ha già una richiesta di fruizione in stato ACTIVE per una versione di e-service, il quale ha mode = RECEIVE, crea una nuova finalità con tutti i campi richiesti correttamente formattati ma senza riskAnalysisId. Ottiene un errore.
     Given l'utente è un "admin" di "PA2"
     Given "PA1" ha già creato un e-service in modalità "RECEIVE" con un descrittore in stato "DRAFT"
     Given "PA1" ha già creato un'analisi del rischio per quell'e-service
@@ -136,7 +136,7 @@ Feature: Creazione finalità per e-service in erogazione inversa
     Then si ottiene status code 400
 
   @purpose_creation_receive8
-  Scenario Outline: Un utente con sufficienti permessi (admin); il cui ente ha già una richiesta di fruizione in stato ACTIVE per una versione di e-service, il quale ha mode = RECEIVE, crea una nuova finalità con tutti i campi richiesti correttamente formattati, con in aggiunta un riskAnalysisId diverso da uno di quelli delle riskAnalysis create dall'erogatore. Ottiene un errore (NB: verificare status code).
+  Scenario Outline: Un utente con sufficienti permessi (admin); il cui ente ha già una richiesta di fruizione in stato ACTIVE per una versione di e-service, il quale ha mode = RECEIVE, crea una nuova finalità con tutti i campi richiesti correttamente formattati, con in aggiunta un riskAnalysisId diverso da uno di quelli delle riskAnalysis create dall'erogatore. Ottiene un errore.
     Given l'utente è un "admin" di "PA2"
     Given "PA1" ha già creato un e-service in modalità "RECEIVE" con un descrittore in stato "DRAFT"
     Given "PA1" ha già creato un'analisi del rischio per quell'e-service
