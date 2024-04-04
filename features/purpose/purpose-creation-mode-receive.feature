@@ -2,13 +2,13 @@
 Feature: Creazione finalità per e-service in erogazione inversa
   Tutti gli utenti admin possono creare una nuova finalità per un e-service in erogazione inversa.
 
-  @purpose_creation_receive1 @wait_for_fix
+  @purpose_creation_receive1
   Scenario Outline: Un utente con sufficienti permessi (admin); il cui ente ha già una richiesta di fruizione in stato ACTIVE per una versione di e-service, il quale ha mode = RECEIVE, crea una nuova finalità con tutti i campi richiesti correttamente formattati. La richiesta va a buon fine.
     Given l'utente è un "<ruolo>" di "<ente>"
-    Given "PA1" ha già creato un e-service in modalità "RECEIVE" con un descrittore in stato "DRAFT"
-    Given "PA1" ha già creato un'analisi del rischio per quell'e-service
-    Given "PA1" ha già caricato un'interfaccia per quel descrittore
-    Given "PA1" ha già pubblicato quella versione di e-service
+    Given "PA2" ha già creato un e-service in modalità "RECEIVE" con un descrittore in stato "DRAFT"
+    Given "PA2" ha già creato un'analisi del rischio per quell'e-service
+    Given "PA2" ha già caricato un'interfaccia per quel descrittore
+    Given "PA2" ha già pubblicato quella versione di e-service
     Given "<ente>" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     When l'utente crea una nuova finalità con tutti i campi richiesti correttamente formattati per quell'e-service associando quella analisi del rischio creata dall'erogatore
     Then si ottiene status code <risultato>

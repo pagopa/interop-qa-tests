@@ -2,7 +2,7 @@
 Feature: Creazione finalità per e-service in erogazione diretta
   Tutti gli utenti admin possono creare una nuova finalità per un e-service in erogazione diretta.
 
-  @purpose_creation_deliver1 @wait_for_fix
+  @purpose_creation_deliver1
   Scenario Outline: Un utente con sufficienti permessi (admin); il cui ente ha già una richiesta di fruizione in stato ACTIVE per una versione di e-service, il quale ha mode = DELIVER, crea una nuova finalità con tutti i campi richiesti correttamente formattati. La richiesta va a buon fine.
     Given l'utente è un "<ruolo>" di "<ente>"
     Given "PA2" ha già creato e pubblicato 1 e-service
