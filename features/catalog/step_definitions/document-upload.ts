@@ -8,18 +8,12 @@ import {
   uploadInterfaceDocument,
 } from "../../../utils/commons";
 import { dataPreparationService } from "../../../services/data-preparation.service";
-import { Role, TenantType } from "../../common-steps";
+import { TenantType } from "../../common-steps";
 
 Given(
-  "un {string} di {string} ha già creato un e-service con un descrittore in stato DRAFT e tecnologia {string}",
-  async function (
-    role: Role,
-    tenantType: TenantType,
-    technology: EServiceTechnology
-  ) {
-    assertContextSchema(this);
-
-    const token = getToken(this.tokens, tenantType, role);
+  "{string} ha già creato un e-service con un descrittore in stato DRAFT e tecnologia {string}",
+  async function (tenantType: TenantType, technology: EServiceTechnology) {
+    const token = await getToken(tenantType);
 
     const eserviceId = await dataPreparationService.createEService(token, {
       technology,
