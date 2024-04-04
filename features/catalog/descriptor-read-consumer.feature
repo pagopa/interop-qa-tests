@@ -5,7 +5,7 @@ Feature: Lettura di un descrittore lato fruitore
   @descriptor_read_consumer1
   Scenario Outline: Per un e-service precedentemente creato da qualsiasi ente, il quale ha un solo descrittore in stato NON DRAFT (PUBLISHED, SUSPENDED, DEPRECATED, ARCHIVED), la richiesta per ottenere i dettagli della versione di e-service va a buon fine
     Given l'utente è un "<ruolo>" di "<ente>"
-    Given un "admin" di "PA2" ha già creato un e-service con un descrittore in stato "<statoVersione>"
+    Given "PA2" ha già creato un e-service con un descrittore in stato "<statoVersione>"
     When l'utente fruitore richiede la lettura di quel descrittore
     Then si ottiene status code 200
 
@@ -36,6 +36,6 @@ Feature: Lettura di un descrittore lato fruitore
   @descriptor_read_consumer2
   Scenario Outline: Per un e-service precedentemente creato da qualsiasi ente, il quale ha un solo descrittore in stato DRAFT, la richiesta per ottenere i dettagli della versione di e-service restituisce errore
     Given l'utente è un "admin" di "PA1"
-    Given un "admin" di "PA2" ha già creato un e-service con un descrittore in stato "DRAFT"
+    Given "PA2" ha già creato un e-service con un descrittore in stato "DRAFT"
     When l'utente fruitore richiede la lettura di quel descrittore
     Then si ottiene status code 404

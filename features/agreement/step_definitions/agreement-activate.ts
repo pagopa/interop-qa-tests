@@ -7,7 +7,7 @@ import {
   getAuthorizationHeader,
   getToken,
 } from "../../../utils/commons";
-import { Role, TenantType } from "../../common-steps";
+import { TenantType } from "../../common-steps";
 import {
   EServiceDescriptorState,
   AgreementApprovalPolicy,
@@ -17,9 +17,7 @@ import { dataPreparationService } from "../../../services/data-preparation.servi
 Given(
   "{string} crea un attributo verificato",
   async function (consumer: TenantType) {
-    assertContextSchema(this);
-
-    const token = getToken(this.tokens, consumer, "admin");
+    const token = await getToken(consumer);
 
     const attributeId = await dataPreparationService.createAttribute(
       token,
@@ -37,7 +35,7 @@ Given(
       requiredVerifiedAttributes: z.array(z.array(z.string())),
     });
 
-    const token = getToken(this.tokens, verifier, "admin");
+    const token = await getToken(verifier);
     const consumerId = getOrganizationId(consumer);
     const verifierId = getOrganizationId(verifier);
 
@@ -53,9 +51,8 @@ Given(
 );
 
 Given(
-  "un {string} di {string} ha già creato un e-service in stato {string} che richiede quegli attributi con approvazione {string}",
+  "{string} ha già creato un e-service in stato {string} che richiede quegli attributi con approvazione {string}",
   async function (
-    role: Role,
     tenantType: TenantType,
     descriptorState: EServiceDescriptorState,
     agreementApprovalPolicy: AgreementApprovalPolicy
@@ -70,7 +67,7 @@ Given(
     const requiredDeclaredAttributes = this.requiredDeclaredAttributes ?? [];
     const requiredVerifiedAttributes = this.requiredVerifiedAttributes ?? [];
 
-    const token = getToken(this.tokens, tenantType, role);
+    const token = await getToken(tenantType);
     this.eserviceId = await dataPreparationService.createEService(token);
     const response =
       await dataPreparationService.createDescriptorWithGivenState({
@@ -110,7 +107,7 @@ Given(
       agreementId: z.string(),
     });
 
-    const token = getToken(this.tokens, tenant, "admin");
+    const token = await getToken(tenant);
     await dataPreparationService.suspendAgreement(
       token,
       this.agreementId,
@@ -126,7 +123,7 @@ Given(
       agreementId: z.string(),
     });
 
-    const token = getToken(this.tokens, tenantType, "admin");
+    const token = await getToken(tenantType);
 
     await dataPreparationService.activateAgreement(token, this.agreementId);
   }
@@ -135,9 +132,8 @@ Given(
 Given(
   "due gruppi di due attributi certificati da {string}, dei quali {string} ne possiede uno per gruppo",
   async function (certifier: TenantType, consumer: TenantType) {
-    assertContextSchema(this);
     const consumerId = getOrganizationId(consumer);
-    const certifierToken = getToken(this.tokens, certifier, "admin");
+    const certifierToken = await getToken(certifier);
 
     const requiredCertifiedAttributes: string[][] = [];
 
@@ -168,8 +164,7 @@ Given(
 Given(
   "{string} crea due gruppi di due attributi verificati",
   async function (tenant: TenantType) {
-    assertContextSchema(this);
-    const token = getToken(this.tokens, tenant, "admin");
+    const token = await getToken(tenant);
 
     const requiredVerifiedAttributes: string[][] = [];
 
@@ -191,9 +186,8 @@ Given(
 Given(
   "due gruppi di due attributi dichiarati, dei quali {string} ne possiede uno per gruppo",
   async function (tenant: TenantType) {
-    assertContextSchema(this);
     const tenantId = getOrganizationId(tenant);
-    const token = getToken(this.tokens, tenant, "admin");
+    const token = await getToken(tenant);
 
     const requiredDeclaredAttributes: string[][] = [];
 
@@ -227,7 +221,7 @@ Given(
     assertContextSchema(this, {
       requiredVerifiedAttributes: z.array(z.array(z.string())),
     });
-    const verifierToken = getToken(this.tokens, verifier, "admin");
+    const verifierToken = await getToken(verifier);
     const verifierId = getOrganizationId(verifier);
     const consumerId = getOrganizationId(consumer);
 
