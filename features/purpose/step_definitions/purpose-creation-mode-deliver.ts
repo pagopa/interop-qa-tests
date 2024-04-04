@@ -10,7 +10,10 @@ import {
 } from "../../../utils/commons";
 import { apiClient } from "../../../api";
 import { TenantType } from "../../common-steps";
-import { dataPreparationService } from "../../../services/data-preparation.service";
+import {
+  ESERVICE_DAILY_CALLS,
+  dataPreparationService,
+} from "../../../services/data-preparation.service";
 
 When(
   "l'utente crea una nuova finalità per quell'e-service con tutti i campi richiesti correttamente formattati",
@@ -30,7 +33,7 @@ When(
         description: "description of the purpose - QA",
         isFreeOfCharge: true,
         freeOfChargeReason: "free of charge - QA",
-        dailyCalls: 5,
+        dailyCalls: ESERVICE_DAILY_CALLS.perConsumer - 1,
       },
       getAuthorizationHeader(this.token)
     );
@@ -48,17 +51,19 @@ Given(
     const consumerId = getOrganizationId(tenantType);
 
     const title = `purpose title - QA - ${this.TEST_SEED} - ${getRandomInt()}`;
-    this.purposeId = await dataPreparationService.createPurposeWithGivenState({
-      token,
-      testSeed: this.TEST_SEED,
-      eserviceMode: "DELIVER",
-      payload: {
-        title,
-        eserviceId: this.eserviceId,
-        consumerId,
-      },
-      purposeState: "DRAFT",
-    });
+    const { purposeId } =
+      await dataPreparationService.createPurposeWithGivenState({
+        token,
+        testSeed: this.TEST_SEED,
+        eserviceMode: "DELIVER",
+        payload: {
+          title,
+          eserviceId: this.eserviceId,
+          consumerId,
+        },
+        purposeState: "DRAFT",
+      });
+    this.purposeId = purposeId;
     this.purposeTitle = title;
   }
 );
@@ -82,7 +87,7 @@ When(
         description: "description of the purpose - QA",
         isFreeOfCharge: true,
         freeOfChargeReason: "free of charge - QA",
-        dailyCalls: 5,
+        dailyCalls: ESERVICE_DAILY_CALLS.perConsumer - 1,
       },
       getAuthorizationHeader(this.token)
     );
@@ -107,7 +112,7 @@ When(
         description: "description of the purpose - QA",
         isFreeOfCharge: true,
         freeOfChargeReason: undefined,
-        dailyCalls: 5,
+        dailyCalls: ESERVICE_DAILY_CALLS.perConsumer - 1,
       },
       getAuthorizationHeader(this.token)
     );
@@ -132,7 +137,7 @@ When(
         description: "description of the purpose - QA",
         isFreeOfCharge: true,
         freeOfChargeReason: "free of charge - QA",
-        dailyCalls: 5,
+        dailyCalls: ESERVICE_DAILY_CALLS.perConsumer - 1,
         riskAnalysisForm: getRiskAnalysis({
           tenantType: "PA1",
           completed: false,
@@ -168,7 +173,7 @@ When(
         description: "description of the purpose - QA",
         isFreeOfCharge: true,
         freeOfChargeReason: "free of charge - QA",
-        dailyCalls: 5,
+        dailyCalls: ESERVICE_DAILY_CALLS.perConsumer - 1,
         riskAnalysisForm: {
           ...riskAnalysisForm,
           version: outdatedVersion,

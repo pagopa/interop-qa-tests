@@ -5,7 +5,10 @@ import {
   assertContextSchema,
 } from "../../../utils/commons";
 import { apiClient } from "../../../api";
-import { dataPreparationService } from "../../../services/data-preparation.service";
+import {
+  ESERVICE_DAILY_CALLS,
+  dataPreparationService,
+} from "../../../services/data-preparation.service";
 
 When(
   "l'utente crea una versione in bozza per quell'e-service",
@@ -20,8 +23,8 @@ When(
         description: "Questo è un e-service di test",
         audience: ["api/v1"],
         voucherLifespan: 60,
-        dailyCallsPerConsumer: 10,
-        dailyCallsTotal: 100,
+        dailyCallsPerConsumer: ESERVICE_DAILY_CALLS.perConsumer,
+        dailyCallsTotal: ESERVICE_DAILY_CALLS.total,
         agreementApprovalPolicy: "AUTOMATIC",
         attributes: {
           certified: [],

@@ -6,6 +6,7 @@ import {
   assertContextSchema,
   getToken,
   getOrganizationId,
+  getRiskAnalysis,
 } from "../../../utils/commons";
 import { TenantType } from "../../common-steps";
 
@@ -22,18 +23,27 @@ Given(
 
     const token = await getToken(tenantType);
     const consumerId = getOrganizationId(tenantType);
+    const { riskAnalysisForm } = getRiskAnalysis({
+      completed: true,
+      tenantType,
+    });
 
+    this.purposesIds = [];
     for (let index = 0; index < n; index++) {
-      await dataPreparationService.createPurposeWithGivenState({
-        token,
-        testSeed: this.TEST_SEED,
-        eserviceMode: "DELIVER",
-        payload: {
-          eserviceId: this.eserviceId,
-          consumerId,
-        },
-        purposeState,
-      });
+      const { purposeId } =
+        await dataPreparationService.createPurposeWithGivenState({
+          token,
+          testSeed: this.TEST_SEED,
+          eserviceMode: "DELIVER",
+          payload: {
+            eserviceId: this.eserviceId,
+            consumerId,
+            riskAnalysisForm,
+          },
+          purposeState,
+        });
+      this.purposesIds.push(purposeId);
     }
+    this.purposeId = this.purposesIds[0];
   }
 );
