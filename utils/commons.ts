@@ -141,10 +141,9 @@ export async function getToken(
   role: Role = "admin"
 ): Promise<string> {
   if (!cachedTokens) {
-    const tokens = SessionTokens.parse(
+    cachedTokens = SessionTokens.parse(
       await generateSessionTokens(process.env.TENANTS_IDS_FILE_PATH)
     );
-    cachedTokens = tokens;
   }
   const token = cachedTokens[tenantType]?.[role];
   if (!token) {
