@@ -5,7 +5,7 @@ Feature: Cancellazione finalità
   @purpose_delete1
   Scenario Outline: Per una finalità precedentemente creata dall’ente, la quale prima versione è in stato DRAFT, alla richiesta di cancellazione da parte di un utente con sufficienti permessi (admin), va a buon fine
     Given l'utente è un "<ruolo>" di "<ente>"
-    Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
+    Given "PA2" ha già creato e pubblicato 1 e-service
     Given "<ente>" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given "<ente>" ha già creato 1 finalità in stato "DRAFT" per quell'eservice
     When l'utente richiede la cancellazione della finalità
@@ -32,7 +32,7 @@ Feature: Cancellazione finalità
   @purpose_delete2
   Scenario Outline: Per una finalità precedentemente creata dall’ente, la quale prima versione è in stato ACTIVE, SUSPENDED, WAITING_FOR_APPROVAL o ARCHIVED, alla richiesta di cancellazione da parte di un utente con sufficienti permessi (admin), ottiene un errore (NB: verificare status code)
     Given l'utente è un "admin" di "PA1"
-    Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
+    Given "PA2" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given "PA1" ha già creato 1 finalità in stato "<statoFinalita>" per quell'eservice
     When l'utente richiede la cancellazione della finalità
@@ -48,7 +48,7 @@ Feature: Cancellazione finalità
   @purpose_delete3
   Scenario Outline: Per una finalità precedentemente creata dall’ente, la quale prima versione è in stato DRAFT, alla richiesta di cancellazione da parte di un utente con sufficienti permessi (admin), che non è nè l'erogatore nè il fruitore, ottiene un errore
     Given l'utente è un "admin" di "PA1"
-    Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
+    Given "PA2" ha già creato e pubblicato 1 e-service
     Given "GSP" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given "GSP" ha già creato 1 finalità in stato "DRAFT" per quell'eservice
     When l'utente richiede la cancellazione della finalità

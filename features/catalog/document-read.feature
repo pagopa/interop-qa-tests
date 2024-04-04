@@ -5,7 +5,7 @@ Feature: Lettura di un documento
   @document_read1
   Scenario Outline: Per un e-service che ha un solo descrittore, il quale è in stato DRAFT, alla richiesta di recupero di un documento precedentemente caricato da parte di un utente autorizzato (api o admin dell’ente erogatore di quell’e-service), l'operazione va a buon fine
     Given l'utente è un "<ruolo>" di "<ente>"
-    Given un "admin" di "<ente>" ha già creato un e-service con un descrittore in stato "DRAFT" e un documento già caricato
+    Given "<ente>" ha già creato un e-service con un descrittore in stato "DRAFT" e un documento già caricato
     When l'utente richiede il documento
     Then si ottiene status code <risultato>
 
@@ -25,7 +25,7 @@ Feature: Lettura di un documento
   @document_read2
   Scenario Outline: Per un e-service che ha un solo descrittore, il quale è in stato NON DRAFT (PUBLISHED, SUSPENDED, DEPRECATED, ARCHIVED), alla richiesta di recupero di un documento precedentemente caricato da parte di un utente autenticato (qualunque livello di permesso di qualunque ente), l'operazione va a buon fine
     Given l'utente è un "<ruolo>" di "<ente>"
-    Given un "admin" di "PA1" ha già creato un e-service con un descrittore in stato "<statoDescrittore>" e un documento già caricato
+    Given "PA1" ha già creato un e-service con un descrittore in stato "<statoDescrittore>" e un documento già caricato
     When l'utente richiede il documento
     Then si ottiene status code 200
 
