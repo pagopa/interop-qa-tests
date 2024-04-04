@@ -158,7 +158,7 @@ When(
       tenantType: this.tenantType,
     });
 
-    const outdatedVersion = "1.0";
+    const outdatedVersion = "0.0";
 
     this.response = await apiClient.purposes.createPurpose(
       {
