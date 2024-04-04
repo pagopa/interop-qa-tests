@@ -1,6 +1,6 @@
 import { Given } from "@cucumber/cucumber";
 import { z } from "zod";
-import { Role, TenantType } from "../../common-steps";
+import { TenantType } from "../../common-steps";
 import { dataPreparationService } from "../../../services/data-preparation.service";
 import {
   assertContextSchema,
@@ -14,15 +14,13 @@ import {
 } from "../../../api/models";
 
 Given(
-  "un {string} di {string} ha già creato un e-service in stato {string} con approvazione {string}",
+  "{string} ha già creato un e-service in stato {string} con approvazione {string}",
   async function (
-    role: Role,
     tenantType: TenantType,
     descriptorState: EServiceDescriptorState,
     agreementApprovalPolicy: AgreementApprovalPolicy
   ) {
-    assertContextSchema(this);
-    const token = getToken(this.tokens, tenantType, role);
+    const token = await getToken(tenantType);
     this.eserviceId = await dataPreparationService.createEService(token);
     const response =
       await dataPreparationService.createDescriptorWithGivenState({
@@ -36,10 +34,10 @@ Given(
 );
 
 Given(
-  "un {string} di {string} ha già creato e pubblicato {int} e-service(s)",
-  async function (role: Role, tenantType: TenantType, totalEservices: number) {
+  "{string} ha già creato e pubblicato {int} e-service(s)",
+  async function (tenantType: TenantType, totalEservices: number) {
     assertContextSchema(this);
-    const token = getToken(this.tokens, tenantType, role);
+    const token = await getToken(tenantType);
 
     const arr = new Array(totalEservices).fill(0);
     const createEServiceWithPublishedDescriptor = async (i: number) => {
@@ -72,7 +70,7 @@ Given(
       descriptorId: z.string(),
       token: z.string(),
     });
-    const token = getToken(this.tokens, consumer, "admin");
+    const token = await getToken(consumer);
     this.agreementId =
       await dataPreparationService.createAgreementWithGivenState(
         token,
@@ -86,8 +84,7 @@ Given(
 Given(
   "{string} ha creato un attributo certificato e lo ha assegnato a {string}",
   async function (certifier: TenantType, tenantType: TenantType) {
-    assertContextSchema(this);
-    const token = getToken(this.tokens, certifier, "admin");
+    const token = await getToken(certifier);
 
     const tenantId = getOrganizationId(tenantType);
     this.attributeId = await dataPreparationService.createAttribute(
@@ -106,9 +103,8 @@ Given(
 Given(
   "{string} dichiara un attributo dichiarato",
   async function (tenantType: TenantType) {
-    assertContextSchema(this);
     const tenantId = getOrganizationId(tenantType);
-    const token = getToken(this.tokens, tenantType, "admin");
+    const token = await getToken(tenantType);
 
     const attributeId = await dataPreparationService.createAttribute(
       token,
@@ -132,7 +128,7 @@ Given(
       publishedEservicesIds: z.array(z.array(z.string())),
       token: z.string(),
     });
-    const token = getToken(this.tokens, consumer, "admin");
+    const token = await getToken(consumer);
 
     this.agreementIds = await Promise.all(
       this.publishedEservicesIds.map(([eserviceId, descriptorId]) =>
@@ -148,18 +144,14 @@ Given(
 );
 
 Given(
-  "un {string} di {string} ha già creato una richiesta di fruizione in stato {string} con un documento allegato",
-  async function (
-    role: Role,
-    consumer: TenantType,
-    agreementState: AgreementState
-  ) {
+  "{string} ha già creato una richiesta di fruizione in stato {string} con un documento allegato",
+  async function (consumer: TenantType, agreementState: AgreementState) {
     assertContextSchema(this, {
       eserviceId: z.string(),
       descriptorId: z.string(),
       token: z.string(),
     });
-    const token = getToken(this.tokens, consumer, role);
+    const token = await getToken(consumer);
     const [agreementId, documentId] =
       await dataPreparationService.createAgreementWithGivenStateAndDocument(
         token,
