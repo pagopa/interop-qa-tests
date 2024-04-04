@@ -5,7 +5,7 @@ Feature: Aggiornamento del nome di un documento
   @document_update1
   Scenario Outline: Per un e-service che ha un solo descrittore, il quale è in stato DRAFT, e che ha almeno un documento già caricato, alla richiesta di aggiornamento del nome, l'operazione va a buon fine
     Given l'utente è un "<ruolo>" di "<ente>"
-    Given un "admin" di "<ente>" ha già creato un e-service con un descrittore in stato "DRAFT" e un documento già caricato
+    Given "<ente>" ha già creato un e-service con un descrittore in stato "DRAFT" e un documento già caricato
     When l'utente aggiorna il nome di quel documento
     Then si ottiene status code <risultato>
 
@@ -25,7 +25,7 @@ Feature: Aggiornamento del nome di un documento
   @document_update2
   Scenario Outline: Per un e-service che ha un solo descrittore, il quale è in stato NON DRAFT (PUBLISHED, SUSPENDED, DEPRECATED, ARCHIVED), e che ha almeno un documento già caricato, alla richiesta di aggiornamento del nome, si ottiene un errore
     Given l'utente è un "admin" di "PA1"
-    Given un "admin" di "PA1" ha già creato un e-service con un descrittore in stato "<statoDescrittore>" e un documento già caricato
+    Given "PA1" ha già creato un e-service con un descrittore in stato "<statoDescrittore>" e un documento già caricato
     When l'utente aggiorna il nome di quel documento
     Then si ottiene status code 400
 
