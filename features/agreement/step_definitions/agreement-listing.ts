@@ -9,7 +9,7 @@ import {
 } from "../../../utils/commons";
 import { apiClient } from "../../../api";
 import { dataPreparationService } from "../../../services/data-preparation.service";
-import { TenantType, SessionTokens, Role } from "../../common-steps";
+import { TenantType, SessionTokens } from "../../common-steps";
 import { AgreementState } from "../../../api/models";
 
 Given(
@@ -62,17 +62,13 @@ Given(
 );
 
 Given(
-  "un {string} di {string} ha già pubblicato una nuova versione per {int} di questi e-service",
-  async function (
-    role: Role,
-    tenantType: TenantType,
-    descriptorsCount: number
-  ) {
+  "{string} ha già pubblicato una nuova versione per {int} di questi e-service",
+  async function (tenantType: TenantType, descriptorsCount: number) {
     assertContextSchema(this, {
       publishedEservicesIds: z.array(z.tuple([z.string(), z.string()])),
     });
 
-    const token = getToken(this.tokens, tenantType, role);
+    const token = getToken(this.tokens, tenantType, "admin");
     const eserviceIds = this.publishedEservicesIds
       .slice(0, descriptorsCount)
       .map(([eserviceId, _]) => eserviceId);

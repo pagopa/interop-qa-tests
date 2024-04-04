@@ -9,14 +9,14 @@ import {
 } from "../../../utils/commons";
 import { EServiceMode } from "../../../api/models";
 import { apiClient } from "../../../api";
-import { Role, TenantType } from "../../common-steps";
+import { TenantType } from "../../common-steps";
 
 Given(
-  "un {string} di {string} ha già creato un e-service in modalità {string} senza descrittore",
-  async function (role: Role, tenantType: TenantType, mode: EServiceMode) {
+  "{string} ha già creato un e-service in modalità {string} senza descrittore",
+  async function (tenantType: TenantType, mode: EServiceMode) {
     assertContextSchema(this, { token: z.string() });
 
-    const token = getToken(this.tokens, tenantType, role);
+    const token = getToken(this.tokens, tenantType, "admin");
 
     this.eserviceId = await dataPreparationService.createEService(token, {
       mode,

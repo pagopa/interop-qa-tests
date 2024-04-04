@@ -9,17 +9,17 @@ import {
 } from "../../../utils/commons";
 import { apiClient } from "../../../api";
 import { EServiceDescriptorState, EServiceMode } from "../../../api/models";
-import { TenantType, Role } from "../../common-steps";
+import { TenantType } from "../../common-steps";
 
 Given(
-  "un {string} di {string} ha già caricato un'interfaccia per quel descrittore",
-  async function (role: Role, tenantType: TenantType) {
+  "{string} ha già caricato un'interfaccia per quel descrittore",
+  async function (tenantType: TenantType) {
     assertContextSchema(this, {
       eserviceId: z.string(),
       descriptorId: z.string(),
     });
 
-    const token = getToken(this.tokens, tenantType, role);
+    const token = getToken(this.tokens, tenantType, "admin");
 
     await dataPreparationService.addInterfaceToDescriptor(
       token,
@@ -30,15 +30,14 @@ Given(
 );
 
 Given(
-  "un {string} di {string} ha già creato un e-service in modalità {string} con un descrittore in stato {string}",
+  "{string} ha già creato un e-service in modalità {string} con un descrittore in stato {string}",
   async function (
-    role: Role,
     tenantType: TenantType,
     mode: EServiceMode,
     descriptorState: EServiceDescriptorState
   ) {
     assertContextSchema(this);
-    const token = getToken(this.tokens, tenantType, role);
+    const token = getToken(this.tokens, tenantType, "admin");
     this.eserviceId = await dataPreparationService.createEService(token, {
       mode,
     });

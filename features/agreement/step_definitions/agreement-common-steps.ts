@@ -1,6 +1,6 @@
 import { Given } from "@cucumber/cucumber";
 import { z } from "zod";
-import { Role, TenantType } from "../../common-steps";
+import { TenantType } from "../../common-steps";
 import { dataPreparationService } from "../../../services/data-preparation.service";
 import {
   assertContextSchema,
@@ -14,15 +14,14 @@ import {
 } from "../../../api/models";
 
 Given(
-  "un {string} di {string} ha già creato un e-service in stato {string} con approvazione {string}",
+  "{string} ha già creato un e-service in stato {string} con approvazione {string}",
   async function (
-    role: Role,
     tenantType: TenantType,
     descriptorState: EServiceDescriptorState,
     agreementApprovalPolicy: AgreementApprovalPolicy
   ) {
     assertContextSchema(this);
-    const token = getToken(this.tokens, tenantType, role);
+    const token = getToken(this.tokens, tenantType, "admin");
     this.eserviceId = await dataPreparationService.createEService(token);
     const response =
       await dataPreparationService.createDescriptorWithGivenState({
@@ -36,10 +35,10 @@ Given(
 );
 
 Given(
-  "un {string} di {string} ha già creato e pubblicato {int} e-service(s)",
-  async function (role: Role, tenantType: TenantType, totalEservices: number) {
+  "{string} ha già creato e pubblicato {int} e-service(s)",
+  async function (tenantType: TenantType, totalEservices: number) {
     assertContextSchema(this);
-    const token = getToken(this.tokens, tenantType, role);
+    const token = getToken(this.tokens, tenantType, "admin");
 
     const arr = new Array(totalEservices).fill(0);
     const createEServiceWithPublishedDescriptor = async (i: number) => {
@@ -148,18 +147,14 @@ Given(
 );
 
 Given(
-  "un {string} di {string} ha già creato una richiesta di fruizione in stato {string} con un documento allegato",
-  async function (
-    role: Role,
-    consumer: TenantType,
-    agreementState: AgreementState
-  ) {
+  "{string} ha già creato una richiesta di fruizione in stato {string} con un documento allegato",
+  async function (consumer: TenantType, agreementState: AgreementState) {
     assertContextSchema(this, {
       eserviceId: z.string(),
       descriptorId: z.string(),
       token: z.string(),
     });
-    const token = getToken(this.tokens, consumer, role);
+    const token = getToken(this.tokens, consumer, "admin");
     const [agreementId, documentId] =
       await dataPreparationService.createAgreementWithGivenStateAndDocument(
         token,

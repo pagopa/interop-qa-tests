@@ -7,7 +7,7 @@ import {
   getAuthorizationHeader,
   getToken,
 } from "../../../utils/commons";
-import { Role, TenantType } from "../../common-steps";
+import { TenantType } from "../../common-steps";
 import {
   EServiceDescriptorState,
   AgreementApprovalPolicy,
@@ -53,9 +53,8 @@ Given(
 );
 
 Given(
-  "un {string} di {string} ha già creato un e-service in stato {string} che richiede quegli attributi con approvazione {string}",
+  "{string} ha già creato un e-service in stato {string} che richiede quegli attributi con approvazione {string}",
   async function (
-    role: Role,
     tenantType: TenantType,
     descriptorState: EServiceDescriptorState,
     agreementApprovalPolicy: AgreementApprovalPolicy
@@ -70,7 +69,7 @@ Given(
     const requiredDeclaredAttributes = this.requiredDeclaredAttributes ?? [];
     const requiredVerifiedAttributes = this.requiredVerifiedAttributes ?? [];
 
-    const token = getToken(this.tokens, tenantType, role);
+    const token = getToken(this.tokens, tenantType, "admin");
     this.eserviceId = await dataPreparationService.createEService(token);
     const response =
       await dataPreparationService.createDescriptorWithGivenState({

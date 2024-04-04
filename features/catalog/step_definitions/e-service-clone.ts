@@ -7,13 +7,12 @@ import {
 } from "../../../utils/commons";
 import { apiClient } from "../../../api";
 import { EServiceDescriptorState } from "../../../api/models";
-import { Role, TenantType } from "../../common-steps";
+import { TenantType } from "../../common-steps";
 import { dataPreparationService } from "./../../../services/data-preparation.service";
 
 Given(
-  "un {string} di {string} ha già creato una versione in {string} per quell'e-service",
+  "{string} ha già creato una versione in {string} per quell'e-service",
   async function (
-    role: Role,
     tenantType: TenantType,
     descriptorState: EServiceDescriptorState
   ) {
@@ -21,7 +20,7 @@ Given(
       eserviceId: z.string(),
     });
 
-    const token = getToken(this.tokens, tenantType, role);
+    const token = getToken(this.tokens, tenantType, "admin");
 
     const { descriptorId } =
       await dataPreparationService.createDescriptorWithGivenState({
