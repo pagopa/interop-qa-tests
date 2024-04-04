@@ -5,7 +5,7 @@ Feature: Download dei fruitori di un e-service
   @eservice_consumers1
   Scenario Outline: Per un e-service precedentemente creato e pubblicato, è possibile scaricare il file contenente l'elenco dei fruitori
     Given l'utente è un "<ruolo>" di "<ente>"
-    Given un "admin" di "<ente>" ha già creato un e-service con un descrittore in stato "PUBLISHED"
+    Given "<ente>" ha già creato un e-service con un descrittore in stato "PUBLISHED"
     Given "GSP" ha un agreement attivo con quell'e-service
     Given "PA2" ha un agreement attivo con quell'e-service
     When l'utente richiede una operazione di download dei fruitori di quell'e-service
