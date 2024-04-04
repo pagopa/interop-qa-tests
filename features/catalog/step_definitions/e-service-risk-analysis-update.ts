@@ -8,15 +8,15 @@ import {
 } from "../../../utils/commons";
 import { dataPreparationService } from "../../../services/data-preparation.service";
 import { apiClient } from "../../../api";
-import { Role, TenantType } from "../../common-steps";
+import { TenantType } from "../../common-steps";
 
 Given(
-  "un {string} di {string} ha già aggiunto un'analisi del rischio a quell'e-service",
-  async function (role: Role, tenantType: TenantType) {
+  "{string} ha già aggiunto un'analisi del rischio a quell'e-service",
+  async function (tenantType: TenantType) {
     assertContextSchema(this, {
       eserviceId: z.string(),
     });
-    const token = getToken(this.tokens, tenantType, role);
+    const token = getToken(this.tokens, tenantType, "admin");
     this.riskAnalysisId =
       await dataPreparationService.addRiskAnalysisToEService(
         token,
