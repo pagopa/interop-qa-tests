@@ -1,10 +1,11 @@
+import "../configs/env";
 import { readFileSync } from "fs";
 import { z } from "zod";
 import { AxiosResponse } from "axios";
 import { CreatedResource } from "../api/models";
 import { TenantType, Role, SessionTokens } from "../features/common-steps";
 import { apiClient } from "../api";
-import "../configs/env";
+import { generateSessionTokens } from "./session-tokens";
 
 type RiskAnalysisTemplateType = "PA" | "Privato/GSP";
 
@@ -115,7 +116,6 @@ export function getAuthorizationHeader(token: string) {
 
 const COMMON_CONTEXT_SCHEMA = z.object({
   TEST_SEED: z.string(),
-  tokens: SessionTokens,
 });
 export function assertContextSchema<TSchema extends z.ZodRawShape>(
   context: unknown,
@@ -134,14 +134,20 @@ export function getOrganizationId(tenantType: TenantType) {
   return file[tenantType].admin.organizationId;
 }
 
-export function getToken(
-  tokens: SessionTokens,
+let cachedTokens: SessionTokens | undefined;
+
+export async function getToken(
   tenantType: TenantType,
-  role: Role
-) {
-  const token = tokens[tenantType]?.[role];
+  role: Role = "admin"
+): Promise<string> {
+  if (!cachedTokens) {
+    cachedTokens = SessionTokens.parse(
+      await generateSessionTokens(process.env.TENANTS_IDS_FILE_PATH)
+    );
+  }
+  const token = cachedTokens[tenantType]?.[role];
   if (!token) {
-    throw Error(
+    throw new Error(
       `Token not found for tenantType: ${tenantType} and role: ${role}`
     );
   }

@@ -28,6 +28,8 @@ export const ESERVICE_DAILY_CALLS: Readonly<{
   total: number;
   perConsumer: number;
 }> = {
+  // Con questi valori ci aspettiamo che nei listing ci siano al più 20 finalità create da un singolo fruitore
+  // altrimenti si supera la soglia di carico disponibile
   total: 1000,
   perConsumer: 50,
 };

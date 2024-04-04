@@ -8,7 +8,7 @@ import {
   makePolling,
 } from "../../../utils/commons";
 import { apiClient } from "../../../api";
-import { Role, TenantType } from "../../common-steps";
+import { TenantType } from "../../common-steps";
 import { dataPreparationService } from "../../../services/data-preparation.service";
 import { AttributeKind, DescriptorAttributeSeed } from "../../../api/models";
 
@@ -27,14 +27,14 @@ When(
 );
 
 Given(
-  "un {string} di {string} ha già pubblicato una nuova versione per quell'e-service richiedendo gli stessi attributi certificati",
-  async function (role: Role, tenantType: TenantType) {
+  "{string} ha già pubblicato una nuova versione per quell'e-service richiedendo gli stessi attributi certificati",
+  async function (tenantType: TenantType) {
     assertContextSchema(this, {
       token: z.string(),
       eserviceId: z.string(),
       attributeId: z.string(),
     });
-    const token = getToken(this.tokens, tenantType, role);
+    const token = await getToken(tenantType);
     const response =
       await dataPreparationService.createDescriptorWithGivenState({
         token,
@@ -53,9 +53,8 @@ Given(
 );
 
 Given(
-  "un {string} di {string} ha già pubblicato una nuova versione per quell'e-service che richiede un attributo {string} che {string} non possiede",
+  "{string} ha già pubblicato una nuova versione per quell'e-service che richiede un attributo {string} che {string} non possiede",
   async function (
-    role: Role,
     tenantType: TenantType,
     kind: AttributeKind,
     _consumer: TenantType
@@ -65,7 +64,7 @@ Given(
       eserviceId: z.string(),
     });
 
-    const token = getToken(this.tokens, tenantType, role);
+    const token = await getToken(tenantType);
 
     const attributeId = await dataPreparationService.createAttribute(
       token,
