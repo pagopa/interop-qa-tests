@@ -5,7 +5,7 @@ Feature: Caricamento di un documento di interfaccia
   @document_upload1
   Scenario Outline: Per un e-service che eroga con una determinata tecnologia e che ha un solo descrittore, il quale è in stato DRAFT, alla richiesta di caricamento di un documento di interfaccia coerente con la tecnologia, da parte di un utente autorizzato, l'operazione avrà successo altrimenti restituirà errore.
     Given l'utente è un "<ruolo>" di "<ente>"
-    Given un "admin" di "<ente>" ha già creato un e-service con un descrittore in stato DRAFT e tecnologia "REST"
+    Given "<ente>" ha già creato un e-service con un descrittore in stato DRAFT e tecnologia "REST"
     When l'utente carica un documento di interfaccia di tipo "yaml"
     Then si ottiene status code <risultato>
 
@@ -26,7 +26,7 @@ Feature: Caricamento di un documento di interfaccia
   @document_upload2
   Scenario Outline: Per un e-service che eroga con una determinata tecnologia e che ha un solo descrittore, il quale è in stato DRAFT, alla richiesta di caricamento di un documento di interfaccia coerente con la tecnologia, da parte di un utente autorizzato, l'operazione avrà successo altrimenti restituirà errore.
     Given l'utente è un "admin" di "PA1"
-    Given un "admin" di "PA1" ha già creato un e-service con un descrittore in stato DRAFT e tecnologia "<technology>"
+    Given "PA1" ha già creato un e-service con un descrittore in stato DRAFT e tecnologia "<technology>"
     When l'utente carica un documento di interfaccia di tipo "<tipoFile>"
     Then si ottiene status code <risultato>
 
@@ -44,7 +44,7 @@ Feature: Caricamento di un documento di interfaccia
   @document_upload3
   Scenario Outline: Per un e-service che eroga con una determinata tecnologia e che ha un solo descrittore, il quale è in stato DRAFT, alla richiesta di caricamento di un documento di interfaccia coerente con la tecnologia, ma contenente il termine localhost, l'operazione restituirà errore.
     Given l'utente è un "admin" di "PA1"
-    Given un "admin" di "PA1" ha già creato un e-service con un descrittore in stato DRAFT e tecnologia "<technology>"
+    Given "PA1" ha già creato un e-service con un descrittore in stato DRAFT e tecnologia "<technology>"
     When l'utente carica un documento di interfaccia di tipo "<tipoFile>" che contiene il termine localhost
     Then si ottiene status code 403
 
@@ -58,7 +58,7 @@ Feature: Caricamento di un documento di interfaccia
   @document_upload4
   Scenario Outline: Per un e-service che ha un solo descrittore, il quale è in stato NON DRAFT, alla richiesta di caricamento di un documento di interfaccia, l'operazione restituirà errore.
     Given l'utente è un "admin" di "PA1"
-    Given un "admin" di "PA1" ha già creato un e-service con un descrittore in stato "<statoDescrittore>"
+    Given "PA1" ha già creato un e-service con un descrittore in stato "<statoDescrittore>"
     When l'utente carica un documento di interfaccia di tipo "yaml"
     Then si ottiene status code 400
 
@@ -72,7 +72,7 @@ Feature: Caricamento di un documento di interfaccia
   @document_upload5
   Scenario Outline: Per un e-service che ha un solo descrittore, il quale è in stato DRAFT, e per il quale è già stato caricato un documento di interfaccia, alla richiesta di caricamento di un nuovo documento di interfaccia, l’operazione restituirà errore.
     Given l'utente è un "admin" di "PA1"
-    Given un "admin" di "PA1" ha già creato un e-service con un descrittore in stato "DRAFT"
-    Given un "admin" di "PA1" ha già caricato un'interfaccia per quel descrittore
+    Given "PA1" ha già creato un e-service con un descrittore in stato "DRAFT"
+    Given "PA1" ha già caricato un'interfaccia per quel descrittore
     When l'utente carica un documento di interfaccia di tipo "yaml"
     Then si ottiene status code 400
