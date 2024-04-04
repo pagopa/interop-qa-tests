@@ -41,7 +41,7 @@ Given(
       purposeId: z.string(),
     });
 
-    const token = getToken(this.tokens, tenant, "admin");
+    const token = await getToken(tenant);
 
     const { waitingForApprovalVersionId } =
       await dataPreparationService.createNewPurposeVersion(

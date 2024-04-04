@@ -181,7 +181,7 @@ Given(
       waitingForApprovalVersionId: z.string(),
     });
 
-    const token = getToken(this.tokens, tenant, "admin");
+    const token = await getToken(tenant);
 
     await dataPreparationService.rejectPurposeVersion(
       token,
