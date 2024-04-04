@@ -22,7 +22,7 @@ import {
 
 Given(
   "{string} ha già creato un'analisi del rischio per quell'e-service",
-  async function (role: Role, tenantType: TenantType) {
+  async function (tenantType: TenantType) {
     assertContextSchema(this, {
       eserviceId: z.string(),
     });
@@ -40,7 +40,7 @@ Given(
 
 Given(
   "{string} ha già pubblicato quella versione di e-service",
-  async function (role: Role, tenantType: TenantType) {
+  async function (tenantType: TenantType) {
     assertContextSchema(this, {
       eserviceId: z.string(),
       descriptorId: z.string(),
@@ -85,11 +85,7 @@ When(
 
 Given(
   "{string} ha già creato una finalità in stato {string} per quell'eservice associando quell'analisi del rischio creata dall'erogatore",
-  async function (
-    role: Role,
-    tenantType: TenantType,
-    purposeState: PurposeVersionState
-  ) {
+  async function (tenantType: TenantType, purposeState: PurposeVersionState) {
     assertContextSchema(this, {
       eserviceId: z.string(),
       riskAnalysisId: z.string(),
@@ -118,7 +114,6 @@ Given(
 Given(
   "{string} ha già creato un e-service in modalità RECEIVE in stato DRAFT che richiede quell'attributo certificato con approvazione {string}",
   async function (
-    role: Role,
     tenantType: TenantType,
     approvalPolicy: AgreementApprovalPolicy
   ) {
@@ -155,7 +150,6 @@ Given(
 Given(
   "{string} ha già creato un e-service in stato DRAFT in modalità RECEIVE con approvazione {string}",
   async function (
-    role: Role,
     tenantType: TenantType,
     approvalPolicy: AgreementApprovalPolicy
   ) {
