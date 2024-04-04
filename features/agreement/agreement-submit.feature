@@ -33,7 +33,7 @@ Tutti gli utenti autorizzati possono inoltrare una richiesta di fruizione
     Given l'utente è un "admin" di "PA1"
     Given "PA2" ha già creato un e-service in stato "PUBLISHED" con approvazione "AUTOMATIC"
     Given "PA1" ha una richiesta di fruizione in stato "DRAFT" per quell'e-service
-    Given "PA2" ha sospeso quell'e-service
+    Given "PA2" ha già sospeso quell'e-service
     When l'utente inoltra quella richiesta di fruizione
     Then si ottiene status code 400
 
