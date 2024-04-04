@@ -5,7 +5,7 @@ Feature: Lettura singola finalità
   @purpose_read1 @wait_for_fix @IMN-396
   Scenario Outline: Per una finalità precedentemente creata dal fruitore, la quale prima versione è in qualsiasi stato (DRAFT, WAITING_FOR_APPROVAL, ACTIVE, SUSPENDED, ARCHIVED), alla richiesta di lettura, va a buon fine, l’analisi del rischio è disponibile solo per gli admin
     Given l'utente è un "<ruolo>" di "<ente>"
-    Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
+    Given "PA2" ha già creato e pubblicato 1 e-service
     Given "<ente>" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given "<ente>" ha già creato 1 finalità in stato "<statoFinalità>" per quell'eservice
     When l'utente richiede la lettura della finalità
@@ -39,7 +39,7 @@ Feature: Lettura singola finalità
   @purpose_read2
   Scenario Outline: Per una finalità precedentemente creata da un fruitore, la quale prima versione è in stato NON DRAFT (WAITING_FOR_APPROVAL, ACTIVE, SUSPENDED, ARCHIVED), alla richiesta di lettura da parte dell’erogatore, va a buon fine
     Given l'utente è un "admin" di "PA2"
-    Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
+    Given "PA2" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given "PA1" ha già creato 1 finalità in stato "<statoFinalita>" per quell'eservice
     When l'utente richiede la lettura della finalità
@@ -55,7 +55,7 @@ Feature: Lettura singola finalità
   @purpose_read3 @resource_intensive
   Scenario Outline: Per una finalità precedentemente creata da un fruitore, la quale prima versione è in qualsiasi stato (DRAFT, (WAITING_FOR_APPROVAL, ACTIVE, SUSPENDED, ARCHIVED), alla richiesta di lettura da parte di un ente che non è né l'erogatore, né il fruitore, va a buon fine ma non ottiene l'analisi del rischio
     Given l'utente è un "admin" di "GSP"
-    Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
+    Given "PA2" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given "PA1" ha già creato 1 finalità in stato "<statoFinalita>" per quell'eservice
     When l'utente richiede la lettura della finalità

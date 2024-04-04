@@ -5,7 +5,7 @@ Feature: Cancellazione di un e-service
   @eservice_delete1
   Scenario Outline: Per un e-service precedentemente creato, il quale non ha descrittori, la cancellazione dell'e-service avviene correttamente per i ruoli autorizzati
     Given l'utente è un "<ruolo>" di "<ente>"
-    Given un "admin" di "<ente>" ha già creato un e-service senza descrittore
+    Given "<ente>" ha già creato un e-service senza descrittore
     When l'utente cancella quell'e-service
     Then si ottiene status code <risultato>
 
@@ -25,7 +25,7 @@ Feature: Cancellazione di un e-service
   @eservice_delete2
   Scenario Outline: Per un e-service che ha un solo descrittore, il quale è in qualsiasi stato NON DRAFT (PUBLISHED, SUSPENDED, DEPRECATED, ARCHIVED), la cancellazione dell'e-service restituisce errore
     Given l'utente è un "admin" di "PA1"
-    Given un "admin" di "PA1" ha già creato un e-service con un descrittore in stato "<statoDescrittore>"
+    Given "PA1" ha già creato un e-service con un descrittore in stato "<statoDescrittore>"
     When l'utente cancella quell'e-service
     Then si ottiene status code 409
 
@@ -40,7 +40,7 @@ Feature: Cancellazione di un e-service
   @eservice_delete3
   Scenario Outline: Per un e-service che ha un solo descrittore, il quale è in stato DRAFT, la cancellazione dell'e-service va a buon fine
     Given l'utente è un "admin" di "PA1"
-    Given un "admin" di "PA1" ha già creato un e-service con un descrittore in stato "DRAFT"
+    Given "PA1" ha già creato un e-service con un descrittore in stato "DRAFT"
     When l'utente cancella quell'e-service
     Then si ottiene status code 204
 

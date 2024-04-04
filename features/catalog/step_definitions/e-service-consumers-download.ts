@@ -16,7 +16,7 @@ Given(
       eserviceId: z.string(),
       descriptorId: z.string(),
     });
-    const token = getToken(this.tokens, tenantType, "admin");
+    const token = await getToken(tenantType);
     const agreementId = await dataPreparationService.createAgreement(
       token,
       this.eserviceId,
