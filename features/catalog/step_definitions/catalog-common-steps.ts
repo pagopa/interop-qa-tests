@@ -3,7 +3,7 @@ import { Given, Then } from "@cucumber/cucumber";
 import { z } from "zod";
 import { EServiceDescriptorState } from "../../../api/models";
 import { dataPreparationService } from "../../../services/data-preparation.service";
-import { TenantType, Role } from "../../common-steps";
+import { TenantType } from "../../common-steps";
 import { assertContextSchema, getToken } from "../../../utils/commons";
 
 Then(
@@ -23,15 +23,12 @@ Then(
 );
 
 Given(
-  "un {string} di {string} ha già creato un e-service con un descrittore in stato {string}",
+  "{string} ha già creato un e-service con un descrittore in stato {string}",
   async function (
-    role: Role,
     tenantType: TenantType,
     descriptorState: EServiceDescriptorState
   ) {
-    assertContextSchema(this);
-
-    const token = getToken(this.tokens, tenantType, role);
+    const token = await getToken(tenantType);
 
     this.eserviceId = await dataPreparationService.createEService(token);
 
@@ -47,15 +44,12 @@ Given(
 );
 
 Given(
-  "un {string} di {string} ha già creato un e-service con un descrittore in stato {string} e un documento già caricato",
+  "{string} ha già creato un e-service con un descrittore in stato {string} e un documento già caricato",
   async function (
-    role: Role,
     tenantType: TenantType,
     descriptorState: EServiceDescriptorState
   ) {
-    assertContextSchema(this);
-
-    const token = getToken(this.tokens, tenantType, role);
+    const token = await getToken(tenantType);
 
     this.eserviceId = await dataPreparationService.createEService(token);
 

@@ -5,7 +5,7 @@ Feature: Cancellazione di un descrittore
   @descriptor_deletion1
   Scenario Outline: Per un e-service che ha un solo descrittore, il quale è in stato DRAFT, la richiesta di cancellazione del descrittore cancella contestualmente anche l'e-service del quale fa parte
     Given l'utente è un "admin" di "PA1"
-    Given un "admin" di "PA1" ha già creato un e-service con un descrittore in stato "DRAFT"
+    Given "PA1" ha già creato un e-service con un descrittore in stato "DRAFT"
     When l'utente cancella il descrittore di quell'e-service
     Then si ottiene status code 204
     Then il descrittore è stato cancellato, ma l'eservice no
@@ -13,8 +13,8 @@ Feature: Cancellazione di un descrittore
   @descriptor_deletion2
   Scenario Outline: Per un e-service che ha più di un descrittore, l’ultimo dei quali è in stato DRAFT, la richiesta di cancellazione del descrittore cancella solo il descrittore stesso e non l’e-service del quale fa parte né nessuno degli altri descrittori dell’e-service
     Given l'utente è un "admin" di "PA1"
-    Given un "admin" di "PA1" ha già creato un e-service con un descrittore in stato "PUBLISHED"
-    Given un "admin" di "PA1" ha già creato una versione in "DRAFT" per quell'e-service
+    Given "PA1" ha già creato un e-service con un descrittore in stato "PUBLISHED"
+    Given "PA1" ha già creato una versione in "DRAFT" per quell'e-service
     When l'utente cancella il descrittore di quell'e-service
     Then si ottiene status code 204
     Then quell'e-service non è stato cancellato
@@ -22,7 +22,7 @@ Feature: Cancellazione di un descrittore
   @descriptor_deletion3
   Scenario Outline: Per un e-service che ha un solo descrittore, il quale è in stato NON DRAFT (PUBLISHED, SUSPENDED, DEPRECATED, ARCHIVED), la richiesta di cancellazione del descrittore restituisce errore
     Given l'utente è un "admin" di "PA1"
-    Given un "admin" di "PA1" ha già creato un e-service con un descrittore in stato "<statoVersione>"
+    Given "PA1" ha già creato un e-service con un descrittore in stato "<statoVersione>"
     When l'utente cancella il descrittore di quell'e-service
     Then si ottiene status code 400
 

@@ -42,7 +42,7 @@ Given(
       purposeId: z.string(),
       currentVersionId: z.string(),
     });
-    const token = getToken(this.tokens, tenantType, "admin");
+    const token = await getToken(tenantType);
     switch (desiredPurposeState) {
       case "ARCHIVED":
         await dataPreparationService.archivePurpose(
