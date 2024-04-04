@@ -10,7 +10,7 @@ import {
   getRiskAnalysis,
   getRandomInt,
 } from "../../../utils/commons";
-import { Role, TenantType } from "../../common-steps";
+import { TenantType } from "../../common-steps";
 
 Given(
   "{string} ha già creato {int} finalità in stato {string} per quell'eservice",
@@ -22,7 +22,8 @@ Given(
     assertContextSchema(this, {
       eserviceId: z.string(),
     });
-    const token = getToken(this.tokens, tenantType, "admin");
+
+    const token = await getToken(tenantType);
     const consumerId = getOrganizationId(tenantType);
     const { riskAnalysisForm } = getRiskAnalysis({
       completed: true,
@@ -56,14 +57,14 @@ Given(
 );
 
 Given(
-  "un {string} di {string} ha già pubblicato quella versione di e-service",
-  async function (role: Role, tenantType: TenantType) {
+  "{string} ha già pubblicato quella versione di e-service",
+  async function (tenantType: TenantType) {
     assertContextSchema(this, {
       eserviceId: z.string(),
       descriptorId: z.string(),
     });
 
-    const token = getToken(this.tokens, tenantType, role);
+    const token = await getToken(tenantType);
 
     await dataPreparationService.publishDescriptor(
       token,
@@ -81,7 +82,7 @@ Given(
       riskAnalysisId: z.string(),
     });
 
-    const token = getToken(this.tokens, tenantType, "admin");
+    const token = await getToken(tenantType);
     const consumerId = getOrganizationId(tenantType);
 
     const { purposeId } =
@@ -102,13 +103,13 @@ Given(
 );
 
 Given(
-  "un {string} di {string} ha già creato un'analisi del rischio per quell'e-service",
-  async function (role: Role, tenantType: TenantType) {
+  "{string} ha già creato un'analisi del rischio per quell'e-service",
+  async function (tenantType: TenantType) {
     assertContextSchema(this, {
       eserviceId: z.string(),
     });
 
-    const token = getToken(this.tokens, tenantType, role);
+    const token = await getToken(tenantType);
 
     this.riskAnalysisId =
       await dataPreparationService.addRiskAnalysisToEService(
@@ -146,7 +147,7 @@ Given(
       eserviceId: z.string(),
     });
 
-    const token = getToken(this.tokens, tenantType, "admin");
+    const token = await getToken(tenantType);
     const consumerId = getOrganizationId(tenantType);
 
     const { riskAnalysisForm } = getRiskAnalysis({

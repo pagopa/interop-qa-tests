@@ -7,14 +7,12 @@ import {
   getToken,
 } from "../../../utils/commons";
 import { apiClient } from "../../../api";
-import { Role, TenantType } from "../../common-steps";
+import { TenantType } from "../../common-steps";
 
 Given(
-  "un {string} di {string} ha già creato un e-service senza descrittore",
-  async function (role: Role, tenantType: TenantType) {
-    assertContextSchema(this);
-
-    const token = getToken(this.tokens, tenantType, role);
+  "{string} ha già creato un e-service senza descrittore",
+  async function (tenantType: TenantType) {
+    const token = await getToken(tenantType);
 
     this.eserviceId = await dataPreparationService.createEService(token);
   }
