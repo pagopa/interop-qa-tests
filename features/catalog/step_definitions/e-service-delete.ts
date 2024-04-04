@@ -12,9 +12,7 @@ import { TenantType } from "../../common-steps";
 Given(
   "{string} ha già creato un e-service senza descrittore",
   async function (tenantType: TenantType) {
-    assertContextSchema(this);
-
-    const token = getToken(this.tokens, tenantType, "admin");
+    const token = await getToken(tenantType);
 
     this.eserviceId = await dataPreparationService.createEService(token);
   }

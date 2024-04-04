@@ -9,7 +9,7 @@ import {
 } from "../../../utils/commons";
 import { apiClient } from "../../../api";
 import { dataPreparationService } from "../../../services/data-preparation.service";
-import { TenantType, SessionTokens } from "../../common-steps";
+import { TenantType } from "../../common-steps";
 import { AgreementState } from "../../../api/models";
 
 Given(
@@ -18,9 +18,8 @@ Given(
     assertContextSchema(this, {
       token: z.string(),
       publishedEservicesIds: z.array(z.tuple([z.string(), z.string()])),
-      tokens: SessionTokens,
     });
-    const token = getToken(this.tokens, consumer, "admin");
+    const token = await getToken(consumer);
 
     const agreementsIds = await Promise.all(
       this.publishedEservicesIds.map(([eserviceId, descriptorId]) =>
@@ -47,9 +46,8 @@ Given(
     assertContextSchema(this, {
       token: z.string(),
       publishedEservicesIds: z.array(z.tuple([z.string(), z.string()])),
-      tokens: SessionTokens,
     });
-    const token = getToken(this.tokens, consumer, "admin");
+    const token = await getToken(consumer);
     const [eserviceId, descriptorId] =
       this.publishedEservicesIds[eserviceIndex];
     await dataPreparationService.createAgreementWithGivenState(
@@ -68,7 +66,7 @@ Given(
       publishedEservicesIds: z.array(z.tuple([z.string(), z.string()])),
     });
 
-    const token = getToken(this.tokens, tenantType, "admin");
+    const token = await getToken(tenantType);
     const eserviceIds = this.publishedEservicesIds
       .slice(0, descriptorsCount)
       .map(([eserviceId, _]) => eserviceId);

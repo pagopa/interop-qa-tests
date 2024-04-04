@@ -30,7 +30,7 @@ Given(
       eserviceId: z.string(),
       descriptorId: z.string(),
     });
-    const token = getToken(this.tokens, tenant, "admin");
+    const token = await getToken(tenant);
     this.response = await dataPreparationService.suspendDescriptor(
       token,
       this.eserviceId,
@@ -58,7 +58,7 @@ Given(
   "{string} non possiede uno specifico attributo dichiarato",
   async function (tenant: TenantType) {
     assertContextSchema(this, { token: z.string() });
-    const token = getToken(this.tokens, tenant, "admin");
+    const token = await getToken(tenant);
 
     const attributeId = await dataPreparationService.createAttribute(
       token,

@@ -8,7 +8,7 @@ import {
   getToken,
 } from "../../../utils/commons";
 import { dataPreparationService } from "../../../services/data-preparation.service";
-import { TenantType, SessionTokens } from "../../common-steps";
+import { TenantType } from "../../common-steps";
 
 Given(
   "{string} ha già creato {int} e-services in catalogo in stato PUBLISHED o SUSPENDED e {int} in stato DRAFT",
@@ -19,7 +19,7 @@ Given(
   ) {
     assertContextSchema(this);
 
-    const token = getToken(this.tokens, tenantType, "admin");
+    const token = await getToken(tenantType);
     const SUSPENDED_ESERVICES = Math.floor(countEservices / 2);
     const PUBLISHED_ESERVICES = countEservices - SUSPENDED_ESERVICES;
     const DRAFT_ESERVICES = countDraftEservices;
@@ -97,9 +97,8 @@ Given(
     assertContextSchema(this, {
       token: z.string(),
       publishedEservicesIds: z.array(z.tuple([z.string(), z.string()])),
-      tokens: SessionTokens,
     });
-    const token = getToken(this.tokens, consumer, "admin");
+    const token = await getToken(consumer);
     const [eserviceId, descriptorId] = this.publishedEservicesIds[0];
 
     const agreementId = await dataPreparationService.createAgreement(
@@ -232,7 +231,7 @@ Given(
   async function (tenantType: TenantType, keyword: string) {
     assertContextSchema(this);
 
-    const token = getToken(this.tokens, tenantType, "admin");
+    const token = await getToken(tenantType);
     const eserviceName = `e-service-${this.TEST_SEED}-${keyword}`;
     this.eserviceId = await dataPreparationService.createEService(token, {
       name: eserviceName,
