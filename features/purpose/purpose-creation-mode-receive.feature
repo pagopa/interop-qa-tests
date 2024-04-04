@@ -32,7 +32,7 @@ Feature: Creazione finalità per e-service in erogazione inversa
       | Privato | support      |       403 |
 
   @purpose_creation_receive2
-  Scenario Outline: Un utente con sufficienti permessi (admin); il cui ente ha già una richiesta di fruizione in stato ACTIVE per una versione di e-service, il quale ha mode = RECEIVE, e una finalità già in stato DRAFT per lo stesso e-service, crea una nuova finalità con tutti i campi richiesti correttamente formattati. La richiesta va a buon fine. Spiega: è possibile creare più finalità sulla stessa richiesta di fruizione
+  Scenario Outline: Un utente con sufficienti permessi (admin); il cui ente ha già una richiesta di fruizione in stato ACTIVE per una versione di e-service, il quale ha mode = RECEIVE, e una finalità già in stato DRAFT per lo stesso e-service, crea una nuova finalità con tutti i campi richiesti correttamente formattati. La richiesta va a buon fine.
     Given l'utente è un "admin" di "PA1"
     Given "GSP" ha già creato un e-service in modalità "RECEIVE" con un descrittore in stato "DRAFT"
     Given "GSP" ha già creato un'analisi del rischio per quell'e-service
@@ -44,7 +44,7 @@ Feature: Creazione finalità per e-service in erogazione inversa
     Then si ottiene status code 200
 
   @purpose_creation_receive3
-  Scenario Outline: Un utente con sufficienti permessi (admin); il cui ente ha già una richiesta di fruizione in stato ACTIVE per una versione di e-service, il quale ha mode = RECEIVE, la quale è in stato SUSPENDED, crea una nuova finalità con tutti i campi richiesti correttamente formattati. La richiesta va a buon fine. Spiega: è possibile creare una finalità anche se l’e-service è sospeso
+  Scenario Outline: Un utente con sufficienti permessi (admin); il cui ente ha già una richiesta di fruizione in stato ACTIVE per una versione di e-service, il quale ha mode = RECEIVE, la quale è in stato SUSPENDED, crea una nuova finalità con tutti i campi richiesti correttamente formattati. La richiesta va a buon fine.
     Given l'utente è un "admin" di "PA1"
     Given "GSP" ha già creato un e-service in modalità "RECEIVE" con un descrittore in stato "DRAFT"
     Given "GSP" ha già creato un'analisi del rischio per quell'e-service
@@ -114,7 +114,7 @@ Feature: Creazione finalità per e-service in erogazione inversa
     Then si ottiene status code 400
 
   @purpose_creation_receive6
-  Scenario Outline: Un utente con sufficienti permessi (admin); il cui ente ha già una richiesta di fruizione in stato ACTIVE per una versione di e-service, il quale ha mode = RECEIVE, crea una nuova finalità con tutti i campi richiesti correttamente formattati, il campo isFreeOfCharge valorizzato a true e il campo freeOfChargeReason non compilato. Ottiene un errore (NB: verificare status code). Spiega: non è possibile creare una finalità ad uso gratuito senza specificare qual è la ragione
+  Scenario Outline: Un utente con sufficienti permessi (admin); il cui ente ha già una richiesta di fruizione in stato ACTIVE per una versione di e-service, il quale ha mode = RECEIVE, crea una nuova finalità con tutti i campi richiesti correttamente formattati, il campo isFreeOfCharge valorizzato a true e il campo freeOfChargeReason non compilato. Ottiene un errore.
     Given l'utente è un "admin" di "PA2"
     Given "PA1" ha già creato un e-service in modalità "RECEIVE" con un descrittore in stato "DRAFT"
     Given "PA1" ha già creato un'analisi del rischio per quell'e-service
