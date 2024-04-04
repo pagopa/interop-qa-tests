@@ -2,13 +2,13 @@
 Feature: Creazione finalità per e-service in erogazione inversa
   Tutti gli utenti admin possono creare una nuova finalità per un e-service in erogazione inversa.
 
-  @purpose_creation_receive1 @wait_for_fix
+  @purpose_creation_receive1
   Scenario Outline: Un utente con sufficienti permessi (admin); il cui ente ha già una richiesta di fruizione in stato ACTIVE per una versione di e-service, il quale ha mode = RECEIVE, crea una nuova finalità con tutti i campi richiesti correttamente formattati. La richiesta va a buon fine.
     Given l'utente è un "<ruolo>" di "<ente>"
-    Given "PA1" ha già creato un e-service in modalità "RECEIVE" con un descrittore in stato "DRAFT"
-    Given "PA1" ha già creato un'analisi del rischio per quell'e-service
-    Given "PA1" ha già caricato un'interfaccia per quel descrittore
-    Given "PA1" ha già pubblicato quella versione di e-service
+    Given "PA2" ha già creato un e-service in modalità "RECEIVE" con un descrittore in stato "DRAFT"
+    Given "PA2" ha già creato un'analisi del rischio per quell'e-service
+    Given "PA2" ha già caricato un'interfaccia per quel descrittore
+    Given "PA2" ha già pubblicato quella versione di e-service
     Given "<ente>" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     When l'utente crea una nuova finalità con tutti i campi richiesti correttamente formattati per quell'e-service associando quella analisi del rischio creata dall'erogatore
     Then si ottiene status code <risultato>
@@ -56,7 +56,7 @@ Feature: Creazione finalità per e-service in erogazione inversa
     Then si ottiene status code 200
 
   @purpose_creation_receive4a
-  Scenario Outline: Un utente con sufficienti permessi (admin); il cui ente ha già una richiesta di fruizione in stato NON ACTIVE (DRAFT, PENDING, SUSPENDED o ARCHIVED) per un e-service, il quale ha mode = RECEIVE, crea una nuova finalità con tutti i campi richiesti correttamente formattati. Ottiene un errore (NB: verificare status code).
+  Scenario Outline: Un utente con sufficienti permessi (admin); il cui ente ha già una richiesta di fruizione in stato NON ACTIVE (DRAFT, PENDING, SUSPENDED o ARCHIVED) per un e-service, il quale ha mode = RECEIVE, crea una nuova finalità con tutti i campi richiesti correttamente formattati. Ottiene un errore.
     Given l'utente è un "admin" di "PA1"
     Given "GSP" ha già creato un e-service in stato DRAFT in modalità RECEIVE con approvazione "<tipoApprovazione>"
     Given "GSP" ha già creato un'analisi del rischio per quell'e-service
@@ -74,7 +74,7 @@ Feature: Creazione finalità per e-service in erogazione inversa
       | ARCHIVED       | AUTOMATIC        |
 
   @purpose_creation_receive4b
-  Scenario Outline: Un utente con sufficienti permessi (admin); il cui ente ha già una richiesta di fruizione in stato MISSING_CERTIFIED_ATTRIBUTES per un e-service, il quale ha mode = RECEIVE, crea una nuova finalità con tutti i campi richiesti correttamente formattati. Ottiene un errore (NB: verificare status code).
+  Scenario Outline: Un utente con sufficienti permessi (admin); il cui ente ha già una richiesta di fruizione in stato MISSING_CERTIFIED_ATTRIBUTES per un e-service, il quale ha mode = RECEIVE, crea una nuova finalità con tutti i campi richiesti correttamente formattati. Ottiene un errore.
     Given l'utente è un "admin" di "<enteFruitore>"
     Given "<enteCertificatore>" ha creato un attributo certificato e lo ha assegnato a "<enteFruitore>"
     Given "<enteErogatore>" ha già creato un e-service in modalità RECEIVE in stato DRAFT che richiede quell'attributo certificato con approvazione "AUTOMATIC"
@@ -92,7 +92,7 @@ Feature: Creazione finalità per e-service in erogazione inversa
       | PA1          | PA2               | GSP           |
 
   @purpose_creation_receive4c
-  Scenario Outline: Un utente con sufficienti permessi (admin); il cui ente ha già una richiesta di fruizione in stato REJECTED per un e-service, il quale ha mode = RECEIVE, crea una nuova finalità con tutti i campi richiesti correttamente formattati. Ottiene un errore (NB: verificare status code).
+  Scenario Outline: Un utente con sufficienti permessi (admin); il cui ente ha già una richiesta di fruizione in stato REJECTED per un e-service, il quale ha mode = RECEIVE, crea una nuova finalità con tutti i campi richiesti correttamente formattati. Ottiene un errore.
     Given l'utente è un "admin" di "PA1"
     Given "PA2" ha già creato un e-service in stato DRAFT in modalità RECEIVE con approvazione "MANUAL"
     Given "PA2" ha già creato un'analisi del rischio per quell'e-service

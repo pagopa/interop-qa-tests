@@ -71,7 +71,7 @@ Feature: Archiviazione richiesta di fruizione
     Then si ottiene status code 400
 
   @agreement_archive3c
-  Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fruitore e attivata da un erogatore, la quale è in stato REJECTED alla richiesta di archiviazione da parte di un utente con sufficienti permessi dell’ente fruitore, ottiene un errore (NB: verificare status code)
+  Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fruitore e attivata da un erogatore, la quale è in stato REJECTED alla richiesta di archiviazione da parte di un utente con sufficienti permessi dell’ente fruitore, ottiene un errore
     Given l'utente è un "admin" di "PA1"
     Given "PA2" ha già creato un e-service in stato "PUBLISHED" con approvazione "MANUAL"
     Given "PA1" ha una richiesta di fruizione in stato "PENDING" per quell'e-service
@@ -80,7 +80,7 @@ Feature: Archiviazione richiesta di fruizione
     Then si ottiene status code 400
 
   @agreement_archive3d
-  Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fruitore e attivata da un erogatore, la quale è in stato MISSING_CERTIFIED_ATTRIBUTES alla richiesta di archiviazione da parte di un utente con sufficienti permessi dell’ente fruitore, ottiene un errore (NB: verificare status code)
+  Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fruitore e attivata da un erogatore, la quale è in stato MISSING_CERTIFIED_ATTRIBUTES alla richiesta di archiviazione da parte di un utente con sufficienti permessi dell’ente fruitore, ottiene un errore
     Given l'utente è un "admin" di "<enteFruitore>"
     Given "<enteCertificatore>" ha creato un attributo certificato e lo ha assegnato a "<enteFruitore>"
     Given "<enteErogatore>" ha già creato un e-service in stato "PUBLISHED" che richiede quell'attributo certificato con approvazione "AUTOMATIC"

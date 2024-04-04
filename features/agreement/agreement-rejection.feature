@@ -26,7 +26,7 @@ Feature: Rifiuto di una richiesta di fruizione
       | PA1  | api,security |       403 |
 
   @agreement_rejection2
-  Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fruitore, la quale è in stato PENDING, alla richiesta di rifiuto SENZA messaggio da parte di un utente con sufficienti permessi dell’ente erogatore, ottiene un errore (NB: verificare status code)
+  Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fruitore, la quale è in stato PENDING, alla richiesta di rifiuto SENZA messaggio da parte di un utente con sufficienti permessi dell’ente erogatore, ottiene un errore
     Given l'utente è un "admin" di "PA2"
     Given "PA2" ha già creato un e-service in stato "PUBLISHED" con approvazione "MANUAL"
     Given "PA1" ha una richiesta di fruizione in stato "PENDING" per quell'e-service
