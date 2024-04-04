@@ -8,7 +8,7 @@ import {
   makePolling,
 } from "../../../utils/commons";
 import { apiClient } from "../../../api";
-import { Role, TenantType } from "../../common-steps";
+import { TenantType } from "../../common-steps";
 import { dataPreparationService } from "../../../services/data-preparation.service";
 import {
   AgreementApprovalPolicy,
@@ -17,15 +17,14 @@ import {
 } from "../../../api/models";
 
 Given(
-  "un {string} di {string} ha già creato un e-service in stato {string} che richiede quell'attributo certificato con approvazione {string}",
+  "{string} ha già creato un e-service in stato {string} che richiede quell'attributo certificato con approvazione {string}",
   async function (
-    role: Role,
     tenantType: TenantType,
     descriptorState: EServiceDescriptorState,
     agreementApprovalPolicy: AgreementApprovalPolicy
   ) {
     assertContextSchema(this, { attributeId: z.string() });
-    const token = getToken(this.tokens, tenantType, role);
+    const token = await getToken(tenantType);
     this.eserviceId = await dataPreparationService.createEService(token);
     const response =
       await dataPreparationService.createDescriptorWithGivenState({
@@ -46,14 +45,14 @@ Given(
 );
 
 Given(
-  "un {string} di {string} ha già creato e inviato una richiesta di fruizione per quell'e-service ed è in attesa di approvazione",
-  async function (role: Role, tenantType: TenantType) {
+  "{string} ha già creato e inviato una richiesta di fruizione per quell'e-service ed è in attesa di approvazione",
+  async function (tenantType: TenantType) {
     assertContextSchema(this, {
       token: z.string(),
       eserviceId: z.string(),
       descriptorId: z.string(),
     });
-    const token = getToken(this.tokens, tenantType, role);
+    const token = await getToken(tenantType);
     this.agreementId = await dataPreparationService.createAgreement(
       token,
       this.eserviceId,
@@ -68,12 +67,12 @@ Given(
 );
 
 Given(
-  "un {string} di {string} ha già rifiutato quella richiesta di fruizione",
-  async function (role: Role, tenantType: TenantType) {
+  "{string} ha già rifiutato quella richiesta di fruizione",
+  async function (tenantType: TenantType) {
     assertContextSchema(this, {
       agreementId: z.string(),
     });
-    const token = getToken(this.tokens, tenantType, role);
+    const token = await getToken(tenantType);
     await dataPreparationService.rejectAgreement(token, this.agreementId);
   }
 );
@@ -81,8 +80,7 @@ Given(
 Given(
   "{string} ha creato un attributo certificato e non lo ha assegnato a {string}",
   async function (certifier: TenantType, _tenantType: TenantType) {
-    assertContextSchema(this);
-    const token = getToken(this.tokens, certifier, "admin");
+    const token = await getToken(certifier);
 
     this.attributeId = await dataPreparationService.createAttribute(
       token,
@@ -95,7 +93,7 @@ Given(
   "{string} ha già revocato quell'attributo a {string}",
   async function (certifier: TenantType, tenantType: TenantType) {
     assertContextSchema(this, { attributeId: z.string() });
-    const token = getToken(this.tokens, certifier, "admin");
+    const token = await getToken(certifier);
 
     const tenantId = getOrganizationId(tenantType);
 
@@ -123,12 +121,12 @@ Given(
 );
 
 Given(
-  "un {string} di {string} ha già pubblicato una nuova versione per quell'e-service",
-  async function (role: Role, tenantType: TenantType) {
+  "{string} ha già pubblicato una nuova versione per quell'e-service",
+  async function (tenantType: TenantType) {
     assertContextSchema(this, {
       eserviceId: z.string(),
     });
-    const token = getToken(this.tokens, tenantType, role);
+    const token = await getToken(tenantType);
     const response =
       await dataPreparationService.createDescriptorWithGivenState({
         token,

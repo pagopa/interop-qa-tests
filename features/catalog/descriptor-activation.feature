@@ -5,7 +5,7 @@ Feature: Attivazione di un descrittore
   @descriptor_activation1
   Scenario Outline: Per un e-service che ha un solo descrittore, il quale è in stato SUSPENDED, all'attivazione del descrittore, torna allo stato PUBLISHED
     Given l'utente è un "<ruolo>" di "<ente>"
-    Given un "admin" di "<ente>" ha già creato un e-service con un descrittore in stato "SUSPENDED"
+    Given "<ente>" ha già creato un e-service con un descrittore in stato "SUSPENDED"
     When l'utente attiva il descrittore di quell'e-service
     Then si ottiene status code <risultato>
 
@@ -25,7 +25,7 @@ Feature: Attivazione di un descrittore
   @descriptor_activation2
   Scenario Outline: Per un e-service che ha un solo descrittore, il quale non si trova in stato SUSPENDED, alla riattivazione del descrittore, si ottiene un errore
     Given l'utente è un "admin" di "PA1"
-    Given un "admin" di "PA1" ha già creato un e-service con un descrittore in stato "<statoDescrittore>"
+    Given "PA1" ha già creato un e-service con un descrittore in stato "<statoDescrittore>"
     When l'utente attiva il descrittore di quell'e-service
     Then si ottiene status code 400
 
