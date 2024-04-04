@@ -1,7 +1,7 @@
 import { randomUUID } from "crypto";
 import { Given, When } from "@cucumber/cucumber";
 import { z } from "zod";
-import { Role, TenantType } from "../../common-steps";
+import { TenantType } from "../../common-steps";
 import {
   assertContextSchema,
   getAuthorizationHeader,
