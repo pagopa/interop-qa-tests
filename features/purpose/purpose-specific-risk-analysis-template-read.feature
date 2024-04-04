@@ -5,7 +5,7 @@ Feature: Lettura di una specifica versione di analisi del rischio
   @purpose_risk_analysis_read1 @wait_for_fix @PIN-4772
   Scenario Outline: Per una richiesta di lettura di una specifica versione di template di analisi del rischio da parte di un ente, alla richiesta di lettura, ottiene la specifica versione di analisi del rischio dedicata a quel tipo specifico di ente
     Given l'utente è un "<ruolo>" di "<ente>"
-    Given un "admin" di "PA2" ha già creato e pubblicato 1 e-service
+    Given "PA2" ha già creato e pubblicato 1 e-service
     When l'utente richiede la versione "2.0" del template dell'analisi del rischio
     Then si ottiene status code 200 e il template in versione "2.0"
 
