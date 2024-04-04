@@ -34,7 +34,7 @@ Given(
       eserviceId: z.string(),
       attributeId: z.string(),
     });
-    const token = getToken(this.tokens, tenantType, "admin");
+    const token = await getToken(tenantType);
     const response =
       await dataPreparationService.createDescriptorWithGivenState({
         token,
@@ -64,7 +64,7 @@ Given(
       eserviceId: z.string(),
     });
 
-    const token = getToken(this.tokens, tenantType, "admin");
+    const token = await getToken(tenantType);
 
     const attributeId = await dataPreparationService.createAttribute(
       token,
