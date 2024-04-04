@@ -47,7 +47,7 @@ Given(
       eserviceId: z.string(),
     });
 
-    const token = getToken(this.tokens, tenantType, "admin");
+    const token = await getToken(tenantType);
     const consumerId = getOrganizationId(tenantType);
 
     const title = `purpose title - QA - ${this.TEST_SEED} - ${getRandomInt()}`;
@@ -163,7 +163,7 @@ When(
       tenantType: this.tenantType,
     });
 
-    const outdatedVersion = "1.0";
+    const outdatedVersion = "0.0";
 
     this.response = await apiClient.purposes.createPurpose(
       {

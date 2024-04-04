@@ -5,7 +5,7 @@ Feature: Lettura singolo attributo
   @attribute_read1
   Scenario Outline: Alla richiesta di un attributo presente in DB, restituisce il risultato
     Given l'utente è un "<ruolo>" di "<ente>"
-    Given un "admin" di "PA1" ha già creato 1 attributo "DECLARED"
+    Given "PA1" ha già creato 1 attributo "DECLARED"
     When l'utente richiede una operazione di lettura di quel attributo
     Then si ottiene status code 200
 
