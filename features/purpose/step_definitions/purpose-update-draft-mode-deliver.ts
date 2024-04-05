@@ -36,10 +36,10 @@ When(
       token: z.string(),
       purposeId: z.string(),
     });
-    const riskAnalysisForm = getRiskAnalysis({
+    const { riskAnalysisForm } = await getRiskAnalysis({
       tenantType: this.tenantType,
       completed: true,
-    }).riskAnalysisForm;
+    });
     riskAnalysisForm.version = (Number(riskAnalysisForm.version) + 1).toFixed(
       1
     );

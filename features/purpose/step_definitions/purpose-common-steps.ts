@@ -28,7 +28,7 @@ Given(
 
     const token = await getToken(tenantType);
     const consumerId = getOrganizationId(tenantType);
-    const { riskAnalysisForm } = getRiskAnalysis({
+    const { riskAnalysisForm } = await getRiskAnalysis({
       completed: true,
       tenantType,
     });
@@ -118,7 +118,7 @@ Given(
       await dataPreparationService.addRiskAnalysisToEService(
         token,
         this.eserviceId,
-        getRiskAnalysis({ completed: true, tenantType })
+        await getRiskAnalysis({ completed: true, tenantType })
       );
   }
 );
@@ -153,7 +153,7 @@ Given(
     const token = await getToken(tenantType);
     const consumerId = getOrganizationId(tenantType);
 
-    const { riskAnalysisForm } = getRiskAnalysis({
+    const { riskAnalysisForm } = await getRiskAnalysis({
       completed: true,
       tenantType,
     });

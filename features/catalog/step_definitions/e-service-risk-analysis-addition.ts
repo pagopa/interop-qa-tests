@@ -32,7 +32,7 @@ When("l'utente aggiunge un'analisi del rischio", async function () {
   });
   this.response = await apiClient.eservices.addRiskAnalysisToEService(
     this.eserviceId,
-    getRiskAnalysis({ completed: true, tenantType: this.tenantType }),
+    await getRiskAnalysis({ completed: true, tenantType: this.tenantType }),
     getAuthorizationHeader(this.token)
   );
 });
@@ -54,7 +54,7 @@ When(
 
     this.response = await apiClient.eservices.addRiskAnalysisToEService(
       this.eserviceId,
-      getRiskAnalysis({ completed: true, tenantType }),
+      await getRiskAnalysis({ completed: true, tenantType }),
       getAuthorizationHeader(this.token)
     );
   }
@@ -69,12 +69,12 @@ When(
       tenantType: TenantType,
     });
 
-    const { name, riskAnalysisForm } = getRiskAnalysis({
+    const { name, riskAnalysisForm } = await getRiskAnalysis({
       completed: true,
       tenantType: this.tenantType,
     });
 
-    const outdatedVersion = "0.0";
+    const outdatedVersion = (Number(riskAnalysisForm.version) - 1).toFixed(1);
 
     this.response = await apiClient.eservices.addRiskAnalysisToEService(
       this.eserviceId,

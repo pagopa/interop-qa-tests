@@ -47,7 +47,10 @@ Given(
         await dataPreparationService.addRiskAnalysisToEService(
           token,
           this.eserviceId,
-          getRiskAnalysis({ completed: true, tenantType: this.tenantType })
+          await getRiskAnalysis({
+            completed: true,
+            tenantType: this.tenantType,
+          })
         );
     }
 
@@ -88,7 +91,7 @@ Given(
     await dataPreparationService.addRiskAnalysisToEService(
       this.token,
       this.eserviceId,
-      getRiskAnalysis({ completed: false, tenantType: this.tenantType })
+      await getRiskAnalysis({ completed: false, tenantType: this.tenantType })
     );
   }
 );

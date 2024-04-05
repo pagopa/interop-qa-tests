@@ -11,10 +11,9 @@ type RiskAnalysisTemplateType = "PA" | "Privato/GSP";
 
 const RISK_ANALYSIS_DATA: Record<
   RiskAnalysisTemplateType,
-  { version: string; completed: unknown; uncompleted: unknown }
+  { completed: unknown; uncompleted: unknown }
 > = {
   "Privato/GSP": {
-    version: "2.0",
     completed: {
       purpose: ["INSTITUTIONAL"],
       institutionalPurpose: ["test"],
@@ -28,7 +27,6 @@ const RISK_ANALYSIS_DATA: Record<
     },
   },
   PA: {
-    version: "3.0",
     completed: {
       purpose: ["INSTITUTIONAL"],
       institutionalPurpose: ["test"],
@@ -63,7 +61,7 @@ const RISK_ANALYSIS_DATA: Record<
   },
 };
 
-export function getRiskAnalysis({
+export async function getRiskAnalysis({
   tenantType,
   completed,
 }: {
@@ -75,12 +73,19 @@ export function getRiskAnalysis({
   const templateStatus = completed ?? true ? "completed" : "uncompleted";
 
   const answers = RISK_ANALYSIS_DATA[templateType][templateStatus];
-  const version = RISK_ANALYSIS_DATA[templateType].version;
+
+  const token = await getToken(tenantType);
+  const latestRiskAnalysisResponse =
+    await apiClient.purposes.retrieveLatestRiskAnalysisConfiguration(
+      getAuthorizationHeader(token)
+    );
+
+  assertValidResponse(latestRiskAnalysisResponse);
 
   return {
     name: "finalità test",
     riskAnalysisForm: {
-      version,
+      version: latestRiskAnalysisResponse.data.version,
       answers,
     },
   };
