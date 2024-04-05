@@ -130,7 +130,7 @@ When(
 
     const consumerId = getOrganizationId(this.tenantType);
     const { riskAnalysisForm } = await getRiskAnalysis({
-      completed: true,
+      completed: false,
       tenantType: "PA1",
     });
 
