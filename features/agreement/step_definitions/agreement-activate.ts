@@ -7,7 +7,7 @@ import {
   getAuthorizationHeader,
   getToken,
 } from "../../../utils/commons";
-import { TenantType } from "../../common-steps";
+import { TenantType } from "../../../utils/commons";
 import {
   EServiceDescriptorState,
   AgreementApprovalPolicy,

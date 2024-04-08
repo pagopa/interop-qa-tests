@@ -8,7 +8,7 @@ import {
 } from "../../../utils/commons";
 import { apiClient } from "../../../api";
 import { EServiceDescriptorState, EServiceMode } from "../../../api/models";
-import { TenantType } from "../../common-steps";
+import { TenantType } from "../../../utils/commons";
 
 Given(
   "{string} ha già caricato un'interfaccia per quel descrittore",

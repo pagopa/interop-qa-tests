@@ -8,7 +8,7 @@ import {
   getToken,
 } from "../../../utils/commons";
 import { dataPreparationService } from "../../../services/data-preparation.service";
-import { TenantType } from "../../common-steps";
+import { TenantType } from "../../../utils/commons";
 
 Given(
   "{string} ha già creato {int} e-services in catalogo in stato PUBLISHED o SUSPENDED e {int} in stato DRAFT",

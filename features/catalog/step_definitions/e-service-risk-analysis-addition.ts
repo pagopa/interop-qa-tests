@@ -8,7 +8,7 @@ import {
 } from "../../../utils/commons";
 import { EServiceMode } from "../../../api/models";
 import { apiClient } from "../../../api";
-import { TenantType } from "../../common-steps";
+import { TenantType } from "../../../utils/commons";
 
 Given(
   "{string} ha già creato un e-service in modalità {string} senza descrittore",

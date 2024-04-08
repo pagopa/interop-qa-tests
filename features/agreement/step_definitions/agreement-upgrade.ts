@@ -8,7 +8,7 @@ import {
   makePolling,
 } from "../../../utils/commons";
 import { apiClient } from "../../../api";
-import { TenantType } from "../../common-steps";
+import { TenantType } from "../../../utils/commons";
 import { dataPreparationService } from "../../../services/data-preparation.service";
 import { AttributeKind, DescriptorAttributeSeed } from "../../../api/models";
 

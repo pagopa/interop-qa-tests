@@ -3,7 +3,7 @@ import { Given, Then } from "@cucumber/cucumber";
 import { z } from "zod";
 import { EServiceDescriptorState } from "../../../api/models";
 import { dataPreparationService } from "../../../services/data-preparation.service";
-import { TenantType } from "../../common-steps";
+import { TenantType } from "../../../utils/commons";
 import { assertContextSchema, getToken } from "../../../utils/commons";
 
 Then(

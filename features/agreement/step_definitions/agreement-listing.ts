@@ -9,7 +9,7 @@ import {
 } from "../../../utils/commons";
 import { apiClient } from "../../../api";
 import { dataPreparationService } from "../../../services/data-preparation.service";
-import { TenantType } from "../../common-steps";
+import { TenantType } from "../../../utils/commons";
 import { AgreementState } from "../../../api/models";
 
 Given(

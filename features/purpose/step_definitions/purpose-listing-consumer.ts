@@ -6,7 +6,7 @@ import {
   getOrganizationId,
   getAuthorizationHeader,
 } from "../../../utils/commons";
-import { TenantType } from "../../common-steps";
+import { TenantType } from "../../../utils/commons";
 import { PurposeVersionState } from "../../../api/models";
 
 When(

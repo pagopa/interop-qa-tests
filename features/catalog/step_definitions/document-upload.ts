@@ -3,7 +3,7 @@ import { z } from "zod";
 import { EServiceTechnology } from "../../../api/models";
 import { assertContextSchema, getToken } from "../../../utils/commons";
 import { dataPreparationService } from "../../../services/data-preparation.service";
-import { FileType, TenantType } from "../../common-steps";
+import { FileType, TenantType } from "../../../utils/commons";
 
 Given(
   "{string} ha già creato un e-service con un descrittore in stato DRAFT e tecnologia {string}",

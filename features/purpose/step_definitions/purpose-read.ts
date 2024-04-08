@@ -6,7 +6,7 @@ import {
   getAuthorizationHeader,
 } from "../../../utils/commons";
 import { apiClient } from "../../../api";
-import { Role } from "./../../common-steps";
+import { Role } from "../../../utils/commons";
 
 When("l'utente richiede la lettura della finalità", async function () {
   assertContextSchema(this, { purposeId: z.string() });

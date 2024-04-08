@@ -6,7 +6,7 @@ import {
   getAuthorizationHeader,
   getOrganizationId,
 } from "../../../utils/commons";
-import { TenantType } from "../../common-steps";
+import { TenantType } from "../../../utils/commons";
 
 When(
   "l'utente richiede una operazione di listing sui propri e-services erogati",

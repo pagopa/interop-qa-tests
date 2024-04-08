@@ -7,7 +7,7 @@ import {
   getToken,
 } from "../../../utils/commons";
 import { apiClient } from "../../../api";
-import { TenantType } from "../../common-steps";
+import { TenantType } from "../../../utils/commons";
 
 Given(
   "{string} ha già creato un e-service senza descrittore",

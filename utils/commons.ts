@@ -2,8 +2,23 @@ import "../configs/env";
 import { readFileSync } from "fs";
 import { z } from "zod";
 import { type AxiosResponse } from "axios";
-import { TenantType, SessionTokens, Role } from "../features/common-steps";
 import { generateSessionTokens } from "./session-tokens";
+
+export type FileType = "yaml" | "wsdl";
+
+export const TenantType = z.enum(["GSP", "PA1", "PA2", "Privato"]);
+export type TenantType = z.infer<typeof TenantType>;
+export const Role = z.enum([
+  "admin",
+  "api",
+  "security",
+  "support",
+  "api,security",
+]);
+export type Role = z.infer<typeof Role>;
+
+export const SessionTokens = z.record(TenantType, z.record(Role, z.string()));
+export type SessionTokens = z.infer<typeof SessionTokens>;
 
 export const getRandomInt = () =>
   Number(Math.random() * Number.MAX_SAFE_INTEGER).toFixed(0);

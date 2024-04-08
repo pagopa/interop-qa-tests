@@ -8,8 +8,8 @@ import {
   makePolling,
   assertValidResponse,
   getToken,
+  TenantType,
 } from "../utils/commons";
-import { TenantType } from "../features/common-steps";
 import {
   EServiceSeed,
   EServiceDescriptorSeed,
