@@ -1046,4 +1046,15 @@ export const dataPreparationService = {
     );
     return response.data;
   },
+
+  async retrieveRiskAnalysisConfiguration(token: string) {
+    const response =
+      await apiClient.purposes.retrieveLatestRiskAnalysisConfiguration(
+        getAuthorizationHeader(token)
+      );
+
+    assertValidResponse(response);
+
+    return response.data;
+  },
 };

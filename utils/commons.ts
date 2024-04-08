@@ -5,6 +5,7 @@ import { AxiosResponse } from "axios";
 import { CreatedResource } from "../api/models";
 import { TenantType, Role, SessionTokens } from "../features/common-steps";
 import { apiClient } from "../api";
+import { dataPreparationService } from "../services/data-preparation.service";
 import { generateSessionTokens } from "./session-tokens";
 
 type RiskAnalysisTemplateType = "PA" | "Privato/GSP";
@@ -75,17 +76,13 @@ export async function getRiskAnalysis({
   const answers = RISK_ANALYSIS_DATA[templateType][templateStatus];
 
   const token = await getToken(tenantType);
-  const latestRiskAnalysisResponse =
-    await apiClient.purposes.retrieveLatestRiskAnalysisConfiguration(
-      getAuthorizationHeader(token)
-    );
-
-  assertValidResponse(latestRiskAnalysisResponse);
+  const { version } =
+    await dataPreparationService.retrieveRiskAnalysisConfiguration(token);
 
   return {
     name: "finalità test",
     riskAnalysisForm: {
-      version: latestRiskAnalysisResponse.data.version,
+      version,
       answers,
     },
   };
