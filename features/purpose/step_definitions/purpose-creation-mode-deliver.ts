@@ -5,7 +5,6 @@ import {
   getAuthorizationHeader,
   getOrganizationId,
   getRandomInt,
-  getRiskAnalysis,
   getToken,
 } from "../../../utils/commons";
 import { apiClient } from "../../../api";
@@ -129,7 +128,7 @@ When(
     });
 
     const consumerId = getOrganizationId(this.tenantType);
-    const { riskAnalysisForm } = await getRiskAnalysis({
+    const { riskAnalysisForm } = await dataPreparationService.getRiskAnalysis({
       completed: false,
       tenantType: "PA1",
     });
@@ -160,7 +159,7 @@ When(
     });
 
     const consumerId = getOrganizationId(this.tenantType);
-    const { riskAnalysisForm } = await getRiskAnalysis({
+    const { riskAnalysisForm } = await dataPreparationService.getRiskAnalysis({
       completed: false,
       tenantType: this.tenantType,
     });

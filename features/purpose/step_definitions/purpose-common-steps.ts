@@ -10,7 +10,6 @@ import {
   assertContextSchema,
   getToken,
   getOrganizationId,
-  getRiskAnalysis,
   getRandomInt,
 } from "../../../utils/commons";
 import { TenantType } from "../../common-steps";
@@ -28,7 +27,7 @@ Given(
 
     const token = await getToken(tenantType);
     const consumerId = getOrganizationId(tenantType);
-    const { riskAnalysisForm } = await getRiskAnalysis({
+    const { riskAnalysisForm } = await dataPreparationService.getRiskAnalysis({
       completed: true,
       tenantType,
     });
@@ -118,7 +117,10 @@ Given(
       await dataPreparationService.addRiskAnalysisToEService(
         token,
         this.eserviceId,
-        await getRiskAnalysis({ completed: true, tenantType })
+        await dataPreparationService.getRiskAnalysis({
+          completed: true,
+          tenantType,
+        })
       );
   }
 );
@@ -153,7 +155,7 @@ Given(
     const token = await getToken(tenantType);
     const consumerId = getOrganizationId(tenantType);
 
-    const { riskAnalysisForm } = await getRiskAnalysis({
+    const { riskAnalysisForm } = await dataPreparationService.getRiskAnalysis({
       completed: true,
       tenantType,
     });

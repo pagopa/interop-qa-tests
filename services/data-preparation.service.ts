@@ -7,7 +7,9 @@ import {
   getRandomInt,
   makePolling,
   assertValidResponse,
+  getToken,
 } from "../utils/commons";
+import { TenantType } from "../features/common-steps";
 import {
   EServiceSeed,
   EServiceDescriptorSeed,
@@ -33,6 +35,60 @@ export const ESERVICE_DAILY_CALLS: Readonly<{
   // altrimenti si supera la soglia di carico disponibile
   total: 1000,
   perConsumer: 50,
+};
+
+type RiskAnalysisTemplateType = "PA" | "Privato/GSP";
+
+const RISK_ANALYSIS_DATA: Record<
+  RiskAnalysisTemplateType,
+  { completed: unknown; uncompleted: unknown }
+> = {
+  "Privato/GSP": {
+    completed: {
+      purpose: ["INSTITUTIONAL"],
+      institutionalPurpose: ["test"],
+      usesPersonalData: ["NO"],
+      usesThirdPartyPersonalData: ["NO"],
+    },
+    uncompleted: {
+      purpose: ["INSTITUTIONAL"],
+      usesPersonalData: ["NO"],
+      usesThirdPartyPersonalData: ["NO"],
+    },
+  },
+  PA: {
+    completed: {
+      purpose: ["INSTITUTIONAL"],
+      institutionalPurpose: ["test"],
+      personalDataTypes: ["WITH_NON_IDENTIFYING_DATA"],
+      legalBasis: ["CONSENT"],
+      knowsDataQuantity: ["NO"],
+      deliveryMethod: ["CLEARTEXT"],
+      policyProvided: ["YES"],
+      confirmPricipleIntegrityAndDiscretion: ["true"],
+      doneDpia: ["NO"],
+      dataDownload: ["NO"],
+      purposePursuit: ["MERE_CORRECTNESS"],
+      checkedExistenceMereCorrectnessInteropCatalogue: ["true"],
+      usesThirdPartyData: ["NO"],
+      declarationConfirmGDPR: ["true"],
+    },
+    uncompleted: {
+      purpose: ["INSTITUTIONAL"],
+      institutionalPurpose: ["test"],
+      legalBasis: ["CONSENT"],
+      knowsDataQuantity: ["NO"],
+      deliveryMethod: ["CLEARTEXT"],
+      policyProvided: ["YES"],
+      confirmPricipleIntegrityAndDiscretion: ["true"],
+      doneDpia: ["NO"],
+      dataDownload: ["NO"],
+      purposePursuit: ["MERE_CORRECTNESS"],
+      checkedExistenceMereCorrectnessInteropCatalogue: ["true"],
+      usesThirdPartyData: ["NO"],
+      declarationConfirmGDPR: ["true"],
+    },
+  },
 };
 
 export const dataPreparationService = {
@@ -1047,7 +1103,7 @@ export const dataPreparationService = {
     return response.data;
   },
 
-  async retrieveRiskAnalysisConfiguration(token: string) {
+  async retrieveCurrentRiskAnalysisVersion(token: string) {
     const response =
       await apiClient.purposes.retrieveLatestRiskAnalysisConfiguration(
         getAuthorizationHeader(token)
@@ -1055,6 +1111,32 @@ export const dataPreparationService = {
 
     assertValidResponse(response);
 
-    return response.data;
+    return response.data.version;
+  },
+
+  async getRiskAnalysis({
+    tenantType,
+    completed,
+  }: {
+    tenantType: TenantType;
+    completed?: boolean;
+  }) {
+    const templateType =
+      tenantType === "PA1" || tenantType === "PA2" ? "PA" : "Privato/GSP";
+    const templateStatus = completed ?? true ? "completed" : "uncompleted";
+
+    const answers = RISK_ANALYSIS_DATA[templateType][templateStatus];
+
+    const token = await getToken(tenantType);
+    const version =
+      await dataPreparationService.retrieveCurrentRiskAnalysisVersion(token);
+
+    return {
+      name: "finalità test",
+      riskAnalysisForm: {
+        version,
+        answers,
+      },
+    };
   },
 };
