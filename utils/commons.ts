@@ -1,10 +1,8 @@
 import "../configs/env";
 import { readFileSync } from "fs";
 import { z } from "zod";
-import { AxiosResponse } from "axios";
-import { CreatedResource } from "../api/models";
-import { TenantType, Role, SessionTokens } from "../features/common-steps";
-import { apiClient } from "../api";
+import { type AxiosResponse } from "axios";
+import { TenantType, SessionTokens, Role } from "../features/common-steps";
 import { generateSessionTokens } from "./session-tokens";
 
 export const getRandomInt = () =>
@@ -83,27 +81,4 @@ export function assertValidResponse<T>(response: AxiosResponse<T>) {
       )}`
     );
   }
-}
-
-export type FileType = "yaml" | "wsdl";
-
-export async function uploadInterfaceDocument(
-  fileName: string,
-  eserviceId: string,
-  descriptorId: string,
-  token: string
-): Promise<AxiosResponse<CreatedResource>> {
-  const blobFile = new Blob([readFileSync(`./data/${fileName}`)]);
-  const file = new File([blobFile], fileName);
-
-  return apiClient.eservices.createEServiceDocument(
-    eserviceId,
-    descriptorId,
-    {
-      kind: "INTERFACE",
-      prettyName: "Interfaccia",
-      doc: file,
-    },
-    getAuthorizationHeader(token)
-  );
 }

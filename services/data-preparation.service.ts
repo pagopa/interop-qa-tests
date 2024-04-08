@@ -1139,4 +1139,24 @@ export const dataPreparationService = {
       },
     };
   },
+  async uploadInterfaceDocument(
+    fileName: string,
+    eserviceId: string,
+    descriptorId: string,
+    token: string
+  ): Promise<AxiosResponse<CreatedResource>> {
+    const blobFile = new Blob([readFileSync(`./data/${fileName}`)]);
+    const file = new File([blobFile], fileName);
+
+    return apiClient.eservices.createEServiceDocument(
+      eserviceId,
+      descriptorId,
+      {
+        kind: "INTERFACE",
+        prettyName: "Interfaccia",
+        doc: file,
+      },
+      getAuthorizationHeader(token)
+    );
+  },
 };
