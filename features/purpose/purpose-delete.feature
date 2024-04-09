@@ -1,6 +1,6 @@
 @purpose_delete
 Feature: Cancellazione finalità
-  Tutti gli utenti possono cancellare una propria finalità in stato DRAFT o WAITING_FOR_APPROVAL.
+  Tutti gli admin possono cancellare una propria finalità in stato DRAFT o WAITING_FOR_APPROVAL.
 
   @purpose_delete1
   Scenario Outline: Per una finalità precedentemente creata dall’ente, la quale prima versione è in stato DRAFT, alla richiesta di cancellazione da parte di un utente con sufficienti permessi (admin), va a buon fine
