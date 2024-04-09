@@ -1,4 +1,5 @@
-import { Given } from "@cucumber/cucumber";
+import assert from "assert";
+import { Given, Then } from "@cucumber/cucumber";
 import { z } from "zod";
 import { PurposeVersionState } from "../../../api/models";
 import { dataPreparationService } from "../../../services/data-preparation.service";
@@ -7,6 +8,7 @@ import {
   getToken,
   getOrganizationId,
   getRiskAnalysis,
+  getRandomInt,
 } from "../../../utils/commons";
 import { TenantType } from "../../common-steps";
 
@@ -109,5 +111,56 @@ Given(
         this.eserviceId,
         getRiskAnalysis({ completed: true, tenantType })
       );
+  }
+);
+
+Then(
+  "si ottiene status code {int} e la lista di {int} finalità",
+  async function (statusCode: number, count: number) {
+    assertContextSchema(this, {
+      response: z.object({
+        status: z.number(),
+        data: z.object({
+          results: z.array(z.unknown()),
+        }),
+      }),
+    });
+    assert.equal(this.response.status, statusCode);
+    assert.equal(this.response.data.results.length, count);
+  }
+);
+
+Given(
+  "{string} ha già creato una finalità in stato {string} per quell'e-service contenente la keyword {string}",
+  async function (
+    tenantType: TenantType,
+    purposeState: PurposeVersionState,
+    keyword: string
+  ) {
+    assertContextSchema(this, {
+      eserviceId: z.string(),
+    });
+
+    const token = await getToken(tenantType);
+    const consumerId = getOrganizationId(tenantType);
+
+    const { riskAnalysisForm } = getRiskAnalysis({
+      completed: true,
+      tenantType,
+    });
+
+    const title = `purpose ${this.TEST_SEED} - ${getRandomInt()} - ${keyword}`;
+    this.purposeId = await dataPreparationService.createPurposeWithGivenState({
+      token,
+      testSeed: this.TEST_SEED,
+      eserviceMode: "DELIVER",
+      payload: {
+        title,
+        eserviceId: this.eserviceId,
+        consumerId,
+        riskAnalysisForm,
+      },
+      purposeState,
+    });
   }
 );
