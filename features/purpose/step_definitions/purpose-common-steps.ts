@@ -47,3 +47,67 @@ Given(
     this.purposeId = this.purposesIds[0];
   }
 );
+
+Given(
+  "{string} ha già pubblicato quella versione di e-service",
+  async function (tenantType: TenantType) {
+    assertContextSchema(this, {
+      eserviceId: z.string(),
+      descriptorId: z.string(),
+    });
+
+    const token = await getToken(tenantType);
+
+    await dataPreparationService.publishDescriptor(
+      token,
+      this.eserviceId,
+      this.descriptorId
+    );
+  }
+);
+
+Given(
+  "{string} ha già creato una finalità in stato {string} per quell'eservice associando quell'analisi del rischio creata dall'erogatore",
+  async function (tenantType: TenantType, purposeState: PurposeVersionState) {
+    assertContextSchema(this, {
+      eserviceId: z.string(),
+      riskAnalysisId: z.string(),
+    });
+
+    const token = await getToken(tenantType);
+    const consumerId = getOrganizationId(tenantType);
+
+    const { purposeId } =
+      await dataPreparationService.createPurposeWithGivenState({
+        token,
+        testSeed: this.TEST_SEED,
+        payload: {
+          eserviceId: this.eserviceId,
+          consumerId,
+          riskAnalysisId: this.riskAnalysisId,
+        },
+        purposeState,
+        eserviceMode: "RECEIVE",
+      });
+
+    this.purposeId = purposeId;
+  }
+);
+
+Given(
+  "{string} ha già creato un'analisi del rischio per quell'e-service",
+  async function (tenantType: TenantType) {
+    assertContextSchema(this, {
+      eserviceId: z.string(),
+    });
+
+    const token = await getToken(tenantType);
+
+    this.riskAnalysisId =
+      await dataPreparationService.addRiskAnalysisToEService(
+        token,
+        this.eserviceId,
+        getRiskAnalysis({ completed: true, tenantType })
+      );
+  }
+);

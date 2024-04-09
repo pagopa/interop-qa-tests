@@ -7,7 +7,6 @@ import {
   getAuthorizationHeader,
   getOrganizationId,
   getRandomInt,
-  getRiskAnalysis,
   getToken,
 } from "../../../utils/commons";
 import {
@@ -15,46 +14,7 @@ import {
   dataPreparationService,
 } from "../../../services/data-preparation.service";
 import { apiClient } from "../../../api";
-import {
-  AgreementApprovalPolicy,
-  PurposeVersionState,
-} from "../../../api/models";
-
-Given(
-  "{string} ha già creato un'analisi del rischio per quell'e-service",
-  async function (tenantType: TenantType) {
-    assertContextSchema(this, {
-      eserviceId: z.string(),
-    });
-
-    const token = await getToken(tenantType);
-
-    this.riskAnalysisId =
-      await dataPreparationService.addRiskAnalysisToEService(
-        token,
-        this.eserviceId,
-        getRiskAnalysis({ completed: true, tenantType })
-      );
-  }
-);
-
-Given(
-  "{string} ha già pubblicato quella versione di e-service",
-  async function (tenantType: TenantType) {
-    assertContextSchema(this, {
-      eserviceId: z.string(),
-      descriptorId: z.string(),
-    });
-
-    const token = await getToken(tenantType);
-
-    await dataPreparationService.publishDescriptor(
-      token,
-      this.eserviceId,
-      this.descriptorId
-    );
-  }
-);
+import { AgreementApprovalPolicy } from "../../../api/models";
 
 When(
   "l'utente crea una nuova finalità con tutti i campi richiesti correttamente formattati per quell'e-service associando quella analisi del rischio creata dall'erogatore",
@@ -80,34 +40,6 @@ When(
       },
       getAuthorizationHeader(this.token)
     );
-  }
-);
-
-Given(
-  "{string} ha già creato una finalità in stato {string} per quell'eservice associando quell'analisi del rischio creata dall'erogatore",
-  async function (tenantType: TenantType, purposeState: PurposeVersionState) {
-    assertContextSchema(this, {
-      eserviceId: z.string(),
-      riskAnalysisId: z.string(),
-    });
-
-    const token = await getToken(tenantType);
-    const consumerId = getOrganizationId(tenantType);
-
-    const { purposeId } =
-      await dataPreparationService.createPurposeWithGivenState({
-        token,
-        testSeed: this.TEST_SEED,
-        payload: {
-          eserviceId: this.eserviceId,
-          consumerId,
-          riskAnalysisId: this.riskAnalysisId,
-        },
-        purposeState,
-        eserviceMode: "RECEIVE",
-      });
-
-    this.purposeId = purposeId;
   }
 );
 
