@@ -1103,7 +1103,7 @@ export const dataPreparationService = {
     return response.data;
   },
 
-  async retrieveCurrentRiskAnalysisVersion(token: string) {
+  async retrieveCurrentRiskAnalysisConfiguration(token: string) {
     const response =
       await apiClient.purposes.retrieveLatestRiskAnalysisConfiguration(
         getAuthorizationHeader(token)
@@ -1111,7 +1111,7 @@ export const dataPreparationService = {
 
     assertValidResponse(response);
 
-    return response.data.version;
+    return response.data;
   },
 
   async getRiskAnalysis({
@@ -1128,8 +1128,10 @@ export const dataPreparationService = {
     const answers = RISK_ANALYSIS_DATA[templateType][templateStatus];
 
     const token = await getToken(tenantType);
-    const version =
-      await dataPreparationService.retrieveCurrentRiskAnalysisVersion(token);
+    const { version } =
+      await dataPreparationService.retrieveCurrentRiskAnalysisConfiguration(
+        token
+      );
 
     return {
       name: "finalità test",
