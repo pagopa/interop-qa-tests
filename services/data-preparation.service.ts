@@ -22,6 +22,7 @@ import {
   CreatedResource,
   PurposeSeed,
   PurposeEServiceSeed,
+  PurposeVersionSeed,
 } from "./../api/models";
 
 export const ESERVICE_DAILY_CALLS: Readonly<{
@@ -919,5 +920,30 @@ export const dataPreparationService = {
       );
     }
     return { purposeId, versionId };
+  },
+
+  async createNewPurposeVersion(
+    token: string,
+    purposeId: string,
+    { dailyCalls }: PurposeVersionSeed
+  ) {
+    const response = await apiClient.purposes.createPurposeVersion(
+      purposeId,
+      { dailyCalls },
+      getAuthorizationHeader(token)
+    );
+
+    assertValidResponse(response);
+
+    const shouldWaitForApproval = dailyCalls > ESERVICE_DAILY_CALLS.perConsumer;
+
+    await makePolling(
+      () =>
+        apiClient.purposes.getPurpose(purposeId, getAuthorizationHeader(token)),
+      (res) =>
+        shouldWaitForApproval
+          ? res.data.waitingForApprovalVersion?.state === "WAITING_FOR_APPROVAL"
+          : res.data.currentVersion?.dailyCalls === dailyCalls
+    );
   },
 };
