@@ -28,17 +28,17 @@ Feature: Listing attributi
       | Privato | api,security |
 
   @attribute_listing2
-  Scenario Outline: A fronte di 20 attributi in db e una richiesta di 12 attributi, restituisce solo i primi 12 risultati
+  Scenario Outline: A fronte di 5 attributi in db e una richiesta di 3 attributi, restituisce solo i primi 3 risultati
     Given l'utente è un "admin" di "PA1"
-    Given "PA1" ha già creato 20 attributi "DECLARED"
-    When l'utente richiede una operazione di listing degli attributi limitata ai primi 12 attributi
-    Then si ottiene status code 200 e la lista di 12 attributi
+    Given "PA1" ha già creato 5 attributi "DECLARED"
+    When l'utente richiede una operazione di listing degli attributi limitata ai primi 3 attributi
+    Then si ottiene status code 200 e la lista di 3 attributi
 
   @attribute_listing3
-  Scenario Outline: A fronte di 15 attribute in db e un offset di 12, restituisce solo 3 risultati
+  Scenario Outline: A fronte di 5 attributi in db e un offset di 2, restituisce solo 3 risultati
     Given l'utente è un "admin" di "PA1"
-    Given "PA1" ha già creato 15 attributi "DECLARED"
-    When l'utente richiede una operazione di listing degli attributi con offset 12
+    Given "PA1" ha già creato 5 attributi "DECLARED"
+    When l'utente richiede una operazione di listing degli attributi con offset 2
     Then si ottiene status code 200 e la lista di 3 attributi
 
   @attribute_listing4

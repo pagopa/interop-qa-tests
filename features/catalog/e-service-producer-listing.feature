@@ -24,17 +24,17 @@ Feature: Listing e-services lato erogatore
       | PA1  | support      |         5 |
 
   @producer_listing2
-  Scenario Outline: A fronte di 20 e-service in db, restituisce solo i primi 12 risultati di e-service
+  Scenario Outline: A fronte di 5 e-service in db, restituisce solo i primi 3 risultati di e-service
     Given l'utente è un "admin" di "PA1"
-    Given "PA1" ha già creato 19 e-services in catalogo in stato PUBLISHED o SUSPENDED e 1 in stato DRAFT
-    When l'utente richiede una operazione di listing sui propri e-services erogati limitata ai primi 12 e-services
-    Then si ottiene status code 200 e la lista di 12 e-services
+    Given "PA1" ha già creato 4 e-services in catalogo in stato PUBLISHED o SUSPENDED e 1 in stato DRAFT
+    When l'utente richiede una operazione di listing sui propri e-services erogati limitata ai primi 3 e-services
+    Then si ottiene status code 200 e la lista di 3 e-services
 
   @producer_listing3
-  Scenario Outline: A fronte di 15 e-service in db e una richiesta di offset 12, restituisce solo 3 risultati
+  Scenario Outline: A fronte di 5 e-service in db e una richiesta di offset 2, restituisce solo 3 risultati
     Given l'utente è un "admin" di "PA1"
-    Given "PA1" ha già creato 14 e-services in catalogo in stato PUBLISHED o SUSPENDED e 1 in stato DRAFT
-    When l'utente richiede una operazione di listing sui propri e-services con offset 12
+    Given "PA1" ha già creato 4 e-services in catalogo in stato PUBLISHED o SUSPENDED e 1 in stato DRAFT
+    When l'utente richiede una operazione di listing sui propri e-services con offset 2
     Then si ottiene status code 200 e la lista di 3 e-services
 
   @producer_listing4 @wait_for_fix @IMN-261
