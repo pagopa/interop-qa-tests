@@ -841,7 +841,9 @@ export const dataPreparationService = {
       () =>
         apiClient.purposes.getPurpose(purposeId, getAuthorizationHeader(token)),
       (res) => {
-        versionId = res.data.currentVersion!.id;
+        if (res.data.currentVersion?.id) {
+          versionId = res.data.currentVersion.id;
+        }
         return res.status !== 404;
       }
     );
