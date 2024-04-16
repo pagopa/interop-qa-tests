@@ -64,13 +64,3 @@ Given(
     this.documentId = documentId;
   }
 );
-
-Then("si ottiene status code {int}", function (statusCode: number) {
-  assertContextSchema(this, {
-    response: z.object({
-      status: z.number(),
-    }),
-  });
-
-  assert.equal(this.response.status, statusCode);
-});

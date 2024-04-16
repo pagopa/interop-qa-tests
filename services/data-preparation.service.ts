@@ -786,6 +786,7 @@ export const dataPreparationService = {
     );
   },
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   async createPurposeWithGivenState<TEServiceMode extends EServiceMode>({
     token,
     testSeed,
@@ -834,20 +835,18 @@ export const dataPreparationService = {
     assertValidResponse(response);
 
     const purposeId = response.data.id;
-    let versionId: string | undefined;
+    let versionId = "";
 
     await makePolling(
       () =>
         apiClient.purposes.getPurpose(purposeId, getAuthorizationHeader(token)),
       (res) => {
-        versionId = res.data.currentVersion?.id;
+        if (res.data.currentVersion?.id) {
+          versionId = res.data.currentVersion.id;
+        }
         return res.status !== 404;
       }
     );
-
-    if (!versionId) {
-      throw new Error(`Purpose version for id ${purposeId} not found`);
-    }
 
     if (purposeState === "DRAFT") {
       return { purposeId, versionId };
@@ -870,8 +869,14 @@ export const dataPreparationService = {
             purposeId,
             getAuthorizationHeader(token)
           ),
-        (res) =>
-          res.data.waitingForApprovalVersion?.state === "WAITING_FOR_APPROVAL"
+        (res) => {
+          if (res.data.waitingForApprovalVersion?.id) {
+            versionId = res.data.waitingForApprovalVersion.id;
+          }
+          return (
+            res.data.waitingForApprovalVersion?.state === "WAITING_FOR_APPROVAL"
+          );
+        }
       );
       return { purposeId, versionId };
     }
@@ -879,7 +884,13 @@ export const dataPreparationService = {
     await makePolling(
       () =>
         apiClient.purposes.getPurpose(purposeId, getAuthorizationHeader(token)),
-      (res) => res.data.currentVersion?.state === "ACTIVE"
+      (res) => {
+        if (res.data.currentVersion?.state === "ACTIVE") {
+          versionId = res.data.currentVersion.id;
+          return true;
+        }
+        return false;
+      }
     );
 
     // 4. If the state required is SUSPENDED call the endpoint to suspend the purpose version
@@ -897,7 +908,13 @@ export const dataPreparationService = {
             purposeId,
             getAuthorizationHeader(token)
           ),
-        (res) => res.data.currentVersion?.state === "SUSPENDED"
+        (res) => {
+          if (res.data.currentVersion?.state === "SUSPENDED") {
+            versionId = res.data.currentVersion.id;
+            return true;
+          }
+          return false;
+        }
       );
     }
 
@@ -916,7 +933,13 @@ export const dataPreparationService = {
             purposeId,
             getAuthorizationHeader(token)
           ),
-        (res) => res.data.currentVersion?.state === "ARCHIVED"
+        (res) => {
+          if (res.data.currentVersion?.state === "ARCHIVED") {
+            versionId = res.data.currentVersion.id;
+            return true;
+          }
+          return false;
+        }
       );
     }
     return { purposeId, versionId };
@@ -945,5 +968,7 @@ export const dataPreparationService = {
           ? res.data.waitingForApprovalVersion?.state === "WAITING_FOR_APPROVAL"
           : res.data.currentVersion?.dailyCalls === dailyCalls
     );
+
+    return response.data;
   },
 };
