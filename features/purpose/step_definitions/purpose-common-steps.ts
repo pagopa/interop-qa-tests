@@ -31,9 +31,10 @@ Given(
     });
 
     this.purposesIds = [];
-    this.versionIds = [];
+    this.currentVersionIds = [];
+    this.waitingForApprovalVersionIds = [];
     for (let index = 0; index < n; index++) {
-      const { purposeId, versionId } =
+      const { purposeId, currentVersionId, waitingForApprovalVersionId } =
         await dataPreparationService.createPurposeWithGivenState({
           token,
           testSeed: this.TEST_SEED,
@@ -46,10 +47,12 @@ Given(
           purposeState,
         });
       this.purposesIds.push(purposeId);
-      this.versionIds.push(versionId);
+      this.currentVersionIds.push(currentVersionId);
+      this.waitingForApprovalVersionIds.push(waitingForApprovalVersionId);
     }
     this.purposeId = this.purposesIds[0];
-    this.versionId = this.versionIds[0];
+    this.currentVersionId = this.currentVersionIds[0];
+    this.waitingForApprovalVersionId = this.waitingForApprovalVersionIds[0];
   }
 );
 
@@ -153,17 +156,37 @@ Given(
     });
 
     const title = `purpose ${this.TEST_SEED} - ${getRandomInt()} - ${keyword}`;
-    this.purposeId = await dataPreparationService.createPurposeWithGivenState({
-      token,
-      testSeed: this.TEST_SEED,
-      eserviceMode: "DELIVER",
-      payload: {
-        title,
-        eserviceId: this.eserviceId,
-        consumerId,
-        riskAnalysisForm,
-      },
-      purposeState,
+    const { purposeId } =
+      await dataPreparationService.createPurposeWithGivenState({
+        token,
+        testSeed: this.TEST_SEED,
+        eserviceMode: "DELIVER",
+        payload: {
+          title,
+          eserviceId: this.eserviceId,
+          consumerId,
+          riskAnalysisForm,
+        },
+        purposeState,
+      });
+    this.purposeId = purposeId;
+  }
+);
+
+Given(
+  "{string} ha già rifiutato l'aggiornamento della stima di carico per quella finalità",
+  async function (tenant: TenantType) {
+    assertContextSchema(this, {
+      purposeId: z.string(),
+      waitingForApprovalVersionId: z.string(),
     });
+
+    const token = await getToken(tenant);
+
+    await dataPreparationService.rejectPurposeVersion(
+      token,
+      this.purposeId,
+      this.waitingForApprovalVersionId
+    );
   }
 );

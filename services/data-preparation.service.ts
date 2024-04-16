@@ -835,28 +835,29 @@ export const dataPreparationService = {
     assertValidResponse(response);
 
     const purposeId = response.data.id;
-    let versionId = "";
+    let currentVersionId = "";
+    let waitingForApprovalVersionId = "";
 
     await makePolling(
       () =>
         apiClient.purposes.getPurpose(purposeId, getAuthorizationHeader(token)),
       (res) => {
         if (res.data.currentVersion?.id) {
-          versionId = res.data.currentVersion.id;
+          currentVersionId = res.data.currentVersion.id;
         }
         return res.status !== 404;
       }
     );
 
     if (purposeState === "DRAFT") {
-      return { purposeId, versionId };
+      return { purposeId, currentVersionId };
     }
 
     // 2. Activate the purpose version
     const activatePurposeResponse =
       await apiClient.purposes.activatePurposeVersion(
         purposeId,
-        versionId,
+        currentVersionId,
         getAuthorizationHeader(token)
       );
     assertValidResponse(activatePurposeResponse);
@@ -871,14 +872,14 @@ export const dataPreparationService = {
           ),
         (res) => {
           if (res.data.waitingForApprovalVersion?.id) {
-            versionId = res.data.waitingForApprovalVersion.id;
+            waitingForApprovalVersionId = res.data.waitingForApprovalVersion.id;
           }
           return (
             res.data.waitingForApprovalVersion?.state === "WAITING_FOR_APPROVAL"
           );
         }
       );
-      return { purposeId, versionId };
+      return { purposeId, waitingForApprovalVersionId };
     }
 
     await makePolling(
@@ -886,7 +887,7 @@ export const dataPreparationService = {
         apiClient.purposes.getPurpose(purposeId, getAuthorizationHeader(token)),
       (res) => {
         if (res.data.currentVersion?.state === "ACTIVE") {
-          versionId = res.data.currentVersion.id;
+          currentVersionId = res.data.currentVersion.id;
           return true;
         }
         return false;
@@ -898,7 +899,7 @@ export const dataPreparationService = {
       const suspendPurposeResponse =
         await apiClient.purposes.suspendPurposeVersion(
           purposeId,
-          versionId,
+          currentVersionId,
           getAuthorizationHeader(token)
         );
       assertValidResponse(suspendPurposeResponse);
@@ -910,7 +911,7 @@ export const dataPreparationService = {
           ),
         (res) => {
           if (res.data.currentVersion?.state === "SUSPENDED") {
-            versionId = res.data.currentVersion.id;
+            currentVersionId = res.data.currentVersion.id;
             return true;
           }
           return false;
@@ -923,7 +924,7 @@ export const dataPreparationService = {
       const archivePurposeResponse =
         await apiClient.purposes.archivePurposeVersion(
           purposeId,
-          versionId,
+          currentVersionId,
           getAuthorizationHeader(token)
         );
       assertValidResponse(archivePurposeResponse);
@@ -935,14 +936,14 @@ export const dataPreparationService = {
           ),
         (res) => {
           if (res.data.currentVersion?.state === "ARCHIVED") {
-            versionId = res.data.currentVersion.id;
+            currentVersionId = res.data.currentVersion.id;
             return true;
           }
           return false;
         }
       );
     }
-    return { purposeId, versionId };
+    return { purposeId, currentVersionId };
   },
 
   async createNewPurposeVersion(
@@ -956,6 +957,9 @@ export const dataPreparationService = {
       getAuthorizationHeader(token)
     );
 
+    let currentVersionId = "";
+    let waitingForApprovalVersionId: string | undefined;
+
     assertValidResponse(response);
 
     const shouldWaitForApproval = dailyCalls > ESERVICE_DAILY_CALLS.perConsumer;
@@ -963,12 +967,45 @@ export const dataPreparationService = {
     await makePolling(
       () =>
         apiClient.purposes.getPurpose(purposeId, getAuthorizationHeader(token)),
-      (res) =>
-        shouldWaitForApproval
-          ? res.data.waitingForApprovalVersion?.state === "WAITING_FOR_APPROVAL"
-          : res.data.currentVersion?.dailyCalls === dailyCalls
+      (res) => {
+        currentVersionId = res.data.currentVersion!.id;
+        if (shouldWaitForApproval) {
+          waitingForApprovalVersionId = res.data.waitingForApprovalVersion?.id;
+          return (
+            res.data.waitingForApprovalVersion?.state === "WAITING_FOR_APPROVAL"
+          );
+        }
+        return res.data.currentVersion?.dailyCalls === dailyCalls;
+      }
     );
 
-    return response.data;
+    return {
+      purposeId,
+      currentVersionId,
+      waitingForApprovalVersionId,
+    };
+  },
+
+  async rejectPurposeVersion(
+    token: string,
+    purposeId: string,
+    versionId: string
+  ) {
+    const response = await apiClient.purposes.rejectPurposeVersion(
+      purposeId,
+      versionId,
+      {
+        rejectionReason: "Testing QA purposes",
+      },
+      getAuthorizationHeader(token)
+    );
+
+    assertValidResponse(response);
+
+    await makePolling(
+      () =>
+        apiClient.purposes.getPurpose(purposeId, getAuthorizationHeader(token)),
+      (res) => res.data.currentVersion?.state === "REJECTED"
+    );
   },
 };
