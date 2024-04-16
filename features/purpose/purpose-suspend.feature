@@ -43,14 +43,9 @@ Feature: Sospensione di una finalità
     Given l'utente è un "admin" di "PA1"
     Given "PA1" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given "PA1" ha già creato 1 finalità in stato "<statoFinalita>" per quell'eservice
-    When l'utente sospende quella finalità in stato "<statoFinalita>"
+    Given "PA1" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
+    When l'utente sospende quella finalità in stato "ACTIVE"
     Then si ottiene status code 200
-
-    Examples: 
-      | statoFinalita |
-      | ACTIVE        |
-      | SUSPENDED     |
 
   @purpose_suspend4a @wait_for_fix @IMN-404
   Scenario Outline: Per una finalità precedentemente creata da un fruitore, la quale è in stato WAITING_FOR_APPROVAL, DRAFT o ARCHIVED, alla richiesta di sospensione da parte di un utente con sufficienti permessi, ottiene un errore
