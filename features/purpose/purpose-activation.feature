@@ -2,8 +2,8 @@
 Feature: Attivazione e riattivazione di una finalità
   Tutti gli utenti admin possono attivare o riattivare una propria finalità
 
-  @purpose_activation1
-  Scenario Outline: Per una finalità precedentemente creata da un fruitore e attivata da un erogatore, la quale è stata successivamente portata in stato SUSPENDED, alla richiesta di riattivazione da parte di un utente con sufficienti permessi (admin) dell’ente che ha sospeso la finalità, va a buon fine
+  @purpose_activation1a
+  Scenario Outline: Per una finalità precedentemente creata da un fruitore e attivata da un erogatore, la quale è stata successivamente portata in stato SUSPENDED, alla richiesta di riattivazione da parte di un utente con sufficienti permessi (admin) dell’ente che ha sospeso la finalità (fruitore), va a buon fine
     Given l'utente è un "<ruolo>" di "<ente>"
     Given "PA2" ha già creato e pubblicato 1 e-service
     Given "<ente>" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
@@ -28,6 +28,18 @@ Feature: Attivazione e riattivazione di una finalità
       | Privato | security     |       403 |
       | Privato | api,security |       403 |
       | Privato | support      |       403 |
+
+
+  @purpose_activation1b
+  Scenario Outline: Per una finalità precedentemente creata da un fruitore e attivata da un erogatore, la quale è stata successivamente portata in stato SUSPENDED, alla richiesta di riattivazione da parte di un utente con sufficienti permessi (admin) dell’ente che ha sospeso la finalità (erogatore), va a buon fine
+    Given l'utente è un "admin" di "PA1"
+    Given "PA1" ha già creato e pubblicato 1 e-service
+    Given "PA2" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
+    Given "PA2" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
+    Given "PA1" ha già portato la finalità in stato "SUSPENDED"
+    When l'utente riattiva la finalità in stato "SUSPENDED" per quell'e-service
+    Then si ottiene status code 200
+
 
   @purpose_activation2
   Scenario Outline: Per una finalità precedentemente creata da un fruitore e attivata da un erogatore, la quale è stata successivamente portata in stato SUSPENDED, alla richiesta di riattivazione da parte di un utente con sufficienti permessi (admin) dell’ente opposto a quello che ha sospeso la finalità (es. se sospesa dall’erogatore, è il fruitore), va a buon fine ma la finalità non cambia stato. in questa casistica è rispettata l'idempotenza.
