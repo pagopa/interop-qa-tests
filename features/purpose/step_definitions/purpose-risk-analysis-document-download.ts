@@ -38,7 +38,7 @@ When("l'utente scarica il documento di analisi del rischio", async function () {
   this.response = await apiClient.purposes.getRiskAnalysisDocument(
     this.purposeId,
     this.versionId,
-    purpose.currentVersion?.riskAnalysisDocument?.id || "",
+    purpose.currentVersion!.riskAnalysisDocument!.id,
     getAuthorizationHeader(this.token)
   );
 });
