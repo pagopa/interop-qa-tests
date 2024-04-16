@@ -37,8 +37,8 @@ Feature: Clonazione di una finalità
       | PA1  | admin | WAITING_FOR_APPROVAL |       200 |
       | PA1  | admin | SUSPENDED            |       200 |
 
-  @purpose_clone2 @wait_for_fix @IMN-399
-  Scenario Outline: Un utente con sufficienti permessi (admin); il cui ente ha già una finalità in stato DRAFT, o ARCHIVED per una versione di e-service, il quale ha mode = RECEIVE, clona una finalità. Ottiene un errore (NB: verificare status code)
+  @purpose_clone2
+  Scenario Outline: Un utente con sufficienti permessi (admin); il cui ente ha già una finalità in stato DRAFT, o ARCHIVED per una versione di e-service, il quale ha mode = RECEIVE, clona una finalità. Ottiene un errore se la finalità è in stato DRAFT, successo se è in stato ARCHIVED
     Given l'utente è un "admin" di "PA1"
     Given "PA2" ha già creato un e-service in modalità "RECEIVE" con un descrittore in stato "DRAFT"
     Given "PA2" ha già creato un'analisi del rischio per quell'e-service
@@ -47,15 +47,15 @@ Feature: Clonazione di una finalità
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given "PA1" ha già creato una finalità in stato "<statoFinalita>" per quell'eservice associando quell'analisi del rischio creata dall'erogatore
     When l'utente richiede una operazione di clonazione della finalità
-    Then si ottiene status code 409
+    Then si ottiene status code <status>
 
     Examples: 
-      | statoFinalita |
-      | DRAFT         |
-      | ARCHIVED      |
+      | statoFinalita | status |
+      | DRAFT         |  409   |
+      | ARCHIVED      |  200   |
 
   @purpose_clone3
-  Scenario Outline: Un utente con sufficienti permessi (admin); il cui ente ha già una finalità in stato WAITING_FOR_APPROVAL, ACTIVE, o SUSPENDED per una versione di e-service, il quale ha mode = DELIVER, clona una finalità. La richiesta va a buon fine. Spiega: visto che ci sono problemi legati all’analisi del rischio in erogazione inversa, non è possibile clonare una finalità che faccia riferimento a un e-service in erogazione inversa. (Che vuol dire "spiega" sembra che tutti gli altri test siano implementati seguendo questa logica)
+  Scenario Outline: Un utente con sufficienti permessi (admin); il cui ente ha già una finalità in stato WAITING_FOR_APPROVAL, ACTIVE, o SUSPENDED per una versione di e-service, il quale ha mode = DELIVER, clona una finalità. La richiesta va a buon fine. Spiega: visto che ci sono problemi legati all’analisi del rischio in erogazione inversa, non è possibile clonare una finalità che faccia riferimento a un e-service in erogazione inversa.
     Given l'utente è un "admin" di "PA1"
     Given "PA2" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
