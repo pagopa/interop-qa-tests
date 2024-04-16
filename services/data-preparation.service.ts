@@ -968,7 +968,7 @@ export const dataPreparationService = {
       () =>
         apiClient.purposes.getPurpose(purposeId, getAuthorizationHeader(token)),
       (res) => {
-        currentVersionId = res.data.currentVersion?.id ?? "";
+        currentVersionId = res.data.currentVersion!.id;
         if (shouldWaitForApproval) {
           waitingForApprovalVersionId = res.data.waitingForApprovalVersion?.id;
           return (
