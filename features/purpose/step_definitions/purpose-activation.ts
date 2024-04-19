@@ -1,13 +1,16 @@
 import assert from "assert";
-import { Then, When } from "@cucumber/cucumber";
+import { Given, Then, When } from "@cucumber/cucumber";
 import { z } from "zod";
 import {
   assertContextSchema,
   getAuthorizationHeader,
+  getToken,
   makePolling,
 } from "../../../utils/commons";
 import { apiClient } from "../../../api";
 import { PurposeVersionState } from "../../../api/models";
+import { dataPreparationService } from "../../../services/data-preparation.service";
+import { TenantType } from "../../common-steps";
 
 When(
   "l'utente (ri)attiva la finalità in stato {string} per quell'e-service",
@@ -55,5 +58,30 @@ Then(
           : res.data.currentVersion?.state === desiredState
     );
     assert.equal(this.response.status, statusCode);
+  }
+);
+
+Given(
+  "{string} ha già approvato quella finalità in stato {string}",
+  async function (tenantType: TenantType, state: PurposeVersionState) {
+    assertContextSchema(this, {
+      token: z.string(),
+      currentVersionId: z.string().optional(),
+      waitingForApprovalVersionId: z.string().optional(),
+      purposeId: z.string(),
+    });
+    const token = await getToken(tenantType);
+    const purposeVersionId =
+      state === "WAITING_FOR_APPROVAL"
+        ? this.waitingForApprovalVersionId
+        : this.currentVersionId;
+
+    const { versionId } = await dataPreparationService.activatePurposeVersion(
+      token,
+      this.purposeId,
+      purposeVersionId!
+    );
+
+    this.currentVersionId = versionId;
   }
 );
