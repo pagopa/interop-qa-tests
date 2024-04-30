@@ -66,7 +66,7 @@ Feature: Attivazione e riattivazione di una finalità
     When l'utente attiva la finalità in stato "WAITING_FOR_APPROVAL" per quell'e-service
     Then si ottiene status code 200
 
-  @purpose_activation5 @Implement
+  @purpose_activation5
   Scenario Outline: Per una finalità precedentemente creata da un fruitore e attivata da un erogatore, la quale è stata successivamente portata in stato SUSPENDED dall’erogatore; per la quale versione di e-service sia stata successivamente superata una delle soglie di carico; alla richiesta di riattivazione da parte di un utente con sufficienti permessi (admin) dell’ente erogatore, va a buon fine e la finalità passa in stato ACTIVE. Spiega: se è l’erogatore a riattivare una finalità sospesa, anche se questa è sopra soglia, passa in stato attivo; si intende che l’erogatore, riattivandola, approvi implicitamente che la finalità possa contribuire al carico sull’e-service.
     Given l'utente è un "admin" di "PA2"
     Given "PA2" ha già creato e pubblicato 1 e-service
