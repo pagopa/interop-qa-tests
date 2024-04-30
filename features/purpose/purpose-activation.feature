@@ -40,7 +40,7 @@ Feature: Attivazione e riattivazione di una finalità
     Then si ottiene status code 200
 
   @purpose_activation2
-  Scenario Outline: Per una finalità precedentemente creata da un fruitore e attivata da un erogatore, la quale è stata successivamente portata in stato SUSPENDED, alla richiesta di riattivazione da parte di un utente con sufficienti permessi (admin) dell’ente opposto a quello che ha sospeso la finalità (es. se sospesa dall’erogatore, è il fruitore), va a buon fine ma la finalità non cambia stato. in questa casistica è rispettata l'idempotenza.
+  Scenario Outline: Per una finalità precedentemente creata da un fruitore e attivata da un erogatore, la quale è stata successivamente portata in stato SUSPENDED, alla richiesta di riattivazione da parte di un utente con sufficienti permessi (admin) dell’ente opposto a quello che ha sospeso la finalità (es. se sospesa dall’erogatore, è il fruitore), va a buon fine ma la finalità non cambia stato. In questa casistica è rispettata l'idempotenza.
     Given l'utente è un "admin" di "PA2"
     Given "PA2" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
