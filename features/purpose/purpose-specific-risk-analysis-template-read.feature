@@ -1,6 +1,6 @@
 @purpose_risk_analysis_read
 Feature: Lettura di una specifica versione di analisi del rischio
-  Tutti gli admin possono leggere una specifica versione di analisi del rischio di una propria finalità
+  Tutti gli utenti possono leggere una specifica versione di analisi del rischio
 
   @purpose_risk_analysis_read1 @wait_for_fix @PIN-4772
   Scenario Outline: Per una richiesta di lettura di una specifica versione di template di analisi del rischio da parte di un ente, alla richiesta di lettura, ottiene la specifica versione di analisi del rischio dedicata a quel tipo specifico di ente
