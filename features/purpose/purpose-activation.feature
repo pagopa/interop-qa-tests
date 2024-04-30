@@ -88,7 +88,7 @@ Feature: Attivazione e riattivazione di una finalità
     Then si ottiene status code 200 e la finalità in stato "WAITING_FOR_APPROVAL"
 
   @purpose_activation7
-  Scenario Outline: Per una finalità precedentemente creata da un fruitore e che è in stato DRAFT, REJECTED o ARCHIVED, alla richiesta di attivazione da parte di un utente con sufficienti permessi (admin) dell’ente erogatore, ottiene un errore (NB: verificare status code)
+  Scenario Outline: Per una finalità precedentemente creata da un fruitore e che è in stato DRAFT, REJECTED o ARCHIVED, alla richiesta di attivazione da parte di un utente con sufficienti permessi (admin) dell’ente erogatore, ottiene un errore
     Given l'utente è un "admin" di "PA2"
     Given "PA2" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
