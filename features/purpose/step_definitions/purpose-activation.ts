@@ -12,6 +12,40 @@ import { PurposeVersionState } from "../../../api/models";
 import { dataPreparationService } from "../../../services/data-preparation.service";
 import { TenantType } from "../../common-steps";
 
+Given(
+  "{string} ha già creato e pubblicato un e-service con una soglia di carico tale da contenere una sola finalità",
+  async function (tenantType: TenantType) {
+    assertContextSchema(this);
+
+    const token = await getToken(tenantType);
+    const eserviceName = `e-service-${this.TEST_SEED}}`;
+    this.eserviceId = await dataPreparationService.createEService(token, {
+      name: eserviceName,
+    });
+
+    this.descriptorId = await dataPreparationService.createDraftDescriptor(
+      token,
+      this.eserviceId,
+      {
+        dailyCallsPerConsumer: 1,
+        dailyCallsTotal: 1,
+      }
+    );
+
+    await dataPreparationService.addInterfaceToDescriptor(
+      token,
+      this.eserviceId,
+      this.descriptorId
+    );
+
+    await dataPreparationService.publishDescriptor(
+      token,
+      this.eserviceId,
+      this.descriptorId
+    );
+  }
+);
+
 When(
   "l'utente (ri)attiva la finalità in stato {string} per quell'e-service",
   async function (state: PurposeVersionState) {
@@ -27,6 +61,30 @@ When(
         : this.currentVersionId;
     this.response = await apiClient.purposes.activatePurposeVersion(
       this.purposeId,
+      versionId!,
+      getAuthorizationHeader(this.token)
+    );
+  }
+);
+
+When(
+  "l'utente (ri)attiva la prima finalità in stato {string} per quell'e-service",
+  async function (state: PurposeVersionState) {
+    assertContextSchema(this, {
+      token: z.string(),
+      currentVersionIds: z.array(z.string().optional()).optional(),
+      waitingForApprovalVersionIds: z.array(z.string().optional()).optional(),
+      purposesIds: z.array(z.string()),
+    });
+    const purposeId = this.purposesIds?.[0];
+    const waitingForApprovalVersionId = this.waitingForApprovalVersionIds?.[0];
+    const currentVersionId = this.currentVersionIds?.[0];
+    const versionId =
+      state === "WAITING_FOR_APPROVAL"
+        ? waitingForApprovalVersionId
+        : currentVersionId;
+    this.response = await apiClient.purposes.activatePurposeVersion(
+      purposeId,
       versionId!,
       getAuthorizationHeader(this.token)
     );
