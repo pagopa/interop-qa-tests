@@ -24,6 +24,19 @@ const sessionTokenPayloadTemplate = {
   "user-roles": "VALUES_USER_ROLES",
   selfcareId: "VALUES_SELFCARE_ID",
   organizationId: "VALUES_ORG_ID",
+  // Data here are placeholders, the backend does not use them
+  organization: {
+    id: uuidv4(),
+    name: "PagoPA S.p.A.",
+    roles: [
+      {
+        partyRole: "MANAGER",
+        role: "admin",
+      },
+    ],
+    fiscal_code: "15376371009",
+    ipaCode: "5N2TR557",
+  },
   uid: "VALUES_UID",
   iss: "{{ENVIRONMENT}}.interop.pagopa.it",
   aud: "{{ENVIRONMENT}}.interop.pagopa.it/ui",
