@@ -2,6 +2,7 @@ import assert from "assert";
 import { Given, Then, When } from "@cucumber/cucumber";
 import { z } from "zod";
 import {
+  TenantType,
   assertContextSchema,
   getAuthorizationHeader,
   getToken,
@@ -10,7 +11,6 @@ import {
 import { apiClient } from "../../../api";
 import { PurposeVersionState } from "../../../api/models";
 import { dataPreparationService } from "../../../services/data-preparation.service";
-import { TenantType } from "../../common-steps";
 
 Given(
   "{string} ha già creato e pubblicato un e-service con una soglia di carico tale da contenere una sola finalità",
