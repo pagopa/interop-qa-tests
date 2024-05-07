@@ -32,9 +32,9 @@ Given(
       tenantType,
     });
 
-    this.purposesIds = [];
-    this.currentVersionIds = [];
-    this.waitingForApprovalVersionIds = [];
+    this.purposesIds = this.purposesIds || [];
+    this.currentVersionIds = this.currentVersionIds || [];
+    this.waitingForApprovalVersionIds = this.waitingForApprovalVersionIds || [];
     for (let index = 0; index < n; index++) {
       const { purposeId, currentVersionId, waitingForApprovalVersionId } =
         await dataPreparationService.createPurposeWithGivenState({
@@ -52,9 +52,13 @@ Given(
       this.currentVersionIds.push(currentVersionId);
       this.waitingForApprovalVersionIds.push(waitingForApprovalVersionId);
     }
-    this.purposeId = this.purposesIds[0];
-    this.currentVersionId = this.currentVersionIds[0];
-    this.waitingForApprovalVersionId = this.waitingForApprovalVersionIds[0];
+    this.purposeId = this.purposesIds[this.purposesIds.length - 1];
+    this.currentVersionId =
+      this.currentVersionIds[this.currentVersionIds.length - 1];
+    this.waitingForApprovalVersionId =
+      this.waitingForApprovalVersionIds[
+        this.waitingForApprovalVersionIds.length - 1
+      ];
   }
 );
 
