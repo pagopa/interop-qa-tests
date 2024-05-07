@@ -1,6 +1,6 @@
 import { Given } from "@cucumber/cucumber";
 import { z } from "zod";
-import { TenantType } from "../../common-steps";
+import { TenantType } from "../../../utils/commons";
 import { dataPreparationService } from "../../../services/data-preparation.service";
 import {
   assertContextSchema,

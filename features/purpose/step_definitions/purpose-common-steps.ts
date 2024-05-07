@@ -12,7 +12,7 @@ import {
   getOrganizationId,
   getRandomInt,
 } from "../../../utils/commons";
-import { TenantType } from "../../common-steps";
+import { TenantType } from "../../../utils/commons";
 
 Given(
   "{string} ha già creato {int} finalità in stato {string} per quell'eservice",

@@ -12,7 +12,7 @@ import {
   ESERVICE_DAILY_CALLS,
   dataPreparationService,
 } from "../../../services/data-preparation.service";
-import { TenantType } from "../../common-steps";
+import { TenantType } from "../../../utils/commons";
 
 When("l'utente scarica il documento di analisi del rischio", async function () {
   assertContextSchema(this, {

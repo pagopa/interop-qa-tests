@@ -7,7 +7,7 @@ import {
   getToken,
   makePolling,
 } from "../../../utils/commons";
-import { TenantType } from "../../common-steps";
+import { TenantType } from "../../../utils/commons";
 import { dataPreparationService } from "../../../services/data-preparation.service";
 import { AgreementState } from "../../../api/models";
 

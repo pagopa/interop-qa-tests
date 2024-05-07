@@ -7,7 +7,7 @@ import {
 } from "../../../utils/commons";
 import { apiClient } from "../../../api";
 import { EServiceDescriptorState } from "../../../api/models";
-import { TenantType } from "../../common-steps";
+import { TenantType } from "../../../utils/commons";
 import { dataPreparationService } from "./../../../services/data-preparation.service";
 
 Given(

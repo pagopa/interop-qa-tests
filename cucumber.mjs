@@ -20,27 +20,42 @@ export const node = {
 
 export const all = {
   paths: ["features/**/*.feature"],
-  require: ["./features/**/step_definitions/**/*.ts"],
+  require: [
+    "./features/**/step_definitions/**/*.ts",
+    "./features/common-steps.ts",
+  ],
 };
 
 export const catalog = {
   paths: ["features/catalog/*.feature"],
-  require: ["./features/**/step_definitions/**/*.ts"],
+  require: [
+    "./features/**/step_definitions/**/*.ts",
+    "./features/common-steps.ts",
+  ],
 };
 
 export const attribute = {
   paths: ["features/attribute/*.feature"],
-  require: ["./features/**/step_definitions/**/*.ts"],
+  require: [
+    "./features/**/step_definitions/**/*.ts",
+    "./features/common-steps.ts",
+  ],
 };
 
 export const agreement = {
   paths: ["features/agreement/*.feature"],
-  require: ["./features/**/step_definitions/**/*.ts"],
+  require: [
+    "./features/**/step_definitions/**/*.ts",
+    "./features/common-steps.ts",
+  ],
 };
 
 export const purpose = {
   paths: ["features/purpose/*.feature"],
-  require: ["./features/**/step_definitions/**/*.ts"],
+  require: [
+    "./features/**/step_definitions/**/*.ts",
+    "./features/common-steps.ts",
+  ],
 };
 
 export const onlyReady = {
