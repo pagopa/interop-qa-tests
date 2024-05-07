@@ -1,5 +1,5 @@
 export const parallel = {
-  parallel: Number(process.env.CUCUMBER_OPTS_PARALLEL) || 1,
+  parallel: Number(process.env.CUCUMBER_OPTS_PARALLEL),
 };
 export const format = {
   format: ["progress-bar"],
@@ -38,8 +38,13 @@ export const agreement = {
   require: ["./features/**/step_definitions/**/*.ts"],
 };
 
+export const purpose = {
+  paths: ["features/purpose/*.feature"],
+  require: ["./features/**/step_definitions/**/*.ts"],
+};
+
 export const onlyReady = {
-  tags: "(not @wait_for_fix) and (not @resource_intensive)",
+  tags: "(not @wait_for_fix) and (not @resource_intensive) and (not @wait_for_clarification)",
 };
 
 export default {};
