@@ -30,7 +30,7 @@ Feature: Lista delle finalità lato fruitore
       | Privato | support      |       200 |
 
   @purpose_consumer_listing2
-  Scenario Outline: A fronte di 5 finalità in db e una richiesta di offset 2, restituisce solo 3 risultati (scopo del test è verificare il corretto funzionamento del parametro offset)
+  Scenario Outline: A fronte di 5 finalità in db e una richiesta di offset 2, restituisce solo 3 risultati
     Given l'utente è un "admin" di "PA1"
     Given "PA2" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service

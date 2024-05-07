@@ -28,17 +28,17 @@ Feature: Listing catalogo e-services
       | Privato | api,security |
 
   @catalog_listing2
-  Scenario Outline: A fronte di 20 e-service in db e una richiesta di 12 e-service, restituisce solo i primi 12 risultati
+  Scenario Outline: A fronte di 5 e-service in db e una richiesta di 3 e-service, restituisce solo i primi 3 risultati
     Given l'utente è un "admin" di "PA1"
-    Given "PA1" ha già creato 19 e-services in catalogo in stato PUBLISHED o SUSPENDED e 1 in stato DRAFT
-    When l'utente richiede una operazione di listing sul catalogo limitata ai primi 12 e-services
-    Then si ottiene status code 200 e la lista di 12 e-services
+    Given "PA1" ha già creato 4 e-services in catalogo in stato PUBLISHED o SUSPENDED e 1 in stato DRAFT
+    When l'utente richiede una operazione di listing sul catalogo limitata ai primi 3 e-services
+    Then si ottiene status code 200 e la lista di 3 e-services
 
   @catalog_listing3
-  Scenario Outline: A fronte di 15 e-service in db e una richiesta di risultati a partire dal tredicesimo, vengono restituiti solo 3 e-service
+  Scenario Outline: A fronte di 5 e-service in db e una richiesta di offset 2, restituisce solo 3 risultati
     Given l'utente è un "admin" di "PA1"
-    Given "PA1" ha già creato 15 e-services in catalogo in stato PUBLISHED o SUSPENDED e 1 in stato DRAFT
-    When l'utente richiede una operazione di listing sul catalogo con offset 12
+    Given "PA1" ha già creato 5 e-services in catalogo in stato PUBLISHED o SUSPENDED e 1 in stato DRAFT
+    When l'utente richiede una operazione di listing sul catalogo con offset 2
     Then si ottiene status code 200 e la lista di 3 e-services
 
   @catalog_listing4
