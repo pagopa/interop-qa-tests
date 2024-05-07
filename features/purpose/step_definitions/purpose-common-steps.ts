@@ -33,9 +33,9 @@ Given(
       tenantType,
     });
 
-    this.purposesIds = [];
-    this.currentVersionIds = [];
-    this.waitingForApprovalVersionIds = [];
+    this.purposesIds = this.purposesIds || [];
+    this.currentVersionIds = this.currentVersionIds || [];
+    this.waitingForApprovalVersionIds = this.waitingForApprovalVersionIds || [];
     for (let index = 0; index < n; index++) {
       const { purposeId, currentVersionId, waitingForApprovalVersionId } =
         await dataPreparationService.createPurposeWithGivenState({
@@ -53,9 +53,13 @@ Given(
       this.currentVersionIds.push(currentVersionId);
       this.waitingForApprovalVersionIds.push(waitingForApprovalVersionId);
     }
-    this.purposeId = this.purposesIds[0];
-    this.currentVersionId = this.currentVersionIds[0];
-    this.waitingForApprovalVersionId = this.waitingForApprovalVersionIds[0];
+    this.purposeId = this.purposesIds[this.purposesIds.length - 1];
+    this.currentVersionId =
+      this.currentVersionIds[this.currentVersionIds.length - 1];
+    this.waitingForApprovalVersionId =
+      this.waitingForApprovalVersionIds[
+        this.waitingForApprovalVersionIds.length - 1
+      ];
   }
 );
 
@@ -210,5 +214,38 @@ Given(
         { dailyCalls: ESERVICE_DAILY_CALLS.perConsumer + 1 }
       );
     this.waitingForApprovalVersionId = waitingForApprovalVersionId;
+  }
+);
+
+Given(
+  "{string} ha già portato la finalità in stato {string}",
+  async function (
+    tenantType: TenantType,
+    desiredPurposeState: PurposeVersionState
+  ) {
+    assertContextSchema(this, {
+      purposeId: z.string(),
+      currentVersionId: z.string(),
+    });
+    const token = await getToken(tenantType);
+    switch (desiredPurposeState) {
+      case "ARCHIVED":
+        await dataPreparationService.archivePurpose(
+          token,
+          this.purposeId,
+          this.currentVersionId
+        );
+        break;
+
+      case "SUSPENDED":
+        await dataPreparationService.suspendPurpose(
+          token,
+          this.purposeId,
+          this.currentVersionId
+        );
+        break;
+      default:
+        throw Error("To be implemented");
+    }
   }
 );
