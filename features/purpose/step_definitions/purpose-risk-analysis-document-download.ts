@@ -22,7 +22,6 @@ When("l'utente scarica il documento di analisi del rischio", async function () {
     tenantType: TenantType,
   });
 
-  // Only admin has access to the risk analysis document
   const authorizedToken = await getToken(this.tenantType);
 
   const getPurposeResponse = await apiClient.purposes.getPurpose(
@@ -38,7 +37,7 @@ When("l'utente scarica il documento di analisi del rischio", async function () {
   this.response = await apiClient.purposes.getRiskAnalysisDocument(
     this.purposeId,
     this.currentVersionId,
-    purpose.currentVersion?.riskAnalysisDocument?.id || "",
+    purpose.currentVersion!.riskAnalysisDocument!.id,
     getAuthorizationHeader(this.token)
   );
 });
