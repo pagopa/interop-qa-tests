@@ -25,7 +25,7 @@ Feature: Listing finalità lato erogatore
       | GSP  | support      |       200 |
 
   @purpose_listing_producer2
-  Scenario Outline: A fronte di 15 finalità in db e una richiesta di offset 12, restituisce solo 3 risultati (scopo del test è verificare il corretto funzionamento del parametro offset)
+  Scenario Outline: A fronte di 5 finalità in db e una richiesta di offset 2, restituisce solo 3 risultati (scopo del test è verificare il corretto funzionamento del parametro offset)
     Given l'utente è un "admin" di "PA1"
     Given "PA1" ha già creato e pubblicato 1 e-service
     Given "PA2" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
@@ -44,16 +44,17 @@ Feature: Listing finalità lato erogatore
     When l'utente erogatore richiede una operazione di listing delle finalità sui propri e-service
     Then si ottiene status code 200 e la lista di 4 finalità
 
-  @purpose_listing_producer4
+  @purpose_listing_producer4 @PIN-4806
   Scenario Outline: Restituisce le finalità che hanno per fruitore uno o più specifici enti (scopo del test è verificare il corretto funzionamento del parametro consumerIds). NB: vengono escluse le finalità in stato DRAFT, anche qualora non fosse valorizzato il parametro states
     Given l'utente è un "admin" di "PA1"
     Given "PA1" ha già creato e pubblicato 1 e-service
     Given "PA2" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given "PA2" ha già creato 2 finalità in stato "ACTIVE" per quell'eservice
+    Given "PA2" ha già creato 1 finalità in stato "DRAFT" per quell'eservice
     Given "GSP" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given "GSP" ha già creato 2 finalità in stato "ACTIVE" per quell'eservice
     When l'utente erogatore richiede una operazione di listing delle finalità filtrata per fruitore "PA2"
-    Then si ottiene status code 200 e la lista di 2 finalità
+    Then si ottiene status code 200 e la lista di 2 finalità 
 
   @purpose_listing_producer5
   Scenario Outline: Restituisce le finalità associate ad alcuni specifici e-service (scopo del test è verificare che funzioni il filtro per e-servicesIds)
