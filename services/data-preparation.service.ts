@@ -972,7 +972,7 @@ export const dataPreparationService = {
       () =>
         apiClient.purposes.getPurpose(purposeId, getAuthorizationHeader(token)),
       (res) => {
-        currentVersionId = res.data.currentVersion?.id ?? "";
+        currentVersionId = res.data.currentVersion!.id;
         if (shouldWaitForApproval) {
           waitingForApprovalVersionId = res.data.waitingForApprovalVersion?.id;
           return (
@@ -1044,6 +1044,29 @@ export const dataPreparationService = {
         apiClient.purposes.getPurpose(purposeId, getAuthorizationHeader(token)),
       (res) => res.data.currentVersion?.state === "SUSPENDED"
     );
+    return response.data;
+  },
+
+  async activatePurposeVersion(
+    token: string,
+    purposeId: string,
+    versionId: string
+  ) {
+    const authHeader = getAuthorizationHeader(token);
+
+    const response = await apiClient.purposes.activatePurposeVersion(
+      purposeId,
+      versionId,
+      authHeader
+    );
+
+    assertValidResponse(response);
+
+    await makePolling(
+      () => apiClient.purposes.getPurpose(purposeId, authHeader),
+      (res) => res.data.currentVersion?.state === "ACTIVE"
+    );
+
     return response.data;
   },
 };
