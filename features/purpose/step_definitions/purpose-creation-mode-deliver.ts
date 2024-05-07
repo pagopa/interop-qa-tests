@@ -5,7 +5,6 @@ import {
   getAuthorizationHeader,
   getOrganizationId,
   getRandomInt,
-  getRiskAnalysis,
   getToken,
 } from "../../../utils/commons";
 import { apiClient } from "../../../api";
@@ -129,6 +128,11 @@ When(
     });
 
     const consumerId = getOrganizationId(this.tenantType);
+    const { riskAnalysisForm } = await dataPreparationService.getRiskAnalysis({
+      completed: false,
+      tenantType: "PA1",
+    });
+
     this.response = await apiClient.purposes.createPurpose(
       {
         eserviceId: this.eserviceId,
@@ -138,10 +142,7 @@ When(
         isFreeOfCharge: true,
         freeOfChargeReason: "free of charge - QA",
         dailyCalls: ESERVICE_DAILY_CALLS.perConsumer - 1,
-        riskAnalysisForm: getRiskAnalysis({
-          tenantType: "PA1",
-          completed: false,
-        }).riskAnalysisForm,
+        riskAnalysisForm,
       },
       getAuthorizationHeader(this.token)
     );
@@ -158,12 +159,12 @@ When(
     });
 
     const consumerId = getOrganizationId(this.tenantType);
-    const { riskAnalysisForm } = getRiskAnalysis({
+    const { riskAnalysisForm } = await dataPreparationService.getRiskAnalysis({
       completed: false,
       tenantType: this.tenantType,
     });
 
-    const outdatedVersion = "0.0";
+    const outdatedVersion = (Number(riskAnalysisForm.version) - 1).toFixed(1);
 
     this.response = await apiClient.purposes.createPurpose(
       {

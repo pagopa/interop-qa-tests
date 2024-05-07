@@ -6,6 +6,8 @@ import { assertContextSchema, getRandomInt, getToken } from "../utils/commons";
 // Increase duration of every step with the following timeout (Default is 5000 milliseconds)
 setDefaultTimeout(5 * 60 * 1000);
 
+export type FileType = "yaml" | "wsdl";
+
 export const TenantType = z.enum(["GSP", "PA1", "PA2", "Privato"]);
 export type TenantType = z.infer<typeof TenantType>;
 export const Role = z.enum([

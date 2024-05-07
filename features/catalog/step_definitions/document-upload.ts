@@ -1,14 +1,9 @@
 import { Given, When } from "@cucumber/cucumber";
 import { z } from "zod";
 import { EServiceTechnology } from "../../../api/models";
-import {
-  FileType,
-  assertContextSchema,
-  getToken,
-  uploadInterfaceDocument,
-} from "../../../utils/commons";
+import { assertContextSchema, getToken } from "../../../utils/commons";
 import { dataPreparationService } from "../../../services/data-preparation.service";
-import { TenantType } from "../../common-steps";
+import { FileType, TenantType } from "../../common-steps";
 
 Given(
   "{string} ha già creato un e-service con un descrittore in stato DRAFT e tecnologia {string}",
@@ -38,7 +33,7 @@ When(
       descriptorId: z.string(),
     });
 
-    this.response = await uploadInterfaceDocument(
+    this.response = await dataPreparationService.uploadInterfaceDocument(
       `interface.${fileType}`,
       this.eserviceId,
       this.descriptorId,
@@ -56,7 +51,7 @@ When(
       descriptorId: z.string(),
     });
 
-    this.response = await uploadInterfaceDocument(
+    this.response = await dataPreparationService.uploadInterfaceDocument(
       `localhost-interface.${fileType}`,
       this.eserviceId,
       this.descriptorId,

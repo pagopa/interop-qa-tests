@@ -4,7 +4,6 @@ import { dataPreparationService } from "../../../services/data-preparation.servi
 import {
   assertContextSchema,
   getAuthorizationHeader,
-  getRiskAnalysis,
   getToken,
 } from "../../../utils/commons";
 import { apiClient } from "../../../api";
@@ -47,7 +46,10 @@ Given(
         await dataPreparationService.addRiskAnalysisToEService(
           token,
           this.eserviceId,
-          getRiskAnalysis({ completed: true, tenantType: this.tenantType })
+          await dataPreparationService.getRiskAnalysis({
+            completed: true,
+            tenantType: this.tenantType,
+          })
         );
     }
 
@@ -88,7 +90,10 @@ Given(
     await dataPreparationService.addRiskAnalysisToEService(
       this.token,
       this.eserviceId,
-      getRiskAnalysis({ completed: false, tenantType: this.tenantType })
+      await dataPreparationService.getRiskAnalysis({
+        completed: false,
+        tenantType: this.tenantType,
+      })
     );
   }
 );

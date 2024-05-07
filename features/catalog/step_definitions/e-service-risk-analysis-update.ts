@@ -3,7 +3,6 @@ import { z } from "zod";
 import {
   assertContextSchema,
   getAuthorizationHeader,
-  getRiskAnalysis,
   getToken,
 } from "../../../utils/commons";
 import { dataPreparationService } from "../../../services/data-preparation.service";
@@ -21,7 +20,10 @@ Given(
       await dataPreparationService.addRiskAnalysisToEService(
         token,
         this.eserviceId,
-        getRiskAnalysis({ completed: true, tenantType })
+        await dataPreparationService.getRiskAnalysis({
+          completed: true,
+          tenantType,
+        })
       );
   }
 );
@@ -39,7 +41,10 @@ When(
     this.response = await apiClient.eservices.updateEServiceRiskAnalysis(
       this.eserviceId,
       this.riskAnalysisId,
-      getRiskAnalysis({ completed: false, tenantType: this.tenantType }),
+      await dataPreparationService.getRiskAnalysis({
+        completed: false,
+        tenantType: this.tenantType,
+      }),
       getAuthorizationHeader(this.token)
     );
   }

@@ -3,10 +3,12 @@ import { z } from "zod";
 import {
   assertContextSchema,
   getAuthorizationHeader,
-  getRiskAnalysis,
 } from "../../../utils/commons";
 import { apiClient } from "../../../api";
-import { ESERVICE_DAILY_CALLS } from "../../../services/data-preparation.service";
+import {
+  ESERVICE_DAILY_CALLS,
+  dataPreparationService,
+} from "../../../services/data-preparation.service";
 
 When(
   "l'utente aggiorna quella finalità per quell'e-service in erogazione diretta",
@@ -36,10 +38,10 @@ When(
       token: z.string(),
       purposeId: z.string(),
     });
-    const riskAnalysisForm = getRiskAnalysis({
+    const { riskAnalysisForm } = await dataPreparationService.getRiskAnalysis({
       tenantType: this.tenantType,
       completed: true,
-    }).riskAnalysisForm;
+    });
     riskAnalysisForm.version = (Number(riskAnalysisForm.version) + 1).toFixed(
       1
     );
