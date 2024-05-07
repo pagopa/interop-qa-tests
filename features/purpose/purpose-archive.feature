@@ -63,7 +63,7 @@ Feature: Archiviazione di una finalità
       | SUSPENDED     |
 
   @purpose_archive4a @wait_for_fix @IMN-402
-  Scenario Outline: Per una finalità precedentemente creata da un fruitore, la quale è in stato REJECTED, WAITING_FOR_APPROVAL, DRAFT o ARCHIVED, alla richiesta di archiviazione da parte di un utente con sufficienti permessi (admin) dell’ente fruitore, ottiene un errore
+  Scenario Outline: Per una finalità precedentemente creata da un fruitore, la quale è in stato WAITING_FOR_APPROVAL, DRAFT o ARCHIVED, alla richiesta di archiviazione da parte di un utente con sufficienti permessi (admin) dell’ente fruitore, ottiene un errore
     Given l'utente è un "admin" di "PA1"
     Given "PA2" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
@@ -78,7 +78,7 @@ Feature: Archiviazione di una finalità
       | ARCHIVED             |
 
   @purpose_archive4b
-  Scenario Outline: Per una finalità precedentemente creata da un fruitore, la quale è in stato REJECTED, WAITING_FOR_APPROVAL, DRAFT o ARCHIVED, alla richiesta di archiviazione da parte di un utente con sufficienti permessi (admin) dell’ente fruitore, ottiene un errore
+  Scenario Outline: Per una finalità precedentemente creata da un fruitore, la quale è in stato REJECTED, alla richiesta di archiviazione da parte di un utente con sufficienti permessi (admin) dell’ente fruitore, ottiene un errore
     Given l'utente è un "admin" di "PA1"
     Given "PA2" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
