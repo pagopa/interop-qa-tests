@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 import { TypeOf, z } from "zod";
 
-dotenv.config();
+dotenv.config({ override: true });
 
 export const Env = z.object({
   BFF_BASE_URL: z.string(),
