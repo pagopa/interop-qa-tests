@@ -22,6 +22,8 @@
     "bun:test:agreement": "pnpm cucumber:bun -p agreement -p onlyReady",
     "test:purpose": "pnpm cucumber:node -p purpose -p onlyReady",
     "bun:test:purpose": "pnpm cucumber:bun -p purpose -p onlyReady",
+    "test:authorization": "pnpm cucumber:node -p authorization -p onlyReady",
+    "bun:test:authorization": "pnpm cucumber:bun -p authorization -p onlyReady",
     "check-steps": "pnpm test -- -p validate",
     "bun:check-steps": "pnpm bun:test -p validate",
     "check-steps:usage": "pnpm check-steps --format usage",
