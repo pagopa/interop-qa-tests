@@ -1,3 +1,5 @@
+import "dotenv/config";
+
 export const parallel = {
   parallel: Number(process.env.CUCUMBER_OPTS_PARALLEL),
 };
