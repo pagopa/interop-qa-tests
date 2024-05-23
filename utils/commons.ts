@@ -68,6 +68,13 @@ export function getOrganizationId(tenantType: TenantType) {
   return file[tenantType].admin.organizationId;
 }
 
+export function getUserId(tenantType: TenantType, role: Role) {
+  const file = JSON.parse(
+    Buffer.from(readFileSync(process.env.TENANTS_IDS_FILE_PATH)).toString()
+  );
+  return file[tenantType][role].uid;
+}
+
 let cachedTokens: SessionTokens | undefined;
 
 export async function getToken(

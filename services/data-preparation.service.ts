@@ -25,6 +25,8 @@ import {
   PurposeSeed,
   PurposeEServiceSeed,
   PurposeVersionSeed,
+  ClientSeed,
+  ClientKind,
 } from "./../api/models";
 
 export const ESERVICE_DAILY_CALLS: Readonly<{
@@ -1182,5 +1184,61 @@ export const dataPreparationService = {
     );
 
     return response.data;
+  },
+  async createClient(
+    token: string,
+    clientKind: ClientKind,
+    partialClintSeed: Partial<ClientSeed> = {}
+  ) {
+    const DEFAULT_CLIENT_SEED: ClientSeed = {
+      name: `client ${getRandomInt()}`,
+      description: "Descrizione client",
+      members: [],
+    };
+
+    const clientSeed: ClientSeed = {
+      ...DEFAULT_CLIENT_SEED,
+      ...partialClintSeed,
+    };
+
+    const response =
+      clientKind === "CONSUMER"
+        ? await apiClient.clientsConsumer.createConsumerClient(
+            clientSeed,
+            getAuthorizationHeader(token)
+          )
+        : await apiClient.clientsApi.createApiClient(
+            clientSeed,
+            getAuthorizationHeader(token)
+          );
+
+    assertValidResponse(response);
+    const clientId = response.data.id;
+
+    await makePolling(
+      () =>
+        apiClient.clients.getClient(clientId, getAuthorizationHeader(token)),
+      (res) => res.status !== 404
+    );
+
+    return clientId;
+  },
+  async addMemberToClient(token: string, clientId: string, userId: string) {
+    const response = await apiClient.clients.addUserToClient(
+      clientId,
+      userId,
+      getAuthorizationHeader(token)
+    );
+
+    assertValidResponse(response);
+
+    await makePolling(
+      () =>
+        apiClient.clients.getClientUsers(
+          clientId,
+          getAuthorizationHeader(token)
+        ),
+      (res) => res.data.some((user) => user.userId === userId)
+    );
   },
 };
