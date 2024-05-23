@@ -5,7 +5,6 @@ import {
   TenantType,
   assertContextSchema,
   getAuthorizationHeader,
-  getRandomInt,
   getToken,
   getUserId,
 } from "../../../utils/commons";
@@ -14,7 +13,7 @@ import { ClientKind } from "../../../api/models";
 import { dataPreparationService } from "../../../services/data-preparation.service";
 
 Given(
-  "{string} ha già creato {int} client {string} con la keyword {keyword} nel nome",
+  "{string} ha già creato {int} client {string} con la keyword {string} nel nome",
   async function (
     tenantType: TenantType,
     numClient: number,
@@ -29,7 +28,7 @@ Given(
     const result = await Promise.all(
       arr.map((_, i) =>
         dataPreparationService.createClient(token, cliendKind, {
-          name: `client-${i}-${this.TEST_SEED}-${getRandomInt()}-${keyword}`,
+          name: `client-${i}-${this.TEST_SEED}-${keyword}`,
         })
       )
     );
@@ -49,6 +48,7 @@ When(
       {
         limit: 12,
         offset,
+        q: "123456789",
       },
       getAuthorizationHeader(this.token)
     );
@@ -67,6 +67,7 @@ When(
         limit: 12,
         offset: 0,
         kind: "CONSUMER",
+        q: this.TEST_SEED,
       },
       getAuthorizationHeader(this.token)
     );
@@ -84,7 +85,7 @@ When(
       {
         limit: 12,
         offset: 0,
-        q: keyword,
+        q: `${this.TEST_SEED}-${keyword}`,
       },
       getAuthorizationHeader(this.token)
     );
@@ -105,6 +106,42 @@ When(
         limit: 12,
         offset: 0,
         userIds: [userIdMember],
+        q: this.TEST_SEED,
+      },
+      getAuthorizationHeader(this.token)
+    );
+  }
+);
+
+When(
+  "l'utente richiede una operazione di listing dei client",
+  async function () {
+    assertContextSchema(this, {
+      token: z.string(),
+    });
+
+    this.response = await apiClient.clients.getClients(
+      {
+        limit: 12,
+        offset: 0,
+        q: this.TEST_SEED,
+      },
+      getAuthorizationHeader(this.token)
+    );
+  }
+);
+
+When(
+  "l'utente richiede una operazione di listing dei client limitata a {int} risultati",
+  async function (limit: number) {
+    assertContextSchema(this, {
+      token: z.string(),
+    });
+
+    this.response = await apiClient.clients.getClients(
+      {
+        limit,
+        offset: 0,
       },
       getAuthorizationHeader(this.token)
     );
