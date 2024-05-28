@@ -1,3 +1,5 @@
+import "dotenv/config";
+
 export const parallel = {
   parallel: Number(process.env.CUCUMBER_OPTS_PARALLEL),
 };
@@ -52,6 +54,14 @@ export const agreement = {
 
 export const purpose = {
   paths: ["features/purpose/*.feature"],
+  require: [
+    "./features/**/step_definitions/**/*.ts",
+    "./features/common-steps.ts",
+  ],
+};
+
+export const authorization = {
+  paths: ["features/authorization/*.feature"],
   require: [
     "./features/**/step_definitions/**/*.ts",
     "./features/common-steps.ts",

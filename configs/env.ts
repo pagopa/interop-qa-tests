@@ -3,7 +3,7 @@ import { TypeOf, z } from "zod";
 
 dotenv.config({ override: true });
 
-export const Env = z.object({
+const Env = z.object({
   BFF_BASE_URL: z.string(),
   ENVIRONMENT: z.string(),
   REMOTE_WELLKNOWN_URL: z.string(),
