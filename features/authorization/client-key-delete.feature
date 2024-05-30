@@ -7,8 +7,6 @@ Feature: Cancellazione delle chiavi di un client
   Scenario Outline: Un utente con sufficienti permessi (admin); appartenente all'ente che ha creato il client; il quale utente è membro del client; nel quale client c'è una chiave pubblica; richiede la cancellazione della chiave. L'operazione va a buon fine
     Given l'utente è un "<ruolo>" di "<ente>"
     Given "PA2" ha già creato e pubblicato 1 e-service
-    Given "<ente>" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given "<ente>" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
     Given "<ente>" ha già creato 1 client "CONSUMER"
     Given "<ente>" ha già inserito l'utente con ruolo "admin" come membro di un client
     Given un "admin" di "<ente>" ha caricato una chiave pubblica nel client
@@ -33,8 +31,6 @@ Feature: Cancellazione delle chiavi di un client
   Scenario Outline: Un utente admin, api o security, appartenente all'ente che ha creato il client, il quale utente NON è membro del client, nel quale client c'è una chiave pubblica, richiede la cancellazione della chiave. L'operazione va a buon fine solo per il ruolo admin
     Given l'utente è un "<ruolo>" di "PA1"
     Given "PA2" ha già creato e pubblicato 1 e-service
-    Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given "PA1" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
     Given "PA1" ha già creato 1 client "CONSUMER"
     Given un "admin" di "PA1" ha caricato una chiave pubblica nel client
     When l'utente richiede una operazione di cancellazione della chiave di quel client
@@ -51,8 +47,6 @@ Feature: Cancellazione delle chiavi di un client
   Scenario Outline: Un utente con permessi security; appartenente all'ente che ha creato il client; il quale utente NON è membro del client; nel quale client c'è una chiave pubblica; la quale chiave è caricata da un altro utente; richiede la cancellazione della chiave. Ottiene un errore
     Given l'utente è un "security" di "PA1"
     Given "PA2" ha già creato e pubblicato 1 e-service
-    Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given "PA1" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
     Given "PA1" ha già creato 1 client "CONSUMER"
     Given un "admin" di "PA1" ha caricato una chiave pubblica nel client
     When l'utente richiede una operazione di cancellazione della chiave di quel client
@@ -63,8 +57,6 @@ Feature: Cancellazione delle chiavi di un client
   Scenario Outline: Un utente con permessi security; appartenente all'ente che ha creato il client; il quale utente NON è membro del client; nel quale client c'è una chiave pubblica; la quale chiave è caricata da questo utente; richiede la cancellazione della chiave. L’operazione va a buon fine
     Given l'utente è un "security" di "PA1"
     Given "PA2" ha già creato e pubblicato 1 e-service
-    Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given "PA1" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
     Given "PA1" ha già creato 1 client "CONSUMER"
     Given un "security" di "PA1" ha caricato una chiave pubblica nel client
     When l'utente richiede una operazione di cancellazione della chiave di quel client
