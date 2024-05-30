@@ -35,7 +35,23 @@ Feature: Caricamento di una chiave pubblica contenuta in un client
     Given l'utente è un "admin" di "PA1"
     Given "PA1" ha già creato 1 client "CONSUMER"
     Given "<ente>" ha già inserito l'utente con ruolo "admin" come membro di quel client
-    When l'utente richiede il caricamento di una chiave pubblica di tipo "non-RSA"
+    When l'utente richiede il caricamento di una chiave pubblica di tipo "non-RSA" di lunghezza 2048
+    Then si ottiene status code 400
+
+  @client_key_upload4
+  Scenario Outline: Un utente admin; appartenente all'ente che ha creato il client; il quale utente è membro del client; richiede il caricamento di una chiave pubblica di tipo RSA, lunghezza NON 2048. Ottiene un errore (NB: verificare status code)
+    Given l'utente è un "admin" di "PA1"
+    Given "PA1" ha già creato 1 client "CONSUMER"
+    Given "<ente>" ha già inserito l'utente con ruolo "admin" come membro di quel client
+    When l'utente richiede il caricamento di una chiave pubblica di tipo "non-RSA" di lunghezza 1024
+    Then si ottiene status code 400
+
+  @client_key_upload5
+  Scenario Outline: Un utente admin; appartenente all'ente che ha creato il client; il quale utente è membro del client; richiede il caricamento di una chiave pubblica di tipo RSA, lunghezza 2048; alla quale vengono rimossi i delimitatori di inizio e fine (---BEGIN PUBLIC KEY---, ---END PUBLIC KEY---). Ottiene un errore (NB: verificare status code)
+    Given l'utente è un "admin" di "PA1"
+    Given "PA1" ha già creato 1 client "CONSUMER"
+    Given "<ente>" ha già inserito l'utente con ruolo "admin" come membro di quel client
+    When l'utente richiede il caricamento di una chiave pubblica di tipo "RSA" di lunghezza 2048 senza i delimitatori di inizio e fine
     Then si ottiene status code 400
 
   
