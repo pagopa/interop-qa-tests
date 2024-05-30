@@ -9,7 +9,7 @@ Feature: Lettura di una chiave pubblica contenuta in un client
     Given "<ente>" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given "<ente>" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
     Given "<ente>" ha già creato 1 client "CONSUMER"
-    Given un "security" di "<ente>" ha caricato una chiave pubblica nel client
+    Given un "security" di "<ente>" ha caricato una chiave pubblica in quel client
     When l'utente richiede la lettura della chiave pubblica
     Then si ottiene status code <statusCode>
 
@@ -34,7 +34,7 @@ Feature: Lettura di una chiave pubblica contenuta in un client
     Given "PA1" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
     Given "PA1" ha già creato 1 client "CONSUMER"
     Given "PA1" ha già inserito l'utente con ruolo "security" come membro di quel client
-    Given un "admin" di "PA1" ha caricato una chiave pubblica nel client
+    Given un "admin" di "PA1" ha caricato una chiave pubblica in quel client
     When l'utente richiede la lettura della chiave pubblica
     Then si ottiene status code 200
 
