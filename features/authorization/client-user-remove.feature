@@ -5,9 +5,6 @@ Feature: Rimozione di un membro da un client
   @client_user_remove1
   Scenario Outline: Un utente con sufficienti permessi (admin); appartenente all'ente che ha creato il client; il quale utente è già censito tra i membri del client (anche se l’utente da rimuovere è l’utente stesso). L’operazione va a buon fine
     Given l'utente è un "<ruolo>" di "<ente>"
-    Given "PA2" ha già creato e pubblicato 1 e-service
-    Given <ente> ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given <ente> ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
     Given <ente> ha già creato 1 client "CONSUMER"
     Given "<ente>" ha già inserito l'utente con ruolo "admin" come membro di un client
     When l'utente richiede la rimozione di un membro dal client
