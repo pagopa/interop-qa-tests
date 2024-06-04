@@ -6,7 +6,7 @@ import { dataPreparationService } from "../../../services/data-preparation.servi
 import { FileType, TenantType } from "../../../utils/commons";
 
 Given(
-  "{string} ha già creato un e-service con un descrittore in stato DRAFT e tecnologia {string}",
+  "{string} ha già creato un e-service con un descrittore in stato {string} e tecnologia {string}",
   async function (tenantType: TenantType, technology: EServiceTechnology) {
     const token = await getToken(tenantType);
 
