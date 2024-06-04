@@ -42,6 +42,7 @@ Feature: Listing chiavi client
     When l'utente richiede una operazione di listing delle chiavi di quel client
     Then si ottiene status code <statusCode>
 # nota: mantenere la matrice poiché diversa da quella sopra
+
     Examples:
       | ente    | ruolo        | statusCode |
       | GSP     | api          |        403 |
@@ -73,7 +74,7 @@ Feature: Listing chiavi client
   Scenario Outline: Un utente admin; appartenente all'ente che ha creato il client; il quale utente non è membro del client; richiede l’elenco delle chiavi caricate per il client. L’operazione va a buon fine
     Given l'utente è un "admin" di "PA1"
     Given "PA1" ha già creato 1 client "CONSUMER"
-    Given "<ente>" ha già inserito l'utente con ruolo "admin" come membro di quel client
+    Given "PA1" ha già inserito l'utente con ruolo "admin" come membro di quel client
     Given un "admin" di "PA1" ha caricato una chiave pubblica in quel client
     Given un "admin" di "PA1" ha caricato una chiave pubblica in quel client
     Given un "admin" di "PA1" ha caricato una chiave pubblica in quel client
@@ -81,8 +82,36 @@ Feature: Listing chiavi client
     Then si ottiene status code 200 e la lista di 3 chiavi
 
   @client_keys_listing2
+  Scenario Outline: Un utente api o security; appartenente all'ente che ha creato il client; il quale utente NON è membro del client; richiede l’elenco delle chiavi caricate per il client. Ottiene un errore
+    Given l'utente è un "<ruolo>" di "PA1"
+    Given "PA1" ha già creato 1 client "CONSUMER"
+    Given "PA1" ha già inserito l'utente con ruolo "<ruolo>" come membro di quel client
+    Given un "admin" di "PA1" ha caricato una chiave pubblica in quel client
+    Given un "admin" di "PA1" ha caricato una chiave pubblica in quel client
+    Given un "admin" di "PA1" ha caricato una chiave pubblica in quel client
+    When l'utente richiede una operazione delle chiavi di quel client
+    Then si ottiene status code 403
+
+    Examples:
+      | ruolo    |
+      | api      |
+      | security |
+
+  @client_keys_listing3
+  Scenario Outline: Un utente admin; appartenente all'ente che ha creato il client; richiede l’elenco delle chiavi caricate per il client da uno specifico utente. L’operazione va a buon fine (scopo del test è verificare il corretto funzionamento del parametro userIds)
+    Given l'utente è un "admin" di "PA1"
+    Given "PA1" ha già creato 1 client "CONSUMER"
+    Given "PA1" ha già inserito l'utente con ruolo "admin" come membro di quel client
+    Given "PA1" ha già inserito l'utente con ruolo "security" come membro di quel client
+    Given un "security" di "PA1" ha caricato una chiave pubblica in quel client
+    Given un "security" di "PA1" ha caricato una chiave pubblica in quel client
+    Given un "security" di "PA1" ha caricato una chiave pubblica in quel client
+    When l'utente richiede una operazione di listing delle chiavi di quel client create dall'utente "admin"
+    Then si ottiene status code 200 e la lista di 3 chiavi
+
+  @client_keys_listing4
   Scenario Outline: Un utente admin; appartenente all'ente che ha creato il client; richiede l’elenco delle chiavi caricate per il client; nel client non ci sono chiavi. L’operazione va a buon fine (scopo del test è verificare che, se non ci sono risultati, il server risponda con 200 e array vuoto e non con un errore)
     Given l'utente è un "admin" di "PA1"
     Given "PA1" ha già creato 1 client "CONSUMER"
     When l'utente richiede una operazione delle chiavi di quel client caricate da "security"
-    Then si ottiene status code 200 e la lista di 0 chiavi 
+    Then si ottiene status code 200 e la lista di 0 chiavi
