@@ -27,6 +27,7 @@ import {
   PurposeVersionSeed,
   ClientSeed,
   ClientKind,
+  KeySeed,
 } from "./../api/models";
 
 export const ESERVICE_DAILY_CALLS: Readonly<{
@@ -1257,5 +1258,35 @@ export const dataPreparationService = {
         apiClient.clients.getClient(clientId, getAuthorizationHeader(token)),
       (res) => res.data.purposes.some((purp) => purp.purposeId === purposeId)
     );
+  },
+  async addPublicKeyToClient(
+    token: string,
+    clientId: string,
+    keySeed: KeySeed
+  ) {
+    const response = await apiClient.clients.createKeys(
+      clientId,
+      [keySeed],
+      getAuthorizationHeader(token)
+    );
+
+    assertValidResponse(response);
+
+    let kid: string | undefined;
+
+    await makePolling(
+      () =>
+        apiClient.clients.getClientKeys(
+          { clientId },
+          getAuthorizationHeader(token)
+        ),
+      (res) => {
+        const key = res.data.keys.find((k) => k.name === keySeed.name);
+        kid = key?.keyId;
+        return Boolean(key);
+      }
+    );
+
+    return kid as string;
   },
 };
