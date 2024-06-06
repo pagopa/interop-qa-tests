@@ -17,7 +17,7 @@ export interface RejectPurposeVersionPayload {
 export interface GoogleSAMLPayload {
   /** SAML response */
   SAMLResponse: string;
-  RelayState: string | null;
+  RelayState?: string | null;
 }
 
 export interface SAMLTokenRequest {
@@ -567,15 +567,6 @@ export interface PurposeEServiceSeed {
   dailyCalls: number;
 }
 
-/** contains the expected payload for purpose version update. */
-export interface WaitingForApprovalPurposeVersionUpdateContentSeed {
-  /**
-   * Estimated expected approval date for a purpose version
-   * @format date-time
-   */
-  expectedApprovalDate: string;
-}
-
 export interface CompactOrganization {
   /** @format uuid */
   id: string;
@@ -794,8 +785,6 @@ export interface PurposeVersion {
   createdAt: string;
   /** @format date-time */
   suspendedAt?: string;
-  /** @format date-time */
-  expectedApprovalDate?: string;
   /** @format date-time */
   updatedAt?: string;
   /** @format date-time */
@@ -3613,28 +3602,6 @@ export namespace Purposes {
     export type ResponseBody = PurposeVersionResource;
   }
   /**
-   * No description
-   * @tags purposes
-   * @name UpdateWaitingForApprovalPurposeVersion
-   * @summary Update a purpose version in waiting for approval
-   * @request POST:/purposes/{purposeId}/versions/{versionId}/update/waitingForApproval
-   * @secure
-   */
-  export namespace UpdateWaitingForApprovalPurposeVersion {
-    export type RequestParams = {
-      /** @format uuid */
-      purposeId: string;
-      /** @format uuid */
-      versionId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = WaitingForApprovalPurposeVersionUpdateContentSeed;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
-    export type ResponseBody = PurposeVersionResource;
-  }
-  /**
    * @description activates the purpose version by id
    * @tags purposes
    * @name ActivatePurposeVersion
@@ -6164,31 +6131,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         path: `/purposes/${purposeId}/versions/${versionId}/suspend`,
         method: "POST",
         secure: true,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags purposes
-     * @name UpdateWaitingForApprovalPurposeVersion
-     * @summary Update a purpose version in waiting for approval
-     * @request POST:/purposes/{purposeId}/versions/{versionId}/update/waitingForApproval
-     * @secure
-     */
-    updateWaitingForApprovalPurposeVersion: (
-      purposeId: string,
-      versionId: string,
-      data: WaitingForApprovalPurposeVersionUpdateContentSeed,
-      params: RequestParams = {},
-    ) =>
-      this.request<PurposeVersionResource, Problem>({
-        path: `/purposes/${purposeId}/versions/${versionId}/update/waitingForApproval`,
-        method: "POST",
-        body: data,
-        secure: true,
-        type: ContentType.Json,
         format: "json",
         ...params,
       }),
