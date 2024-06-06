@@ -43,12 +43,12 @@ Given(
       clientId: z.string(),
     });
     const token = await getToken(tenantType);
-    const userIdOfMemberToAdd = getUserId(tenantType, roleOfMemberToAdd);
+    this.clientMemberUserId = getUserId(tenantType, roleOfMemberToAdd);
 
     await dataPreparationService.addMemberToClient(
       token,
       this.clientId,
-      userIdOfMemberToAdd
+      this.clientMemberUserId
     );
   }
 );
