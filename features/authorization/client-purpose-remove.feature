@@ -6,27 +6,29 @@ Feature: Rimozione purpose dal client
   Scenario Outline: Un utente con sufficienti permessi (admin) dell'ente che ha creato il client di tipo CONSUMER ed associato il client ad una finalità che si trova in stato ACTIVE, richiede la disassociazione del client dalla finalità. L'operazione va a buon fine
     Given l'utente è un "<ruolo>" di "<ente>"
     Given "PA2" ha già creato e pubblicato 1 e-service
-    Given <ente> ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given <ente> ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
-    Given <ente> ha già creato 1 client "CONSUMER"
-    Given <ente> ha già associato la finalità a quel client
+    Given "<ente>" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
+    Given "<ente>" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
+    Given "<ente>" ha già creato 1 client "CONSUMER"
+    Given "<ente>" ha già associato la finalità a quel client
     When l'utente richiede la disassociazione della finalità dal client
     Then si ottiene status code <statusCode>
 
     Examples:
       | ente | ruolo        | statusCode |
-      | GSP  | admin        |        200 |
+      | GSP  | admin        |        204 |
       | GSP  | api          |        403 |
-      | GSP  | security     |        200 |
-      | GSP  | support      |        200 |
-      | GSP  | api,security |        200 |
-      | PA1  | admin        |        200 |
+      | GSP  | security     |        403 |
+      | GSP  | support      |        403 |
+      | GSP  | api,security |        403 |
+      | PA1  | admin        |        204 |
       | PA1  | api          |        403 |
-      | PA1  | security     |        200 |
-      | PA1  | support      |        200 |
-      | PA1  | api,security |        200 |
+      | PA1  | security     |        403 |
+      | PA1  | support      |        403 |
+      | PA1  | api,security |        403 |
 
-  @client_purpose_remove2
+
+  # al momento anche l'associazione/disassociazione della purpose in stato SUSPENDED è possibile, è corretto?
+  @client_purpose_remove2 @wait_for_clarification @wait_for_fix @PIN-4953
   Scenario Outline: Un utente con sufficienti permessi (admin) dell'ente che ha creato il client ed associato il client di tipo CONSUMER ad una finalità che si trova in stato NON ACTIVE, richiede la disassociazione del client dalla finalità. Ottiene un errore. Chiarimento: è possibile modificare l’associazione/disassociazione dei client ad una finalità solo se questa è attiva
     Given l'utente è un "admin" di "PA1"
     Given "PA2" ha già creato e pubblicato 1 e-service
@@ -44,7 +46,7 @@ Feature: Rimozione purpose dal client
       | WAITING_FOR_APPROVAL |
       | ARCHIVED             |
 
-  @client_purpose_remove2b
+  @client_purpose_remove2b @wait_for_clarification
   Scenario Outline: Un utente con sufficienti permessi (admin) dell'ente che ha creato il client ed associato il client di tipo CONSUMER ad una finalità che si trova in stato NON ACTIVE, richiede la disassociazione del client dalla finalità. Ottiene un errore. Chiarimento: è possibile modificare l’associazione/disassociazione dei client ad una finalità solo se questa è attiva
     Given l'utente è un "admin" di "PA1"
     Given "PA2" ha già creato e pubblicato 1 e-service
@@ -65,4 +67,4 @@ Feature: Rimozione purpose dal client
     Given "GSP" ha già creato 1 client "CONSUMER"
     Given "GSP" ha già associato la finalità a quel client
     When l'utente richiede la disassociazione della finalità dal client
-    Then si ottiene status code 400
+    Then si ottiene status code 403

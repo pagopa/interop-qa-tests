@@ -1,5 +1,6 @@
 import "../configs/env";
 import { readFileSync } from "fs";
+import crypto from "crypto";
 import { z } from "zod";
 import { type AxiosResponse } from "axios";
 import { generateSessionTokens } from "./session-tokens";
@@ -103,4 +104,17 @@ export function assertValidResponse<T>(response: AxiosResponse<T>) {
       )}`
     );
   }
+}
+
+export function createBase64PublicKey() {
+  const { publicKey } = crypto.generateKeyPairSync("rsa", {
+    modulusLength: 2048,
+  });
+
+  const publicKeyPEM = publicKey.export({
+    type: "pkcs1",
+    format: "pem",
+  });
+
+  return Buffer.from(publicKeyPEM).toString("base64");
 }
