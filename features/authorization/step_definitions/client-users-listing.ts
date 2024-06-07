@@ -27,12 +27,10 @@ Then(
     assertContextSchema(this, {
       response: z.object({
         status: z.number(),
-        data: z.object({
-          results: z.array(z.unknown()),
-        }),
+        data: z.array(z.unknown()),
       }),
     });
     assert.equal(this.response.status, 200);
-    assert.equal(this.response.data.results.length, count);
+    assert.equal(this.response.data.length, count);
   }
 );
