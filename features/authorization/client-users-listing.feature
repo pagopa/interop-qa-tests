@@ -4,31 +4,44 @@ Feature: Listing utenti client
 
   @client_users_listing1a
   Scenario Outline: Un utente associato ad un client (dunque con permessi admin o security) richiede la lista dei membri del client stesso. L'operazione va a buon fine
+    Given l'utente è un "api" di "<ente>"
+    Given "<ente>" ha già creato 1 client "CONSUMER"
+    Given "<ente>" ha già inserito l'utente con ruolo "admin" come membro di un client
+    Given "<ente>" ha già inserito l'utente con ruolo "security" come membro di un client
+    Given "<ente>" ha già inserito l'utente con ruolo "api,security" come membro di un client
+    When l'utente richiede una operazione di listing dei membri di quel client
+    Then si ottiene status code 403
+
+    Examples:
+      | ente    |
+      | GSP     |
+      | PA1     |
+      | Privato |
+
+  @client_users_listing1b
+  Scenario Outline: Un utente associato ad un client (dunque con permessi admin o security) richiede la lista dei membri del client stesso. L'operazione va a buon fine
     Given l'utente è un "<ruolo>" di "<ente>"
     Given "<ente>" ha già creato 1 client "CONSUMER"
     Given "<ente>" ha già inserito l'utente con ruolo "admin" come membro di un client
     Given "<ente>" ha già inserito l'utente con ruolo "security" come membro di un client
     Given "<ente>" ha già inserito l'utente con ruolo "api,security" come membro di un client
     When l'utente richiede una operazione di listing dei membri di quel client
-    Then si ottiene status code <statusCode>
+    Then si ottiene status code 200 e la lista di 3 utenti
 
     Examples:
-      | ente    | ruolo        | statusCode |
-      | GSP     | admin        |        200 |
-      | GSP     | api          |        403 |
-      | GSP     | security     |        200 |
-      | GSP     | support      |        200 |
-      | GSP     | api,security |        200 |
-      | PA1     | admin        |        200 |
-      | PA1     | api          |        403 |
-      | PA1     | security     |        200 |
-      | PA1     | support      |        200 |
-      | PA1     | api,security |        200 |
-      | Privato | admin        |        200 |
-      | Privato | api          |        403 |
-      | Privato | security     |        200 |
-      | Privato | support      |        200 |
-      | Privato | api,security |        200 |
+      | ente    | ruolo        |
+      | GSP     | admin        |
+      | GSP     | security     |
+      | GSP     | support      |
+      | GSP     | api,security |
+      | PA1     | admin        |
+      | PA1     | security     |
+      | PA1     | support      |
+      | PA1     | api,security |
+      | Privato | admin        |
+      | Privato | security     |
+      | Privato | support      |
+      | Privato | api,security |
 
   @client_users_listing1b
   Scenario Outline: Un utente associato ad un client (dunque con permessi admin o security) richiede la lista dei membri del client stesso. L'operazione va a buon fine
