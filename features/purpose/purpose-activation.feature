@@ -90,8 +90,8 @@ Feature: Attivazione e riattivazione di una finalità
     When l'utente riattiva la prima finalità in stato "SUSPENDED" per quell'e-service
     Then si ottiene status code 200 e la finalità in stato "WAITING_FOR_APPROVAL"
 
-  @purpose_activation7
-  Scenario Outline: Per una finalità precedentemente creata da un fruitore e che è in stato DRAFT, REJECTED o ARCHIVED, alla richiesta di attivazione da parte di un utente con sufficienti permessi (admin) dell’ente erogatore, ottiene un errore
+  @purpose_activation7a
+  Scenario Outline: Per una finalità precedentemente creata da un fruitore e che è in stato DRAFT o ARCHIVED, alla richiesta di attivazione da parte di un utente con sufficienti permessi (admin) dell’ente erogatore, ottiene un errore
     Given l'utente è un "admin" di "PA2"
     Given "PA2" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
@@ -102,5 +102,14 @@ Feature: Attivazione e riattivazione di una finalità
     Examples: 
       | statoFinalità |
       | DRAFT         |
-      | REJECTED      |
       | ARCHIVED      |
+
+@purpose_activation7b
+  Scenario Outline: Per una finalità precedentemente creata da un fruitore e che è in stato REJECTED, alla richiesta di attivazione da parte di un utente con sufficienti permessi (admin) dell’ente erogatore, ottiene un errore
+    Given l'utente è un "admin" di "PA2"
+    Given "PA2" ha già creato e pubblicato 1 e-service
+    Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
+    Given "PA1" ha già creato 1 finalità in stato "WAITING_FOR_APPROVAL" per quell'eservice
+    Given "PA2" ha già rifiutato l'aggiornamento della stima di carico per quella finalità
+    When l'utente attiva la finalità in stato "REJECTED" per quell'e-service
+    Then si ottiene status code 403
