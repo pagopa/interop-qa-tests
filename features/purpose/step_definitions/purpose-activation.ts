@@ -1,3 +1,4 @@
+/* eslint-disable no-constant-condition */
 import assert from "assert";
 import { Given, Then, When } from "@cucumber/cucumber";
 import { z } from "zod";
@@ -56,7 +57,7 @@ When(
       purposeId: z.string(),
     });
     const versionId =
-      state === "WAITING_FOR_APPROVAL"
+      state === "WAITING_FOR_APPROVAL" || "REJECTED"
         ? this.waitingForApprovalVersionId
         : this.currentVersionId;
     this.response = await apiClient.purposes.activatePurposeVersion(
