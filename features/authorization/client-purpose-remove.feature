@@ -2,12 +2,12 @@
 Feature: Rimozione purpose dal client
   Tutti gli utenti autenticati possono disassociare una purpose da un client 
 
-  @client_purpose_remove1
+  @client_purpose_remove1a
   Scenario Outline: Un utente con sufficienti permessi (admin) dell'ente che ha creato il client di tipo CONSUMER ed associato il client ad una finalità che si trova in stato ACTIVE, SUSPENDED, ARCHIVED o WAITING_FOR_APPROVAL, richiede la disassociazione del client dalla finalità. L'operazione va a buon fine
     Given l'utente è un "<ruolo>" di "<ente>"
     Given "PA2" ha già creato e pubblicato 1 e-service
     Given "<ente>" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given "<ente>" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
+    Given "<ente>" ha già creato 1 finalità in stato "<statoFinalità>" per quell'eservice
     Given "<ente>" ha già creato 1 client "CONSUMER"
     Given "<ente>" ha già associato la finalità a quel client
     When l'utente richiede la disassociazione della finalità dal client
@@ -29,9 +29,21 @@ Feature: Rimozione purpose dal client
     Examples:
       | ente | ruolo | statoFinalità        | statusCode |
       | PA1  | admin | SUSPENDED            |        204 |
-      | PA1  | admin | ARCHIVED             |        204 |
       | PA1  | admin | WAITING_FOR_APPROVAL |        204 |
       
+
+
+  @client_purpose_remove1b
+  Scenario Outline: Un utente con sufficienti permessi (admin) dell'ente che ha creato il client di tipo CONSUMER ed associato il client ad una finalità che si trova in stato ACTIVE, SUSPENDED, ARCHIVED o WAITING_FOR_APPROVAL, richiede la disassociazione del client dalla finalità. L'operazione va a buon fine
+    Given l'utente è un "admin" di "PA1"
+    Given "PA2" ha già creato e pubblicato 1 e-service
+    Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
+    Given "PA1" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
+    Given "PA1" ha già creato 1 client "CONSUMER"
+    Given "PA1" ha già associato la finalità a quel client
+    Given "PA1" ha già archiviato quella finalità
+    When l'utente richiede la disassociazione della finalità dal client
+    Then si ottiene status code 204
       
   @client_purpose_remove2a @wait_for_fix @PIN-4953
   Scenario Outline: Un utente con sufficienti permessi (admin) dell'ente che ha creato il client ed associato il client di tipo CONSUMER ad una finalità che si trova in stato DRAFT, richiede la disassociazione del client dalla finalità. Ottiene un errore. Chiarimento: è possibile modificare l’associazione/disassociazione dei client ad una finalità solo se questa è attiva
