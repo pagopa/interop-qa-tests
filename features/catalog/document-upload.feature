@@ -24,9 +24,10 @@ Feature: Caricamento di un documento di interfaccia
 
     Examples: # Test sugli stati
       | ente | ruolo | statoDescrittore | risultato |
-      | GSP  | admin | PUBLISHED        |       400 |
-      | GSP  | admin | SUSPENDED        |       400 |
-      | GSP  | admin | DEPRECATED       |       400 |
+      | PA1  | admin | PUBLISHED        |       400 |
+      | PA1  | admin | SUSPENDED        |       400 |
+      | PA1  | admin | DEPRECATED       |       400 |
+      | PA1  | admin | ARCHIVED         |       400 |
 
   @document_upload2
   Scenario Outline: Per un e-service che eroga con una determinata tecnologia e che ha un solo descrittore, il quale è in stato DRAFT, alla richiesta di caricamento di un documento di interfaccia coerente con la tecnologia, da parte di un utente autorizzato, l'operazione avrà successo altrimenti restituirà errore.
@@ -61,13 +62,6 @@ Feature: Caricamento di un documento di interfaccia
       | SOAP       | xml      |
 
   @document_upload4
-  Scenario Outline: Per un e-service che ha un solo descrittore, il quale è in stato ARCHIVED, alla richiesta di caricamento di un documento di interfaccia, l'operazione restituirà errore.
-    Given l'utente è un "admin" di "PA1"
-    Given "PA1" ha già creato un e-service con un descrittore in stato "ARCHIVED"
-    When l'utente carica un documento di interfaccia di tipo "yaml"
-    Then si ottiene status code 400
-
-  @document_upload5
   Scenario Outline: Per un e-service che ha un solo descrittore, il quale è in stato DRAFT, e per il quale è già stato caricato un documento di interfaccia, alla richiesta di caricamento di un nuovo documento di interfaccia, l’operazione restituirà errore.
     Given l'utente è un "admin" di "PA1"
     Given "PA1" ha già creato un e-service con un descrittore in stato "DRAFT"
