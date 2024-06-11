@@ -5,7 +5,7 @@ Feature: Caricamento di un documento di interfaccia
   @document_upload1
   Scenario Outline: Per un e-service che eroga con una determinata tecnologia e che ha un solo descrittore, il quale è in uno dei sequenti stati: (PUBLISHED, DRAFT, DEPRECATED, SUSPENDED), alla richiesta di caricamento di un documento di interfaccia coerente con la tecnologia, da parte di un utente autorizzato, l'operazione avrà successo altrimenti restituirà errore.
     Given l'utente è un "<ruolo>" di "<ente>"
-    Given "<ente>" ha già creato un e-service con un descrittore in stato <statoDescrittore> e tecnologia "REST"
+    Given "<ente>" ha già creato un e-service con un descrittore in stato "<statoDescrittore>" e tecnologia "REST"
     When l'utente carica un documento di interfaccia di tipo "yaml"
     Then si ottiene status code <risultato>
 

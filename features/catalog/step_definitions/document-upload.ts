@@ -1,23 +1,32 @@
 import { Given, When } from "@cucumber/cucumber";
 import { z } from "zod";
-import { EServiceTechnology } from "../../../api/models";
+import {
+  EServiceDescriptorState,
+  EServiceTechnology,
+} from "../../../api/models";
 import { assertContextSchema, getToken } from "../../../utils/commons";
 import { dataPreparationService } from "../../../services/data-preparation.service";
 import { FileType, TenantType } from "../../../utils/commons";
 
 Given(
   "{string} ha già creato un e-service con un descrittore in stato {string} e tecnologia {string}",
-  async function (tenantType: TenantType, technology: EServiceTechnology) {
+  async function (
+    tenantType: TenantType,
+    descriptorState: EServiceDescriptorState,
+    technology: EServiceTechnology
+  ) {
     const token = await getToken(tenantType);
 
     const eserviceId = await dataPreparationService.createEService(token, {
       technology,
     });
 
-    const descriptorId = await dataPreparationService.createDraftDescriptor(
-      token,
-      eserviceId
-    );
+    const descriptorId =
+      await dataPreparationService.createDescriptorWithGivenState({
+        token,
+        eserviceId,
+        descriptorState,
+      });
 
     this.eserviceId = eserviceId;
     this.descriptorId = descriptorId;
