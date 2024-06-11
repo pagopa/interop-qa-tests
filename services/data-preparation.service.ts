@@ -1241,4 +1241,21 @@ export const dataPreparationService = {
       (res) => res.data.some((user) => user.userId === userId)
     );
   },
+  async addPurposeToClient(token: string, clientId: string, purposeId: string) {
+    const response = await apiClient.clients.addClientPurpose(
+      clientId,
+      {
+        purposeId,
+      },
+      getAuthorizationHeader(token)
+    );
+
+    assertValidResponse(response);
+
+    await makePolling(
+      () =>
+        apiClient.clients.getClient(clientId, getAuthorizationHeader(token)),
+      (res) => res.data.purposes.some((purp) => purp.purposeId === purposeId)
+    );
+  },
 };
