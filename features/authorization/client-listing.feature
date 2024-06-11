@@ -52,9 +52,9 @@ Feature: Listing client
   Scenario Outline: Restituisce solo i client che hanno per membro l’utente con specifico userId
     Given l'utente è un "admin" di "PA1"
     Given "PA1" ha già creato 1 client "CONSUMER"
-    Given "PA1" ha inserito l'utente con ruolo "security" come membro di un client
+    Given "PA1" ha già inserito l'utente con ruolo "security" come membro di un client
     Given "PA1" ha già creato 1 client "CONSUMER"
-    Given "PA1" ha inserito l'utente con ruolo "admin" come membro di un client
+    Given "PA1" ha già inserito l'utente con ruolo "admin" come membro di un client
     When l'utente richiede una operazione di listing dei client filtrando per membro utente con ruolo "security"
     Then si ottiene status code 200 e la lista di 1 client
 
