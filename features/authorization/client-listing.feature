@@ -1,6 +1,6 @@
 @client_listing
 Feature: Listing client
-  Tutti gli utenti autenticati possono leggere la lista dei propri client
+  Tutti gli utenti autenticati possono leggere la lista dei client
 
   @client_listing1
   Scenario Outline: A fronte di una richiesta di listing restituisce 200 per tutti i ruoli di API
