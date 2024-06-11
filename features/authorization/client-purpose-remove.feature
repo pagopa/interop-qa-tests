@@ -30,8 +30,6 @@ Feature: Rimozione purpose dal client
       | ente | ruolo | statoFinalità        | statusCode |
       | PA1  | admin | SUSPENDED            |        204 |
       | PA1  | admin | WAITING_FOR_APPROVAL |        204 |
-      
-
 
   @client_purpose_remove1b
   Scenario Outline: Un utente con sufficienti permessi (admin) dell'ente che ha creato il client di tipo CONSUMER ed associato il client ad una finalità che si trova in stato ACTIVE, SUSPENDED, ARCHIVED o WAITING_FOR_APPROVAL, richiede la disassociazione del client dalla finalità. L'operazione va a buon fine
@@ -44,7 +42,7 @@ Feature: Rimozione purpose dal client
     Given "PA1" ha già archiviato quella finalità
     When l'utente richiede la disassociazione della finalità dal client
     Then si ottiene status code 204
-      
+
   @client_purpose_remove2a @wait_for_fix @PIN-4953
   Scenario Outline: Un utente con sufficienti permessi (admin) dell'ente che ha creato il client ed associato il client di tipo CONSUMER ad una finalità che si trova in stato DRAFT, richiede la disassociazione del client dalla finalità. Ottiene un errore. Chiarimento: è possibile modificare l’associazione/disassociazione dei client ad una finalità solo se questa è attiva
     Given l'utente è un "admin" di "PA1"
