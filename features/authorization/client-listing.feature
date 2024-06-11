@@ -67,7 +67,7 @@ Feature: Listing client
     Then si ottiene status code 200 e la lista di 1 client
 
   @client_listing7
-  Scenario Outline: Restituisce i client che contengono la keyword "test" all'interno del nome, con ricerca case insensitive
+  Scenario Outline: Restituisce un insieme vuoto di client per una ricerca che non porta risultati
     Given l'utente è un "admin" di "PA1"
     Given "PA1" ha già creato 1 client "CONSUMER"
     When l'utente richiede una operazione di listing dei client filtrando per la keyword "unknown"
