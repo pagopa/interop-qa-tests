@@ -21,7 +21,7 @@ Given(
       technology,
     });
 
-    const descriptorId =
+    const { descriptorId, documentId } =
       await dataPreparationService.createDescriptorWithGivenState({
         token,
         eserviceId,
@@ -30,6 +30,7 @@ Given(
 
     this.eserviceId = eserviceId;
     this.descriptorId = descriptorId;
+    this.documentId = documentId;
   }
 );
 
