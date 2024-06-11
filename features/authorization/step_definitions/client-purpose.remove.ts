@@ -8,7 +8,6 @@ import {
 } from "../../../utils/commons";
 import { dataPreparationService } from "../../../services/data-preparation.service";
 import { apiClient } from "../../../api";
-import { PurposeVersion } from "./../../../api/models";
 
 Given(
   "{string} ha già associato la finalità a quel client",
