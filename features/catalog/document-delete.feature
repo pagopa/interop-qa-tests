@@ -9,24 +9,24 @@ Feature: Cancellazione di un documento
     When l'utente cancella quel documento
     Then si ottiene status code <risultato>
 
-    Examples: 
-      | ente | ruolo        | risultato | statoDescrittore |
-      | GSP  | admin        |       204 | DRAFT            |
-      | GSP  | api          |       204 | DRAFT            |
-      | GSP  | security     |       403 | DRAFT            |
-      | GSP  | api,security |       204 | DRAFT            |
-      | GSP  | support      |       403 | DRAFT            |
-      | PA1  | admin        |       204 | DRAFT            |
-      | PA1  | api          |       204 | DRAFT            |
-      | PA1  | security     |       403 | DRAFT            |
-      | PA1  | api,security |       204 | DRAFT            |
-      | PA1  | support      |       403 | DRAFT            |
+    Examples:
+      | ente | ruolo        | statoDescrittore | risultato |
+      | GSP  | admin        | DRAFT            |       204 |
+      | GSP  | api          | DRAFT            |       204 |
+      | GSP  | security     | DRAFT            |       403 |
+      | GSP  | api,security | DRAFT            |       204 |
+      | GSP  | support      | DRAFT            |       403 |
+      | PA1  | admin        | DRAFT            |       204 |
+      | PA1  | api          | DRAFT            |       204 |
+      | PA1  | security     | DRAFT            |       403 |
+      | PA1  | api,security | DRAFT            |       204 |
+      | PA1  | support      | DRAFT            |       403 |
 
     Examples: # Test sugli stati
-      | ente | ruolo        | risultato | statoDescrittore |
-      | GSP  | admin        |       204 | PUBLISHED        |
-      | GSP  | admin        |       204 | SUSPENDED        |
-      | GSP  | admin        |       204 | DEPRECATED       |
+      | ente | ruolo | statoDescrittore | risultato |
+      | GSP  | admin | PUBLISHED        |       204 |
+      | GSP  | admin | SUSPENDED        |       204 |
+      | GSP  | admin | DEPRECATED       |       204 |
 
   @document_delete2
   Scenario Outline: Per un e-service che ha un solo descrittore, il quale è in stato ARCHIVED alla richiesta di cancellazione di un documento precedentemente caricato, si ottiene un errore
