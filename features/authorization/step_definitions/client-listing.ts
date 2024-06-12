@@ -142,6 +142,7 @@ When(
       {
         limit,
         offset: 0,
+        q: this.TEST_SEED,
       },
       getAuthorizationHeader(this.token)
     );
