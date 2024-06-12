@@ -1,6 +1,6 @@
 @client_key_read
 Feature: Lettura di una chiave pubblica contenuta in un client
-  Tutti gli utenti autenticati possono recuperare le informazione di una chiave pubblica contenuta in un client 
+  Tutti gli utenti autenticati possono recuperare le informazioni di una chiave pubblica contenuta in un client 
 
   @client_key_read1
   Scenario Outline: Un utente, il quale è appartenente all’ente al quale è associato un client; il quale utente NON è membro del client; per il quale client c'è una chiave, caricata da un altro utente; richiede la lettura delle informazioni della chiave pubblica. L'operazione va a buon fine solo per admin, support, security
