@@ -29,7 +29,7 @@ Feature: Listing client
   @client_listing2
   Scenario Outline: A fronte di 5 client in db, restituisce solo i primi 3 risultati
     Given l'utente è un "admin" di "PA1"
-    Given "PA2" ha già creato 5 client "CONSUMER"
+    Given "PA1" ha già creato 5 client "CONSUMER"
     When l'utente richiede una operazione di listing dei client limitata a 3 risultati
     Then si ottiene status code 200 e la lista di 3 client
 
@@ -71,4 +71,13 @@ Feature: Listing client
     Given l'utente è un "admin" di "PA1"
     Given "PA1" ha già creato 1 client "CONSUMER"
     When l'utente richiede una operazione di listing dei client filtrando per la keyword "unknown"
+    Then si ottiene status code 200 e la lista di 0 client
+
+  @client_listing8
+  Scenario Outline: A fronte di una richiesta di listing da parte di un ente, con client creati da altri enti, restituisce 200 e la lista di 0 client
+    Given l'utente è un "admin" di "PA1"
+    Given "PA2" ha già creato 1 client "CONSUMER"
+    Given "GSP" ha già creato 1 client "CONSUMER"
+    Given "Privato" ha già creato 1 client "CONSUMER"
+    When l'utente richiede una operazione di listing dei client
     Then si ottiene status code 200 e la lista di 0 client
