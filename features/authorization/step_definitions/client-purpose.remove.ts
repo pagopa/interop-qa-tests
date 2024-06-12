@@ -27,6 +27,24 @@ Given(
   }
 );
 
+Given(
+  "{string} ha già archiviato quella finalità",
+  async function (tenantType: TenantType) {
+    assertContextSchema(this, {
+      purposeId: z.string(),
+      currentVersionId: z.string(),
+    });
+
+    const token = await getToken(tenantType);
+
+    this.response = await dataPreparationService.archivePurpose(
+      token,
+      this.purposeId,
+      this.currentVersionId
+    );
+  }
+);
+
 When(
   "l'utente richiede la disassociazione della finalità dal client",
   async function () {
