@@ -1,9 +1,9 @@
 @client_purpose_add
 Feature: Associazione purpose al client
-  Tutti gli utenti autenticati possono associare una purpose ad un 
-
+  Tutti gli utenti autenticati possono associare una finalità ad un client
+  
   # waiting for the qa env to be in sync with the others. We are using an old version of the service so the test is failing
-  @client_purpose_add1a @wait_for_fix 
+  @client_purpose_add1a @wait_for_fix
   Scenario Outline: Un utente con sufficienti permessi (admin) dell'ente che ha creato il client di tipo CONSUMER e attivato una finalità che si trova in stato ACTIVE o SUSPENDED, richiede l’associazione del client alla finalità. L'operazione va a buon fine
     Given l'utente è un "<ruolo>" di "<ente>"
     Given "PA2" ha già creato e pubblicato 1 e-service
@@ -32,10 +32,9 @@ Feature: Associazione purpose al client
       | PA1  | admin | DRAFT                |        400 |
       | GSP  | admin | WAITING_FOR_APPROVAL |        400 |
       | PA1  | admin | ARCHIVED             |        400 |
-
-
   # Qui testiamo lo stato REJECTED della finalità, wait for fix per la stessa ragione del test di sopra
-  @client_purpose_add1b @wait_for_fix 
+
+  @client_purpose_add1b @wait_for_fix
   Scenario Outline: Un utente con sufficienti permessi (admin) dell'ente che ha creato il client di tipo CONSUMER e attivato una finalità che si trova in stato NON ACTIVE, richiede l'associazione del client alla finalità. Ottiene un errore. Chiarimento: è possibile modificare l’associazione/disassociazione dei client ad una finalità solo se questa è attiva
     Given l'utente è un "admin" di "PA1"
     Given "PA2" ha già creato e pubblicato 1 e-service
