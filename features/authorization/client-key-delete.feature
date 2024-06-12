@@ -1,10 +1,6 @@
 @client_key_delete
 Feature: Cancellazione delle chiavi di un client
-  Tutti gli utenti admin possono cancellare le chiavi del proprio client
-  # assicurarci che ci sia il seguente test:
-  # Un security quando viene rimosso da un client non deve poter cancellare le chiavi che ha caricato
-  # Invece l'admin ha facoltà di cancellare le chiavi anche quando non è più membro del client
-  # Un security può cancellare chiavi caricate da altri se è un membro del client? No?
+  Tutti gli utenti admin e security possono cancellare le chiavi del proprio client
 
   @client_key_delete1
   Scenario Outline: Un utente con sufficienti permessi (admin o security); appartenente all'ente che ha creato il client; il quale utente è membro del client; nel quale client c'è una chiave pubblica caricata da lui stesso richiede la cancellazione della chiave. L'operazione va a buon fine.
@@ -17,12 +13,12 @@ Feature: Cancellazione delle chiavi di un client
 
     Examples:
       | ente    | ruolo    | statusCode |
-      | GSP     | admin    |        200 |
-      | GSP     | security |        200 |
-      | PA1     | admin    |        200 |
-      | PA1     | security |        200 |
-      | Privato | admin    |        200 |
-      | Privato | security |        200 |
+      | GSP     | admin    |        204 |
+      | GSP     | security |        204 |
+      | PA1     | admin    |        204 |
+      | PA1     | security |        204 |
+      | Privato | admin    |        204 |
+      | Privato | security |        204 |
 
   @client_key_delete2
   Scenario Outline: Un utente con sufficienti permessi (admin o security); appartenente all'ente che ha creato il client; il quale utente è membro del client; nel quale client c'è una chiave pubblica caricata da un altro utente con qualsiasi livello di permesso autorizzato a caricare una chiave (admin o security); richiede la cancellazione della chiave. L'operazione va a buon fine solo per admin.
@@ -36,8 +32,8 @@ Feature: Cancellazione delle chiavi di un client
 
     Examples:
       | ruoloCancellatore | ruoloCaricatore | statusCode |
-      | admin             | security        |        200 |
-      | admin             | api,security    |        200 |
+      | admin             | security        |        204 |
+      | admin             | api,security    |        204 |
       | security          | admin           |        403 |
       | security          | api,security    |        403 |
 
@@ -53,7 +49,7 @@ Feature: Cancellazione delle chiavi di un client
 
     Examples:
       | ruolo    | statusCode |
-      | admin    |        200 |
+      | admin    |        204 |
       | security |        403 |
 
   @client_key_delete4
@@ -67,7 +63,7 @@ Feature: Cancellazione delle chiavi di un client
 
     Examples:
       | ruoloCancellatore | ruoloCaricatore | statusCode |
-      | admin             | security        |        200 |
-      | admin             | api,security    |        200 |
+      | admin             | security        |        204 |
+      | admin             | api,security    |        204 |
       | security          | admin           |        403 |
       | security          | api,security    |        403 |
