@@ -4,7 +4,7 @@ Feature: Lettura di una chiave pubblica contenuta in un client
 
   @client_key_read1
   Scenario Outline: Un utente, il quale è appartenente all’ente al quale è associato un client; il quale utente non è membro del client; per il quale client c'è una chiave, caricata da un altro utente; richiede la lettura delle informazioni della chiave pubblica. L'operazione va a buon fine solo per admin, support, security
-    Given l'utente è un "<ruolo>" di "<ente>"
+    Given l'utente è un "<ruoloUtente>" di "<ente>"
     Given "PA2" ha già creato e pubblicato 1 e-service
     Given "<ente>" ha già creato 1 client "CONSUMER"
     Given "<ente>" ha già inserito l'utente con ruolo "<ruoloUploader>" come membro di un client
@@ -26,6 +26,7 @@ Feature: Lettura di una chiave pubblica contenuta in un client
     Examples:
       | ente | ruoloUtente | ruoloUploader | statusCode |
       | PA1  | admin       | security      |        200 |
+      | PA1  | security    | security      |        200 |
 
   # Lato backend non c'è nessun controllo
   @client_key_read2 @wait_for_clarification
