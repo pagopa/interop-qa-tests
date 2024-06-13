@@ -1068,7 +1068,8 @@ export const dataPreparationService = {
     await makePolling(
       () =>
         apiClient.purposes.getPurpose(purposeId, getAuthorizationHeader(token)),
-      (res) => res.data.currentVersion?.state === "REJECTED"
+      (res) =>
+        res.data.versions.find((v) => v.id === versionId)?.state === "REJECTED"
     );
   },
 
