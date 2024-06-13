@@ -27,6 +27,7 @@ import {
   PurposeVersionSeed,
   ClientSeed,
   ClientKind,
+  KeySeed,
 } from "./../api/models";
 
 export const ESERVICE_DAILY_CALLS: Readonly<{
@@ -1067,7 +1068,8 @@ export const dataPreparationService = {
     await makePolling(
       () =>
         apiClient.purposes.getPurpose(purposeId, getAuthorizationHeader(token)),
-      (res) => res.data.currentVersion?.state === "REJECTED"
+      (res) =>
+        res.data.versions.find((v) => v.id === versionId)?.state === "REJECTED"
     );
   },
 
@@ -1239,6 +1241,76 @@ export const dataPreparationService = {
           getAuthorizationHeader(token)
         ),
       (res) => res.data.some((user) => user.userId === userId)
+    );
+  },
+  async addPurposeToClient(token: string, clientId: string, purposeId: string) {
+    const response = await apiClient.clients.addClientPurpose(
+      clientId,
+      {
+        purposeId,
+      },
+      getAuthorizationHeader(token)
+    );
+
+    assertValidResponse(response);
+
+    await makePolling(
+      () =>
+        apiClient.clients.getClient(clientId, getAuthorizationHeader(token)),
+      (res) => res.data.purposes.some((purp) => purp.purposeId === purposeId)
+    );
+  },
+  async addPublicKeyToClient(
+    token: string,
+    clientId: string,
+    keySeed: KeySeed
+  ) {
+    const response = await apiClient.clients.createKeys(
+      clientId,
+      [keySeed],
+      getAuthorizationHeader(token)
+    );
+
+    assertValidResponse(response);
+
+    let kid: string | undefined;
+
+    await makePolling(
+      () =>
+        apiClient.clients.getClientKeys(
+          { clientId },
+          getAuthorizationHeader(token)
+        ),
+      (res) => {
+        const key = res.data.keys.find((k) => k.name === keySeed.name);
+        kid = key?.keyId;
+        return Boolean(key);
+      }
+    );
+
+    return kid as string;
+  },
+
+  async removeMemberFromClient(
+    token: string,
+    clientId: string,
+    userId: string
+  ) {
+    const response = await apiClient.clients.removeUserFromClient(
+      clientId,
+      userId,
+      getAuthorizationHeader(token)
+    );
+
+    assertValidResponse(response);
+
+    await makePolling(
+      () =>
+        apiClient.clients.getClientUsers(
+          clientId,
+          getAuthorizationHeader(token)
+        ),
+      (res) => !res.data.some((user) => user.userId === userId)
     );
   },
 };

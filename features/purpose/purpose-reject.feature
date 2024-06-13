@@ -13,12 +13,12 @@ Feature: Rifiuto di una versione di una finalità
 
     Examples:
       | ente | ruolo        | risultato |
-      | PA1  | admin        |       200 |
+      | PA1  | admin        |       204 |
       | PA1  | api          |       403 |
       | PA1  | security     |       403 |
       | PA1  | api,security |       403 |
       | PA1  | support      |       403 |
-      | GSP  | admin        |       200 |
+      | GSP  | admin        |       204 |
       | GSP  | api          |       403 |
       | GSP  | security     |       403 |
       | GSP  | api,security |       403 |
@@ -32,7 +32,7 @@ Feature: Rifiuto di una versione di una finalità
     Given "PA2" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
     Given "PA2" ha già richiesto l'aggiornamento della stima di carico superando i limiti di quell'e-service
     When l'utente rifiuta la finalità aggiungendo una motivazione
-    Then si ottiene status code 200
+    Then si ottiene status code 204
     And la versione precedente della finalità rimane nello stato in cui si trovava prima del rifiuto
 
   @purpose_reject3
