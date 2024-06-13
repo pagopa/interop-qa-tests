@@ -1,30 +1,57 @@
-import { Given, Then, When } from "@cucumber/cucumber";
-import { TenantType } from "../../../utils/commons";
-
-Given(
-  "un {string} di {string} ha caricato una chiave pubblica in quel client",
-  (_role: string, _client: string) => {
-    console.log("TODO");
-  }
-);
+import assert from "assert";
+import { Then, When } from "@cucumber/cucumber";
+import { z } from "zod";
+import {
+  TenantType,
+  assertContextSchema,
+  getAuthorizationHeader,
+  getUserId,
+} from "../../../utils/commons";
+import { apiClient } from "../../../api";
 
 When(
   "l'utente richiede una operazione di listing delle chiavi di quel client",
-  () => {
-    console.log("TODO");
+  async function () {
+    assertContextSchema(this, {
+      token: z.string(),
+      clientId: z.string(),
+    });
+
+    this.response = await apiClient.clients.getClientKeys(
+      { userIds: [], clientId: this.clientId },
+      getAuthorizationHeader(this.token)
+    );
   }
 );
 
 Then(
   "si ottiene status code {int} e la lista di {int} chiavi",
-  (_statusCode: number, _numKeys: number) => {
-    console.log("TODO");
+  async function (statusCode: number, numKeys: number) {
+    assertContextSchema(this, {
+      response: z.object({
+        status: z.number(),
+        data: z.object({
+          results: z.array(z.unknown()),
+        }),
+      }),
+    });
+
+    assert.equal(this.response.status, statusCode);
+    assert.equal(this.response.data.results.length, numKeys);
   }
 );
 
 When(
   "l'utente richiede una operazione di listing delle chiavi di quel client create dall'utente {string}",
-  (_tenantType: TenantType) => {
-    console.log("TODO");
+  async function (tenantType: TenantType) {
+    assertContextSchema(this, {
+      token: z.string(),
+      clientId: z.string(),
+    });
+
+    this.response = await apiClient.clients.getClientKeys(
+      { userIds: [getUserId(tenantType, "admin")], clientId: this.clientId },
+      getAuthorizationHeader(this.token)
+    );
   }
 );
