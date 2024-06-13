@@ -80,7 +80,7 @@ When(
     const waitingForApprovalVersionId = this.waitingForApprovalVersionIds?.[0];
     const currentVersionId = this.currentVersionIds?.[0];
     const versionId =
-      state === "WAITING_FOR_APPROVAL"
+      state === "WAITING_FOR_APPROVAL" || state === "REJECTED"
         ? waitingForApprovalVersionId
         : currentVersionId;
     this.response = await apiClient.purposes.activatePurposeVersion(
@@ -113,6 +113,8 @@ Then(
       (res) =>
         desiredState === "WAITING_FOR_APPROVAL"
           ? res.data.waitingForApprovalVersion?.state === desiredState
+          : desiredState === "REJECTED"
+          ? res.data.rejectedVersion?.state === desiredState
           : res.data.currentVersion?.state === desiredState
     );
     assert.equal(this.response.status, statusCode);
