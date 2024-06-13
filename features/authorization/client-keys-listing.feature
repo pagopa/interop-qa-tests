@@ -78,7 +78,7 @@ Feature: Listing chiavi client
     Given un "admin" di "PA1" ha caricato una chiave pubblica in quel client
     Given un "admin" di "PA1" ha caricato una chiave pubblica in quel client
     Given un "admin" di "PA1" ha caricato una chiave pubblica in quel client
-    When l'utente richiede una operazione delle chiavi di quel client
+    When l'utente richiede una operazione di listing delle chiavi di quel client
     Then si ottiene status code 200 e la lista di 3 chiavi
 
   @client_keys_listing2
@@ -89,7 +89,7 @@ Feature: Listing chiavi client
     Given un "admin" di "PA1" ha caricato una chiave pubblica in quel client
     Given un "admin" di "PA1" ha caricato una chiave pubblica in quel client
     Given un "admin" di "PA1" ha caricato una chiave pubblica in quel client
-    When l'utente richiede una operazione delle chiavi di quel client
+    When l'utente richiede una operazione di listing delle chiavi di quel client
     Then si ottiene status code 403
 
     Examples:
@@ -113,5 +113,5 @@ Feature: Listing chiavi client
   Scenario Outline: Un utente admin; appartenente all'ente che ha creato il client; richiede l’elenco delle chiavi caricate per il client; nel client non ci sono chiavi. L’operazione va a buon fine (scopo del test è verificare che, se non ci sono risultati, il server risponda con 200 e array vuoto e non con un errore)
     Given l'utente è un "admin" di "PA1"
     Given "PA1" ha già creato 1 client "CONSUMER"
-    When l'utente richiede una operazione delle chiavi di quel client caricate da "security"
+    When l'utente richiede una operazione di listing delle chiavi di quel client create dall'utente "security"
     Then si ottiene status code 200 e la lista di 0 chiavi
