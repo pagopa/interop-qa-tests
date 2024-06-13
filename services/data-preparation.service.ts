@@ -1068,7 +1068,8 @@ export const dataPreparationService = {
     await makePolling(
       () =>
         apiClient.purposes.getPurpose(purposeId, getAuthorizationHeader(token)),
-      (res) => res.data.currentVersion?.state === "REJECTED"
+      (res) =>
+        res.data.versions.find((v) => v.id === versionId)?.state === "REJECTED"
     );
   },
 
@@ -1288,5 +1289,28 @@ export const dataPreparationService = {
     );
 
     return kid as string;
+  },
+
+  async removeMemberFromClient(
+    token: string,
+    clientId: string,
+    userId: string
+  ) {
+    const response = await apiClient.clients.removeUserFromClient(
+      clientId,
+      userId,
+      getAuthorizationHeader(token)
+    );
+
+    assertValidResponse(response);
+
+    await makePolling(
+      () =>
+        apiClient.clients.getClientUsers(
+          clientId,
+          getAuthorizationHeader(token)
+        ),
+      (res) => !res.data.some((user) => user.userId === userId)
+    );
   },
 };
