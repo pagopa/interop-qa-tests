@@ -6,7 +6,7 @@ Feature: Download attestazione richiesta di fruizione sigillata
   Scenario Outline: Per una richiesta di fruizione precedentemente creata dall’ente, la quale è in stato ACTIVE, alla richiesta di download dell'attestazione della richiesta di fruizione da parte di un utente con sufficienti permessi, va a buon fine
     Given l'utente è un "<ruolo>" di "<ente>"
     Given "PA2" ha già creato un e-service in stato "PUBLISHED" con approvazione "AUTOMATIC"
-    Given "<ente>" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
+    Given "<ente>" ha una richiesta di fruizione in stato "<statoAgreement>" per quell'e-service
     Given l'attestazione di quella richiesta di fruizione è già stata generata
     When l'utente richiede una operazione di download dell'attestazione della richiesta di fruizione
     Then si ottiene status code 200
