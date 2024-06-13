@@ -17,7 +17,7 @@ When(
       waitingForApprovalVersionId: z.string().optional(),
     });
     const versionId =
-      state === "WAITING_FOR_APPROVAL"
+      state === "WAITING_FOR_APPROVAL" || state === "REJECTED"
         ? this.waitingForApprovalVersionId
         : this.currentVersionId;
     this.response = await apiClient.purposes.suspendPurposeVersion(
