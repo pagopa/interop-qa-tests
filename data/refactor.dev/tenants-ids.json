@@ -90,7 +90,7 @@
       "user-roles": "api,security",
       "selfcareId": "026e8c72-7944-4dcd-8668-f596447fec6d",
       "organizationId": "4da67fae-3059-4a29-a5e8-da8255af633e",
-      "uid": "f3d14e3c-d51d-420f-8f47-5a5cbc469143"
+      "uid": "e0477bcc-3baf-4755-aa31-375c051acb44"
     },
     "support": {
       "externalId": {
@@ -132,7 +132,7 @@
       "user-roles": "security",
       "selfcareId": "83e6fc9d-7f60-4a62-8cec-785524b6a0a5",
       "organizationId": "4c177d36-26e6-4b51-8242-986defe39287",
-      "uid": "e490f02e-9429-4b38-bb11-ddb8a561fb62"
+      "uid": "78b9aa62-a472-4c87-8173-3f73bb2e04b5"
     },
     "api,security": {
       "externalId": {
@@ -142,7 +142,7 @@
       "user-roles": "api,security",
       "selfcareId": "83e6fc9d-7f60-4a62-8cec-785524b6a0a5",
       "organizationId": "4c177d36-26e6-4b51-8242-986defe39287",
-      "uid": "78b9aa62-a472-4c87-8173-3f73bb2e04b5"
+      "uid": "e490f02e-9429-4b38-bb11-ddb8a561fb62"
     },
     "support": {
       "externalId": {
