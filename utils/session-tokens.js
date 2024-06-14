@@ -5,6 +5,7 @@ import fs from "fs";
 import { v4 as uuidv4 } from "uuid";
 import _ from "lodash";
 import { VerifyCommand, KMSClient, SignCommand } from "@aws-sdk/client-kms";
+import { env } from "../configs/env";
 
 const verboseMode =
   typeof process.env.ST_VERBOSE_MODE != "undefined" &&
@@ -65,14 +66,17 @@ const config = {
 async function generateSessionTokens(stPayloadValuesFilePath) {
   // Step 1. Read session token payload values file
   logInfo("## Step 1. Read session token payload values file ##");
+  console.log(stPayloadValuesFilePath);
   const sessionTokenPayloadValues = JSON.parse(
     Buffer.from(fs.readFileSync(stPayloadValuesFilePath)).toString()
   );
+
+  console.log("RIuscito");
   logInfo(`ST Payload Values: ${JSON.stringify(sessionTokenPayloadValues)}`);
 
   // Step 2. Parse well known
   logInfo("## Step 2. Parse well known ##");
-  const wellKnownUrl = new URL(process.env.REMOTE_WELLKNOWN_URL);
+  const wellKnownUrl = new URL(env.REMOTE_WELLKNOWN_URL);
   const { kid, alg } = await fetchWellKnown(
     wellKnownUrl.protocol.indexOf("https") >= 0,
     wellKnownUrl.toString()
@@ -102,7 +106,7 @@ async function generateSessionTokens(stPayloadValuesFilePath) {
 
   logInfo("\tDefine token expiration time in seconds");
   const epochTimeExpSeconds =
-    epochTimeSeconds + Number(process.env.SESSION_TOKENS_DURATION_SECONDS);
+    epochTimeSeconds + Number(env.SESSION_TOKENS_DURATION_SECONDS);
   logInfo(`\tExpiration Time in seconds: ${epochTimeExpSeconds}`);
 
   logInfo("\tDefine random UUID");
@@ -119,7 +123,7 @@ async function generateSessionTokens(stPayloadValuesFilePath) {
   stPayloadCompiled = JSON.parse(
     JSON.stringify(stPayloadCompiled).replaceAll(
       "{{ENVIRONMENT}}",
-      process.env.ENVIRONMENT
+      env.ENVIRONMENT
     )
   );
   logInfo(`\tST Payload Compiled: ${JSON.stringify(stPayloadCompiled)}`);
