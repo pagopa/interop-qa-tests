@@ -66,12 +66,10 @@ const config = {
 async function generateSessionTokens(stPayloadValuesFilePath) {
   // Step 1. Read session token payload values file
   logInfo("## Step 1. Read session token payload values file ##");
-  console.log(stPayloadValuesFilePath);
   const sessionTokenPayloadValues = JSON.parse(
     Buffer.from(fs.readFileSync(stPayloadValuesFilePath)).toString()
   );
 
-  console.log("RIuscito");
   logInfo(`ST Payload Values: ${JSON.stringify(sessionTokenPayloadValues)}`);
 
   // Step 2. Parse well known
@@ -251,14 +249,36 @@ function unsignedStsGeneration(
       );
       stsSubOutput[tenant] = {};
 
-      for (const interopRole of Object.keys(stPayloadValues[tenant])) {
+      const organizationId =
+        stPayloadValues[tenant]?.organizationId?.[env.ENVIRONMENT];
+
+      const selfcareId = stPayloadValues[tenant]?.selfcareId;
+      const externalId = stPayloadValues[tenant]?.externalId;
+
+      const userRoles = stPayloadValues[tenant]?.["user-roles"];
+
+      if (!organizationId || !selfcareId || !externalId || !userRoles) {
+        throw Error(
+          `Missing values for tenant ${tenant} in env ${env.ENVIRONMENT}`
+        );
+      }
+
+      for (const interopRole of Object.keys(userRoles)) {
         logInfo(
           `\tunsignedStsGeneration::Phase1: Start dynamic substition for role ${interopRole}`
         );
+        const uid = userRoles[interopRole];
+
         stsSubOutput[tenant][interopRole] = Object.assign(
           {},
           stPayloadCompiled,
-          stPayloadValues[tenant][interopRole]
+          {
+            externalId,
+            uid,
+            selfcareId,
+            organizationId,
+            "user-roles": interopRole,
+          }
         );
       }
     }
@@ -294,6 +314,8 @@ function unsignedStsGeneration(
     logInfo(
       `unsignedStsGeneration::Phase2:END: Build base64 header and body for each tenant/role`
     );
+
+    console.log(JSON.stringify(stsSubOutput, null, 2));
 
     return stOutputIntermediate;
   } catch (ex) {
