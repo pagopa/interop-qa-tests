@@ -315,8 +315,6 @@ function unsignedStsGeneration(
       `unsignedStsGeneration::Phase2:END: Build base64 header and body for each tenant/role`
     );
 
-    console.log(JSON.stringify(stsSubOutput, null, 2));
-
     return stOutputIntermediate;
   } catch (ex) {
     console.error(ex);
