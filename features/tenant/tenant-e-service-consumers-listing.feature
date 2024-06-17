@@ -54,11 +54,11 @@ Feature: Listing e-service consumers
     Given l'utente è un "admin" di "PA1"
     Given "PA1" ha già creato un e-service in stato "PUBLISHED" con approvazione "AUTOMATIC"
     Given "GSP" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    When l'utente richiede una operazione di listing filtrano per nome aderente "PagoPA"
+    When l'utente richiede una operazione di listing dei fruitori filtrando per nome aderente "PagoPA"
     Then si ottiene status code 200 e la lista di 1 aderente
 
   @tenant_e_service_consumers_listing5
   Scenario Outline: Restituisce un insieme vuoto di aderenti per una ricerca che non porta risultati (scopo del test è verificare che, se non ci sono risultati, il server risponda con 200 e array vuoto e non con un errore)
     Given l'utente è un "admin" di "PA1"
-    When l'utente richiede una operazione di listing filtrano per nome aderente "unknown"
-    Then si ottiene status code 200 e la lista di 0 attributi
+    When l'utente richiede una operazione di listing dei fruitori filtrando per nome aderente "unknown"
+    Then si ottiene status code 200 e la lista di 0 aderenti
