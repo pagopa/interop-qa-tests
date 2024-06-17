@@ -1,5 +1,5 @@
 @tenant-requester-certified-attributes-listing
-Feature: Listing attributi certificati posseduti dal richiedenti
+Feature: Listing attributi certificati posseduti dal richiedente
   Tutti gli utenti autenticati possono leggere la lista degli attributi certificati posseduti 
 
   @tenant-requester-certified-attributes-listing1a
