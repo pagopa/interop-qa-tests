@@ -754,13 +754,14 @@ export const dataPreparationService = {
     tenantId: string,
     attributeId: string
   ) {
-    await apiClient.tenants.addCertifiedAttribute(
+    const response = await apiClient.tenants.addCertifiedAttribute(
       tenantId,
       {
         id: attributeId,
       },
       getAuthorizationHeader(token)
     );
+    assertValidResponse(response);
     await makePolling(
       () =>
         apiClient.tenants.getCertifiedAttributes(
@@ -806,12 +807,13 @@ export const dataPreparationService = {
     tenantId: string,
     attributeId: string
   ) {
-    await apiClient.tenants.addDeclaredAttribute(
+    const response = await apiClient.tenants.addDeclaredAttribute(
       {
         id: attributeId,
       },
       getAuthorizationHeader(token)
     );
+    assertValidResponse(response);
     await makePolling(
       () =>
         apiClient.tenants.getDeclaredAttributes(
@@ -827,11 +829,12 @@ export const dataPreparationService = {
     tenantId: string,
     attributeId: string
   ) {
-    await apiClient.tenants.revokeCertifiedAttribute(
+    const response = await apiClient.tenants.revokeCertifiedAttribute(
       tenantId,
       attributeId,
       getAuthorizationHeader(token)
     );
+    assertValidResponse(response);
     await makePolling(
       () =>
         apiClient.tenants.getCertifiedAttributes(
