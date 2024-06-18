@@ -40,9 +40,17 @@ export async function makePolling<TReturnType>(
 ) {
   for (let i = 0; i < env.MAX_POLLING_TRIES; i++) {
     await sleep(env.POLLING_SLEEP_TIME);
-    const result = await promise();
-    if (shouldStop(result)) {
-      return;
+    const response = await promise();
+
+    try {
+      const shouldStopPolling = shouldStop(response);
+      if (shouldStopPolling) {
+        return;
+      }
+    } catch (err) {
+      throw new Error(
+        `Error during shouldStop polling logic evaluation: ${err}`
+      );
     }
   }
   throw Error(`Eventual consistency error: ${errorMessage}`);
