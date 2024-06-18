@@ -1,7 +1,8 @@
 import "dotenv/config";
+import { env } from "./configs/env";
 
 export const parallel = {
-  parallel: Number(process.env.CUCUMBER_OPTS_PARALLEL),
+  parallel: Number(env.CUCUMBER_OPTS_PARALLEL),
 };
 export const format = {
   format: ["progress-bar"],
@@ -69,7 +70,7 @@ export const authorization = {
 };
 
 export const onlyReady = {
-  tags: "(not @wait_for_fix) and (not @resource_intensive) and (not @wait_for_clarification)",
+  tags: "(not @wait_for_fix) and (not @resource_intensive) and (not @wait_for_clarification) and (not @fixed_in_node)",
 };
 
 export default {};

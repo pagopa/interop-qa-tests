@@ -3,7 +3,7 @@ Feature: Aggiunta di un membro ad un client
   Tutti gli admin possono associare un membro ad un client
 
   @client_user_add1
-  Scenario Outline: Un utente  admin, api, security, o support; appartenente all'ente che ha creato il client; il quale utente è già censito tra gli appartenenti all’ente ma non appartiene al client (anche se l’utente da aggiungere è l’utente stesso). L’operazione va a buon fine solo per il ruolo admin.
+  Scenario Outline: Un utente  admin, api, security, o support; appartenente all'ente che ha creato il client; il quale utente è già censito tra gli appartenenti all’ente ma non appartiene al client (anche se l’utente da aggiungere è l’utente stesso); associa un membro ad un client. L’operazione va a buon fine solo per il ruolo admin.
     Given l'utente è un "<ruolo>" di "<ente>"
     Given "<ente>" ha già creato 1 client "CONSUMER"
     When l'utente richiede l'aggiunta di un admin di "<ente>" al client
@@ -28,5 +28,3 @@ Feature: Aggiunta di un membro ad un client
     Given "PA1" ha già creato 1 client "CONSUMER"
     When l'utente richiede l'aggiunta di un admin di "PA2" al client
     Then si ottiene status code 403
-
-  
