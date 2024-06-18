@@ -1293,4 +1293,27 @@ export const dataPreparationService = {
 
     return kid as string;
   },
+
+  async removeMemberFromClient(
+    token: string,
+    clientId: string,
+    userId: string
+  ) {
+    const response = await apiClient.clients.removeUserFromClient(
+      clientId,
+      userId,
+      getAuthorizationHeader(token)
+    );
+
+    assertValidResponse(response);
+
+    await makePolling(
+      () =>
+        apiClient.clients.getClientUsers(
+          clientId,
+          getAuthorizationHeader(token)
+        ),
+      (res) => !res.data.some((user) => user.userId === userId)
+    );
+  },
 };
