@@ -83,9 +83,14 @@ When(
       state === "WAITING_FOR_APPROVAL" || state === "REJECTED"
         ? waitingForApprovalVersionId
         : currentVersionId;
+
+    if (!versionId) {
+      throw new Error("No versionId found");
+    }
+
     this.response = await apiClient.purposes.activatePurposeVersion(
       purposeId,
-      versionId!,
+      versionId,
       getAuthorizationHeader(this.token)
     );
   }
