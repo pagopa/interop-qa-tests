@@ -3,6 +3,7 @@ import { readFileSync } from "fs";
 import crypto from "crypto";
 import { z } from "zod";
 import { type AxiosResponse } from "axios";
+import { env } from "../configs/env";
 import { generateSessionTokens } from "./session-tokens";
 
 export type FileType = "yaml" | "wsdl";
@@ -21,6 +22,8 @@ export type Role = z.infer<typeof Role>;
 export const SessionTokens = z.record(TenantType, z.record(Role, z.string()));
 export type SessionTokens = z.infer<typeof SessionTokens>;
 
+const tenantsIDSPath = "./data/tenants-ids.json";
+
 export const getRandomInt = () =>
   Number(Math.random() * Number.MAX_SAFE_INTEGER).toFixed(0);
 
@@ -35,11 +38,19 @@ export async function makePolling<TReturnType>(
   shouldStop: (data: Awaited<TReturnType>) => boolean,
   errorMessage: string = ""
 ) {
-  for (let i = 0; i < process.env.MAX_POLLING_TRIES; i++) {
-    await sleep(process.env.POLLING_SLEEP_TIME);
-    const result = await promise();
-    if (shouldStop(result)) {
-      return;
+  for (let i = 0; i < env.MAX_POLLING_TRIES; i++) {
+    await sleep(env.POLLING_SLEEP_TIME);
+    const response = await promise();
+
+    try {
+      const shouldStopPolling = shouldStop(response);
+      if (shouldStopPolling) {
+        return;
+      }
+    } catch (err) {
+      throw new Error(
+        `Error during shouldStop polling logic evaluation: ${err}`
+      );
     }
   }
   throw Error(`Eventual consistency error: ${errorMessage}`);
@@ -63,17 +74,13 @@ export function assertContextSchema<TSchema extends z.ZodRawShape>(
 }
 
 export function getOrganizationId(tenantType: TenantType) {
-  const file = JSON.parse(
-    Buffer.from(readFileSync(process.env.TENANTS_IDS_FILE_PATH)).toString()
-  );
-  return file[tenantType].admin.organizationId;
+  const file = JSON.parse(Buffer.from(readFileSync(tenantsIDSPath)).toString());
+  return file[tenantType].organizationId[env.ENVIRONMENT];
 }
 
 export function getUserId(tenantType: TenantType, role: Role) {
-  const file = JSON.parse(
-    Buffer.from(readFileSync(process.env.TENANTS_IDS_FILE_PATH)).toString()
-  );
-  return file[tenantType][role].uid;
+  const file = JSON.parse(Buffer.from(readFileSync(tenantsIDSPath)).toString());
+  return file[tenantType]["user-roles"][role];
 }
 
 let cachedTokens: SessionTokens | undefined;
@@ -84,7 +91,7 @@ export async function getToken(
 ): Promise<string> {
   if (!cachedTokens) {
     cachedTokens = SessionTokens.parse(
-      await generateSessionTokens(process.env.TENANTS_IDS_FILE_PATH)
+      await generateSessionTokens(tenantsIDSPath)
     );
   }
   const token = cachedTokens[tenantType]?.[role];

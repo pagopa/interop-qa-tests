@@ -1,3 +1,4 @@
+import { env } from "../configs/env";
 import { Api } from "./models";
 
 /** This function helps to serialize correctly arrays in url params  */
@@ -15,7 +16,7 @@ const serializeParams = (query: Record<string, string[] | string>) =>
     .join("&");
 
 export const apiClient = new Api({
-  baseURL: process.env.BFF_BASE_URL,
+  baseURL: env.BFF_BASE_URL,
   headers: {
     "X-Correlation-Id": "test",
   },
