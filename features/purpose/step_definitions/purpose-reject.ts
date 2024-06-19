@@ -65,7 +65,11 @@ Then(
     });
 
     await makePolling(
-      () => apiClient.purposes.getPurpose(this.purposeId),
+      () =>
+        apiClient.purposes.getPurpose(
+          this.purposeId,
+          getAuthorizationHeader(this.token)
+        ),
       (res) => {
         const { currentVersion, rejectedVersion } = res.data;
         return !!rejectedVersion && currentVersion?.state === "ACTIVE";
