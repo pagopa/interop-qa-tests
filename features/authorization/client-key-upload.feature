@@ -1,6 +1,6 @@
 @client_key_upload
 Feature: Caricamento di una chiave pubblica contenuta in un client
-  Tutti gli utenti admin o security possono caricare una chiave pubblica di tipo risultati
+  Tutti gli utenti admin o security possono caricare una chiave pubblica di tipo RSA lunghezza 2048
 
   @client_key_upload1
   Scenario Outline: Un utente admin o security; appartenente all'ente che ha creato il client; il quale utente è membro del client; richiede il caricamento di una chiave pubblica di tipo RSA, lunghezza 2048. L'operazione va a buon fine
@@ -22,14 +22,14 @@ Feature: Caricamento di una chiave pubblica contenuta in un client
       | PA1  | api,security |        204 |
 
   @client_key_upload2
-  Scenario Outline: Un utente admin; appartenente all'ente che ha creato il client; il quale utente NON è membro del client; richiede il caricamento di una chiave pubblica di tipo RSA, lunghezza 2048. Ottiene un errore (NB: verificare status code)
+  Scenario Outline: Un utente admin; appartenente all'ente che ha creato il client; il quale utente NON è membro del client; richiede il caricamento di una chiave pubblica di tipo RSA, lunghezza 2048. Ottiene un errore
     Given l'utente è un "admin" di "PA1"
     Given "PA1" ha già creato 1 client "CONSUMER"
     When l'utente richiede il caricamento di una chiave pubblica di tipo "RSA"
     Then si ottiene status code 403
 
   @client_key_upload3
-  Scenario Outline: Un utente admin; appartenente all'ente che ha creato il client; il quale utente è membro del client; richiede il caricamento di una chiave pubblica di tipo NON-RSA, lunghezza 2048. Ottiene un errore (NB: verificare status code)
+  Scenario Outline: Un utente admin; appartenente all'ente che ha creato il client; il quale utente è membro del client; richiede il caricamento di una chiave pubblica di tipo NON-RSA, lunghezza 2048. Ottiene un errore
     Given l'utente è un "admin" di "PA1"
     Given "PA1" ha già creato 1 client "CONSUMER"
     Given "PA1" ha già inserito l'utente con ruolo "admin" come membro di quel client
@@ -37,7 +37,7 @@ Feature: Caricamento di una chiave pubblica contenuta in un client
     Then si ottiene status code 400
 
   @client_key_upload4
-  Scenario Outline: Un utente admin; appartenente all'ente che ha creato il client; il quale utente è membro del client; richiede il caricamento di una chiave pubblica di tipo RSA, lunghezza NON 2048. Ottiene un errore (NB: verificare status code)
+  Scenario Outline: Un utente admin; appartenente all'ente che ha creato il client; il quale utente è membro del client; richiede il caricamento di una chiave pubblica di tipo RSA, lunghezza NON 2048. Ottiene un errore
     Given l'utente è un "admin" di "PA1"
     Given "PA1" ha già creato 1 client "CONSUMER"
     Given "PA1" ha già inserito l'utente con ruolo "admin" come membro di quel client
@@ -45,7 +45,7 @@ Feature: Caricamento di una chiave pubblica contenuta in un client
     Then si ottiene status code 400
 
   @client_key_upload5
-  Scenario Outline: Un utente admin; appartenente all'ente che ha creato il client; il quale utente è membro del client; richiede il caricamento di una chiave pubblica di tipo RSA, lunghezza 2048; alla quale vengono rimossi i delimitatori di inizio e fine (---BEGIN PUBLIC KEY---, ---END PUBLIC KEY---). Ottiene un errore (NB: verificare status code)
+  Scenario Outline: Un utente admin; appartenente all'ente che ha creato il client; il quale utente è membro del client; richiede il caricamento di una chiave pubblica di tipo RSA, lunghezza 2048; alla quale vengono rimossi i delimitatori di inizio e fine (---BEGIN PUBLIC KEY---, ---END PUBLIC KEY---). Ottiene un errore
     Given l'utente è un "admin" di "PA1"
     Given "PA1" ha già creato 1 client "CONSUMER"
     Given "PA1" ha già inserito l'utente con ruolo "admin" come membro di quel client
