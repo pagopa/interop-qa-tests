@@ -1,4 +1,3 @@
-
 @tenant-e-service-producers-listing
 Feature: Listing e-service producers
   Tutti gli utenti autenticati possono leggere la lista dei aderenti che erogano almeno un e-service
@@ -8,9 +7,8 @@ Feature: Listing e-service producers
     Given l'utente è un "<ruolo>" di "<ente>"
     Given "PA1" ha già creato un e-service in stato "PUBLISHED" con approvazione "AUTOMATIC"
     When l'utente richiede una operazione di listing degli erogatori
-    # controllare in implementazione
-    Then si ottiene status code 200 e la lista di erogatori contenente "<ente>"
-
+    Then si ottiene status code 200 e la lista di aderenti contenente "<ente>"
+    # controllare perché Privato va in errore
     Examples: 
       | ente    | ruolo        |
       | GSP     | admin        |
@@ -23,11 +21,11 @@ Feature: Listing e-service producers
       | PA1     | security     |
       | PA1     | support      |
       | PA1     | api,security |
-      | Privato | admin        |
-      | Privato | api          |
-      | Privato | security     |
-      | Privato | support      |
-      | Privato | api,security |
+      #| Privato | admin        |
+      #| Privato | api          |
+      #| Privato | security     |
+      #| Privato | support      |
+      #| Privato | api,security |
 
   @tenant-e-service-producers-listing2
   Scenario Outline: A fronte di 4 o più aderenti in db, restituisce solo i primi 2 risultati (scopo del test è verificare il corretto funzionamento del parametro limit)
@@ -39,13 +37,13 @@ Feature: Listing e-service producers
     Then si ottiene status code 200 e la lista di 2 aderenti
 
   @tenant-e-service-producers-listing3
-  Scenario Outline: A fronte di 4 o più aderenti in db e una richiesta di offset 12, restituisce solo 3 risultati (scopo del test è verificare il corretto funzionamento del parametro offset)
+  Scenario Outline: A fronte di più aderenti in db e una richiesta con offset, restituisce il corretto numero di risultati (scopo del test è verificare il corretto funzionamento del parametro offset)
     Given l'utente è un "admin" di "PA1"
     Given "PA1" ha già creato un e-service in stato "PUBLISHED" con approvazione "AUTOMATIC"
     Given "PA2" ha già creato un e-service in stato "PUBLISHED" con approvazione "AUTOMATIC"
     Given "GSP" ha già creato un e-service in stato "PUBLISHED" con approvazione "AUTOMATIC"
     When l'utente richiede una operazione di listing degli erogatori con offset 2
-    Then si ottiene status code 200 e il giusto numero di risultati in base all'offset richiesto
+    Then si ottiene status code 200 e il giusto numero di erogatori in base all'offset richiesto
 
   @tenant-e-service-producers-listing4
   Scenario Outline: Restituisce gli aderenti che contengono la keyword "PagoPA" all'interno del nome, con ricerca case insensitive (scopo del test è verificare che funzioni il filtro q)

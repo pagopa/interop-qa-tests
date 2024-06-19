@@ -25,7 +25,7 @@ When(
 );
 
 Then(
-  "si ottiene status code 200 e la lista di fruitori contenente {string}",
+  "si ottiene status code 200 e la lista di aderenti contenente {string}",
   async function (tenantType: TenantType) {
     assertContextSchema(this, {
       response: z.object({
@@ -98,7 +98,7 @@ When(
 );
 
 Then(
-  "si ottiene status code 200 e il giusto numero di risultati in base all'offset richiesto",
+  "si ottiene status code 200 e il giusto numero di fruitori in base all'offset richiesto",
   async function () {
     assertContextSchema(this, {
       token: z.string(),
@@ -125,13 +125,13 @@ Then(
 
 When(
   "l'utente richiede una operazione di listing dei fruitori filtrando per nome aderente {string}",
-  async function (q: string) {
+  async function (nomeAderente: string) {
     assertContextSchema(this, {
       token: z.string(),
     });
 
     this.response = await apiClient.consumers.getConsumers(
-      { limit: 20, offset: 0, q },
+      { limit: 20, offset: 0, q: nomeAderente },
       getAuthorizationHeader(this.token)
     );
   }
