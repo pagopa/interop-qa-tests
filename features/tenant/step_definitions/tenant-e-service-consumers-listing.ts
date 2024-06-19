@@ -21,7 +21,6 @@ When(
       { limit: 20, offset: 0 },
       getAuthorizationHeader(this.token)
     );
-    console.log(this.response);
   }
 );
 
