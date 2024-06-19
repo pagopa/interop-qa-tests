@@ -32,15 +32,15 @@ Feature: Assegnazione di un attributo verificato ad un aderente
   @tenant_assign_verified_attribute3
   Scenario Outline: Per un attributo verificato precedentemente creato da un primo aderente, alla richiesta di assegnazione dell’attributo con data di scadenza nel futuro ad un secondo aderente da parte di un utente con sufficienti permessi (admin) appartenente al primo aderente, va a buon fine
     Given l'utente è un "admin" di "PA1"
-    Given "PA1" ha già creato un attributo verificato con data di scadenza nel futuro
-    When l'utente assegna a "PA2" l'attributo verificato precedentemente creato
+    Given "PA2" ha già creato 1 attributo "VERIFIED"
+    When l'utente assegna a "PA2" l'attributo verificato precedentemente creato con data di scadenza nel futuro
     Then si ottiene status code 200
 
   @tenant_assign_verified_attribute4
   Scenario Outline: Per un attributo verificato precedentemente creato da un primo aderente, alla richiesta di assegnazione dell’attributo con data di scadenza nel passato ad un secondo aderente da parte di un utente con sufficienti permessi (admin) appartenente al primo aderente, ottiene un errore
     Given l'utente è un "admin" di "PA1"
-    Given "PA1" ha già creato un attributo verificato con data di scadenza nel passato
-    When l'utente assegna a "PA2" l'attributo verificato precedentemente creato
+    Given "PA2" ha già creato 1 attributo "VERIFIED"
+    When l'utente assegna a "PA2" l'attributo verificato precedentemente creato con data di scadenza nel passato
     Then si ottiene status code 400
 
   @tenant_assign_verified_attribute5
