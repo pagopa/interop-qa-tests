@@ -754,13 +754,14 @@ export const dataPreparationService = {
     tenantId: string,
     attributeId: string
   ) {
-    await apiClient.tenants.addCertifiedAttribute(
+    const response = await apiClient.tenants.addCertifiedAttribute(
       tenantId,
       {
         id: attributeId,
       },
       getAuthorizationHeader(token)
     );
+    assertValidResponse(response);
     await makePolling(
       () =>
         apiClient.tenants.getCertifiedAttributes(
@@ -806,12 +807,13 @@ export const dataPreparationService = {
     tenantId: string,
     attributeId: string
   ) {
-    await apiClient.tenants.addDeclaredAttribute(
+    const response = await apiClient.tenants.addDeclaredAttribute(
       {
         id: attributeId,
       },
       getAuthorizationHeader(token)
     );
+    assertValidResponse(response);
     await makePolling(
       () =>
         apiClient.tenants.getDeclaredAttributes(
@@ -827,11 +829,12 @@ export const dataPreparationService = {
     tenantId: string,
     attributeId: string
   ) {
-    await apiClient.tenants.revokeCertifiedAttribute(
+    const response = await apiClient.tenants.revokeCertifiedAttribute(
       tenantId,
       attributeId,
       getAuthorizationHeader(token)
     );
+    assertValidResponse(response);
     await makePolling(
       () =>
         apiClient.tenants.getCertifiedAttributes(
@@ -1289,5 +1292,28 @@ export const dataPreparationService = {
     );
 
     return kid as string;
+  },
+
+  async removeMemberFromClient(
+    token: string,
+    clientId: string,
+    userId: string
+  ) {
+    const response = await apiClient.clients.removeUserFromClient(
+      clientId,
+      userId,
+      getAuthorizationHeader(token)
+    );
+
+    assertValidResponse(response);
+
+    await makePolling(
+      () =>
+        apiClient.clients.getClientUsers(
+          clientId,
+          getAuthorizationHeader(token)
+        ),
+      (res) => !res.data.some((user) => user.userId === userId)
+    );
   },
 };
