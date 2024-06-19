@@ -44,7 +44,7 @@ Feature: Listing finalità lato erogatore
     When l'utente erogatore richiede una operazione di listing delle finalità sui propri e-service
     Then si ottiene status code 200 e la lista di 4 finalità
 
-  @purpose_listing_producer4 @PIN-4806
+  @purpose_listing_producer4 @wait_for_fix @PIN-4806
   Scenario Outline: Restituisce le finalità che hanno per fruitore uno o più specifici enti (scopo del test è verificare il corretto funzionamento del parametro consumerIds). NB: vengono escluse le finalità in stato DRAFT, anche qualora non fosse valorizzato il parametro states
     Given l'utente è un "admin" di "PA1"
     Given "PA1" ha già creato e pubblicato 1 e-service

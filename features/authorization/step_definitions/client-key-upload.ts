@@ -16,8 +16,6 @@ When(
       clientId: z.string(),
     });
 
-    const key = createBase64PublicKey(keyType);
-
     this.response = await apiClient.clients.createKeys(
       this.clientId,
       [
@@ -25,7 +23,7 @@ When(
           use: "SIG",
           alg: "RS256",
           name: `key-${this.TEST_SEED}-${getRandomInt()}`,
-          key,
+          key: createBase64PublicKey(keyType),
         },
       ],
       getAuthorizationHeader(this.token)
@@ -64,8 +62,6 @@ When(
       clientId: z.string(),
     });
 
-    const key = createBase64PublicKey(keyType, keyLength, false);
-
     this.response = await apiClient.clients.createKeys(
       this.clientId,
       [
@@ -73,7 +69,7 @@ When(
           use: "SIG",
           alg: "RS256",
           name: `key-${this.TEST_SEED}-${getRandomInt()}`,
-          key,
+          key: createBase64PublicKey(keyType, keyLength, false),
         },
       ],
       getAuthorizationHeader(this.token)
@@ -84,6 +80,7 @@ When(
 When(
   "l'utente richiede il caricamento di una chiave pubblica di tipo {string} di lunghezza {int} con lo stesso kid",
   async function (_keyType: string, _keyLength: number) {
+    // I parametri in input non influenzano l'output in quanto non vengono utilizzati
     assertContextSchema(this, {
       key: z.string(),
       token: z.string(),
