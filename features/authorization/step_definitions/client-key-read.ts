@@ -9,8 +9,8 @@ import {
   getRandomInt,
   getToken,
 } from "../../../utils/commons";
-import { dataPreparationService } from "../../../services/data-preparation.service";
 import { apiClient } from "../../../api";
+import { dataPreparationService } from "../../../services/data-preparation.service";
 
 Given(
   "un {string} di {string} ha caricato una chiave pubblica nel client",
@@ -21,16 +21,14 @@ Given(
 
     const token = await getToken(tenantType, role);
 
-    this.keyId = await dataPreparationService.addPublicKeyToClient(
-      token,
-      this.clientId,
-      {
-        use: "SIG",
-        alg: "RS256",
-        name: `key-${this.TEST_SEED}-${getRandomInt()}`,
-        key: createBase64PublicKey(),
-      }
-    );
+    this.key = createBase64PublicKey();
+
+    await dataPreparationService.addPublicKeyToClient(token, this.clientId, {
+      use: "SIG",
+      alg: "RS256",
+      name: `key-${this.TEST_SEED}-${getRandomInt()}`,
+      key: this.key,
+    });
   }
 );
 

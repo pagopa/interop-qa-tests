@@ -17,12 +17,17 @@ When(
       waitingForApprovalVersionId: z.string().optional(),
     });
     const versionId =
-      state === "WAITING_FOR_APPROVAL"
+      state === "WAITING_FOR_APPROVAL" || state === "REJECTED"
         ? this.waitingForApprovalVersionId
         : this.currentVersionId;
+
+    if (!versionId) {
+      throw new Error("No versionId found");
+    }
+
     this.response = await apiClient.purposes.suspendPurposeVersion(
       this.purposeId,
-      versionId!,
+      versionId,
       getAuthorizationHeader(this.token)
     );
   }

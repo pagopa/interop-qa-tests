@@ -6,6 +6,7 @@ import {
   Role,
   TenantType,
   assertContextSchema,
+  createBase64PublicKey,
   getRandomInt,
   getToken,
   getUserId,
@@ -37,18 +38,18 @@ Given(
 );
 
 Given(
-  "{string} ha già inserito l'utente con ruolo {string} come membro di un client",
+  "{string} ha già inserito l'utente con ruolo {string} come membro di quel client",
   async function (tenantType: TenantType, roleOfMemberToAdd: Role) {
     assertContextSchema(this, {
       clientId: z.string(),
     });
     const token = await getToken(tenantType);
-    const userIdOfMemberToAdd = getUserId(tenantType, roleOfMemberToAdd);
+    this.clientMemberUserId = getUserId(tenantType, roleOfMemberToAdd);
 
     await dataPreparationService.addMemberToClient(
       token,
       this.clientId,
-      userIdOfMemberToAdd
+      this.clientMemberUserId
     );
   }
 );
@@ -66,5 +67,27 @@ Then(
     });
     assert.equal(this.response.status, statusCode);
     assert.equal(this.response.data.results.length, count);
+  }
+);
+
+Given(
+  "un {string} di {string} ha caricato una chiave pubblica in quel client",
+  async function (role: Role, tenantType: TenantType) {
+    assertContextSchema(this, {
+      clientId: z.string(),
+    });
+
+    const token = await getToken(tenantType, role);
+
+    this.keyId = await dataPreparationService.addPublicKeyToClient(
+      token,
+      this.clientId,
+      {
+        use: "SIG",
+        alg: "RS256",
+        name: `key-${this.TEST_SEED}-${getRandomInt()}`,
+        key: createBase64PublicKey(),
+      }
+    );
   }
 );
