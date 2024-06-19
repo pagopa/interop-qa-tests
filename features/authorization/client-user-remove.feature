@@ -6,7 +6,7 @@ Feature: Rimozione di un membro da un client
   Scenario Outline: Un utente con sufficienti permessi (admin); appartenente all'ente che ha creato il client; il quale utente è già censito tra i membri del client (anche se l’utente da rimuovere è l’utente stesso). L’operazione va a buon fine
     Given l'utente è un "<ruolo>" di "<ente>"
     Given "<ente>" ha già creato 1 client "CONSUMER"
-    Given "<ente>" ha già inserito l'utente con ruolo "admin" come membro di un client
+    Given "<ente>" ha già inserito l'utente con ruolo "admin" come membro di quel client
     When l'utente richiede la rimozione di quel membro dal client
     Then si ottiene status code <statusCode>
 
