@@ -17,10 +17,11 @@ When(
       token: z.string(),
     });
 
-    this.response = apiClient.consumers.getConsumers(
+    this.response = await apiClient.consumers.getConsumers(
       { limit: 20, offset: 0 },
       getAuthorizationHeader(this.token)
     );
+    console.log(this.response);
   }
 );
 
@@ -58,7 +59,7 @@ When(
       token: z.string(),
     });
 
-    this.response = apiClient.consumers.getConsumers(
+    this.response = await apiClient.consumers.getConsumers(
       { limit, offset: 0 },
       getAuthorizationHeader(this.token)
     );
@@ -90,7 +91,7 @@ When(
     });
 
     this.offset = offset;
-    this.response = apiClient.consumers.getConsumers(
+    this.response = await apiClient.consumers.getConsumers(
       { limit: 20, offset },
       getAuthorizationHeader(this.token)
     );
@@ -130,7 +131,7 @@ When(
       token: z.string(),
     });
 
-    this.response = apiClient.consumers.getConsumers(
+    this.response = await apiClient.consumers.getConsumers(
       { limit: 20, offset: 0, q },
       getAuthorizationHeader(this.token)
     );
