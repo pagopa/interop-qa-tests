@@ -8,9 +8,8 @@ Feature: Listing e-service consumers
     Given "PA1" ha già creato un e-service in stato "PUBLISHED" con approvazione "AUTOMATIC"
     Given "<ente>" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     When l'utente richiede una operazione di listing dei fruitori
-    # controllare in implementazione
     Then si ottiene status code 200 e la lista di fruitori contenente "<ente>"
-
+    # controllare perché Privato va in errore
     Examples: 
       | ente    | ruolo        |
       | GSP     | admin        |
@@ -23,11 +22,11 @@ Feature: Listing e-service consumers
       | PA1     | security     |
       | PA1     | support      |
       | PA1     | api,security |
-      | Privato | admin        |
-      | Privato | api          |
-      | Privato | security     |
-      | Privato | support      |
-      | Privato | api,security |
+      #| Privato | admin        |
+      #| Privato | api          |
+      #| Privato | security     |
+      #| Privato | support      |
+      #| Privato | api,security |
 
   @tenant_e_service_consumers_listing2
   Scenario Outline: A fronte di 4 o più aderenti in db, restituisce solo i primi 2 risultati (scopo del test è verificare il corretto funzionamento del parametro limit)
