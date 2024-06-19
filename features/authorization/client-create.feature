@@ -1,6 +1,7 @@
 @client_create
 Feature: Creazione di un client
-  Tutti gli utenti autenticati possono creare un client
+  Tutti gli admin possono creare un client
+
   @client_create1a
   Scenario Outline: Un utente con sufficienti permessi (admin); inserisce nome e descrizione, e crea un nuovo client. L'operazione va a buon fine
     Given l'utente è un "<ruolo>" di "<ente>"
