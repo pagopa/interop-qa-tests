@@ -20,9 +20,14 @@ When(
       state === "WAITING_FOR_APPROVAL" || state === "REJECTED"
         ? this.waitingForApprovalVersionId
         : this.currentVersionId;
+
+    if (!versionId) {
+      throw new Error("No versionId found");
+    }
+
     this.response = await apiClient.purposes.archivePurposeVersion(
       this.purposeId,
-      versionId!,
+      versionId,
       getAuthorizationHeader(this.token)
     );
   }
