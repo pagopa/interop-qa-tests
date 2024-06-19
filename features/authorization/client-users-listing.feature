@@ -6,9 +6,9 @@ Feature: Listing utenti client
   Scenario Outline: Un utente API richiede la lista dei membri del client. Ritorna errore 403.
     Given l'utente è un "api" di "<ente>"
     Given "<ente>" ha già creato 1 client "CONSUMER"
-    Given "<ente>" ha già inserito l'utente con ruolo "admin" come membro di un client
-    Given "<ente>" ha già inserito l'utente con ruolo "security" come membro di un client
-    Given "<ente>" ha già inserito l'utente con ruolo "api,security" come membro di un client
+    Given "<ente>" ha già inserito l'utente con ruolo "admin" come membro di quel client
+    Given "<ente>" ha già inserito l'utente con ruolo "security" come membro di quel client
+    Given "<ente>" ha già inserito l'utente con ruolo "api,security" come membro di quel client
     When l'utente richiede una operazione di listing dei membri di quel client
     Then si ottiene status code 403
 
@@ -22,9 +22,9 @@ Feature: Listing utenti client
   Scenario Outline: Un utente associato ad un client, di ruolo non API, richiede la lista dei membri del client stesso. L'operazione va a buon fine
     Given l'utente è un "<ruolo>" di "<ente>"
     Given "<ente>" ha già creato 1 client "CONSUMER"
-    Given "<ente>" ha già inserito l'utente con ruolo "admin" come membro di un client
-    Given "<ente>" ha già inserito l'utente con ruolo "security" come membro di un client
-    Given "<ente>" ha già inserito l'utente con ruolo "api,security" come membro di un client
+    Given "PA1" ha già inserito l'utente con ruolo "admin" come membro di quel client
+    Given "PA1" ha già inserito l'utente con ruolo "security" come membro di quel client
+    Given "PA1" ha già inserito l'utente con ruolo "api,security" come membro di quel client
     When l'utente richiede una operazione di listing dei membri di quel client
     Then si ottiene status code 200 e la lista di 3 utenti
 

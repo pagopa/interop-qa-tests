@@ -1,8 +1,7 @@
 import "dotenv/config";
-import { env } from "./configs/env";
 
 export const parallel = {
-  parallel: Number(env.CUCUMBER_OPTS_PARALLEL),
+  parallel: Number(process.env.CUCUMBER_OPTS_PARALLEL),
 };
 export const format = {
   format: ["progress-bar"],

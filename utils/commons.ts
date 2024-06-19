@@ -113,15 +113,34 @@ export function assertValidResponse<T>(response: AxiosResponse<T>) {
   }
 }
 
-export function createBase64PublicKey() {
-  const { publicKey } = crypto.generateKeyPairSync("rsa", {
-    modulusLength: 2048,
-  });
+export function createBase64PublicKey(
+  keyType: "RSA" | "NON-RSA" = "RSA",
+  modulusLength = 2048,
+  withDelimitators = true
+) {
+  const keyPair =
+    keyType === "RSA"
+      ? crypto.generateKeyPairSync("rsa", {
+          modulusLength,
+        })
+      : crypto.generateKeyPairSync("ed25519", {
+          modulusLength,
+        });
+
+  const { publicKey } = keyPair;
 
   const publicKeyPEM = publicKey.export({
-    type: "pkcs1",
+    type: keyType === "RSA" ? "pkcs1" : "spki",
     format: "pem",
   });
 
-  return Buffer.from(publicKeyPEM).toString("base64");
+  if (withDelimitators) {
+    return Buffer.from(publicKeyPEM).toString("base64");
+  }
+
+  return Buffer.from(
+    (publicKeyPEM as string)
+      .replace("-----BEGIN RSA PUBLIC KEY-----", "")
+      .replace("-----END RSA PUBLIC KEY-----", "")
+  ).toString("base64");
 }

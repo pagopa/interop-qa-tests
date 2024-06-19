@@ -37,7 +37,7 @@ Given(
 );
 
 Given(
-  "{string} ha già inserito l'utente con ruolo {string} come membro di un client",
+  "{string} ha già inserito l'utente con ruolo {string} come membro di quel client",
   async function (tenantType: TenantType, roleOfMemberToAdd: Role) {
     assertContextSchema(this, {
       clientId: z.string(),
