@@ -5,18 +5,18 @@ Feature: Lettura di una chiave pubblica contenuta in un client
 
   @client_key_content_read1
   Scenario Outline: Un utente con sufficienti permessi (admin); appartenente all'ente che ha creato il client; il quale utente è membro del client; nel quale client c'è una chiave pubblica; richiede la lettura del contenuto della chiave. L'operazione va a buon fine
-    Given l'utente è un "<ruolo>" di "<ente>"
+    Given l'utente è un "admin" di "<ente>"
     Given "<ente>" ha già creato 1 client "CONSUMER"
     Given "<ente>" ha già inserito l'utente con ruolo "admin" come membro di quel client
     Given un "admin" di "<ente>" ha caricato una chiave pubblica in quel client
     When l'utente richiede la lettura del contenuto della chiave pubblica
-    Then si ottiene status code <statusCode>
+    Then si ottiene status code 200
 
     Examples:
-      | ente    | ruolo | statusCode |
-      | GSP     | admin |        200 |
-      | PA1     | admin |        200 |
-      | Privato | admin |        200 |
+      | ente    |
+      | GSP     |
+      | PA1     |
+      | Privato |
 
   @client_key_content_read2 @wait_for_fix @PIN-5007
   Scenario Outline: Un utente di qualsiasi ruolo; appartenente all'ente che ha creato il client; il quale utente non è membro del client; nel quale client c'è una chiave pubblica; richiede la lettura del contenuto della chiave. L'operazione va a buon fine solo per admin e support
