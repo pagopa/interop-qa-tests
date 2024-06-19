@@ -3,7 +3,7 @@ Feature: Listing utenti client
   Tutti gli utenti admin o security possono leggere la lista dei membri di un client a cui sono associati
 
   @client_users_listing1a
-  Scenario Outline: Un utente associato ad un client (dunque con permessi admin o security) richiede la lista dei membri del client stesso. L'operazione va a buon fine
+  Scenario Outline: Un utente API richiede la lista dei membri del client. Ritorna errore 403.
     Given l'utente è un "api" di "<ente>"
     Given "<ente>" ha già creato 1 client "CONSUMER"
     Given "<ente>" ha già inserito l'utente con ruolo "admin" come membro di quel client
@@ -19,7 +19,7 @@ Feature: Listing utenti client
       | Privato |
 
   @client_users_listing1b
-  Scenario Outline: Un utente associato ad un client (dunque con permessi admin o security) richiede la lista dei membri del client stesso. L'operazione va a buon fine
+  Scenario Outline: Un utente associato ad un client, di ruolo non API, richiede la lista dei membri del client stesso. L'operazione va a buon fine
     Given l'utente è un "<ruolo>" di "<ente>"
     Given "<ente>" ha già creato 1 client "CONSUMER"
     Given "PA1" ha già inserito l'utente con ruolo "admin" come membro di quel client
