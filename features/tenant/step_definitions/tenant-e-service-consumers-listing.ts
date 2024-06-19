@@ -46,7 +46,8 @@ Then(
     assert.ok(
       this.response.data.results.some(
         (consumer) => consumer.id === organizationId
-      )
+      ),
+      "Il fruitore non è presente nella lista dei fruitori"
     );
   }
 );
