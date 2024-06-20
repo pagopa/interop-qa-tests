@@ -4,13 +4,13 @@ import { z } from "zod";
 import {
   TenantType,
   assertContextSchema,
-  assertValidResponse,
   getAuthorizationHeader,
+  getOrganizationId,
 } from "../../../utils/commons";
 import { apiClient } from "../../../api";
 
 When(
-  "l'utente richiede una operazione di listing degli attributi certificati posseduti",
+  "l'utente richiede una operazione di listing degli attributi certificati assegnati",
   async function () {
     assertContextSchema(this, {
       token: z.string(),
@@ -20,13 +20,12 @@ When(
       { limit: 20, offset: 0 },
       getAuthorizationHeader(this.token)
     );
-    assertValidResponse(this.response);
   }
 );
 
 Then(
-  "si ottiene status code 200 e la lista degli attributi contenente l'attributo assegnato da {string} e l'attributo IPA comune",
-  async function (_tenantType: TenantType) {
+  "si ottiene status code 200 e la lista degli attributi contenente l'attributo assegnato a {string}",
+  async function (tenantType: TenantType) {
     assertContextSchema(this, {
       attributeId: z.string(),
       response: z.object({
@@ -34,7 +33,6 @@ Then(
         data: z.object({
           results: z.array(
             z.object({
-              attributeName: z.string(),
               attributeId: z.string(),
               tenantId: z.string(),
             })
@@ -44,9 +42,14 @@ Then(
     });
 
     assert.equal(this.response.status, 200);
-    console.log({
-      attributeId: this.attributeId,
-      response: this.response.data.results,
-    });
+
+    const tenantId = getOrganizationId(tenantType);
+
+    assert.ok(
+      this.response.data.results.some(
+        (a) => a.attributeId === this.attributeId && a.tenantId === tenantId
+      ),
+      "L'attributo assegnato non è presente nella lista degli attributi certificati"
+    );
   }
 );
