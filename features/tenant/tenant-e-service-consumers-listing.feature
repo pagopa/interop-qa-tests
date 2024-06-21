@@ -9,7 +9,7 @@ Feature: Listing e-service consumers
     Given "<ente>" ha già creato e pubblicato 1 e-service
     Given "<ente>" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     When l'utente richiede una operazione di listing dei fruitori
-    Then si ottiene status code 200 e la lista di fruitori contenente "<ente>"
+    Then si ottiene status code 200 e la lista di aderenti contenente "<ente>"
 
     Examples:
       | ente | ruolo        |
