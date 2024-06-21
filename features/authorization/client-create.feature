@@ -1,8 +1,9 @@
 @client_create
 Feature: Creazione di un client
-  Tutti gli utenti autenticati possono creare un client
+  Tutti gli admin possono creare un client
+
   @client_create1a
-  Scenario Outline: Un utente con sufficienti permessi (admin); inserisce nome e descrizione, e crea un nuovo client. L'operazione va a buon fine
+  Scenario Outline: Un utente con sufficienti permessi (admin); inserisce nome e descrizione, e crea un nuovo client di tipo CONSUMER. L'operazione va a buon fine
     Given l'utente è un "<ruolo>" di "<ente>"
     When l'utente richiede la creazione di un client "CONSUMER"
     Then si ottiene status code <statusCode>
@@ -21,7 +22,7 @@ Feature: Creazione di un client
       | PA1  | api,security |        403 |
 
   @client_create1b
-  Scenario Outline: Un utente con sufficienti permessi (admin); inserisce nome e descrizione, e crea un nuovo client. L'operazione va a buon fine
+  Scenario Outline: Un utente con sufficienti permessi (admin); inserisce nome e descrizione, e crea un nuovo client di tipo API. L'operazione va a buon fine
     Given l'utente è un "<ruolo>" di "<ente>"
     When l'utente richiede la creazione di un client "API"
     Then si ottiene status code <statusCode>
