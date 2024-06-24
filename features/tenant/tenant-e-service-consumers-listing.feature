@@ -1,27 +1,31 @@
 @tenant_e_service_consumers_listing @PIN-5022
 Feature: Listing e-service consumers
-  Tutti gli utenti autenticati possono leggere la lista dei aderenti che sono iscritti ad almeno un e-service
+  Tutti gli utenti autenticati possono leggere la lista dei aderenti che sono iscritti ad almeno un e-service di cui sono erogatori
 
-  @tenant_e_service_consumers_listing1
-  Scenario Outline: Restituisce tutti gli aderenti che sono iscritti (agreement solo in stato ACTIVE o SUSPENDED) ad almeno un e-service presente in catalogo per qualsiasi livello di permesso e tipologia di ente.
+  @tenant_e_service_consumers_listing1a
+  Scenario Outline: Restituisce tutti gli aderenti che sono iscritti (agreement solo in stato ACTIVE o SUSPENDED) ad almeno un e-service di cui sono erogatori per qualsiasi livello di permesso e tipologia di ente.
     Given l'utente è un "<ruolo>" di "<ente>"
     Given "<ente>" ha già creato e pubblicato 1 e-service
-    Given "<ente>" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
+    Given "<ente>" ha una richiesta di fruizione in stato "<statoAgreement>" per quell'e-service
     When l'utente richiede una operazione di listing dei fruitori
     Then si ottiene status code 200 e la lista di aderenti contenente "<ente>"
 
     Examples:
-      | ente | ruolo        |
-      | GSP  | admin        |
-      | GSP  | api          |
-      | GSP  | security     |
-      | GSP  | support      |
-      | GSP  | api,security |
-      | PA1  | admin        |
-      | PA1  | api          |
-      | PA1  | security     |
-      | PA1  | support      |
-      | PA1  | api,security |
+      | ente | ruolo        | statoAgreement |
+      | GSP  | admin        | ACTIVE         |
+      | GSP  | api          | ACTIVE         |
+      | GSP  | security     | ACTIVE         |
+      | GSP  | support      | ACTIVE         |
+      | GSP  | api,security | ACTIVE         |
+      | PA1  | admin        | ACTIVE         |
+      | PA1  | api          | ACTIVE         |
+      | PA1  | security     | ACTIVE         |
+      | PA1  | support      | ACTIVE         |
+      | PA1  | api,security | ACTIVE         |
+
+    Examples:
+      | ente | ruolo | statoAgreement |
+      | PA1  | admin | SUSPENDED      |
 
   @tenant_e_service_consumers_listing2
   Scenario Outline: A fronte di 4 o più aderenti in db, restituisce solo i primi 2 risultati (scopo del test è verificare il corretto funzionamento del parametro limit)
