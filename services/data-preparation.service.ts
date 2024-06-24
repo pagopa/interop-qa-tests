@@ -28,6 +28,7 @@ import {
   ClientSeed,
   ClientKind,
   KeySeed,
+  AgreementState,
 } from "./../api/models";
 
 export const ESERVICE_DAILY_CALLS: Readonly<{
@@ -345,7 +346,7 @@ export const dataPreparationService = {
 
   async createAgreementWithGivenState(
     token: string,
-    agreementState: string,
+    agreementState: AgreementState,
     eserviceId: string,
     descriptorId: string,
     doc?: File
@@ -421,7 +422,7 @@ export const dataPreparationService = {
 
   async createAgreementWithGivenStateAndDocument(
     token: string,
-    agreementState: string,
+    agreementState: AgreementState,
     eserviceId: string,
     descriptorId: string
   ) {
