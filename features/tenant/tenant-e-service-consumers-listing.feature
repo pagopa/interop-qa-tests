@@ -1,7 +1,6 @@
-@tenant_e_service_consumers_listing
+@tenant_e_service_consumers_listing @PIN-5022
 Feature: Listing e-service consumers
   Tutti gli utenti autenticati possono leggere la lista dei aderenti che sono iscritti ad almeno un e-service
-  # Privati non escono nei risultati della chiamata di listing fruitori
 
   @tenant_e_service_consumers_listing1
   Scenario Outline: Restituisce tutti gli aderenti che sono iscritti (agreement solo in stato ACTIVE o SUSPENDED) ad almeno un e-service presente in catalogo per qualsiasi livello di permesso e tipologia di ente.
