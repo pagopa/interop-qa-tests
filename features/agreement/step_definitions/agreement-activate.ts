@@ -19,12 +19,12 @@ Given(
   async function (consumer: TenantType) {
     const token = await getToken(consumer);
 
-    const attributeId = await dataPreparationService.createAttribute(
+    this.attributeId = await dataPreparationService.createAttribute(
       token,
       "VERIFIED"
     );
 
-    this.requiredVerifiedAttributes = [[attributeId]];
+    this.requiredVerifiedAttributes = [[this.attributeId]];
   }
 );
 
