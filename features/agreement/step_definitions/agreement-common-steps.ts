@@ -87,7 +87,7 @@ Given(
   async function (certifier: TenantType, tenantType: TenantType) {
     const token = await getToken(certifier);
 
-    const tenantId = getOrganizationId(tenantType);
+    this.tenantId = getOrganizationId(tenantType);
     this.attributeId = await dataPreparationService.createAttribute(
       token,
       "CERTIFIED"
@@ -95,19 +95,19 @@ Given(
 
     await dataPreparationService.assignCertifiedAttributeToTenant(
       token,
-      tenantId,
+      this.tenantId,
       this.attributeId
     );
   }
 );
 
 Given(
-  "{string} dichiara un attributo dichiarato",
+  "{string} ha già dichiarato un attributo",
   async function (tenantType: TenantType) {
     const tenantId = getOrganizationId(tenantType);
     const token = await getToken(tenantType);
 
-    const attributeId = await dataPreparationService.createAttribute(
+    this.attributeId = await dataPreparationService.createAttribute(
       token,
       "DECLARED"
     );
@@ -115,10 +115,10 @@ Given(
     await dataPreparationService.declareDeclaredAttribute(
       token,
       tenantId,
-      attributeId
+      this.attributeId
     );
 
-    this.requiredDeclaredAttributes = [[attributeId]];
+    this.requiredDeclaredAttributes = [[this.attributeId]];
   }
 );
 
