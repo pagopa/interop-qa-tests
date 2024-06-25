@@ -107,7 +107,7 @@ Given(
     const tenantId = getOrganizationId(tenantType);
     const token = await getToken(tenantType);
 
-    const attributeId = await dataPreparationService.createAttribute(
+    this.attributeId = await dataPreparationService.createAttribute(
       token,
       "DECLARED"
     );
@@ -115,10 +115,10 @@ Given(
     await dataPreparationService.declareDeclaredAttribute(
       token,
       tenantId,
-      attributeId
+      this.attributeId
     );
 
-    this.requiredDeclaredAttributes = [[attributeId]];
+    this.requiredDeclaredAttributes = [[this.attributeId]];
   }
 );
 
