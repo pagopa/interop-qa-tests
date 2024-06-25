@@ -29,7 +29,7 @@ Feature: Listing attributi verificati posseduti da uno specifico ente
   @tenant-verified-attributes-listing1b
   Scenario Outline: Per un attributo precedentemente verificato da un altro aderente, alla richiesta di lettura, va a buon fine
     Given l'utente è un "admin" di "PA1"
-    Given "PA1" crea un attributo verificato
+    Given "PA1" ha già creato un attributo verificato
     Given "PA1" ha già creato un e-service in stato "PUBLISHED" che richiede quegli attributi con approvazione "AUTOMATIC"
     Given "GSP" ha una richiesta di fruizione in stato "PENDING" per quell'e-service
     Given "PA1" verifica l'attributo verificato a "GSP"

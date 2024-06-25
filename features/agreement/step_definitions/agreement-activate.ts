@@ -15,7 +15,7 @@ import {
 import { dataPreparationService } from "../../../services/data-preparation.service";
 
 Given(
-  "{string} crea un attributo verificato",
+  "{string} ha già creato un attributo verificato",
   async function (consumer: TenantType) {
     const token = await getToken(consumer);
 

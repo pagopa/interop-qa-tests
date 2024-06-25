@@ -102,7 +102,7 @@ Given(
 );
 
 Given(
-  "{string} dichiara un attributo dichiarato",
+  "{string} ha già dichiarato un attributo",
   async function (tenantType: TenantType) {
     const tenantId = getOrganizationId(tenantType);
     const token = await getToken(tenantType);
