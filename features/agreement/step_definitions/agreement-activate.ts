@@ -29,7 +29,7 @@ Given(
 );
 
 Given(
-  "{string} verifica l'attributo verificato a {string}",
+  "{string} ha già verificato l'attributo verificato a {string}",
   async function (verifier: TenantType, consumer: TenantType) {
     assertContextSchema(this, {
       attributeId: z.string(),

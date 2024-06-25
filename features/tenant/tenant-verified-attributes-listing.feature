@@ -32,6 +32,6 @@ Feature: Listing attributi verificati posseduti da uno specifico ente
     Given "PA1" ha già creato un attributo verificato
     Given "PA1" ha già creato un e-service in stato "PUBLISHED" che richiede quegli attributi con approvazione "AUTOMATIC"
     Given "GSP" ha una richiesta di fruizione in stato "PENDING" per quell'e-service
-    Given "PA1" verifica l'attributo verificato a "GSP"
+    Given "PA1" ha già verificato l'attributo verificato a "GSP"
     When l'utente richiede una operazione di listing degli attributi verificati posseduti da "GSP"
     Then si ottiene status code 200 e la lista degli attributi contenente l'attributo verificato da "PA1"

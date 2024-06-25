@@ -10,7 +10,7 @@ Feature: Attivazione richiesta di fruizione
     Given "<enteFruitore>" ha già creato un attributo verificato
     Given "<enteErogatore>" ha già creato un e-service in stato "PUBLISHED" che richiede quegli attributi con approvazione "MANUAL"
     Given "<enteFruitore>" ha una richiesta di fruizione in stato "PENDING" per quell'e-service
-    Given "<enteErogatore>" verifica l'attributo verificato a "<enteFruitore>"
+    Given "<enteErogatore>" ha già verificato l'attributo verificato a "<enteFruitore>"
     When l'utente richiede una operazione di attivazione di quella richiesta di fruizione
     Then si ottiene status code <risultato>
 
@@ -35,7 +35,7 @@ Feature: Attivazione richiesta di fruizione
     Given "<enteFruitore>" ha già creato un attributo verificato
     Given "<enteErogatore>" ha già creato un e-service in stato "PUBLISHED" che richiede quegli attributi con approvazione "AUTOMATIC"
     Given "<enteFruitore>" ha una richiesta di fruizione in stato "PENDING" per quell'e-service
-    Given "<enteErogatore>" verifica l'attributo verificato a "<enteFruitore>"
+    Given "<enteErogatore>" ha già verificato l'attributo verificato a "<enteFruitore>"
     Given "<enteErogatore>" ha già approvato quella richiesta di fruizione
     Given "<enteErogatore>" ha già sospeso quella richiesta di fruizione come "PRODUCER"
     Given "<enteFruitore>" ha già sospeso quella richiesta di fruizione come "CONSUMER"

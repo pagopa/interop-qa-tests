@@ -8,7 +8,7 @@ Feature: Revoca di un attributo verificato posseduto da uno specifico aderente
     Given "PA2" ha già creato un attributo verificato
     Given "PA2" ha già creato un e-service in stato "PUBLISHED" che richiede quegli attributi con approvazione "MANUAL"
     Given "PA1" ha una richiesta di fruizione in stato "PENDING" per quell'e-service
-    Given "PA2" verifica l'attributo verificato a "PA1"
+    Given "PA2" ha già verificato l'attributo verificato a "PA1"
     When l'utente revoca l'attributo precedentemente verificato
     Then si ottiene status code <statusCode>
 
@@ -26,10 +26,10 @@ Feature: Revoca di un attributo verificato posseduto da uno specifico aderente
     Given "PA2" ha già creato un attributo verificato
     Given "PA2" ha già creato un e-service in stato "PUBLISHED" che richiede quegli attributi con approvazione "MANUAL"
     Given "PA1" ha una richiesta di fruizione in stato "PENDING" per quell'e-service
-    Given "PA2" verifica l'attributo verificato a "PA1"
+    Given "PA2" ha già verificato l'attributo verificato a "PA1"
     Given "GSP" ha già creato un e-service in stato "PUBLISHED" che richiede quegli attributi con approvazione "MANUAL"
     Given "PA1" ha una richiesta di fruizione in stato "PENDING" per quell'e-service
-    Given "GSP" verifica l'attributo verificato a "PA1"
+    Given "GSP" ha già verificato l'attributo verificato a "PA1"
     When l'utente revoca l'attributo precedentemente verificato
     Then si ottiene status code 200
     And l'attributo di "PA1" rimane verificato da "GSP"
