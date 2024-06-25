@@ -16,13 +16,12 @@ When(
   async function () {
     assertContextSchema(this, {
       token: z.string(),
-      requiredVerifiedAttributes: z.array(z.array(z.string())),
       consumerId: z.string(),
+      attributeId: z.string(),
     });
-    const attributeId = this.requiredVerifiedAttributes[0][0];
     this.response = await apiClient.tenants.revokeVerifiedAttribute(
       this.consumerId,
-      attributeId,
+      this.attributeId,
       getAuthorizationHeader(this.token)
     );
   }
@@ -32,7 +31,7 @@ Then(
   async function (tenantType: TenantType, tenantTypeVerifier: TenantType) {
     assertContextSchema(this, {
       token: z.string(),
-      requiredVerifiedAttributes: z.array(z.array(z.string())),
+      attributeId: z.string(),
     });
 
     let attribute: VerifiedTenantAttribute | undefined;
@@ -46,8 +45,7 @@ Then(
           getAuthorizationHeader(this.token)
         ),
       (res) => {
-        const attributeId = this.requiredVerifiedAttributes[0][0];
-        attribute = res.data.attributes.find((a) => a.id === attributeId);
+        attribute = res.data.attributes.find((a) => a.id === this.attributeId);
         return attribute?.revokedBy.length !== 0;
       }
     );
@@ -63,7 +61,7 @@ Then(
   async function (tenantType: TenantType, tenantTypeRevoker: TenantType) {
     assertContextSchema(this, {
       token: z.string(),
-      requiredVerifiedAttributes: z.array(z.array(z.string())),
+      attributeId: z.string(),
     });
 
     let attribute: VerifiedTenantAttribute | undefined;
@@ -77,8 +75,7 @@ Then(
           getAuthorizationHeader(this.token)
         ),
       (res) => {
-        const attributeId = this.requiredVerifiedAttributes[0][0];
-        attribute = res.data.attributes.find((a) => a.id === attributeId);
+        attribute = res.data.attributes.find((a) => a.id === this.attributeId);
         return attribute?.revokedBy.length !== 0;
       }
     );

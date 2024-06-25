@@ -5,8 +5,8 @@ Feature: Assegnazione di un attributo verificato ad un aderente
   @tenant_assign_verified_attribute1
   Scenario Outline: Per un attributo verificato precedentemente creato da un primo aderente, alla richiesta di assegnazione dell’attributo senza data di scadenza ad un secondo aderente da parte di un utente con sufficienti permessi (admin) appartenente al primo aderente, va a buon fine
     Given l'utente è un "<ruolo>" di "<ente>"
-    Given "<ente>" ha già creato 1 attributo "VERIFIED"
-    When l'utente assegna a "PA2" l'attributo certificato precedentemente creato
+    Given "<ente>" ha già creato un attributo verificato
+    When l'utente assegna a "PA2" l'attributo verificato precedentemente creato
     Then si ottiene status code <statusCode>
 
     Examples:
@@ -23,15 +23,29 @@ Feature: Assegnazione di un attributo verificato ad un aderente
       | GSP  | api,security |        400 |
 
   @tenant_assign_verified_attribute2
-  Scenario Outline: Per un attributo certificato precedentemente creato da un aderente, il quale ha la qualifica di ente certificatore (certifier), alla richiesta di assegnazione dell’attributo all’ente stesso da parte di un utente con sufficienti permessi (admin), ottiene un errore. Spiegazione: un ente non può autoassegnarsi attributi certificati
-    Given l'utente è un "admin" di "PA2"
-    Given "PA2" ha già creato 1 attributo "CERTIFIED"
-    When l'utente assegna a "PA2" l'attributo certificato precedentemente creato
-    Then si ottiene status code 400
+  Scenario Outline: Per un attributo verificato precedentemente creato da un primo aderente, alla richiesta di assegnazione dell’attributo senza data di scadenza ad un secondo aderente da parte di un utente con sufficienti permessi (admin) appartenente al terzo aderente, va a buon fine. Spiega: gli attributi verificati possono essere assegnati indipendentemente da chi li ha creati
+    Given l'utente è un "admin" di "PA1"
+    Given "PA2" ha già creato un attributo verificato
+    When l'utente assegna a "GSP" l'attributo verificato precedentemente creato
+    Then si ottiene status code 200
 
   @tenant_assign_verified_attribute3
-  Scenario Outline: Per un attributo certificato precedentemente creato da un primo aderente, alla richiesta di assegnazione dell’attributo ad un secondo ente da parte di un utente con sufficienti permessi (admin), il quale admin appartiene ad un terzo aderente, il quale ha la qualifica di ente certificatore (certifier), ottiene un errore (NB: verificare status code). Spiegazione: un ente non può assegnare attributi certificati che non ha creato
-    Given l'utente è un "admin" di "enteCertificatore"
-    Given "PA2" ha già creato 1 attributo "CERTIFIED"
-    When l'utente assegna a "GSP" l'attributo certificato precedentemente creato
+  Scenario Outline: Per un attributo verificato precedentemente creato da un primo aderente, alla richiesta di assegnazione dell’attributo con data di scadenza nel futuro ad un secondo aderente da parte di un utente con sufficienti permessi (admin) appartenente al primo aderente, va a buon fine
+    Given l'utente è un "admin" di "PA1"
+    Given "PA2" ha già creato un attributo verificato
+    When l'utente assegna a "PA2" l'attributo verificato precedentemente creato con data di scadenza nel futuro
+    Then si ottiene status code 200
+
+  @tenant_assign_verified_attribute4
+  Scenario Outline: Per un attributo verificato precedentemente creato da un primo aderente, alla richiesta di assegnazione dell’attributo con data di scadenza nel passato ad un secondo aderente da parte di un utente con sufficienti permessi (admin) appartenente al primo aderente, ottiene un errore
+    Given l'utente è un "admin" di "PA1"
+    Given "PA2" ha già creato un attributo verificato
+    When l'utente assegna a "PA2" l'attributo verificato precedentemente creato con data di scadenza nel passato
+    Then si ottiene status code 400
+
+  @tenant_assign_verified_attribute5
+  Scenario Outline: Per un attributo verificato precedentemente creato da un aderente, alla richiesta di assegnazione dell’attributo senza scadenza al proprio ente da parte di un utente con sufficienti permessi (admin), ottiene un errore. Spiega: un ente non può autoassegnarsi attributi verificati
+    Given l'utente è un "admin" di "PA1"
+    Given "PA1" ha già creato un attributo verificato
+    When l'utente assegna a "PA1" l'attributo verificato precedentemente creato
     Then si ottiene status code 400

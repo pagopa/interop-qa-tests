@@ -65,7 +65,7 @@ Tutti gli utenti autorizzati possono inoltrare una richiesta di fruizione
   @agreement_submit6
   Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fruitore, la quale è in stato DRAFT, associata ad un e-service nella sua ultima versione pubblicata, la quale versione ha attivazione automatica delle richieste di fruizione con almeno un attributo verificato che il fruitore NON possiede, all’inoltro della richiesta di fruizione da parte di un utente con sufficienti permessi dell’ente fruitore, va a buon fine, e la richiesta di fruizione passa in stato PENDING
     Given l'utente è un "admin" di "PA1"
-    Given "GSP" crea un attributo verificato
+    Given "GSP" ha già creato un attributo verificato
     Given "GSP" ha già creato un e-service in stato "PUBLISHED" che richiede quegli attributi con approvazione "AUTOMATIC"
     Given "PA1" ha una richiesta di fruizione in stato "DRAFT" per quell'e-service
     When l'utente inoltra quella richiesta di fruizione
