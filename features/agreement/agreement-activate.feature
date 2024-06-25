@@ -6,11 +6,11 @@ Feature: Attivazione richiesta di fruizione
   Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fruitore, la quale è in stato PENDING (prima attivazione), con tutti gli attributi richiesti certificati, tutti gli attributi richiesti dichiarati dal fruitore, e tutti gli attributi richiesti verificati dall’erogatore, alla richiesta di attivazione da parte di un utente con sufficienti permessi dell’ente erogatore, va a buon fine
     Given l'utente è un "<ruolo>" di "<enteErogatore>"
     Given "<enteCertificatore>" ha creato un attributo certificato e lo ha assegnato a "<enteFruitore>"
-    Given "<enteFruitore>" dichiara un attributo dichiarato
-    Given "<enteFruitore>" crea un attributo verificato
+    Given "<enteFruitore>" ha già dichiarato un attributo
+    Given "<enteFruitore>" ha già creato un attributo verificato
     Given "<enteErogatore>" ha già creato un e-service in stato "PUBLISHED" che richiede quegli attributi con approvazione "MANUAL"
     Given "<enteFruitore>" ha una richiesta di fruizione in stato "PENDING" per quell'e-service
-    Given "<enteErogatore>" verifica l'attributo verificato a "<enteFruitore>"
+    Given "<enteErogatore>" ha già verificato l'attributo verificato a "<enteFruitore>"
     When l'utente richiede una operazione di attivazione di quella richiesta di fruizione
     Then si ottiene status code <risultato>
 
@@ -31,11 +31,11 @@ Feature: Attivazione richiesta di fruizione
   Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fruitore, la quale è in stato SUSPENDED (riattivazione), con tutti gli attributi richiesti certificati, tutti gli attributi richiesti dichiarati dal fruitore, e tutti gli attributi richiesti verificati dall’erogatore, alla richiesta di attivazione da parte di un utente con sufficienti permessi dell’ente erogatore, va a buon fine.
     Given l'utente è un "admin" di "<enteErogatore>"
     Given "<enteCertificatore>" ha creato un attributo certificato e lo ha assegnato a "<enteFruitore>"
-    Given "<enteFruitore>" dichiara un attributo dichiarato
-    Given "<enteFruitore>" crea un attributo verificato
+    Given "<enteFruitore>" ha già dichiarato un attributo
+    Given "<enteFruitore>" ha già creato un attributo verificato
     Given "<enteErogatore>" ha già creato un e-service in stato "PUBLISHED" che richiede quegli attributi con approvazione "AUTOMATIC"
     Given "<enteFruitore>" ha una richiesta di fruizione in stato "PENDING" per quell'e-service
-    Given "<enteErogatore>" verifica l'attributo verificato a "<enteFruitore>"
+    Given "<enteErogatore>" ha già verificato l'attributo verificato a "<enteFruitore>"
     Given "<enteErogatore>" ha già approvato quella richiesta di fruizione
     Given "<enteErogatore>" ha già sospeso quella richiesta di fruizione come "PRODUCER"
     Given "<enteFruitore>" ha già sospeso quella richiesta di fruizione come "CONSUMER"
