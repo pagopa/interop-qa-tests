@@ -36,14 +36,14 @@ Given(
     });
 
     const token = await getToken(verifier);
-    const consumerId = getOrganizationId(consumer);
+    this.consumerId = getOrganizationId(consumer);
     const verifierId = getOrganizationId(verifier);
 
     const attributeId = this.requiredVerifiedAttributes[0][0];
 
     await dataPreparationService.assignVerifiedAttributeToTenant(
       token,
-      consumerId,
+      this.consumerId,
       verifierId,
       attributeId
     );
