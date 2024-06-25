@@ -19,7 +19,7 @@ When(
     });
 
     this.response = await apiClient.clients.getClientKeys(
-      { userIds: [], clientId: this.clientId },
+      { clientId: this.clientId },
       getAuthorizationHeader(this.token)
     );
   }
