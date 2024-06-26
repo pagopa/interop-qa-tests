@@ -28,6 +28,7 @@ import {
   ClientSeed,
   ClientKind,
   KeySeed,
+  MailSeed,
 } from "./../api/models";
 
 export const ESERVICE_DAILY_CALLS: Readonly<{
@@ -1316,6 +1317,27 @@ export const dataPreparationService = {
           getAuthorizationHeader(token)
         ),
       (res) => !res.data.some((user) => user.userId === userId)
+    );
+  },
+  async addEmailToTenant(
+    token: string,
+    tenantId: string,
+    mailSeed: Omit<MailSeed, "kind">
+  ) {
+    const response = await apiClient.tenants.addTenantMail(
+      tenantId,
+      {
+        kind: "CONTACT_EMAIL",
+        ...mailSeed,
+      },
+      getAuthorizationHeader(token)
+    );
+    assertValidResponse(response);
+
+    await makePolling(
+      () =>
+        apiClient.tenants.getTenant(tenantId, getAuthorizationHeader(token)),
+      (res) => res.data.contactMail?.address === mailSeed.address
     );
   },
 };
