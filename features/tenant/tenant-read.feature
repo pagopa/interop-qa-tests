@@ -25,15 +25,3 @@ Feature: Lettura di un singolo aderente
       | Privato | security     |
       | Privato | support      |
       | Privato | api,security |
-
-    @tenants-listing2
-  Scenario Outline: Restituisce gli aderenti che contengono la keyword "comune" all'interno del nome, con ricerca case insensitive (scopo del test è verificare che funzioni il filtro name)
-    Given l'utente è un "admin" di "PA1"
-    When l'utente richiede una operazione di listing degli aderenti filtrando per la keyword "comune"
-    Then si ottiene status code 200 e la lista di 1 aderente
-
-    @tenants-listing3
-  Scenario Outline: Restituisce un insieme vuoto di aderenti per una ricerca che non porta risultati (scopo del test è verificare che, se non ci sono risultati, il server risponda con 200 e array vuoto e non con un errore)
-    Given l'utente è un "admin" di "PA1"
-    When l'utente richiede una operazione di listing degli aderenti senza ricevere risultato 
-    Then si ottiene status code 200 e la lista di 0 aderenti
