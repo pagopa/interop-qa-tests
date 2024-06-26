@@ -5,9 +5,10 @@ Feature: Lettura di un singolo aderente
   @tenant-read1
   Scenario Outline: Per un aderente della piattaforma, alla richiesta di lettura da parte di qualsiasi livello di permesso associato a qualsiasi tipologia di ente, va a buon fine
     Given l'utente è un "<ruolo>" di "<ente>"
-    When l'utente richiede la lettura di un aderente
+    When l'utente richiede la lettura dell'aderente "PA2"
     Then si ottiene status code "200"
 
+# To do vedere se è più coerente fare la query su un tenantId terzo, oppure sul proprio ente
     Examples:
       | ente    | ruolo        |
       | GSP     | admin        |
