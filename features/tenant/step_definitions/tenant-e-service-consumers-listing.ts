@@ -67,8 +67,8 @@ When(
 );
 
 Then(
-  "si ottiene status code 200 e la lista di {int} aderent(i)(e)",
-  async function (tenantNum: number) {
+  "si ottiene status code {int} e la lista di {int} aderent(i)(e)",
+  async function (statusCode: number, tenantNum: number) {
     assertContextSchema(this, {
       response: z.object({
         status: z.number(),
@@ -78,7 +78,7 @@ Then(
       }),
     });
 
-    assert.equal(this.response.status, 200);
+    assert.equal(this.response.status, statusCode);
     assert.equal(this.response.data.results.length, tenantNum);
   }
 );
