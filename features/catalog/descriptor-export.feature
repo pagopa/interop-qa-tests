@@ -1,6 +1,6 @@
 @descriptor_export
 Feature: Export di un descrittore
-  Tutti gli utenti autorizzatipossono effettuare una richiesta di export di un descrittore di un e-service che il proprio ente eroga.
+  Tutti gli utenti autorizzati possono effettuare una richiesta di export di un descrittore di un e-service che il proprio ente eroga.
 
   @descriptor_export1
   Scenario Outline: La richiesta di export di un descrittore di un e-service, senza documenti, in stato NON DRAFT, va a buon fine
