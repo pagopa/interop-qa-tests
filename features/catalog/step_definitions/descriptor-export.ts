@@ -30,7 +30,6 @@ Then("il pacchetto risulta correttamente formattato", async function () {
   assertContextSchema(this, {
     response: z.object({
       data: z.object({
-        filename: z.string(),
         url: z.string(),
       }),
     }),
@@ -45,19 +44,17 @@ Then("il pacchetto risulta correttamente formattato", async function () {
   const configEntry: AdmZip.IZipEntry | undefined = this.zipEntries.find(
     (entry: AdmZip.IZipEntry) => entry.entryName === "configuration.json"
   );
-  if (configEntry) {
-    this.configJson = configEntry.getData().toString("utf-8");
-  }
+
+  assert.ok(configEntry);
+
+  const configString = configEntry.getData().toString("utf-8");
+
+  this.configJson = JSON.parse(configString);
 
   assert.ok(
     this.zipEntries.some(
-      (entry: AdmZip.IZipEntry) => entry.entryName === "configuration.json"
-    )
-  );
-  const allowedExtensions = [".yaml", ".json", ".wsdl", ".xml"];
-  assert.ok(
-    this.zipEntries.some((entry: AdmZip.IZipEntry) =>
-      allowedExtensions.some((ext) => entry.entryName.endsWith(ext))
+      (entry: AdmZip.IZipEntry) =>
+        entry.entryName === this.configJson.descriptor.interface.path
     )
   );
 });
@@ -71,10 +68,11 @@ Then(
           entryName: z.string(),
         })
       ),
-      configJson: z.string(),
+      configJson: z.object({
+        riskAnalysis: z.array(z.unknown()),
+      }),
     });
-    const { riskAnalysis } = JSON.parse(this.configJson);
-    assert.ok(riskAnalysis.length > 0);
+    assert.ok(this.configJson.riskAnalysis.length > 0);
   }
 );
 
@@ -87,12 +85,17 @@ Then(
           entryName: z.string(),
         })
       ),
-      configJson: z.string(),
+      configJson: z.object({
+        descriptor: z.object({
+          docs: z.array(z.object({ path: z.string() })),
+        }),
+      }),
     });
-    const { docs } = JSON.parse(this.configJson);
-    const expectedDocuments = docs.map((doc: { path: string }) => doc.path);
+    const expectedDocuments = this.configJson.descriptor.docs.map(
+      (doc) => doc.path
+    );
 
-    expectedDocuments.forEach((doc: string) => {
+    expectedDocuments.forEach((doc) => {
       assert.ok(this.zipEntries.some((entry) => entry.entryName === doc));
     });
   }
