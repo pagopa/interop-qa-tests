@@ -95,7 +95,6 @@ Then(
       }),
     });
 
-    console.log(this.configJson);
     const expectedDocuments = this.configJson.descriptor.docs.map(
       (doc) => doc.path
     );
