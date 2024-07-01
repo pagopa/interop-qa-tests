@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -euo pipefail
+
+MONGO_HOST=$READMODEL_HOST
+MONGO_PORT=$READMODEL_PORT
+MONGO_USER=$READMODEL_USER
+MONGO_PWD=$READMODEL_PWD
+MONGO_DB_NAME=$READMODEL_DB_NAME
+
+mongosh -u $MONGO_USER -p $MONGO_PWD --host $MONGO_HOST --port $MONGO_PORT  < "./scripts/deleteReadModelItemsScript.js"

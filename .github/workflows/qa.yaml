@@ -1,0 +1,333 @@
+name: QA workflow
+
+on: 
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to run tests against'
+        required: true
+        type: environment
+      kafkaPurgeTopics:
+        description: 'Purge Kafka topics'
+        required: true
+        default: false
+        type: boolean
+      runDataPreparation:
+        description: 'Data preparation (wipe + reload dump)'
+        required: true
+        default: true
+        type: boolean
+      runTests:
+        description: 'Run test suite'
+        required: true
+        default: true
+        type: boolean
+
+
+defaults:
+    run:
+      shell: bash
+      
+permissions:
+  id-token: write
+  contents: read
+  
+env:
+   skip_checkUserMembership: "true"
+   skip_failNotSelectedEnvTagRef: "true"
+   SCRIPTS_FOLDER: "./scripts"
+   
+jobs:
+  inputs:
+    runs-on: ubuntu-22.04
+    environment: ${{ inputs.environment }}
+
+    steps:
+      - name: Print Inputs
+        id: print_inputs
+        run: |
+          echo "- environment: \`${{ inputs.environment }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- ref: \`${{ github.ref }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- plat-dep versions: \`${{ vars.PLAT_DEP_VERSIONS_URL }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- kafkaPurgeTopics: \`${{ inputs.kafkaPurgeTopics }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- runDataPreparation: \`${{ inputs.runDataPreparation }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- runTests: \`${{ inputs.runTests }}\`" >> $GITHUB_STEP_SUMMARY
+
+  create_runner:
+    name: Create Self-Hosted Runner
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        index: [1]
+      fail-fast: true
+    environment: ${{ inputs.environment }}
+
+    steps:
+      - name: Start GitHub Runner
+        id: start_runner
+        uses: pagopa/interop-github-runner-aws-create-action@main
+        with:
+            environment: ${{ inputs.environment }}
+            aws_region: ${{ secrets.AWS_REGION }}
+            iam_role_arn: ${{ secrets.ECS_IAM_ROLE_ARN }}
+            ecs_cluster_name: ${{ secrets.ECS_CLUSTER_NAME }}
+            ecs_task_definition: ${{ secrets.ECS_TASK_DEFINITION }}
+            ecs_container_name: ${{ vars.ECS_TASK_CONTAINER_NAME }}
+            ecs_task_max_duration_seconds: ${{ vars.ECS_TASK_MAX_DURATION_SECONDS }}
+            ecs_task_subnet_id: ${{ secrets.SUBNET_ID }}
+            ecs_task_sec_group: ${{ secrets.SEC_GROUP_ID }}
+            pat_token: ${{ secrets.BOT_TOKEN }}
+
+  svc_version_check:
+    name: Check Deployed Versions
+    needs: create_runner
+    runs-on: [self-hosted, "run_id:${{ inputs.environment }}-${{ github.run_id }}"]
+    environment: ${{ inputs.environment }}
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v3
+
+      - name: Get plat-dep versions
+        run: |
+          curl ${{ vars.PLAT_DEP_VERSIONS_URL }} > plat_dep_versions.sh
+
+      - name: Set kubeconfig
+        run: |
+            aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name ${{ secrets.EKS_CLUSTER_NAME }}
+
+      - name: Check deployed versions
+        id: check_svc_version
+        shell: bash
+        env: 
+            AWS_REGION: ${{ secrets.AWS_REGION}}
+            EKS_CLUSTER_NAME: ${{ secrets.EKS_CLUSTER_NAME}}
+            K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE }}
+        run: |
+           $SCRIPTS_FOLDER/checkSvcVersion.sh ./plat_dep_versions.sh
+  
+  data_prep:
+    name: Data Preparation
+    needs: svc_version_check
+    runs-on: [self-hosted, "run_id:${{ inputs.environment }}-${{ github.run_id }}"]
+    environment: ${{ inputs.environment }}
+    if: ${{ inputs.runDataPreparation }}
+    env: 
+      K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE }}
+      EVENT_STORE_HOST: ${{ secrets.EVENT_STORE_HOST }}
+      EVENT_STORE_DB_NAME: ${{ vars.EVENT_STORE_DB_NAME }}
+      EVENT_STORE_PORT: 5432
+      LOCAL_ATTRIBUTE_REGISTRY_DUMPS: "./db_dumps/attribute_registry"
+      LOCAL_ATTRIBUTE_REGISTRY_SCHEMA_NAME: "${{ vars.K8S_NAMESPACE }}_attribute_registry"
+      LOCAL_ATTRIBUTE_REGISTRY_TABLE_NAME: "events"
+      LOCAL_TENANT_DUMPS: "./db_dumps/tenant"
+      LOCAL_TENANT_SCHEMA_NAME: "${{ vars.K8S_NAMESPACE }}_tenant"
+      LOCAL_TENANT_JOURNAL_TABLE_NAME: "event_journal"
+      LOCAL_TENANT_TAG_TABLE_NAME: "event_tag"
+      MAX_POLLING_TRIES: "${{ vars.MAX_POLLING_TRIES }}"
+      POLLING_SLEEP_TIME: "${{ vars.POLLING_SLEEP_TIME }}"
+
+    steps:
+      - name: Create dump dir
+        id: mkdir_dump
+        shell: bash
+        run: |
+            mkdir -p $LOCAL_TENANT_DUMPS
+            mkdir -p $LOCAL_ATTRIBUTE_REGISTRY_DUMPS
+
+      - name: Get dump from S3
+        id: get_data_dumps
+        env: 
+            AWS_REGION: ${{ secrets.AWS_REGION}}
+        run: |
+            aws s3 cp "s3://${{ vars.DATA_PREPARATION_BUCKET }}/${{ vars.TENANT_DUMP_S3_PREFIX }}" $LOCAL_TENANT_DUMPS --recursive
+            aws s3 cp "s3://${{ vars.DATA_PREPARATION_BUCKET }}/${{ vars.ATTRIBUTE_REGISTRY_DUMP_S3_PREFIX }}" $LOCAL_ATTRIBUTE_REGISTRY_DUMPS --recursive
+
+      - name: Scale service Deployments to 0
+        id: svc_scale_to_0
+        shell: bash
+        run: |
+            set -euo pipefail
+
+            echo "Scaling deployments to 0"
+            kubectl scale deployment -n $K8S_NAMESPACE --replicas=0 --all
+                 
+            echo "Waiting for pods deletion"
+            ACTIVE_PODS_COUNT=$(kubectl get pods -n $K8S_NAMESPACE -o json | jq '.items | length')
+            while [[ $ACTIVE_PODS_COUNT -gt 0 ]]; do
+              sleep 2 
+              ACTIVE_PODS_COUNT=$(kubectl get pods -n $K8S_NAMESPACE -o json | jq '.items | length')
+            done
+          
+            echo "All the deployments have been scaled down to 0 replicas."
+
+      - name: Get EventStore DB Credentials
+        id: get_evtstore_db_credentials
+        env:
+          EVENT_STORE_SECRET_ARN: ${{ secrets.EVENT_STORE_SECRET_ARN }}
+        shell: bash
+        run: |
+            set -euo pipefail
+
+            echo "Retrieving event store credentials..."
+            
+            EVENT_STORE_CREDENTIALS="$(aws secretsmanager get-secret-value --secret-id $EVENT_STORE_SECRET_ARN)"
+            #echo "::add-mask::$EVENT_STORE_CREDENTIALS"
+            
+            echo "Retrieve EventStore username"
+            EVENT_STORE_USERNAME="$(echo $EVENT_STORE_CREDENTIALS | jq -r '.SecretString | fromjson | .username')"
+            echo "::add-mask::$EVENT_STORE_USERNAME"
+            
+            echo "Retrieve EventStore password"
+            EVENT_STORE_PASSWORD="$(echo $EVENT_STORE_CREDENTIALS | jq -r '.SecretString | fromjson | .password')"
+            echo "::add-mask::$EVENT_STORE_PASSWORD"
+            
+            echo "Update env vars with EventStore credentials"
+            echo "EVENT_STORE_USERNAME=$EVENT_STORE_USERNAME" >> "$GITHUB_ENV"
+            echo "EVENT_STORE_PASSWORD=$EVENT_STORE_PASSWORD" >> "$GITHUB_ENV"
+      
+      - name: Get ReadModel DB Credentials
+        id: get_readmodel_db_credentials
+        env:
+          READ_MODEL_SECRET_ARN: ${{ secrets.READ_MODEL_SECRET_ARN }}
+        shell: bash
+        run: |
+            set -euo pipefail
+
+            echo "Retrieving read model credentials..."
+            
+            READ_MODEL_CREDENTIALS="$(aws secretsmanager get-secret-value --secret-id $READ_MODEL_SECRET_ARN)"
+            #echo "::add-mask::$READ_MODEL_CREDENTIALS"
+            
+            echo "Retrieve ReadModel username"
+            READ_MODEL_USERNAME="$(echo $READ_MODEL_CREDENTIALS | jq -r '.SecretString | fromjson | .username')"
+            echo "::add-mask::$READ_MODEL_USERNAME"
+
+            echo "Retrieve ReadModel password"
+            READ_MODEL_PASSWORD="$(echo $READ_MODEL_CREDENTIALS | jq -r '.SecretString | fromjson | .password')"
+            echo "::add-mask::$READ_MODEL_PASSWORD"
+            
+            echo "Update env vars with ReadModel credentials"
+            echo "READ_MODEL_USERNAME=$READ_MODEL_USERNAME" >> "$GITHUB_ENV"
+            echo "READ_MODEL_PASSWORD=$READ_MODEL_PASSWORD" >> "$GITHUB_ENV"
+      
+      - name: Truncate EventStore DB Tables
+        id: event_store_db_truncate
+        shell: bash
+        run: |
+          $SCRIPTS_FOLDER/truncateEventStore.sh
+          
+      - name: Clear ReadModel Collections
+        id: read_model_db_clear
+        shell: bash
+        env:
+          READMODEL_HOST: ${{ secrets.READ_MODEL_HOST }}
+          READMODEL_PORT: 27017
+          READMODEL_USER: ${{ env.READ_MODEL_USERNAME }}
+          READMODEL_PWD: ${{ env.READ_MODEL_PASSWORD }}
+          READMODEL_DB_NAME: ${{ vars.READ_MODEL_DB_NAME }}
+        run: |
+          $SCRIPTS_FOLDER/deleteReadModelItems.sh
+      
+      - name: Purge Kafka topics
+        id: clean_kafka
+        if: ${{ inputs.kafkaPurgeTopics }}
+        shell: bash
+        working-directory: scripts/kafka
+        env: 
+            AWS_REGION: ${{ secrets.AWS_REGION}}
+            KAFKA_BROKERS: ${{ vars.KAFKA_BROKERS }}
+            DOMAIN_TOPIC_PREFIX: ${{ vars.DOMAIN_TOPIC_PREFIX }}
+            TOPICS_PROPERTIES_PATH: ../../data/qa/topics/${{ inputs.environment }}/
+        run: |
+          set -eou pipefail
+
+          npm ci
+          npm run kafka:deleteTopics
+          npm run kafka:createTopics
+
+      - name: Restore Dump
+        id: db_dump_restore
+        shell: bash
+        run: |
+          $SCRIPTS_FOLDER/restoreEventStore.sh
+          
+      - name: Scale service Deployments to 1
+        id: svc_scale_to_1
+        shell: bash
+        run: |
+          set -euo pipefail
+          
+          echo "Scaling deployments to 1 replica"
+          kubectl scale deployment -n $K8S_NAMESPACE --replicas=1 --all
+
+          PODS_NOT_READY_COUNT=$(kubectl get pods -n "$K8S_NAMESPACE" -o json | 
+          jq '[ .items[] | select(.status.phase != "Running" or ([ .status.conditions[] | select(.type == "Ready" and .state == false) ] | length ) == 1 ) ] | length')
+
+          echo "Waiting for pods readiness"
+          while [[ $PODS_NOT_READY_COUNT -gt 0 ]]; do
+            sleep 2
+           
+            PODS_NOT_READY_COUNT=$(kubectl get pods -n "$K8S_NAMESPACE" -o json | 
+              jq '[ .items[] | select(.status.phase != "Running" or ([ .status.conditions[] | select(.type == "Ready" and .state == false) ] | length ) == 1 ) ] | length')
+          done
+        
+          echo "All the deployments have been scaled up to 1 replicas."
+  
+  run_test:
+    name: Run Cucumber Test Suite
+    if: ${{ inputs.runTests }}
+    needs: data_prep
+    runs-on: [self-hosted, "run_id:${{ inputs.environment }}-${{ github.run_id }}"]
+    environment: ${{ inputs.environment }}
+    env: 
+      ENVIRONMENT: ${{ vars.ENVIRONMENT }}
+      SESSION_TOKENS_DURATION_SECONDS: ${{ vars.SESSION_TOKENS_DURATION_SECONDS }}
+      REMOTE_WELLKNOWN_URL: ${{ vars.REMOTE_WELLKNOWN_URL }}
+      BFF_BASE_URL: ${{ vars.BFF_BASE_URL }}
+      ST_VERBOSE_MODE: ${{ vars.ST_VERBOSE_MODE }}
+      TENANTS_IDS_FILE_PATH: ${{ vars.TENANTS_IDS_FILE_PATH }}
+    steps:
+      - name: Clone QA test repo
+        id: clone_qa_repo
+        shell: bash
+        run: |
+          echo "Cloning interop-qa-tests repo.."
+          git clone --branch main --depth 1 ${{ vars.QA_TESTS_REPO_URL }}
+          echo "interop-qa-tests repo has been cloned"
+
+       
+      - name: Run QA tests
+        id: run_qa_tests
+        shell: bash
+        run: |
+          set -uo pipefail
+          
+          cd interop-qa-tests
+          echo "Install node dependencies"
+          pnpm i
+          
+          echo "Run test command"
+          pnpm test
+
+  delete_runner:
+    name: Delete Self-Hosted Runner
+    needs: [create_runner, svc_version_check, data_prep, run_test]
+    if: ${{ always() }}
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        index: [1]
+      fail-fast: true
+    environment: ${{ inputs.environment }}
+
+    steps:
+      - name: Stop Github Runner
+        id: stop_runner
+        uses: pagopa/interop-github-runner-aws-cleanup-action@main
+        with:
+            environment: ${{ inputs.environment }}
+            aws_region: ${{ secrets.AWS_REGION }}
+            iam_role_arn: ${{ secrets.ECS_IAM_ROLE_ARN }}
+            ecs_cluster_name: ${{ secrets.ECS_CLUSTER_NAME }}
+            pat_token: ${{ secrets.BOT_TOKEN }}
