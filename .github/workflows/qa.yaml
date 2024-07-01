@@ -238,7 +238,7 @@ jobs:
             AWS_REGION: ${{ secrets.AWS_REGION}}
             KAFKA_BROKERS: ${{ vars.KAFKA_BROKERS }}
             DOMAIN_TOPIC_PREFIX: ${{ vars.DOMAIN_TOPIC_PREFIX }}
-            TOPICS_PROPERTIES_PATH: ../../data/qa/topics/${{ inputs.environment }}/
+            TOPICS_PROPERTIES_PATH: ../../data/topics/${{ inputs.environment }}/
         run: |
           set -eou pipefail
 
