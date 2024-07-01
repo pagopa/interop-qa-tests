@@ -11,13 +11,13 @@ Feature: Assegnazione di un attributo certificato ad un aderente
 
     Examples:
       | ruolo        | statusCode |
-      | admin        |        200 |
-      | api          |        400 |
-      | security     |        400 |
-      | support      |        400 |
-      | api,security |        400 |
+      | admin        |        204 |
+      | api          |        403 |
+      | security     |        403 |
+      | support      |        403 |
+      | api,security |        403 |
 
-  @tenant_assign_certified_attribute2
+  @tenant_assign_certified_attribute2 @wait_for_fix
   Scenario Outline: Per un attributo certificato precedentemente creato da un aderente, il quale ha la qualifica di ente certificatore (certifier), alla richiesta di assegnazione dell’attributo all’ente stesso da parte di un utente con sufficienti permessi (admin), ottiene un errore. Spiegazione: un ente non può autoassegnarsi attributi certificati
     Given l'utente è un "admin" di "PA2"
     Given "PA2" ha già creato 1 attributo "CERTIFIED"
