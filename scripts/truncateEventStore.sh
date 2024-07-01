@@ -15,7 +15,7 @@ PSQL_BIN=psql
 echo "psql version" $($PSQL_BIN --version)
 
 #Get schema list - ignore schemas without <ENV>_* prefix
-SCHEMA_LIST=$($PSQL_BIN -c "SELECT schema_name FROM information_schema.schemata WHERE schema_name ~ '${K8S_NAMESPACE}_.*';" | grep -i "${K8S_NAMESPACE}_*")
+SCHEMA_LIST=$($PSQL_BIN -c "SELECT schema_name FROM information_schema.schemata WHERE schema_name LIKE '${K8S_NAMESPACE}\_%';" | grep -i "${K8S_NAMESPACE}_*")
 
 for CURRENT_SCHEMA in $SCHEMA_LIST
 do
@@ -25,7 +25,7 @@ do
     TABLE_LIST=$($PSQL_BIN -c "SELECT table_name FROM information_schema.tables WHERE table_schema = '$CURRENT_SCHEMA';" | grep -v -e "-" -e '^(.*)$' -e "flyway" -e "table_name")
     for TABLE_NAME in $TABLE_LIST
     do
-        $PSQL_BIN -c "TRUNCATE TABLE $CURRENT_SCHEMA.$TABLE_NAME CASCADE;"
+        $PSQL_BIN -c "TRUNCATE TABLE \"$CURRENT_SCHEMA\".\"$TABLE_NAME\" CASCADE;"
         if [[ $? -eq 0 ]]; then
             echo "\t-" $TABLE_NAME "truncated"
         else
