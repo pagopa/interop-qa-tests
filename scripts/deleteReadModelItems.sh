@@ -2,10 +2,10 @@
 
 set -euo pipefail
 
-MONGO_HOST=$READMODEL_HOST
-MONGO_PORT=$READMODEL_PORT
-MONGO_USER=$READMODEL_USER
-MONGO_PWD=$READMODEL_PWD
-MONGO_DB_NAME=$READMODEL_DB_NAME
-
-mongosh -u $MONGO_USER -p $MONGO_PWD --host $MONGO_HOST --port $MONGO_PORT  < "./scripts/deleteReadModelItemsScript.js"
+mongosh -u $READ_MODEL_USERNAME -p $READ_MODEL_PASSWORD --host $READ_MODEL_HOST --port $READ_MODEL_PORT \
+  --eval "use ${READ_MODEL_DB_NAME};
+          var collections = db.getCollectionNames(); 
+          for (let coll of collections) {
+            db.getCollection(coll).deleteMany({});
+          }
+          exit;" 

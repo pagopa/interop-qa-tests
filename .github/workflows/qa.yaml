@@ -221,11 +221,11 @@ jobs:
         id: read_model_db_clear
         shell: bash
         env:
-          READMODEL_HOST: ${{ secrets.READ_MODEL_HOST }}
-          READMODEL_PORT: 27017
-          READMODEL_USER: ${{ env.READ_MODEL_USERNAME }}
-          READMODEL_PWD: ${{ env.READ_MODEL_PASSWORD }}
-          READMODEL_DB_NAME: ${{ vars.READ_MODEL_DB_NAME }}
+          READ_MODEL_HOST: ${{ secrets.READ_MODEL_HOST }}
+          READ_MODEL_PORT: 27017
+          READ_MODEL_USERNAME: ${{ env.READ_MODEL_USERNAME }}
+          READ_MODEL_PASSWORD: ${{ env.READ_MODEL_PASSWORD }}
+          READ_MODEL_DB_NAME: ${{ vars.READ_MODEL_DB_NAME }}
         run: |
           $SCRIPTS_FOLDER/deleteReadModelItems.sh
       
