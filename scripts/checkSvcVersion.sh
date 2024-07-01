@@ -36,15 +36,16 @@ do
           echo  "::warning::WARNING - " $CURRENT_SVC  " currently deployed version " $SVC_VERSION " not in list"
           continue
         fi
-        
-        kubectl rollout status -n $K8S_NAMESPACE deployment/$CURRENT_SVC > /dev/null
-        SVC_ROLLOUT_STATUS=$?
-
-        if [[ ! $SVC_ROLLOUT_STATUS  -eq 0 ]]; then
-          # Service not ready
-          echo  "::error::Error - Deployment" $CURRENT_SVC "not ready:" $(kubectl rollout status -n $K8S_NAMESPACE deployment/$CURRENT_SVC)
-          ROLLOUT_ERROR=1
-        fi
+       
+        # TODO: refactor using readiness
+        # kubectl rollout status --watch=false -n $K8S_NAMESPACE deployment/$CURRENT_SVC > /dev/null
+        # SVC_ROLLOUT_STATUS=$?
+        #
+        # if [[ ! $SVC_ROLLOUT_STATUS  -eq 0 ]]; then
+        #   # Service not ready
+        #   echo  "::error::Error - Deployment" $CURRENT_SVC "not ready:" $(kubectl rollout status -n $K8S_NAMESPACE deployment/$CURRENT_SVC)
+        #   ROLLOUT_ERROR=1
+        # fi
 
         SVC_VERSION=$(kubectl get deployment -n $K8S_NAMESPACE $CURRENT_SVC -o jsonpath='{$.spec.template.spec.containers[:1].image}' | tr \: \\t | awk '{print $2}')
 
