@@ -1,6 +1,6 @@
 @descriptor_export
 Feature: Export di un descrittore
-  Tutti gli utenti autorizzatipossono effettuare una richiesta di export di un descrittore di un e-service che il proprio ente eroga.
+  Tutti gli utenti autorizzati possono effettuare una richiesta di export di un descrittore di un e-service che il proprio ente eroga.
 
   @descriptor_export1
   Scenario Outline: La richiesta di export di un descrittore di un e-service, senza documenti, in stato NON DRAFT, va a buon fine
@@ -41,12 +41,12 @@ Feature: Export di un descrittore
     Given l'utente è un "admin" di "PA1"
     Given "PA2" ha già creato un e-service con un descrittore in stato "PUBLISHED"
     When l'utente effettua una richiesta di export del descrittore
-    Then si ottiene status code 400
+    Then si ottiene status code 403
 
   @descriptor_export4
   Scenario Outline: La richiesta di export di un descrittore di un e-service, senza documenti, in erogazione inversa, con un’analisi del rischio compilata, va a buon fine. Il documento di configurazione che è parte del pacchetto esportato contiene anche l’analisi del rischio compilata dall’erogatore
     Given l'utente è un "admin" di "PA1"
-    Given "PA1" ha già creato un e-service con un descrittore in stato "PUBLISHED"
+    Given "PA1" ha già creato un e-service in modalità "RECEIVE" con un descrittore in stato "PUBLISHED"
     When l'utente effettua una richiesta di export del descrittore
     Then si ottiene status code 200
     And il pacchetto risulta correttamente formattato
@@ -55,7 +55,7 @@ Feature: Export di un descrittore
   @descriptor_export5
   Scenario Outline: La richiesta di export di un descrittore di un e-service, con documenti, va a buon fine e vengono esportati anche i documenti
     Given l'utente è un "admin" di "PA1"
-    Given "PA1" ha già creato un e-service con un descrittore in stato "PUBLISHED"
+    Given "PA1" ha già creato un e-service con un descrittore in stato "PUBLISHED" e un documento già caricato
     When l'utente effettua una richiesta di export del descrittore
     Then si ottiene status code 200
     And il pacchetto risulta correttamente formattato

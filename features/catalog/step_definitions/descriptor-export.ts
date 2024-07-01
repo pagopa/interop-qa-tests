@@ -42,20 +42,20 @@ Then("il pacchetto risulta correttamente formattato", async function () {
   this.zipEntries = zip.getEntries();
 
   const configEntry: AdmZip.IZipEntry | undefined = this.zipEntries.find(
-    (entry: AdmZip.IZipEntry) => entry.entryName === "configuration.json"
+    (entry: AdmZip.IZipEntry) => entry.entryName.endsWith("configuration.json")
   );
 
-  assert.ok(configEntry);
+  assert.ok(configEntry, "configuration.json not found");
 
   const configString = configEntry.getData().toString("utf-8");
 
   this.configJson = JSON.parse(configString);
 
   assert.ok(
-    this.zipEntries.some(
-      (entry: AdmZip.IZipEntry) =>
-        entry.entryName === this.configJson.descriptor.interface.path
-    )
+    this.zipEntries.some((entry: AdmZip.IZipEntry) =>
+      entry.entryName.endsWith(this.configJson.descriptor.interface.path)
+    ),
+    "interface not found"
   );
 });
 
@@ -72,7 +72,10 @@ Then(
         riskAnalysis: z.array(z.unknown()),
       }),
     });
-    assert.ok(this.configJson.riskAnalysis.length > 0);
+    assert.ok(
+      this.configJson.riskAnalysis.length > 0,
+      "riskAnalysis not found"
+    );
   }
 );
 
@@ -91,12 +94,16 @@ Then(
         }),
       }),
     });
+
     const expectedDocuments = this.configJson.descriptor.docs.map(
       (doc) => doc.path
     );
 
     expectedDocuments.forEach((doc) => {
-      assert.ok(this.zipEntries.some((entry) => entry.entryName === doc));
+      assert.ok(
+        this.zipEntries.some((entry) => entry.entryName.endsWith(doc)),
+        "Document not found"
+      );
     });
   }
 );
