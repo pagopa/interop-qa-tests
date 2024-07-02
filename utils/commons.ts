@@ -2,7 +2,7 @@ import "../configs/env";
 import { readFileSync } from "fs";
 import crypto from "crypto";
 import { z } from "zod";
-import { type AxiosResponse } from "axios";
+import axios, { type AxiosResponse } from "axios";
 import { env } from "../configs/env";
 import { generateSessionTokens } from "./session-tokens";
 
@@ -143,4 +143,14 @@ export function createBase64PublicKey(
       .replace("-----BEGIN RSA PUBLIC KEY-----", "")
       .replace("-----END RSA PUBLIC KEY-----", "")
   ).toString("base64");
+}
+
+export async function downloadFile(fileUrl: string): Promise<Buffer> {
+  const response = await axios({
+    method: "get",
+    url: fileUrl,
+    responseType: "arraybuffer",
+  });
+
+  return Buffer.from(response.data);
 }
