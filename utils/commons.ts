@@ -1,5 +1,5 @@
 import "../configs/env";
-import { readFileSync } from "fs";
+import { createReadStream, readFileSync } from "fs";
 import crypto from "crypto";
 import { z } from "zod";
 import axios, { type AxiosResponse } from "axios";
@@ -152,5 +152,23 @@ export async function downloadFile(fileUrl: string): Promise<Buffer> {
     responseType: "arraybuffer",
   });
 
+  assertValidResponse(response);
+
   return Buffer.from(response.data);
+}
+
+export async function uploadFile(
+  fileUrl: string,
+  zipFilePath: string
+): Promise<void> {
+  const response = await axios({
+    method: "put",
+    url: fileUrl,
+    data: createReadStream(zipFilePath),
+    headers: {
+      "Content-Type": "application/zip",
+    },
+  });
+
+  assertValidResponse(response);
 }

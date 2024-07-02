@@ -1,0 +1,27 @@
+{
+  "description": "Descrizione e-service",
+  "technology": "REST",
+  "mode": "DELIVER",
+  "descriptor": {
+    "interface": {
+      "prettyName": "Interfaccia",
+      "path": "interface.yaml"
+    },
+    "docs": [
+      {
+        "prettyName": "Documento_test_qa",
+        "path": "documents/documento-test-qa.pdf"
+      }
+    ],
+    "audience": [
+      "api/v1"
+    ],
+    "voucherLifespan": 60,
+    "dailyCallsPerConsumer": 50,
+    "dailyCallsTotal": 1000,
+    "description": "Questo è un e-service di test",
+    "agreementApprovalPolicy": "AUTOMATIC"
+  },
+  "riskAnalysis": [],
+  "name": "e-service-IMPORTED-1449798293817017"
+}
