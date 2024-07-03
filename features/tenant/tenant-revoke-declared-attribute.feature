@@ -4,15 +4,15 @@ Feature: Revoca di un attributo dichiarato posseduto da uno specifico aderente
 
   @tenant-revoke-declared-attribute1
   Scenario Outline: Per un attributo precedentemente dichiarato dall’aderente stesso, alla richiesta di revoca da parte di un utente con sufficienti permessi (admin) appartenente a quell'ente, va a buon fine
-    Given l'utente è un "<ruolo>" di "PA1"
+    Given l'utente è un "<ruolo>" di "PA2"
     Given "PA2" dichiara un attributo dichiarato
     When l'utente revoca l'attributo precedentemente dichiarato
     Then si ottiene status code <statusCode>
 
     Examples:
       | ruolo        | statusCode |
-      | admin        |        200 |
-      | api          |        400 |
-      | security     |        400 |
-      | support      |        400 |
-      | api,security |        400 |
+      | admin        |        204 |
+      | api          |        403 |
+      | security     |        403 |
+      | support      |        403 |
+      | api,security |        403 |
