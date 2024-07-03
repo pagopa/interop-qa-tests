@@ -26,7 +26,7 @@
     "selfcareId": "037be1b6-6229-4abf-ab68-f433a5dce0f9",
     "organizationId": {
       "dev": "f6e264d2-e1bc-4e8a-be54-5c05b4ea6e45",
-      "refactor.dev": "89804b2c-f62e-4867-87a4-3a82f2b03485",
+      "refactor.dev": "f6e264d2-e1bc-4e8a-be54-5c05b4ea6e45",
       "qa": "f6e264d2-e1bc-4e8a-be54-5c05b4ea6e45"
     },
     "user-roles": {
