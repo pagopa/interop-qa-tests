@@ -1,8 +1,8 @@
-@tenant-requester-certified-attributes-listing
+@tenant_requester_certified_attributes_listing
 Feature: Listing attributi certificati assegnati dall'ente certificatore
   Tutti gli utenti certificatori possono leggere la lista degli attributi certificati assegnati 
 
-  @tenant-requester-certified-attributes-listing1
+  @tenant_requester_certified_attributes_listing1
   Scenario Outline: A fronte di una richiesta di listing di attributi certificati creati e assegnati dall'ente richiedente, la richiesta va buon fine solo se il richiedente è un ente certificatore
     Given l'utente è un "<ruolo>" di "<ente>"
     When l'utente richiede una operazione di listing degli attributi certificati assegnati
@@ -26,7 +26,7 @@ Feature: Listing attributi certificati assegnati dall'ente certificatore
       | Privato | support      |        403 |
       | Privato | api,security |        403 |
 
-  @tenant-requester-certified-attributes-listing2
+  @tenant_requester_certified_attributes_listing2
   Scenario Outline: A fronte di una richiesta di listing di attributi certificati creati e assegnati dall'ente richiedente, va a buon fine
   # ci restituisce l'errore "The server was not able to produce a timely response to your request. Please try again in a short while!"
     Given l'utente è un "admin" di "PA2"
