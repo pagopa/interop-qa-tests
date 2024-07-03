@@ -65,7 +65,7 @@ Given(
 
 Given(
   "{string} ha una richiesta di fruizione in stato {string} per quell'e-service",
-  async function (consumer: TenantType, agreementState: string) {
+  async function (consumer: TenantType, agreementState: AgreementState) {
     assertContextSchema(this, {
       eserviceId: z.string(),
       descriptorId: z.string(),
@@ -87,7 +87,7 @@ Given(
   async function (certifier: TenantType, tenantType: TenantType) {
     const token = await getToken(certifier);
 
-    const tenantId = getOrganizationId(tenantType);
+    this.tenantId = getOrganizationId(tenantType);
     this.attributeId = await dataPreparationService.createAttribute(
       token,
       "CERTIFIED"
@@ -95,7 +95,7 @@ Given(
 
     await dataPreparationService.assignCertifiedAttributeToTenant(
       token,
-      tenantId,
+      this.tenantId,
       this.attributeId
     );
   }
@@ -124,7 +124,7 @@ Given(
 
 Given(
   "{string} ha una richiesta di fruizione in stato {string} per ognuno di quegli e-services",
-  async function (consumer: TenantType, agreementState: string) {
+  async function (consumer: TenantType, agreementState: AgreementState) {
     assertContextSchema(this, {
       publishedEservicesIds: z.array(z.array(z.string())),
       token: z.string(),

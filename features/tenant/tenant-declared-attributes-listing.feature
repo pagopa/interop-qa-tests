@@ -1,14 +1,14 @@
-@tenant-declared-attributes-listing
+@tenant_declared_attributes_listing
 Feature: Listing attributi dichiarati posseduti da uno specifico ente
   Tutti gli utenti autenticati possono leggere la lista degli attributi dichiarati posseduti da uno specifico ente
 
-  @tenant-declared-attributes-listing1a
+  @tenant_declared_attributes_listing1a
   Scenario Outline: Per un attributo precedentemente dichiarato dall’aderente stesso, alla richiesta di lettura, va a buon fine
     Given l'utente è un "<ruolo>" di "<ente>"
     When l'utente richiede una operazione di listing degli attributi dichiarati posseduti da "GSP"
-    Then si ottiene status code 200 
+    Then si ottiene status code 200
 
-    Examples: 
+    Examples:
       | ente    | ruolo        |
       | GSP     | admin        |
       | GSP     | api          |
@@ -25,8 +25,8 @@ Feature: Listing attributi dichiarati posseduti da uno specifico ente
       | Privato | security     |
       | Privato | support      |
       | Privato | api,security |
-    
-  @tenant-declared-attributes-listing1b
+
+  @tenant_declared_attributes_listing1b
   Scenario Outline: Per un attributo precedentemente dichiarato dall’aderente stesso, alla richiesta di lettura, va a buon fine
     Given l'utente è un "admin" di "PA2"
     Given "PA1" dichiara un attributo dichiarato
