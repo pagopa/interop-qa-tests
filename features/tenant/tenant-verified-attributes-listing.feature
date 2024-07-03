@@ -1,8 +1,8 @@
-@tenant-verified-attributes-listing
+@tenant_verified_attributes_listing
 Feature: Listing attributi verificati posseduti da uno specifico ente
   Tutti gli utenti autenticati possono leggere la lista degli attributi verificati posseduti da uno specifico ente
 
-  @tenant-verified-attributes-listing1a
+  @tenant_verified_attributes_listing1a
   Scenario Outline: Per un attributo precedentemente verificato da un altro aderente, alla richiesta di lettura, va a buon fine
     Given l'utente è un "<ruolo>" di "<ente>"
     When l'utente richiede una operazione di listing degli attributi verificati posseduti da "GSP"
@@ -26,7 +26,7 @@ Feature: Listing attributi verificati posseduti da uno specifico ente
       | Privato | support      |
       | Privato | api,security |
     
-  @tenant-verified-attributes-listing1b
+  @tenant_verified_attributes_listing1b
   Scenario Outline: Per un attributo precedentemente verificato da un altro aderente, alla richiesta di lettura, va a buon fine
     Given l'utente è un "admin" di "PA1"
     Given "PA1" crea un attributo verificato
