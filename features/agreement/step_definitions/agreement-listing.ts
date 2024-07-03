@@ -39,7 +39,7 @@ Given(
   "{string} ha un agreement in stato {string} per l'e-service numero {int} di {string}",
   async function (
     consumer: TenantType,
-    agreementState: string,
+    agreementState: AgreementState,
     eserviceIndex: number,
     _producer: string
   ) {
