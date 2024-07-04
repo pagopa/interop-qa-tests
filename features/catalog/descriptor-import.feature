@@ -3,7 +3,7 @@ Feature: Import di un descrittore
   Tutti gli utenti autorizzati possono effettuare una richiesta di import di un descrittore di un e-service.
 
   @descriptor_import1
-  Scenario Outline: La richiesta di import di un descrittore di un e-service da parte di un utente autorizzato, dato un pacchetto correttamente strutturato, contenente anche un documento correttamente mappato nel file di configurazione, va a buon fine e il descrittore viene correttamente creato in stato DRAFT con quel documento
+  Scenario Outline: La richiesta di import di un descrittore di un e-service da parte di un utente autorizzato, dato un pacchetto correttamente strutturato, contenente due documenti correttamente mappati nel file di configurazione, va a buon fine e il descrittore viene correttamente creato in stato DRAFT con quei documenti
     Given l'utente è un "<ruolo>" di "<ente>"
     Given l'utente ha già un pacchetto correttamente strutturato con un eservice in mode "DELIVER"
     Given l'utente ha già richiesto una presignedURL per il caricamento del pacchetto
@@ -11,7 +11,7 @@ Feature: Import di un descrittore
     When l'utente effettua una richiesta di import del descrittore
     Then si ottiene status code 200
     And il descrittore viene correttamente creato in stato DRAFT 
-    And il documento risulta correttamente caricato
+    And i documenti risultano correttamente caricati
 
     Examples:
       | ente | ruolo        |
@@ -23,7 +23,7 @@ Feature: Import di un descrittore
       | GSP  | api,security |
 
   @descriptor_import2
-  Scenario Outline: La richiesta di import di un descrittore di un e-service da parte di un utente non autorizzato, dato un pacchetto correttamente strutturato, contenente anche un documento correttamente mappato nel file di configurazione, non va a buon fine
+  Scenario Outline: La richiesta di import di un descrittore di un e-service da parte di un utente non autorizzato, dato un pacchetto correttamente strutturato, contenente due documenti correttamente mappati nel file di configurazione, non va a buon fine
     Given l'utente è un "<ruolo>" di "<ente>"
     Given l'utente ha già un pacchetto correttamente strutturato con un eservice in mode "DELIVER"
     Given l'utente ha già richiesto una presignedURL per il caricamento del pacchetto

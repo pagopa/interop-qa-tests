@@ -11,6 +11,10 @@
       {
         "prettyName": "Documento_test_qa",
         "path": "documents/documento-test-qa.pdf"
+      },
+      {
+        "prettyName": "dummy",
+        "path": "documents/dummy.pdf"
       }
     ],
     "audience": [
@@ -23,5 +27,5 @@
     "agreementApprovalPolicy": "AUTOMATIC"
   },
   "riskAnalysis": [],
-  "name": "e-service-IMPORTED-1449798293817017"
+  "name": "e-service-IMPORTED-5906297622704946"
 }

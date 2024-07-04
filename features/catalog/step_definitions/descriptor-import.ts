@@ -26,17 +26,13 @@ function updateAndZipConfig({
   notAllowedFiles?: boolean;
 }) {
   const folderPath = `./data/${folderName}`;
+  const configFilePath = path.join(folderPath, "configuration.json");
 
   if (notAllowedFiles) {
     writeFileSync(path.join(folderPath, "notAllowedFile.txt"), "");
   } else {
-    try {
-      unlinkSync(path.join(folderPath, "notAllowedFile.txt"));
-    } catch (error) {
-      // File non esiste, non c'è nulla da fare
-    }
+    unlinkSync(path.join(folderPath, "notAllowedFile.txt"));
   }
-  const configFilePath = path.join(folderPath, "configuration.json");
 
   try {
     const configData = readFileSync(configFilePath, "utf-8");
@@ -244,7 +240,7 @@ Then(
   }
 );
 
-Then("il documento risulta correttamente caricato", async function () {
+Then("i documenti risultano correttamente caricati", async function () {
   assertContextSchema(this, {
     token: z.string(),
     eserviceId: z.string(),
