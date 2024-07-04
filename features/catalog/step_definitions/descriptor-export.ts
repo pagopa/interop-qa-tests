@@ -1,5 +1,5 @@
 import assert from "assert";
-import { Then, When } from "@cucumber/cucumber";
+import { Given, Then, When } from "@cucumber/cucumber";
 import { z } from "zod";
 import AdmZip from "adm-zip";
 import { apiClient } from "../../../api";
@@ -8,6 +8,7 @@ import {
   downloadFile,
   getAuthorizationHeader,
 } from "../../../utils/commons";
+import { dataPreparationService } from "../../../services/data-preparation.service";
 
 When(
   "l'utente effettua una richiesta di export del descrittore",
@@ -63,11 +64,6 @@ Then(
   "il documento di configurazione contiene anche l’analisi del rischio compilata dall’erogatore",
   function () {
     assertContextSchema(this, {
-      zipEntries: z.array(
-        z.object({
-          entryName: z.string(),
-        })
-      ),
       configJson: z.object({
         riskAnalysis: z.array(z.unknown()),
       }),
@@ -102,8 +98,25 @@ Then(
     expectedDocuments.forEach((doc) => {
       assert.ok(
         this.zipEntries.some((entry) => entry.entryName.endsWith(doc)),
-        "Document not found"
+        "Document not found: " + doc
       );
     });
+  }
+);
+
+Given(
+  "l'utente ha già aggiunto un documento al descrittore",
+  async function () {
+    assertContextSchema(this, {
+      token: z.string(),
+      eserviceId: z.string(),
+      descriptorId: z.string(),
+    });
+
+    await dataPreparationService.addDocumentToDescriptor(
+      this.token,
+      this.eserviceId,
+      this.descriptorId
+    );
   }
 );

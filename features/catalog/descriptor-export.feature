@@ -53,9 +53,10 @@ Feature: Export di un descrittore
     And il documento di configurazione contiene anche l’analisi del rischio compilata dall’erogatore
 
   @descriptor_export5
-  Scenario Outline: La richiesta di export di un descrittore di un e-service, con documenti, va a buon fine e vengono esportati anche i documenti
+  Scenario Outline: La richiesta di export di un descrittore di un e-service, con due documenti, va a buon fine e vengono esportati anche i documenti
     Given l'utente è un "admin" di "PA1"
     Given "PA1" ha già creato un e-service con un descrittore in stato "PUBLISHED" e un documento già caricato
+    Given l'utente ha già aggiunto un documento al descrittore
     When l'utente effettua una richiesta di export del descrittore
     Then si ottiene status code 200
     And il pacchetto risulta correttamente formattato

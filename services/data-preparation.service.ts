@@ -218,12 +218,14 @@ export const dataPreparationService = {
     const blobFile = new Blob([readFileSync("./data/dummy.pdf")]);
     const file = new File([blobFile], "documento-test-qa.pdf");
 
+    const prettyName = `Documento_test_qa-${getRandomInt()}`;
+
     const response = await apiClient.eservices.createEServiceDocument(
       eserviceId,
       descriptorId,
       {
         kind: "DOCUMENT",
-        prettyName: "Documento_test_qa",
+        prettyName,
         doc: file,
       },
       getAuthorizationHeader(token)
@@ -239,7 +241,7 @@ export const dataPreparationService = {
           descriptorId,
           getAuthorizationHeader(token)
         ),
-      (res) => res.data.docs.some((doc) => doc.id === documentId)
+      (res) => res.data.docs.some((doc) => doc.prettyName === prettyName)
     );
     return documentId;
   },
