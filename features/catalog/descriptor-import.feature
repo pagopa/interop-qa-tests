@@ -11,7 +11,7 @@ Feature: Import di un descrittore
     When l'utente effettua una richiesta di import del descrittore
     Then si ottiene status code 200
     And il descrittore viene correttamente creato in stato DRAFT 
-    And i documenti risultano correttamente caricati
+    And i due documenti risultano correttamente caricati
 
     Examples:
       | ente | ruolo        |

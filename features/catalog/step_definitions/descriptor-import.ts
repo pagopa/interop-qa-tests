@@ -240,7 +240,7 @@ Then(
   }
 );
 
-Then("i documenti risultano correttamente caricati", async function () {
+Then("i due documenti risultano correttamente caricati", async function () {
   assertContextSchema(this, {
     token: z.string(),
     eserviceId: z.string(),
@@ -254,7 +254,7 @@ Then("i documenti risultano correttamente caricati", async function () {
         this.descriptorId,
         getAuthorizationHeader(this.token)
       ),
-    (response) => response.status !== 404 && response.data.docs.length > 0
+    (response) => response.status !== 404 && response.data.docs.length === 2
   );
 
   const { data } = await apiClient.producers.getProducerEServiceDescriptor(
