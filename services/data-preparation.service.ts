@@ -29,6 +29,7 @@ import {
   ClientKind,
   KeySeed,
   MailSeed,
+  AgreementState,
 } from "./../api/models";
 
 export const ESERVICE_DAILY_CALLS: Readonly<{
@@ -346,7 +347,7 @@ export const dataPreparationService = {
 
   async createAgreementWithGivenState(
     token: string,
-    agreementState: string,
+    agreementState: AgreementState,
     eserviceId: string,
     descriptorId: string,
     doc?: File
@@ -422,7 +423,7 @@ export const dataPreparationService = {
 
   async createAgreementWithGivenStateAndDocument(
     token: string,
-    agreementState: string,
+    agreementState: AgreementState,
     eserviceId: string,
     descriptorId: string
   ) {
@@ -800,6 +801,7 @@ export const dataPreparationService = {
         res.data.attributes.some(
           (attr) =>
             attr.id === attributeId &&
+            attr.verifiedBy.some((verifier) => verifier.id === verifierId) &&
             !attr.revokedBy.some((revoker) => revoker.id === verifierId)
         )
     );

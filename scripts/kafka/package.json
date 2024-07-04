@@ -1,0 +1,17 @@
+{
+  "name": "interop-kafka-utility",
+  "version": "1.0.0",
+  "description": "interop Kafka Utility",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "kafka:deleteTopics": "node deleteTopics.js",
+    "kafka:createTopics": "node createTopics.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aws-msk-iam-sasl-signer-js": "^1.0.0",
+    "kafkajs": "^2.2.4"
+  }
+}

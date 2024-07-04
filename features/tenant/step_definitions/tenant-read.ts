@@ -13,7 +13,7 @@ When(
   async function (tenantType: TenantType) {
     assertContextSchema(this, { token: z.string() });
     const tenantId = getOrganizationId(tenantType); // alternative query: this.tenantType
-    await apiClient.tenants.getTenant(
+    this.response = await apiClient.tenants.getTenant(
       tenantId,
       getAuthorizationHeader(this.token)
     );
