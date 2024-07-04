@@ -12,21 +12,21 @@ Feature: Export di un descrittore
 
     Examples:
       | ente | ruolo        | statoDescrittore |
-      # | GSP  | admin        | PUBLISHED        |
-      # | GSP  | api          | PUBLISHED        |
-      # | GSP  | security     | PUBLISHED        |
-      # | GSP  | api,security | PUBLISHED        |
-      # | GSP  | support      | PUBLISHED        |
-      # | PA1  | admin        | PUBLISHED        |
-      # | PA1  | api          | PUBLISHED        |
-      # | PA1  | security     | PUBLISHED        |
-      # | PA1  | api,security | PUBLISHED        |
-      # | PA1  | support      | PUBLISHED        |
+      | GSP  | admin        | PUBLISHED        |
+      | GSP  | api          | PUBLISHED        |
+      | GSP  | security     | PUBLISHED        |
+      | GSP  | api,security | PUBLISHED        |
+      | GSP  | support      | PUBLISHED        |
+      | PA1  | admin        | PUBLISHED        |
+      | PA1  | api          | PUBLISHED        |
+      | PA1  | security     | PUBLISHED        |
+      | PA1  | api,security | PUBLISHED        |
+      | PA1  | support      | PUBLISHED        |
 
     Examples:
       | ente | ruolo | statoDescrittore |
-      # | PA1  | admin | ARCHIVED         |
-      # | PA1  | admin | DEPRECATED       |
+      | PA1  | admin | ARCHIVED         |
+      | PA1  | admin | DEPRECATED       |
       | PA1  | admin | SUSPENDED        |
 
   @descriptor_export2
