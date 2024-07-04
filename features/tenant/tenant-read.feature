@@ -1,8 +1,8 @@
-@tenant-read
+@tenant_read
 Feature: Lettura di un singolo aderente
   Tutti gli utenti autenticati possono leggere un singolo aderente
 
-  @tenant-read1
+  @tenant_read1
   Scenario Outline: Per un aderente della piattaforma, alla richiesta di lettura da parte di qualsiasi livello di permesso associato a qualsiasi tipologia di ente, va a buon fine
     Given l'utente è un "<ruolo>" di "<ente>"
     When l'utente richiede la lettura dell'aderente "PA2"
