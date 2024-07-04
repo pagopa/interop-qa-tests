@@ -19,7 +19,7 @@ Given(
     const tenantId = getOrganizationId(tenantType);
     await dataPreparationService.addEmailToTenant(this.token, tenantId, {
       address: this.email,
-      description: "test",
+      description: "test description",
     });
   }
 );
@@ -34,7 +34,7 @@ When(
       {
         kind: "CONTACT_EMAIL",
         address: `${this.TEST_SEED}@pagopa.it`,
-        description: "test",
+        description: "test description",
       },
       getAuthorizationHeader(this.token)
     );
@@ -63,9 +63,9 @@ When(
   async function () {
     assertContextSchema(this, { token: z.string(), tenantType: TenantType });
     this.email = `${this.TEST_SEED}@pagopa.it`;
-    const tenantId = getOrganizationId(this.tenantType);
+    this.tenantId = getOrganizationId(this.tenantType);
     this.response = await apiClient.tenants.addTenantMail(
-      tenantId,
+      this.tenantId,
       {
         kind: "CONTACT_EMAIL",
         address: this.email,
