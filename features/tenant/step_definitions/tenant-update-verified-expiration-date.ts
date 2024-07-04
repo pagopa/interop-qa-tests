@@ -20,46 +20,48 @@ Given(
       attributeId: z.string(),
     });
     const date = new Date();
+    date.setDate(date.getDate() + 7);
     const verifierId = getOrganizationId(verifierTenantType);
-    this.tenantId = getOrganizationId(targetTenantType);
+    const tenantId = getOrganizationId(targetTenantType);
     await dataPreparationService.assignVerifiedAttributeToTenant(
       this.token,
-      this.tenantId,
+      tenantId,
       verifierId,
       this.attributeId,
-      date.setDate(date.getDate() + 7).toString()
+      date.toISOString()
     );
   }
 );
 
 When(
-  "l'utente richiede l'aggiornamento di quell'attributo con una data di scadenza nel futuro",
-  async function () {
+  "l'utente richiede l'aggiornamento di quell'attributo di {string} con una data di scadenza nel futuro",
+  async function (tenantType: TenantType) {
     assertContextSchema(this, {
       token: z.string(),
-      tenantId: z.string(),
       attributeId: z.string(),
     });
     const date = new Date();
+    date.setDate(date.getDate() + 7);
+    const tenantId = getOrganizationId(tenantType);
     this.response = await apiClient.tenants.updateVerifiedAttribute(
-      this.tenantId,
+      tenantId,
       this.attributeId,
-      { expirationDate: date.setDate(date.getDate() + 7).toString() },
+      { expirationDate: date.toISOString() },
       getAuthorizationHeader(this.token)
     );
   }
 );
 
 When(
-  "l'utente richiede l'aggiornamento di quell'attributo rimuovendo la data di scadenza",
-  async function () {
+  "l'utente richiede l'aggiornamento di quell'attributo di {string} rimuovendo la data di scadenza",
+  async function (tenantType: TenantType) {
     assertContextSchema(this, {
       token: z.string(),
-      tenantId: z.string(),
       attributeId: z.string(),
     });
+    const tenantId = getOrganizationId(tenantType);
     this.response = await apiClient.tenants.updateVerifiedAttribute(
-      this.tenantId,
+      tenantId,
       this.attributeId,
       { expirationDate: undefined },
       getAuthorizationHeader(this.token)
@@ -68,16 +70,16 @@ When(
 );
 
 When(
-  "l'utente richiede l'aggiornamento di quell'attributo con una data di scadenza nel passato",
-  async function () {
+  "l'utente richiede l'aggiornamento di quell'attributo di {string} con una data di scadenza nel passato",
+  async function (tenantType: TenantType) {
     assertContextSchema(this, {
       token: z.string(),
-      tenantId: z.string(),
       attributeId: z.string(),
     });
     const date = new Date();
+    const tenantId = getOrganizationId(tenantType);
     this.response = await apiClient.tenants.updateVerifiedAttribute(
-      this.tenantId,
+      tenantId,
       this.attributeId,
       { expirationDate: date.setDate(date.getDate() - 7).toString() },
       getAuthorizationHeader(this.token)

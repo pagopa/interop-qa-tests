@@ -1,8 +1,8 @@
-@tenant-certified-attributes-listing
+@tenant_certified_attributes_listing
 Feature: Listing attributi certificati posseduti da uno specifico aderente
   Tutti gli utenti autenticati possono leggere la lista degli attributi certificati posseduti da uno specifico aderente
 
-  @tenant-certified-attributes-listing1a
+  @tenant_certified_attributes_listing1a
   Scenario Outline: Per due attributi precedentemente assegnati all’aderente, uno assegnato dalla piattaforma e facente parte degli attributi previsti da IPA e uno assegnato da un altro aderente dal flusso attributi self-service, alla richiesta di lettura, va a buon fine
     Given l'utente è un "<ruolo>" di "<ente>"
     When l'utente richiede una operazione di listing degli attributi certificati posseduti da "GSP"
@@ -26,7 +26,7 @@ Feature: Listing attributi certificati posseduti da uno specifico aderente
       | Privato | support      |
       | Privato | api,security |
     
-  @tenant-certified-attributes-listing1b
+  @tenant_certified_attributes_listing1b
   Scenario Outline: Per due attributi precedentemente assegnati all’aderente, uno assegnato dalla piattaforma e facente parte degli attributi previsti da IPA e uno assegnato da un altro aderente dal flusso attributi self-service, alla richiesta di lettura, va a buon fine
     Given l'utente è un "admin" di "PA2"
     Given "PA2" ha creato un attributo certificato e lo ha assegnato a "PA1"
