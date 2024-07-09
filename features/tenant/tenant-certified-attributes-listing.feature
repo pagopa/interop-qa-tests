@@ -31,4 +31,4 @@ Feature: Listing attributi certificati posseduti da uno specifico aderente
     Given l'utente è un "admin" di "PA2"
     Given "PA2" ha creato un attributo certificato e lo ha assegnato a "PA1"
     When l'utente richiede una operazione di listing degli attributi certificati posseduti da "PA1"
-    Then si ottiene status code 200 e la lista degli attributi certificati contenente l'attributo assegnato e l'attributo IPA comune
+    Then si ottiene status code 200 e la lista degli attributi certificati contenente l'attributo assegnato e l'attributo IPA "Comune"

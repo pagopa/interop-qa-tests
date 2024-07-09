@@ -1,5 +1,5 @@
 import assert from "assert";
-import { When } from "@cucumber/cucumber";
+import { Then, When } from "@cucumber/cucumber";
 import { z } from "zod";
 import {
   TenantType,
@@ -25,8 +25,8 @@ When(
   }
 );
 
-When(
-  "si ottiene status code 200 e la lista degli attributi certificati contenente l'attributo assegnato e l'attributo IPA comune",
+Then(
+  "si ottiene status code 200 e la lista degli attributi certificati contenente l'attributo assegnato e l'attributo IPA \"Comune\"",
   async function () {
     assertContextSchema(this, {
       attributeId: z.string(),
