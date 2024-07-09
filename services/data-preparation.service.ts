@@ -213,7 +213,8 @@ export const dataPreparationService = {
   async addDocumentToDescriptor(
     token: string,
     eserviceId: string,
-    descriptorId: string
+    descriptorId: string,
+    prettyName: string = "Documento_test_qa"
   ) {
     const blobFile = new Blob([readFileSync("./data/dummy.pdf")]);
     const file = new File([blobFile], "documento-test-qa.pdf");
@@ -223,7 +224,7 @@ export const dataPreparationService = {
       descriptorId,
       {
         kind: "DOCUMENT",
-        prettyName: "Documento_test_qa",
+        prettyName,
         doc: file,
       },
       getAuthorizationHeader(token)
