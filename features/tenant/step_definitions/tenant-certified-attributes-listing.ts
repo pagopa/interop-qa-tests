@@ -54,7 +54,7 @@ Then(
       this.response.data.attributes.some(
         (attr) => attr.name === "Comuni e loro Consorzi e Associazioni"
       ),
-      "L'attributo IPA comune non è presente nella lista degli attributi certificati"
+      'L\'attributo IPA "Comune" non è presente nella lista degli attributi certificati'
     );
   }
 );
