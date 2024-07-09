@@ -28,7 +28,7 @@ Feature: Listing e-service consumers
       | PA1  | admin | SUSPENDED      |
 
   @tenant_e_service_consumers_listing2
-  Scenario Outline: A fronte di 4 o più aderenti in db, restituisce solo i primi 2 risultati (scopo del test è verificare il corretto funzionamento del parametro limit)
+  Scenario Outline: A fronte di 3 o più aderenti in db, restituisce solo i primi 2 risultati (scopo del test è verificare il corretto funzionamento del parametro limit)
     Given l'utente è un "admin" di "PA1"
     Given "PA1" ha già creato e pubblicato 1 e-service
     Given "GSP" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
@@ -38,7 +38,7 @@ Feature: Listing e-service consumers
     Then si ottiene status code 200 e la lista di 2 aderenti
 
   @tenant_e_service_consumers_listing3
-  Scenario Outline: A fronte di 4 o più aderenti in db e una richiesta di offset 12, restituisce solo 3 risultati (scopo del test è verificare il corretto funzionamento del parametro offset)
+  Scenario Outline: A fronte di 3 o più aderenti in db e una richiesta di offset 2, restituisce solo 1 risultato (scopo del test è verificare il corretto funzionamento del parametro offset)
     Given l'utente è un "admin" di "PA1"
     Given "PA1" ha già creato e pubblicato 1 e-service
     Given "GSP" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
