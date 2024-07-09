@@ -1,4 +1,4 @@
-@tenant_e_service_consumers_listing
+@tenant_e_service_consumers_listing @PIN-5022
 Feature: Listing e-service consumers
   Tutti gli utenti autenticati possono leggere la lista dei aderenti che sono iscritti ad almeno un e-service di cui sono erogatori
 
@@ -8,7 +8,7 @@ Feature: Listing e-service consumers
     Given "<ente>" ha già creato e pubblicato 1 e-service
     Given "<ente>" ha una richiesta di fruizione in stato "<statoAgreement>" per quell'e-service
     When l'utente richiede una operazione di listing dei fruitori
-    Then si ottiene status code 200 e la lista di fruitori contenente "<ente>"
+    Then si ottiene status code 200 e la lista di aderenti contenente "<ente>"
 
     Examples:
       | ente | ruolo        | statoAgreement |
@@ -38,14 +38,14 @@ Feature: Listing e-service consumers
     Then si ottiene status code 200 e la lista di 2 aderenti
 
   @tenant_e_service_consumers_listing3
-  Scenario Outline: A fronte di 3 o più aderenti in db e una richiesta di offset 2, restituisce solo 1 risultato (scopo del test è verificare il corretto funzionamento del parametro offset)
+  Scenario Outline: A fronte di più aderenti in db e una richiesta con offset, restituisce il corretto numero di risultati (scopo del test è verificare il corretto funzionamento del parametro offset)
     Given l'utente è un "admin" di "PA1"
     Given "PA1" ha già creato e pubblicato 1 e-service
     Given "GSP" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given "PA2" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     When l'utente richiede una operazione di listing dei fruitori con offset 2
-    Then si ottiene status code 200 e il giusto numero di risultati in base all'offset richiesto
+    Then si ottiene status code 200 e il giusto numero di fruitori in base all'offset richiesto
 
   @tenant_e_service_consumers_listing4
   Scenario Outline: Restituisce gli aderenti che contengono la keyword "PagoPA" all'interno del nome, con ricerca case insensitive (scopo del test è verificare che funzioni il filtro q)
