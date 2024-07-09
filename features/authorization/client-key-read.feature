@@ -28,7 +28,7 @@ Feature: Lettura di una chiave pubblica contenuta in un client
     Given "<ente>" ha già creato 1 client "CONSUMER"
     Given "<ente>" ha già inserito l'utente con ruolo "security" come membro di quel client
     Given "<ente>" ha già inserito l'utente con ruolo "admin" come membro di quel client
-    Given un "admin" di "<ente>" ha caricato una chiave pubblica nel client
+    Given un "admin" di "<ente>" ha caricato una chiave pubblica in quel client
     When l'utente richiede la lettura della chiave pubblica
     Then si ottiene status code <statusCode>
 

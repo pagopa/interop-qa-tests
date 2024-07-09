@@ -9,8 +9,8 @@ import {
   getRandomInt,
   getToken,
 } from "../../../utils/commons";
-import { dataPreparationService } from "../../../services/data-preparation.service";
 import { apiClient } from "../../../api";
+import { dataPreparationService } from "../../../services/data-preparation.service";
 
 Given(
   "un {string} di {string} ha caricato una chiave pubblica nel client",
