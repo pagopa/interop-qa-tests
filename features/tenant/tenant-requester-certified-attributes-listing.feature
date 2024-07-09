@@ -4,7 +4,7 @@ Feature: Listing attributi certificati assegnati dall'ente certificatore
   Ai fini dei test solo PA2 e GSP2 sono certificatori, la quale qualifica non può essere assegnata durante i test.
 
   @tenant_requester_certified_attributes_listing1
-  Scenario Outline: A fronte di una richiesta di listing di attributi certificati creati e assegnati dall'ente richiedente, la richiesta va buon fine solo se il richiedente è un ente certificatore
+  Scenario Outline: A fronte di una richiesta di listing di attributi certificati, la richiesta va buon fine solo se il richiedente è un ente certificatore
     Given l'utente è un "<ruolo>" di "<ente>"
     When l'utente richiede una operazione di listing degli attributi certificati assegnati
     Then si ottiene status code <statusCode>
@@ -33,7 +33,7 @@ Feature: Listing attributi certificati assegnati dall'ente certificatore
       | GSP     | api,security |        403 |
 
   @tenant_requester_certified_attributes_listing2
-  Scenario Outline: A fronte di una richiesta di listing di attributi certificati creati e assegnati dall'ente richiedente, va a buon fine
+  Scenario Outline: A fronte di una richiesta di listing di attributi certificati creati e assegnati dall'ente richiedente, va a buon fine e l'attributo creato è contenuto nei risultati
     Given l'utente è un "admin" di "PA2"
     Given "PA2" ha creato un attributo certificato e lo ha assegnato a "PA1"
     When l'utente richiede una operazione di listing degli attributi certificati assegnati
