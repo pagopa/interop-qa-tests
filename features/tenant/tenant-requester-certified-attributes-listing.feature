@@ -34,7 +34,6 @@ Feature: Listing attributi certificati assegnati dall'ente certificatore
 
   @tenant_requester_certified_attributes_listing2
   Scenario Outline: A fronte di una richiesta di listing di attributi certificati creati e assegnati dall'ente richiedente, va a buon fine
-  # ci restituisce l'errore "The server was not able to produce a timely response to your request. Please try again in a short while!"
     Given l'utente è un "admin" di "PA2"
     Given "PA2" ha creato un attributo certificato e lo ha assegnato a "PA1"
     When l'utente richiede una operazione di listing degli attributi certificati assegnati
