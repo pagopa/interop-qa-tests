@@ -49,6 +49,7 @@ When(
       descriptorId: z.string(),
     });
 
+    // to do: this shouldn't use dataPreparationService
     this.response = await dataPreparationService.uploadInterfaceDocument(
       `interface.${fileType}`,
       this.eserviceId,
