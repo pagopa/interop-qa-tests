@@ -22,7 +22,7 @@ Feature: Listing e-service producers
       | PA1     | api,security |
 
   @tenant_e_service_producers_listing2
-  Scenario Outline: A fronte di 4 o più aderenti in db, restituisce solo i primi 2 risultati (scopo del test è verificare il corretto funzionamento del parametro limit)
+  Scenario Outline: A fronte di 3 o più aderenti in db, restituisce solo i primi 2 risultati (scopo del test è verificare il corretto funzionamento del parametro limit)
     Given l'utente è un "admin" di "PA1"
     Given "PA1" ha già creato e pubblicato 1 e-service
     Given "PA2" ha già creato e pubblicato 1 e-service
