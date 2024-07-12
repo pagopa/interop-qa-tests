@@ -1,6 +1,6 @@
 @purpose_clone
 Feature: Clonazione di una finalità
-  Tutti gli utenti admin di enti fruitori possono clonare una propria finalità
+  Tutti gli utenti autorizzati di enti fruitori possono clonare una propria finalità
 
   @purpose_clone1
   Scenario Outline: Un utente con sufficienti permessi (admin); il cui ente ha già una finalità in stato ACTIVE, per una versione di e-service, il quale ha mode = RECEIVE, clona una finalità. La richiesta va a buon fine.

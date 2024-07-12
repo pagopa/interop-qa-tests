@@ -1,6 +1,6 @@
 @tenant_revoke_certified_attribute
 Feature: Revoca di un attributo certificato posseduto da uno specifico aderente
-  Tutti gli utenti admin degli enti certificatori possono revocare uno degli attributi certificati che hanno assegnato precedentemente
+  Tutti gli utenti autorizzati degli enti certificatori possono revocare uno degli attributi certificati che hanno assegnato precedentemente
 
   @tenant_revoke_certified_attribute1
   Scenario Outline: Per un attributo certificato precedentemente creato da un aderente, il quale ha la qualifica di ente certificatore (certifier), che lo assegna ad un altro ente, alla richiesta di revoca da parte di un utente con sufficienti permessi (admin), va a buon fine, altrimenti ottiene un errore

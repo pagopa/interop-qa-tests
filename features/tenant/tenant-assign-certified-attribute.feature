@@ -1,6 +1,6 @@
 @tenant_assign_certified_attribute
 Feature: Assegnazione di un attributo certificato ad un aderente
-  Tutti gli utenti admin degli enti certificatori possono assegnare un attributo certificato
+  Tutti gli utenti autorizzati degli enti certificatori possono assegnare un attributo certificato
 
   @tenant_assign_certified_attribute1
   Scenario Outline: Per un attributo certificato precedentemente creato da un aderente, il quale ha la qualifica di ente certificatore (certifier), alla richiesta di assegnazione dell’attributo ad un altro ente da parte di un utente con sufficienti permessi (admin), va a buon fine
