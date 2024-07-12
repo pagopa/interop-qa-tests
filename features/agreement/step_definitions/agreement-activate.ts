@@ -15,16 +15,16 @@ import {
 import { dataPreparationService } from "../../../services/data-preparation.service";
 
 Given(
-  "{string} crea un attributo verificato",
+  "{string} ha già creato un attributo verificato",
   async function (consumer: TenantType) {
     const token = await getToken(consumer);
 
-    const attributeId = await dataPreparationService.createAttribute(
+    this.attributeId = await dataPreparationService.createAttribute(
       token,
       "VERIFIED"
     );
 
-    this.requiredVerifiedAttributes = [[attributeId]];
+    this.requiredVerifiedAttributes = [[this.attributeId]];
   }
 );
 
@@ -32,20 +32,18 @@ Given(
   "{string} verifica l'attributo verificato a {string}",
   async function (verifier: TenantType, consumer: TenantType) {
     assertContextSchema(this, {
-      requiredVerifiedAttributes: z.array(z.array(z.string())),
+      attributeId: z.string(),
     });
 
     const token = await getToken(verifier);
     this.consumerId = getOrganizationId(consumer);
     const verifierId = getOrganizationId(verifier);
 
-    const attributeId = this.requiredVerifiedAttributes[0][0];
-
     await dataPreparationService.assignVerifiedAttributeToTenant(
       token,
       this.consumerId,
       verifierId,
-      attributeId
+      this.attributeId
     );
   }
 );

@@ -11,11 +11,10 @@ When(
   async function () {
     assertContextSchema(this, {
       token: z.string(),
-      requiredDeclaredAttributes: z.array(z.array(z.string())),
+      attributeId: z.string(),
     });
-    const attributeId = this.requiredDeclaredAttributes[0][0];
     this.response = await apiClient.tenants.revokeDeclaredAttribute(
-      attributeId,
+      this.attributeId,
       getAuthorizationHeader(this.token)
     );
   }

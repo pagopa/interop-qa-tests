@@ -25,7 +25,7 @@ Then(
   "si ottiene status code 200 e la lista degli attributi contenente l'attributo dichiarato",
   async function () {
     assertContextSchema(this, {
-      requiredDeclaredAttributes: z.array(z.array(z.string())),
+      attributeId: z.string(),
       response: z.object({
         status: z.number(),
         data: z.object({
@@ -40,9 +40,7 @@ Then(
 
     assert.equal(this.response.status, 200);
     assert.ok(
-      this.response.data.attributes.some(
-        (a) => a.id === this.requiredDeclaredAttributes[0][0]
-      ),
+      this.response.data.attributes.some((a) => a.id === this.attributeId),
       "L'attributo dichiarato non è presente nella lista degli attributi dichiarati"
     );
   }
