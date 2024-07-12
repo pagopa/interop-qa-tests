@@ -1,6 +1,6 @@
 @tenant_update_verified_expiration_date
 Feature: Aggiornamento della data di scadenza di un attributo verificato ad un aderente
-  Tutti gli utenti admin di enti non Privati possono aggiornare la data di scadenza di un proprio attributo verificato
+  Tutti gli utenti autorizzati di enti che possono erogare eservice possono aggiornare la data di scadenza di un proprio attributo verificato
 
   @tenant_update_verified_expiration_date1
   Scenario Outline: Per un attributo verificato precedentemente creato e assegnato da un primo aderente ad un secondo aderente, alla richiesta di aggiornamento di un attributo che non ha data di scadenza ad una data nel futuro da parte di un utente con sufficienti permessi (admin) appartenente al primo aderente, va a buon fine

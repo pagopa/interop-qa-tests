@@ -8,7 +8,6 @@ Feature: Lettura di un singolo aderente
     When l'utente richiede la lettura dell'aderente "PA2"
     Then si ottiene status code 200 
 
-# To do vedere se è più coerente fare la query su un tenantId terzo, oppure sul proprio ente
     Examples:
       | ente    | ruolo        |
       | GSP     | admin        |
