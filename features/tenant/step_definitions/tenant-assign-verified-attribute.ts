@@ -48,11 +48,13 @@ When(
     assertContextSchema(this, { token: z.string(), attributeId: z.string() });
     const tenantId = getOrganizationId(tenantType);
     const date = new Date();
+    date.setDate(date.getDate() - 7);
+
     this.response = await apiClient.tenants.verifyVerifiedAttribute(
       tenantId,
       {
         id: this.attributeId,
-        expirationDate: date.setDate(date.getDate() - 7).toString(),
+        expirationDate: date.toISOString(),
       },
       getAuthorizationHeader(this.token)
     );
