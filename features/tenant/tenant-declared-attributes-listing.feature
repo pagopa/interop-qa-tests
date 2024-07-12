@@ -5,7 +5,7 @@ Feature: Listing attributi dichiarati posseduti da uno specifico ente
   @tenant_declared_attributes_listing1a
   Scenario Outline: Per un attributo precedentemente dichiarato dall’aderente stesso, alla richiesta di lettura, va a buon fine
     Given l'utente è un "<ruolo>" di "<ente>"
-    Given "<ente>" dichiara un attributo dichiarato
+    Given "GSP" dichiara un attributo dichiarato
     When l'utente richiede una operazione di listing degli attributi dichiarati posseduti da "GSP"
     Then si ottiene status code 200 e la lista degli attributi contenente l'attributo dichiarato
 
