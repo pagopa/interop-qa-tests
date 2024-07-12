@@ -1,6 +1,6 @@
 @tenant_assign_verified_attribute
 Feature: Assegnazione di un attributo verificato ad un aderente
-  Tutti gli utenti autorizzati di enti che possono erogare eservices possono assegnare un attributo verificato
+  Tutti gli utenti autorizzati di enti che possono erogare eservice possono assegnare un attributo verificato
 
   @tenant_assign_verified_attribute1
   Scenario Outline: Per un attributo verificato precedentemente creato da un primo aderente, alla richiesta di assegnazione dell’attributo senza data di scadenza ad un secondo aderente da parte di un utente con sufficienti permessi (admin) appartenente al primo aderente, va a buon fine
