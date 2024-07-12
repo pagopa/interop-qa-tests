@@ -87,7 +87,7 @@ Given(
   async function (certifier: TenantType, tenantType: TenantType) {
     const token = await getToken(certifier);
 
-    const tenantId = getOrganizationId(tenantType);
+    this.tenantId = getOrganizationId(tenantType);
     this.attributeId = await dataPreparationService.createAttribute(
       token,
       "CERTIFIED"
@@ -95,7 +95,7 @@ Given(
 
     await dataPreparationService.assignCertifiedAttributeToTenant(
       token,
-      tenantId,
+      this.tenantId,
       this.attributeId
     );
   }
