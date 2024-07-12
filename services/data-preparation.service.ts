@@ -777,12 +777,14 @@ export const dataPreparationService = {
     token: string,
     tenantId: string,
     verifierId: string,
-    attributeId: string
+    attributeId: string,
+    expirationDate?: string
   ) {
     const response = await apiClient.tenants.verifyVerifiedAttribute(
       tenantId,
       {
         id: attributeId,
+        expirationDate,
       },
       getAuthorizationHeader(token)
     );
