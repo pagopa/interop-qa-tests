@@ -1,6 +1,6 @@
 @tenant_revoke_verified_attribute
 Feature: Revoca di un attributo verificato posseduto da uno specifico aderente
-  Tutti gli utenti autenticati degli enti erogatori possono revocare uno degli attributi verificati che hanno assegnato precedentemente
+  Tutti gli utenti autorizzati degli enti erogatori possono revocare uno degli attributi verificati che hanno assegnato precedentemente
 
   @tenant_revoke_verified_attribute1
   Scenario Outline: Per un attributo precedentemente verificato da un primo aderente ad un secondo aderente, alla richiesta di revoca da parte di un utente con sufficienti permessi (admin) appartenente al primo aderente, va a buon fine
