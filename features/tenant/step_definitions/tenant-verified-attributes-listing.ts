@@ -28,7 +28,7 @@ Then(
   "si ottiene status code 200 e la lista degli attributi contenente l'attributo verificato da {string}",
   async function (tenantType: TenantType) {
     assertContextSchema(this, {
-      requiredVerifiedAttributes: z.array(z.array(z.string())),
+      attributeId: z.string(),
       response: z.object({
         status: z.number(),
         data: z.object({
@@ -49,11 +49,11 @@ Then(
     assert.equal(this.response.status, 200);
 
     const verifierId = getOrganizationId(tenantType);
-    const attributeId = this.requiredVerifiedAttributes[0][0];
     assert.ok(
       this.response.data.attributes.some(
         (a) =>
-          a.id === attributeId && a.verifiedBy.some((v) => v.id === verifierId),
+          a.id === this.attributeId &&
+          a.verifiedBy.some((v) => v.id === verifierId),
         "L'attributo verificato non è presente nella lista degli attributi verificati"
       )
     );
