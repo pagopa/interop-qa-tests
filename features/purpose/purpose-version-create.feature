@@ -9,7 +9,7 @@ Feature: Creazione di una nuova versione di finalità
     Given "<ente>" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given "<ente>" ha già creato 1 finalità in stato "<statoFinalità>" per quell'eservice
     When l'utente aggiorna la stima di carico per quella finalità
-    Then si ottiene status code 200 e la finalità con la nuova stima di carico in stato "<statoFinalità>"
+    Then si ottiene status code 200 e la nuova versione della finalità è stata creata in stato "<statoFinalità>" con la nuova stima di carico
 
     Examples: # Test sui ruoli
       | ente    | ruolo | statoFinalità |
@@ -82,4 +82,4 @@ Feature: Creazione di una nuova versione di finalità
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given "PA1" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
     When l'utente aggiorna la stima di carico per quella finalità
-    Then si ottiene status code 200 e la finalità con la nuova stima di carico in stato "WAITING_FOR_APPROVAL"
+    Then si ottiene status code 200 e la nuova versione della finalità è stata creata in stato "WAITING_FOR_APPROVAL" con la nuova stima di carico

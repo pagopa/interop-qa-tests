@@ -49,7 +49,7 @@ Given(
 );
 
 Then(
-  "si ottiene status code 200 e la finalità con la nuova stima di carico in stato {string}",
+  "si ottiene status code 200 e la nuova versione della finalità è stata creata in stato {string} con la nuova stima di carico",
   async function (desiredState: PurposeVersionState) {
     assertContextSchema(this, {
       token: z.string(),
