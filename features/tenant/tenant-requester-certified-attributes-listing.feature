@@ -1,9 +1,9 @@
 @tenant_requester_certified_attributes_listing
 Feature: Listing attributi certificati assegnati dall'ente certificatore
-  Tutti gli utenti certificatori possono leggere la lista degli attributi certificati assegnati.
-  Ai fini dei test solo PA2 e GSP2 sono certificatori, la quale qualifica non può essere assegnata durante i test.
+  Tutti gli utenti autorizzati di enti certificatori possono leggere la lista degli attributi certificati assegnati.
+  Ai fini dei test solo PA2 e GSP2 sono certificatori, la quale qualifica non può essere assegnata durante la loro esecuzione.
 
-  @tenant_requester_certified_attributes_listing1
+  @tenant_requester_certified_attributes_listing1 @wait_for_fix @PIN-5070
   Scenario Outline: A fronte di una richiesta di listing di attributi certificati, la richiesta va buon fine solo se il richiedente è un ente certificatore
     Given l'utente è un "<ruolo>" di "<ente>"
     When l'utente richiede una operazione di listing degli attributi certificati assegnati
@@ -17,10 +17,10 @@ Feature: Listing attributi certificati assegnati dall'ente certificatore
       | PA1     | support      |        403 |
       | PA1     | api,security |        403 |
       | PA2     | admin        |        200 |
-      | PA2     | api          |        200 |
-      | PA2     | security     |        200 |
+      | PA2     | api          |        403 |
+      | PA2     | security     |        403 |
       | PA2     | support      |        200 |
-      | PA2     | api,security |        200 |
+      | PA2     | api,security |        403 |
       | Privato | admin        |        403 |
       | Privato | api          |        403 |
       | Privato | security     |        403 |

@@ -1,6 +1,6 @@
 @client_key_delete
 Feature: Cancellazione delle chiavi di un client
-  Tutti gli utenti admin possono cancellare le chiavi del proprio client, security solo le proprie
+  Tutti gli utenti autorizzati possono cancellare le chiavi del proprio client, security solo le proprie
 
   @client_key_delete1
   Scenario Outline: Un utente con sufficienti permessi (admin o security); appartenente all'ente che ha creato il client; il quale utente è membro del client; nel quale client c'è una chiave pubblica caricata da lui stesso richiede la cancellazione della chiave. L'operazione va a buon fine.

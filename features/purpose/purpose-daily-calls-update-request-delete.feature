@@ -1,6 +1,6 @@
 @daily_calls_update_request_delete
 Feature: Cancellazione di una richiesta di aggiornamento di una stima di carico
-  Tutti gli utenti admin di enti fruitori possono cancellare una richiesta di aggiornamento di una stima di carico 
+  Tutti gli utenti autorizzati di enti fruitori possono cancellare una richiesta di aggiornamento di una stima di carico 
 
   @daily_calls_update_request_delete1
   Scenario Outline: Per una finalità precedentemente creata da un fruitore e attivata da un erogatore, la quale è in stato ACTIVE o SUSPENDED, e la cui stima di carico è stata successivamente aggiornata dal fruitore ad un valore che supera una soglia dell'erogatore portando quella versione in WAITING_FOR_APPROVAL, alla richiesta di cancellazione di aggiornamento stima di carico da parte di un utente con sufficienti permessi (admin) dell’ente fruitore, va a buon fine

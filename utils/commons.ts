@@ -8,7 +8,7 @@ import { generateSessionTokens } from "./session-tokens";
 
 export type FileType = "yaml" | "wsdl";
 
-export const TenantType = z.enum(["GSP", "PA1", "PA2", "Privato"]);
+export const TenantType = z.enum(["GSP", "GSP2", "PA1", "PA2", "Privato"]);
 export type TenantType = z.infer<typeof TenantType>;
 export const Role = z.enum([
   "admin",

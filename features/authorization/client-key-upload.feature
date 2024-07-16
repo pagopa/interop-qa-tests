@@ -1,6 +1,6 @@
 @client_key_upload
 Feature: Caricamento di una chiave pubblica contenuta in un client
-  Tutti gli utenti admin o security possono caricare una chiave pubblica di tipo RSA lunghezza 2048
+  Tutti gli utenti autorizzati o security possono caricare una chiave pubblica di tipo RSA lunghezza 2048
 
   @client_key_upload1
   Scenario Outline: Un utente admin o security; appartenente all'ente che ha creato il client; il quale utente è membro del client; richiede il caricamento di una chiave pubblica di tipo RSA, lunghezza 2048. L'operazione va a buon fine
