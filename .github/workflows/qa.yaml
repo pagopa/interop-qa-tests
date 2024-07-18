@@ -276,8 +276,8 @@ jobs:
   
   run_test:
     name: Run Cucumber Test Suite
-    if: ${{ inputs.runTests }}
-    needs: data_prep
+    if: ${{ always() && inputs.runTests }}
+    needs: [data_prep]
     runs-on: [self-hosted, "run_id:${{ inputs.environment }}-${{ github.run_id }}"]
     environment: ${{ inputs.environment }}
     env: 
