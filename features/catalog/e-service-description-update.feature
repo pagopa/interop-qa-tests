@@ -22,12 +22,11 @@ Feature: Aggiornamento della descrizione di un e-service
       | GSP  | api,security | PUBLISHED        |       200 |
       | GSP  | support      | PUBLISHED        |       403 |
 
-    Examples:
+    Examples: # ARCHIVED non viene testato in quanto non è possibile avere un eservice con un singolo descrittore in stato ARCHIVED
       | ente | ruolo | statoDescrittore | risultato |
       | PA1  | admin | SUSPENDED        |       200 |
       | PA1  | admin | DEPRECATED       |       200 |
       | PA1  | admin | DRAFT            |       409 |
-      | PA1  | admin | ARCHIVED         |       409 |
 
   @eservice_description_update2
   Scenario Outline: A fronte di una richiesta aggiornamento della descrizione di un e-service da parte di un utente autorizzato dell’ente che lo eroga, per un e-service senza descrittori, ottiene un errore

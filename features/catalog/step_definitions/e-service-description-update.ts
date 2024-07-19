@@ -5,7 +5,6 @@ import {
   assertContextSchema,
   getRandomInt,
   getAuthorizationHeader,
-  assertValidResponse,
 } from "../../../utils/commons";
 
 When("l'utente aggiorna la descrizione di quell'e-service", async function () {
@@ -17,6 +16,4 @@ When("l'utente aggiorna la descrizione di quell'e-service", async function () {
     },
     getAuthorizationHeader(this.token)
   );
-
-  assertValidResponse(this.response);
 });
