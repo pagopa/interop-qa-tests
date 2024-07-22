@@ -11,13 +11,13 @@ Feature: Creazione di una nuova versione di finalità
     When l'utente aggiorna la stima di carico per quella finalità
     Then si ottiene status code 200 e la nuova versione della finalità è stata creata in stato "<statoFinalità>" con la nuova stima di carico
 
-    Examples: # Test sui ruoli
+    Examples:
       | ente    | statoFinalità |
       | PA1     | ACTIVE        |
       | GSP     | ACTIVE        |
       | Privato | ACTIVE        |
 
-    Examples: # Test sui stati finalità
+    Examples:
       | ente | statoFinalità |
       | PA1  | SUSPENDED     |
 
