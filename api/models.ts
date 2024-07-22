@@ -175,6 +175,10 @@ export interface Mail {
   description?: string;
 }
 
+export interface EServiceDescriptionSeed {
+  description: string;
+}
+
 export interface EServiceDescriptorSeed {
   description?: string;
   audience: string[];
@@ -2800,6 +2804,29 @@ export namespace Eservices {
       "X-Correlation-Id": string;
     };
     export type ResponseBody = void;
+  }
+  /**
+   * No description
+   * @tags eservices
+   * @name UpdateEServiceDescription
+   * @summary Update an e-service description
+   * @request POST:/eservices/{eServiceId}/update
+   * @secure
+   */
+  export namespace UpdateEServiceDescription {
+    export type RequestParams = {
+      /**
+       * the eservice id
+       * @format uuid
+       */
+      eServiceId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = EServiceDescriptionSeed;
+    export type RequestHeaders = {
+      "X-Correlation-Id": string;
+    };
+    export type ResponseBody = CreatedResource;
   }
 }
 
@@ -5540,6 +5567,26 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         path: `/eservices/${eServiceId}/riskAnalysis/${riskAnalysisId}`,
         method: "DELETE",
         secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags eservices
+     * @name UpdateEServiceDescription
+     * @summary Update an e-service description
+     * @request POST:/eservices/{eServiceId}/update
+     * @secure
+     */
+    updateEServiceDescription: (eServiceId: string, data: EServiceDescriptionSeed, params: RequestParams = {}) =>
+      this.request<CreatedResource, Problem>({
+        path: `/eservices/${eServiceId}/update`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
         ...params,
       }),
   };
