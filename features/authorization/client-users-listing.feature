@@ -1,6 +1,6 @@
 @client_users_listing
 Feature: Listing utenti client
-  Tutti gli utenti admin o security possono leggere la lista dei membri di un client a cui sono associati
+  Tutti gli utenti autorizzati o security possono leggere la lista dei membri di un client a cui sono associati
 
   @client_users_listing1a
   Scenario Outline: Un utente API richiede la lista dei membri del client. Ritorna errore 403.

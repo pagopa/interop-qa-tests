@@ -1,6 +1,6 @@
 @purpose_reject
 Feature: Rifiuto di una versione di una finalità
-  Tutti gli utenti admin di enti erogatori possono rifiutare una nuova versione di una finalità
+  Tutti gli utenti autorizzati di enti erogatori possono rifiutare una nuova versione di una finalità
 
   @purpose_reject1
   Scenario Outline: Per una finalità precedentemente creata e presentata da un fruitore sopra una delle soglie dell’e-service dell’erogatore, la quale prima versione è quindi in stato WAITING_FOR_APPROVAL, alla richiesta di rifiuto con motivazione da parte di un utente con sufficienti permessi (admin) dell’ente erogatore, va a buon fine

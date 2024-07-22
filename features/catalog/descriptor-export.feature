@@ -27,7 +27,7 @@ Feature: Export di un descrittore
       | ente | ruolo | statoDescrittore |
       | PA1  | admin | ARCHIVED         |
       | PA1  | admin | DEPRECATED       |
-      | PA1  | admin | ARCHIVED         |
+      | PA1  | admin | SUSPENDED        |
 
   @descriptor_export2
   Scenario Outline: La richiesta di export di un descrittore di un e-service, in stato DRAFT, ritorna un errore
