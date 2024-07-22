@@ -215,12 +215,10 @@ export const dataPreparationService = {
     token: string,
     eserviceId: string,
     descriptorId: string,
-    prettyName: string = "Documento_test_qa"
+    prettyName: string = `Documento_test_qa-${getRandomInt()}`
   ) {
     const blobFile = new Blob([readFileSync("./data/dummy.pdf")]);
     const file = new File([blobFile], "documento-test-qa.pdf");
-
-    const prettyName = `Documento_test_qa-${getRandomInt()}`;
 
     const response = await apiClient.eservices.createEServiceDocument(
       eserviceId,
@@ -1155,26 +1153,6 @@ export const dataPreparationService = {
         answers,
       },
     };
-  },
-  async uploadInterfaceDocument(
-    fileName: string,
-    eserviceId: string,
-    descriptorId: string,
-    token: string
-  ): Promise<AxiosResponse<CreatedResource>> {
-    const blobFile = new Blob([readFileSync(`./data/${fileName}`)]);
-    const file = new File([blobFile], fileName);
-
-    return apiClient.eservices.createEServiceDocument(
-      eserviceId,
-      descriptorId,
-      {
-        kind: "INTERFACE",
-        prettyName: "Interfaccia",
-        doc: file,
-      },
-      getAuthorizationHeader(token)
-    );
   },
   async activatePurposeVersion(
     token: string,

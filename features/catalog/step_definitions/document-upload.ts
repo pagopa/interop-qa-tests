@@ -49,12 +49,20 @@ When(
       descriptorId: z.string(),
     });
 
-    // to do: this shouldn't use dataPreparationService
-    this.response = await dataPreparationService.uploadInterfaceDocument(
-      `interface.${fileType}`,
+    const fileName = `interface.${fileType}`;
+
+    const blobFile = new Blob([readFileSync(`./data/${fileName}`)]);
+    const file = new File([blobFile], fileName);
+
+    this.response = apiClient.eservices.createEServiceDocument(
       this.eserviceId,
       this.descriptorId,
-      this.token
+      {
+        kind: "INTERFACE",
+        prettyName: "Interfaccia",
+        doc: file,
+      },
+      getAuthorizationHeader(this.token)
     );
   }
 );
@@ -68,11 +76,20 @@ When(
       descriptorId: z.string(),
     });
 
-    this.response = await dataPreparationService.uploadInterfaceDocument(
-      `localhost-interface.${fileType}`,
+    const fileName = `localhost-interface.${fileType}`;
+
+    const blobFile = new Blob([readFileSync(`./data/${fileName}`)]);
+    const file = new File([blobFile], fileName);
+
+    this.response = apiClient.eservices.createEServiceDocument(
       this.eserviceId,
       this.descriptorId,
-      this.token
+      {
+        kind: "INTERFACE",
+        prettyName: "Interfaccia",
+        doc: file,
+      },
+      getAuthorizationHeader(this.token)
     );
   }
 );
