@@ -50,7 +50,6 @@ When(
     });
 
     const fileName = `interface.${fileType}`;
-
     const blobFile = new Blob([readFileSync(`./data/${fileName}`)]);
     const file = new File([blobFile], fileName);
 
@@ -77,7 +76,6 @@ When(
     });
 
     const fileName = `localhost-interface.${fileType}`;
-
     const blobFile = new Blob([readFileSync(`./data/${fileName}`)]);
     const file = new File([blobFile], fileName);
 
