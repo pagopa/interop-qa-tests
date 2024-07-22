@@ -1,6 +1,6 @@
 @purpose_activation
 Feature: Attivazione e riattivazione di una finalità
-  Tutti gli utenti admin possono attivare o riattivare una finalità
+  Tutti gli utenti autorizzati possono attivare o riattivare una finalità
 
   @purpose_activation1a
   Scenario Outline: Per una finalità precedentemente creata da un fruitore e attivata da un erogatore, la quale è stata successivamente portata in stato SUSPENDED, alla richiesta di riattivazione da parte di un utente con sufficienti permessi (admin) dell’ente che ha sospeso la finalità (fruitore), va a buon fine

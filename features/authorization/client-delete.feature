@@ -1,6 +1,6 @@
 @client_delete
 Feature: Cancellazione client
-  Tutti gli utenti admin possono cancellare il proprio client
+  Tutti gli utenti autorizzati possono cancellare il proprio client
 
   @client_delete1
   Scenario Outline: Un utente con sufficienti permessi (admin) dell'ente che ha creato il client, richiede la cancellazione del client. L'operazione va a buon fine

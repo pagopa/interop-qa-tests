@@ -1,6 +1,6 @@
 @purpose_risk_analysis_document_download
 Feature: Download documento di analisi del rischio sigillato
-  Tutti gli utenti admin possono scaricare il documento di analisi del rischio di una propria finalità
+  Tutti gli utenti autorizzati possono scaricare il documento di analisi del rischio di una propria finalità
 
   @purpose_risk_analysis_document_download1 @wait_for_fix @IMN-401
   Scenario Outline: Per una finalità precedentemente creata dal fruitore, la quale è stata in passato almeno per un momento ACTIVE, alla richiesta di lettura del documento di analisi del rischio da parte di un qualsiasi utente dell'ente, va a buon fine. NB: il documento della richiesta di fruizione viene generato all’attivazione di una versione di finalità. Può essere che se si tenta di scaricarlo immediatamente dopo aver attivato una finalità non sia immediatamente disponibile per i tempi connessi alla generazione del PDF.

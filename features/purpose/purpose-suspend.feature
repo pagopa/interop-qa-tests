@@ -1,6 +1,6 @@
 @purpose_suspend
 Feature: Sospensione di una finalità
-  Tutti gli utenti admin possono sospendere una propria finalità
+  Tutti gli utenti autorizzati possono sospendere una propria finalità
 
   @purpose_suspend1
   Scenario Outline: Per una finalità precedentemente creata da un fruitore e attivata da un erogatore, la quale è in stato ACTIVE, alla richiesta di sospensione da parte di un utente con sufficienti permessi dell’ente fruitore, che non coincide con l’ente erogatore, va a buon fine
