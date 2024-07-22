@@ -28,6 +28,7 @@ import {
   ClientSeed,
   ClientKind,
   KeySeed,
+  MailSeed,
   AgreementState,
 } from "./../api/models";
 
@@ -218,12 +219,14 @@ export const dataPreparationService = {
     const blobFile = new Blob([readFileSync("./data/dummy.pdf")]);
     const file = new File([blobFile], "documento-test-qa.pdf");
 
+    const prettyName = `Documento_test_qa-${getRandomInt()}`;
+
     const response = await apiClient.eservices.createEServiceDocument(
       eserviceId,
       descriptorId,
       {
         kind: "DOCUMENT",
-        prettyName: "Documento_test_qa",
+        prettyName,
         doc: file,
       },
       getAuthorizationHeader(token)
@@ -239,7 +242,7 @@ export const dataPreparationService = {
           descriptorId,
           getAuthorizationHeader(token)
         ),
-      (res) => res.data.docs.some((doc) => doc.id === documentId)
+      (res) => res.data.docs.some((doc) => doc.prettyName === prettyName)
     );
     return documentId;
   },
@@ -777,12 +780,14 @@ export const dataPreparationService = {
     token: string,
     tenantId: string,
     verifierId: string,
-    attributeId: string
+    attributeId: string,
+    expirationDate?: string
   ) {
     const response = await apiClient.tenants.verifyVerifiedAttribute(
       tenantId,
       {
         id: attributeId,
+        expirationDate,
       },
       getAuthorizationHeader(token)
     );
@@ -798,6 +803,7 @@ export const dataPreparationService = {
         res.data.attributes.some(
           (attr) =>
             attr.id === attributeId &&
+            attr.verifiedBy.some((verifier) => verifier.id === verifierId) &&
             !attr.revokedBy.some((revoker) => revoker.id === verifierId)
         )
     );
@@ -1315,6 +1321,27 @@ export const dataPreparationService = {
           getAuthorizationHeader(token)
         ),
       (res) => !res.data.some((user) => user.userId === userId)
+    );
+  },
+  async addEmailToTenant(
+    token: string,
+    tenantId: string,
+    mailSeed: Omit<MailSeed, "kind">
+  ) {
+    const response = await apiClient.tenants.addTenantMail(
+      tenantId,
+      {
+        kind: "CONTACT_EMAIL",
+        ...mailSeed,
+      },
+      getAuthorizationHeader(token)
+    );
+    assertValidResponse(response);
+
+    await makePolling(
+      () =>
+        apiClient.tenants.getTenant(tenantId, getAuthorizationHeader(token)),
+      (res) => res.data.contactMail?.address === mailSeed.address
     );
   },
 };

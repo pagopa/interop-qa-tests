@@ -1,6 +1,6 @@
 @purpose_archive
 Feature: Archiviazione di una finalità
-  Tutti gli utenti admin possono archiviare una propria finalità
+  Tutti gli utenti autorizzati possono archiviare una propria finalità
 
   @purpose_archive1
   Scenario Outline: Per una finalità precedentemente creata da un fruitore, la quale è in stato ACTIVE o SUSPENDED, alla richiesta di archiviazione da parte di un utente con sufficienti permessi dell’ente fruitore, va a buon fine

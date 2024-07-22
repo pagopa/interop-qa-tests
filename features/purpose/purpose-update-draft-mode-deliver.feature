@@ -1,6 +1,6 @@
 @purpose_update_draft_mode_deliver
 Feature: Aggiornamento bozza nuova finalità in erogazione diretta
-  Tutti gli utenti admin possono aggiornare una finalità in bozza per un e-service in erogazione diretta.
+  Tutti gli utenti autorizzati possono aggiornare una finalità in bozza per un e-service in erogazione diretta.
 
   @purpose_update_draft_mode_deliver1
   Scenario Outline: Un utente con sufficienti permessi (admin); il cui ente ha già una finalità in stato DRAFT per una versione di e-service, il quale ha mode = DELIVER, aggiorna una finalità con tutti i campi richiesti correttamente formattati. La richiesta va a buon fine.

@@ -1,6 +1,6 @@
 @client_keys_listing
 Feature: Listing chiavi client
-  Tutti gli utenti admin, security o support possono leggere la lista delle chiavi di un client a cui sono associati
+  Tutti gli utenti autorizzati, security o support possono leggere la lista delle chiavi di un client a cui sono associati
 
   @client_keys_listing1
   Scenario Outline: Un utente admin o security; appartenente all'ente che ha creato il client; il quale utente è membro del client; richiede l’elenco delle chiavi caricate per il client. L’operazione va a buon fine
