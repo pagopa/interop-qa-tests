@@ -60,12 +60,12 @@ When(
     assertContextSchema(this, {
       eserviceId: z.string(),
       descriptorId: z.string(),
-      documentId: z.string(),
+      documentId2: z.string(),
     });
     this.response = await apiClient.eservices.updateEServiceDocumentById(
       this.eserviceId,
       this.descriptorId,
-      this.documentId,
+      this.documentId2,
       { prettyName },
       getAuthorizationHeader(this.token)
     );
