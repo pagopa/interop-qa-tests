@@ -1,6 +1,6 @@
 @eservice_description_update
 Feature: Aggiornamento della descrizione di un e-service
-  Tutti gli utenti autorizzati di enti erogatori possono aggiornare la descrizione un proprio e-service attivo
+  Tutti gli utenti autorizzati di enti erogatori possono aggiornare la descrizione un proprio e-service a catalogo
 
   @eservice_description_update1
   Scenario Outline: A fronte di una richiesta aggiornamento della descrizione di un e-service da parte di un utente autorizzato dell’ente che lo eroga, va a buon fine solo per un e-service con descrittori in stato PUBLISHED, SUSPENDED e DEPRECATED
