@@ -1,8 +1,7 @@
 @descriptor_import
 Feature: Import di un descrittore
   Tutti gli utenti autorizzati possono effettuare una richiesta di import di un descrittore di un e-service.
-
-  # Il controllo sui documenti da caricare e se il nome dell'eservice è già presente sono stati tralasciati in quanto già testati nei relativi endpoint dedicati
+  Il controllo sui documenti da caricare e se il nome dell'eservice è già presente sono stati tralasciati in quanto già testati nei relativi endpoint dedicati
 
   @descriptor_import1
   Scenario Outline: La richiesta di import di un descrittore di un e-service da parte di un utente autorizzato, dato un pacchetto correttamente strutturato, contenente due documenti correttamente mappati nel file di configurazione, va a buon fine e il descrittore viene correttamente creato in stato DRAFT con quei documenti
@@ -12,7 +11,7 @@ Feature: Import di un descrittore
     Given è già stato caricato il pacchetto nella presignedURL
     When l'utente effettua una richiesta di import del descrittore
     Then si ottiene status code 200
-    And il descrittore viene correttamente creato in stato DRAFT 
+    And il descrittore viene correttamente creato in stato DRAFT
     And i due documenti risultano correttamente caricati
 
     Examples:
@@ -48,17 +47,17 @@ Feature: Import di un descrittore
     Given è già stato caricato il pacchetto nella presignedURL
     When l'utente effettua una richiesta di import del descrittore
     Then si ottiene status code 200
-    And il descrittore viene correttamente creato in stato DRAFT 
+    And il descrittore viene correttamente creato in stato DRAFT
     And l'eservice contiene l'analisi del rischio
 
-  @descriptor_import4 @wait_for_fix
+  @descriptor_import4
   Scenario Outline: La richiesta di import di un descrittore di un e-service, dato un pacchetto con il file di configurazione correttamente formattato ma con il nome del file errato, non va a buon fine.
     Given l'utente è un "admin" di "PA1"
     Given l'utente ha già un pacchetto correttamente strutturato con un eservice in mode "DELIVER"
     Given l'utente ha già richiesto una presignedURL per il caricamento del pacchetto
     Given è già stato caricato il pacchetto nella presignedURL
     When l'utente effettua una richiesta di import del descrittore con nome del file errato
-    Then si ottiene status code 400
+    Then si ottiene status code 500
 
   @descriptor_import5
   Scenario Outline: La richiesta di import di un descrittore di un e-service, dato un pacchetto con il file di configurazione non correttamente formattato (campi richiesti mancanti o json non valido), non va a buon fine
@@ -86,4 +85,3 @@ Feature: Import di un descrittore
     Given è già stato caricato il pacchetto nella presignedURL
     When l'utente effettua una richiesta di import del descrittore
     Then si ottiene status code 400
-

@@ -15,12 +15,19 @@ import {
 import { apiClient } from "../../../api";
 import { EServiceMode } from "../../../api/models";
 
+const FOLDER_NAME_EXPORTED_WITH_DOCUMENT = "exportedWithDocument";
+const FOLDER_NAME_EXPORTED_WITH_RISK_ANALYSIS = "exportedWithRiskAnalysis";
+
+type FolderName =
+  | typeof FOLDER_NAME_EXPORTED_WITH_DOCUMENT
+  | typeof FOLDER_NAME_EXPORTED_WITH_RISK_ANALYSIS;
+
 function updateAndZipConfig({
   folderName,
   updateConfig,
   notAllowedFiles = false,
 }: {
-  folderName: string;
+  folderName: FolderName;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   updateConfig: (config: any) => void;
   notAllowedFiles?: boolean;
@@ -28,10 +35,11 @@ function updateAndZipConfig({
   const folderPath = `./data/${folderName}`;
   const configFilePath = path.join(folderPath, "configuration.json");
 
+  const notAllowedFilePath = path.join(folderPath, "notAllowedFile.txt");
   if (notAllowedFiles) {
-    writeFileSync(path.join(folderPath, "notAllowedFile.txt"), "");
-  } else {
-    unlinkSync(path.join(folderPath, "notAllowedFile.txt"));
+    writeFileSync(notAllowedFilePath, "");
+  } else if (existsSync(notAllowedFilePath)) {
+    unlinkSync(notAllowedFilePath);
   }
 
   try {
@@ -76,8 +84,8 @@ Given(
 
     this.folderName =
       eserviceMode === "DELIVER"
-        ? "exportedWithDocument"
-        : "exportedWithRiskAnalysis";
+        ? FOLDER_NAME_EXPORTED_WITH_DOCUMENT
+        : FOLDER_NAME_EXPORTED_WITH_RISK_ANALYSIS;
 
     updateAndZipConfig({
       folderName: this.folderName,
@@ -93,7 +101,7 @@ Given(
   function () {
     assertContextSchema(this);
 
-    this.folderName = "exportedWithDocument";
+    this.folderName = FOLDER_NAME_EXPORTED_WITH_DOCUMENT;
 
     updateAndZipConfig({
       folderName: this.folderName,
@@ -110,7 +118,7 @@ Given(
   function () {
     assertContextSchema(this);
 
-    this.folderName = "exportedWithDocument";
+    this.folderName = FOLDER_NAME_EXPORTED_WITH_DOCUMENT;
 
     updateAndZipConfig({
       folderName: this.folderName,
@@ -126,7 +134,7 @@ Given(
   function () {
     assertContextSchema(this);
 
-    this.folderName = "exportedWithDocument";
+    this.folderName = FOLDER_NAME_EXPORTED_WITH_DOCUMENT;
 
     updateAndZipConfig({
       folderName: this.folderName,
@@ -143,9 +151,11 @@ Given(
   async function () {
     assertContextSchema(this, {
       token: z.string(),
-      folderName: z.string(),
+      folderName: z.union([
+        z.literal(FOLDER_NAME_EXPORTED_WITH_DOCUMENT),
+        z.literal(FOLDER_NAME_EXPORTED_WITH_RISK_ANALYSIS),
+      ]),
     });
-
     const response = await apiClient.import.getImportEservicePresignedUrl(
       {
         fileName: `${this.folderName}.zip`,
@@ -164,7 +174,10 @@ Given(
   async function () {
     assertContextSchema(this, {
       url: z.string(),
-      folderName: z.string(),
+      folderName: z.union([
+        z.literal(FOLDER_NAME_EXPORTED_WITH_DOCUMENT),
+        z.literal(FOLDER_NAME_EXPORTED_WITH_RISK_ANALYSIS),
+      ]),
     });
 
     await uploadFile(this.url, `./data/${this.folderName}.zip`);
@@ -176,7 +189,10 @@ When(
   async function () {
     assertContextSchema(this, {
       token: z.string(),
-      folderName: z.string(),
+      folderName: z.union([
+        z.literal(FOLDER_NAME_EXPORTED_WITH_DOCUMENT),
+        z.literal(FOLDER_NAME_EXPORTED_WITH_RISK_ANALYSIS),
+      ]),
     });
 
     this.response = await apiClient.import.importEService(
