@@ -2894,70 +2894,6 @@ export namespace Import {
   }
 }
 
-export namespace Export {
-  /**
-   * No description
-   * @tags eservices
-   * @name ExportEServiceDescriptor
-   * @summary Export EService descriptor
-   * @request GET:/export/eservices/{eserviceId}/descriptors/{descriptorId}
-   * @secure
-   */
-  export namespace ExportEServiceDescriptor {
-    export type RequestParams = {
-      /** @format uuid */
-      eserviceId: string;
-      /** @format uuid */
-      descriptorId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
-    export type ResponseBody = FileResource;
-  }
-}
-
-export namespace Import {
-  /**
-   * No description
-   * @tags eservices
-   * @name GetImportEservicePresignedUrl
-   * @summary Get presigned URL
-   * @request GET:/import/eservices/presignedUrl
-   * @secure
-   */
-  export namespace GetImportEservicePresignedUrl {
-    export type RequestParams = {};
-    export type RequestQuery = {
-      fileName: string;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
-    export type ResponseBody = PresignedUrl;
-  }
-  /**
-   * No description
-   * @tags eservices
-   * @name ImportEService
-   * @summary Import EService
-   * @request POST:/import/eservices
-   * @secure
-   */
-  export namespace ImportEService {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = FileResource;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
-    export type ResponseBody = CreatedEServiceDescriptor;
-  }
-}
-
 export namespace Producers {
   /**
    * @description Retrieve Tenants that have published an EService
@@ -5646,65 +5582,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     updateEServiceDescription: (eServiceId: string, data: EServiceDescriptionSeed, params: RequestParams = {}) =>
       this.request<CreatedResource, Problem>({
         path: `/eservices/${eServiceId}/update`,
-        method: "POST",
-        body: data,
-        secure: true,
-        type: ContentType.Json,
-        format: "json",
-        ...params,
-      }),
-  };
-  export = {
-    /**
-     * No description
-     *
-     * @tags eservices
-     * @name ExportEServiceDescriptor
-     * @summary Export EService descriptor
-     * @request GET:/export/eservices/{eserviceId}/descriptors/{descriptorId}
-     * @secure
-     */
-    exportEServiceDescriptor: (eserviceId: string, descriptorId: string, params: RequestParams = {}) =>
-      this.request<FileResource, Problem>({
-        path: `/export/eservices/${eserviceId}/descriptors/${descriptorId}`,
-        method: "GET",
-        secure: true,
-        format: "json",
-        ...params,
-      }),
-  };
-  import = {
-    /**
-     * No description
-     *
-     * @tags eservices
-     * @name GetImportEservicePresignedUrl
-     * @summary Get presigned URL
-     * @request GET:/import/eservices/presignedUrl
-     * @secure
-     */
-    getImportEservicePresignedUrl: (query: GetImportEservicePresignedUrlParams, params: RequestParams = {}) =>
-      this.request<PresignedUrl, Problem>({
-        path: `/import/eservices/presignedUrl`,
-        method: "GET",
-        query: query,
-        secure: true,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags eservices
-     * @name ImportEService
-     * @summary Import EService
-     * @request POST:/import/eservices
-     * @secure
-     */
-    importEService: (data: FileResource, params: RequestParams = {}) =>
-      this.request<CreatedEServiceDescriptor, Problem>({
-        path: `/import/eservices`,
         method: "POST",
         body: data,
         secure: true,
