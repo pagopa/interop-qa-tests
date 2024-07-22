@@ -15,9 +15,9 @@ Feature: Lettura di un e-service
       | GSP  | api          |       200 |
       | GSP  | security     |       404 |
       | GSP  | api,security |       200 |
-      | GSP  | support      |       404 |
+      | GSP  | support      |       200 |
       | PA1  | admin        |       200 |
       | PA1  | api          |       200 |
       | PA1  | security     |       404 |
       | PA1  | api,security |       200 |
-      | PA1  | support      |       404 |
+      | PA1  | support      |       200 |
