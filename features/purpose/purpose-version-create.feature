@@ -30,7 +30,7 @@ Feature: Creazione di una nuova versione di finalità
     When l'utente aggiorna la stima di carico per quella finalità
     Then si ottiene status code 403
 
-    Examples: # Test sui ruoli
+    Examples:
       | ente    | ruolo        |
       | PA1     | api          |
       | PA1     | security     |
