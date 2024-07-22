@@ -29,7 +29,7 @@ Feature: Rimozione purpose dal client
     Examples:
       | ente | ruolo | statoFinalità        | statusCode |
       | PA1  | admin | SUSPENDED            |        204 |
-      | PA1  | admin | WAITING_FOR_APPROVAL |        204 |
+      #| PA1  | admin | WAITING_FOR_APPROVAL |        204 | non valido: non si può associare al client una purpose che è in è WAITING_FOR_APPROVAL
 
   @client_purpose_remove1b
   Scenario Outline: Un utente con sufficienti permessi (admin) dell'ente che ha creato il client di tipo CONSUMER ed associato il client ad una finalità che si trova in stato ARCHIVED richiede la disassociazione del client dalla finalità. L'operazione va a buon fine
