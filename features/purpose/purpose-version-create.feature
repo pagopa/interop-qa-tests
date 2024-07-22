@@ -4,7 +4,7 @@ Feature: Creazione di una nuova versione di finalità
 
   @purpose_version_create1a
   Scenario Outline: Un utente con sufficienti permessi; il cui ente ha già una finalità in stato ACTIVE o SUSPENDED e non ha versioni in stato WAITING_FOR_APPROVAL per una versione di e-service, aggiorna la stima di carico di una finalità. La richiesta va a buon fine e la finalità viene aggiornata con la nuova stima di carico restando nello stato originale.
-    Given l'utente è un "<ruolo>" di "<ente>"
+    Given l'utente è un "admin" di "<ente>"
     Given "PA2" ha già creato e pubblicato 1 e-service
     Given "<ente>" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given "<ente>" ha già creato 1 finalità in stato "<statoFinalità>" per quell'eservice
@@ -12,14 +12,14 @@ Feature: Creazione di una nuova versione di finalità
     Then si ottiene status code 200 e la nuova versione della finalità è stata creata in stato "<statoFinalità>" con la nuova stima di carico
 
     Examples: # Test sui ruoli
-      | ente    | ruolo | statoFinalità |
-      | PA1     | admin | ACTIVE        |
-      | GSP     | admin | ACTIVE        |
-      | Privato | admin | ACTIVE        |
+      | ente    | statoFinalità |
+      | PA1     | ACTIVE        |
+      | GSP     | ACTIVE        |
+      | Privato | ACTIVE        |
 
     Examples: # Test sui stati finalità
-      | ente | ruolo | statoFinalità |
-      | PA1  | admin | SUSPENDED     |
+      | ente | statoFinalità |
+      | PA1  | SUSPENDED     |
 
   @purpose_version_create1b
   Scenario Outline: Un utente senza sufficienti permessi; il cui ente ha già una finalità in stato ACTIVE o SUSPENDED e non ha versioni in stato WAITING_FOR_APPROVAL per una versione di e-service, aggiorna la stima di carico di una finalità. Ottiene un errore.
