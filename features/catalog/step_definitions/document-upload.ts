@@ -17,17 +17,33 @@ Given(
   ) {
     const token = await getToken(tenantType);
 
-    const eserviceId = await dataPreparationService.createEService(token, {
-      technology,
-    });
+    // const eserviceId = await dataPreparationService.deprecated__createEService(token, {
+    //   technology,
+    // });
 
-    const { descriptorId, documentId } =
-      await dataPreparationService.createDescriptorWithGivenState({
+    // const { descriptorId, documentId } =
+    //   await dataPreparationService.deprecated__createDescriptorWithGivenState({
+    //     token,
+    //     eserviceId,
+    //     descriptorState,
+    //   });
+
+    const { eserviceId, descriptorId } =
+      await dataPreparationService.createEServiceAndDraftDescriptor(
+        token,
+        {
+          technology,
+        },
+        {}
+      );
+
+    const { documentId } =
+      await dataPreparationService.bringDescriptorToGivenState({
         token,
         eserviceId,
+        descriptorId,
         descriptorState,
       });
-
     this.eserviceId = eserviceId;
     this.descriptorId = descriptorId;
     this.documentId = documentId;

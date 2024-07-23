@@ -22,14 +22,26 @@ Given(
 
     const token = await getToken(tenantType);
 
-    const { descriptorId } =
-      await dataPreparationService.createDescriptorWithGivenState({
-        token,
-        eserviceId: this.eserviceId,
-        descriptorState,
-      });
+    // const { descriptorId } =
+    //   await dataPreparationService.deprecated__createDescriptorWithGivenState({
+    //     token,
+    //     eserviceId: this.eserviceId,
+    //     descriptorState,
+    //   });
 
-    this.descriptorId = descriptorId;
+    this.descriptorId = await dataPreparationService.createNextDraftDescriptor(
+      token,
+      this.eserviceId
+    );
+
+    await dataPreparationService.bringDescriptorToGivenState({
+      token,
+      eserviceId: this.eserviceId,
+      descriptorId: this.descriptorId,
+      descriptorState,
+    });
+
+    // this.descriptorId = descriptorId;
   }
 );
 

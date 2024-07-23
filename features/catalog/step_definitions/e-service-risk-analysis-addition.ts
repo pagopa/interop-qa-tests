@@ -17,9 +17,15 @@ Given(
 
     const token = await getToken(tenantType);
 
-    this.eserviceId = await dataPreparationService.createEService(token, {
-      mode,
-    });
+    // this.eserviceId = await dataPreparationService.deprecated__createEService(token, {
+    //   mode,
+    // });
+
+    const { eserviceId } =
+      await dataPreparationService.createEServiceAndDraftDescriptor(token, {
+        mode,
+      });
+    this.eserviceId = eserviceId;
   }
 );
 
