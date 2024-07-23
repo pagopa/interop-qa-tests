@@ -68,3 +68,11 @@ Feature: Caricamento di un documento di interfaccia
     Given "PA1" ha già caricato un'interfaccia per quel descrittore
     When l'utente carica un documento di interfaccia di tipo "yaml"
     Then si ottiene status code 400
+
+  @document_upload5
+  Scenario Outline: Per un e-service che ha un solo descrittore, il quale è in stato DRAFT, e per il quale è già stato caricato un documento, alla richiesta di caricamento di un nuovo documento con lo stesso nome, l’operazione restituirà errore.
+    Given l'utente è un "admin" di "PA1"
+    Given "PA1" ha già creato un e-service con un descrittore in stato "DRAFT"
+    Given "PA1" ha già caricato un documento con nome "test" in quel descrittore
+    When l'utente carica un documento con nome "test" in quel descrittore
+    Then si ottiene status code 409
