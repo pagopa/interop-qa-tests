@@ -41,7 +41,7 @@ Given(
           agreementApprovalPolicy,
         }
       );
-   
+
     await dataPreparationService.bringDescriptorToGivenState({
       token,
       eserviceId,

@@ -50,7 +50,6 @@ Given(
 
     const arr = new Array(totalEservices).fill(0);
     const createEServiceWithPublishedDescriptor = async (i: number) => {
-
       const { eserviceId, descriptorId } =
         await dataPreparationService.createEServiceAndDraftDescriptor(token, {
           name: `eservice-${i}-${this.TEST_SEED}-${getRandomInt()}`,
