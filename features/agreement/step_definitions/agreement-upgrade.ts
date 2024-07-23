@@ -35,11 +35,24 @@ Given(
       attributeId: z.string(),
     });
     const token = await getToken(tenantType);
-    const response =
-      await dataPreparationService.createDescriptorWithGivenState({
-        token,
-        eserviceId: this.eserviceId,
-        descriptorState: "PUBLISHED",
+    // const response =
+    //   await dataPreparationService.deprecated__createDescriptorWithGivenState({
+    //     token,
+    //     eserviceId: this.eserviceId,
+    //     descriptorState: "PUBLISHED",
+    //     attributes: {
+    //       certified: [
+    //         [{ id: this.attributeId, explicitAttributeVerification: true }],
+    //       ],
+    //       declared: [],
+    //       verified: [],
+    //     },
+    //   });
+
+    const descriptorId = await dataPreparationService.createNextDraftDescriptor(
+      token,
+      this.eserviceId,
+      {
         attributes: {
           certified: [
             [{ id: this.attributeId, explicitAttributeVerification: true }],
@@ -47,8 +60,15 @@ Given(
           declared: [],
           verified: [],
         },
-      });
-    this.descriptorId = response.descriptorId;
+      }
+    );
+    // await dataPreparationService.bringDescriptorToGivenState({
+    //   token,
+    //   eserviceId,
+    //   descriptorId,
+    //   descriptorState: "PUBLISHED",
+    // });
+    this.descriptorId = descriptorId;
   }
 );
 
@@ -75,18 +95,32 @@ Given(
       [{ id: attributeId, explicitAttributeVerification: true }],
     ];
 
-    const response =
-      await dataPreparationService.createDescriptorWithGivenState({
-        token,
-        eserviceId: this.eserviceId,
-        descriptorState: "PUBLISHED",
+    const descriptorId = await dataPreparationService.createNextDraftDescriptor(
+      token,
+      this.eserviceId,
+      {
         attributes: {
           certified: kind === "CERTIFIED" ? seed : [],
           declared: kind === "DECLARED" ? seed : [],
           verified: kind === "VERIFIED" ? seed : [],
         },
-      });
-    this.descriptorId = response.descriptorId;
+      }
+    );
+
+    this.descriptorId = descriptorId;
+
+    // const response =
+    //   await dataPreparationService.deprecated__createDescriptorWithGivenState({
+    //     token,
+    //     eserviceId: this.eserviceId,
+    //     descriptorState: "PUBLISHED",
+    //     attributes: {
+    //       certified: kind === "CERTIFIED" ? seed : [],
+    //       declared: kind === "DECLARED" ? seed : [],
+    //       verified: kind === "VERIFIED" ? seed : [],
+    //     },
+    //   });
+    // this.descriptorId = response.descriptorId;
   }
 );
 

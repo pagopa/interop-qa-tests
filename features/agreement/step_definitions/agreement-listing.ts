@@ -71,13 +71,29 @@ Given(
       .slice(0, descriptorsCount)
       .map(([eserviceId, _]) => eserviceId);
 
-    await Promise.all(
-      eserviceIds.map((eserviceId) =>
-        dataPreparationService.createDescriptorWithGivenState({
-          eserviceId,
+    const descriptorCreation = async (eserviceId: string) => {
+      const descriptorId =
+        await dataPreparationService.createNextDraftDescriptor(
           token,
-          descriptorState: "PUBLISHED",
-        })
+          eserviceId
+        );
+      await dataPreparationService.bringDescriptorToGivenState({
+        token,
+        eserviceId,
+        descriptorId,
+        descriptorState: "PUBLISHED",
+      });
+
+      return [eserviceId, descriptorId];
+    };
+    await Promise.all(
+      eserviceIds.map(
+        (eserviceId) => descriptorCreation(eserviceId)
+        // dataPreparationService.deprecated__createDescriptorWithGivenState({
+        //   eserviceId,
+        //   token,
+        //   descriptorState: "PUBLISHED",
+        // })
       )
     );
   }
