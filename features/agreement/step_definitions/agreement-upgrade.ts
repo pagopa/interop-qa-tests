@@ -82,7 +82,7 @@ Given(
       [{ id: attributeId, explicitAttributeVerification: true }],
     ];
 
-    const descriptorId = await dataPreparationService.createNextDraftDescriptor(
+    this.descriptorId = await dataPreparationService.createNextDraftDescriptor(
       token,
       this.eserviceId,
       {
@@ -93,8 +93,6 @@ Given(
         },
       }
     );
-
-    this.descriptorId = descriptorId;
   }
 );
 

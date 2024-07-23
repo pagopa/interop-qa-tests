@@ -138,14 +138,14 @@ Given(
     });
     const token = await getToken(tenantType);
 
-    const descriptorId = await dataPreparationService.createNextDraftDescriptor(
+    this.descriptorId = await dataPreparationService.createNextDraftDescriptor(
       token,
       this.eserviceId
     );
     await dataPreparationService.bringDescriptorToGivenState({
       token,
       eserviceId: this.eserviceId,
-      descriptorId,
+      descriptorId: this.descriptorId,
       descriptorState: "PUBLISHED",
     });
   }
