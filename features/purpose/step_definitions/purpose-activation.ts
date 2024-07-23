@@ -19,18 +19,30 @@ Given(
 
     const token = await getToken(tenantType);
     const eserviceName = `e-service-${this.TEST_SEED}}`;
-    this.eserviceId = await dataPreparationService.createEService(token, {
-      name: eserviceName,
-    });
+    // this.eserviceId = await dataPreparationService.deprecated__createEService(token, {
+    //   name: eserviceName,
+    // });
 
-    this.descriptorId = await dataPreparationService.createDraftDescriptor(
-      token,
-      this.eserviceId,
-      {
-        dailyCallsPerConsumer: 1,
-        dailyCallsTotal: 1,
-      }
-    );
+    // this.descriptorId = await dataPreparationService.deprecated__createDraftDescriptor(
+    //   token,
+    //   this.eserviceId,
+    //   {
+    //     dailyCallsPerConsumer: 1,
+    //     dailyCallsTotal: 1,
+    //   }
+    // );
+
+    const { eserviceId, descriptorId } =
+      await dataPreparationService.createEServiceAndDraftDescriptor(
+        token,
+        {
+          name: eserviceName,
+        },
+        { dailyCallsPerConsumer: 1, dailyCallsTotal: 1 }
+      );
+
+    this.eserviceId = eserviceId;
+    this.descriptorId = descriptorId;
 
     await dataPreparationService.addInterfaceToDescriptor(
       token,

@@ -53,29 +53,54 @@ Given(
       attributeId: z.string(),
     });
     const token = await getToken(tenantType);
-    this.eserviceId = await dataPreparationService.createEService(token, {
-      mode: "RECEIVE",
-    });
-
-    this.descriptorId = await dataPreparationService.createDraftDescriptor(
-      token,
-      this.eserviceId,
-      {
-        agreementApprovalPolicy: approvalPolicy,
-        attributes: {
-          certified: [
-            [
-              {
-                id: this.attributeId,
-                explicitAttributeVerification: true,
-              },
-            ],
-          ],
-          declared: [],
-          verified: [],
+    // this.eserviceId = await dataPreparationService.deprecated__createEService(token, {
+    //   mode: "RECEIVE",
+    // });
+    const { eserviceId, descriptorId } =
+      await dataPreparationService.createEServiceAndDraftDescriptor(
+        token,
+        {
+          mode: "RECEIVE",
         },
-      }
-    );
+        {
+          agreementApprovalPolicy: approvalPolicy,
+          attributes: {
+            certified: [
+              [
+                {
+                  id: this.attributeId,
+                  explicitAttributeVerification: true,
+                },
+              ],
+            ],
+            declared: [],
+            verified: [],
+          },
+        }
+      );
+
+    this.eserviceId = eserviceId;
+    this.descriptorId = descriptorId;
+
+    // this.descriptorId = await dataPreparationService.deprecated__createDraftDescriptor(
+    //   token,
+    //   this.eserviceId,
+    //   {
+    //     agreementApprovalPolicy: approvalPolicy,
+    //     attributes: {
+    //       certified: [
+    //         [
+    //           {
+    //             id: this.attributeId,
+    //             explicitAttributeVerification: true,
+    //           },
+    //         ],
+    //       ],
+    //       declared: [],
+    //       verified: [],
+    //     },
+    //   }
+    // );
   }
 );
 
@@ -86,17 +111,31 @@ Given(
     approvalPolicy: AgreementApprovalPolicy
   ) {
     const token = await getToken(tenantType);
-    this.eserviceId = await dataPreparationService.createEService(token, {
-      mode: "RECEIVE",
-    });
+    // this.eserviceId = await dataPreparationService.deprecated__createEService(token, {
+    //   mode: "RECEIVE",
+    // });
 
-    this.descriptorId = await dataPreparationService.createDraftDescriptor(
-      token,
-      this.eserviceId,
-      {
-        agreementApprovalPolicy: approvalPolicy,
-      }
-    );
+    // this.descriptorId = await dataPreparationService.deprecated__createDraftDescriptor(
+    //   token,
+    //   this.eserviceId,
+    //   {
+    //     agreementApprovalPolicy: approvalPolicy,
+    //   }
+    // );
+
+    const { eserviceId, descriptorId } =
+      await dataPreparationService.createEServiceAndDraftDescriptor(
+        token,
+        {
+          mode: "RECEIVE",
+        },
+        {
+          agreementApprovalPolicy: approvalPolicy,
+        }
+      );
+
+    this.eserviceId = eserviceId;
+    this.descriptorId = descriptorId;
   }
 );
 
