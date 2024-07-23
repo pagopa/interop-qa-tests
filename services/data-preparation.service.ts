@@ -12,7 +12,6 @@ import {
 } from "../utils/commons";
 import {
   EServiceSeed,
-  EServiceDescriptorSeed,
   EServiceDescriptorState,
   EServiceRiskAnalysisSeed,
   DescriptorAttributesSeed,
@@ -30,6 +29,7 @@ import {
   KeySeed,
   MailSeed,
   AgreementState,
+  UpdateEServiceDescriptorSeed,
 } from "./../api/models";
 
 export const ESERVICE_DAILY_CALLS: Readonly<{
@@ -97,7 +97,8 @@ const RISK_ANALYSIS_DATA: Record<
 };
 
 export const dataPreparationService = {
-  async createEService(
+  /*
+  async deprecated__createEService(
     token: string,
     partialEserviceSeed: Partial<EServiceSeed> = {}
   ) {
@@ -131,8 +132,69 @@ export const dataPreparationService = {
 
     return eserviceId;
   },
+  */
 
-  async createDraftDescriptor(
+  async createEServiceAndDraftDescriptor(
+    token: string,
+    partialEserviceSeed: Partial<EServiceSeed> = {},
+    partialDescriptorSeed: Partial<UpdateEServiceDescriptorSeed> = {}
+  ) {
+    const DEFAULT_ESERVICE_SEED: EServiceSeed = {
+      name: `e-service ${getRandomInt()}`,
+      description: "Descrizione e-service",
+      technology: "REST",
+      mode: "DELIVER",
+    };
+
+    const eserviceSeed: EServiceSeed = {
+      ...DEFAULT_ESERVICE_SEED,
+      ...partialEserviceSeed,
+    };
+
+    const eserviceCreationResponse = await apiClient.eservices.createEService(
+      eserviceSeed,
+      getAuthorizationHeader(token)
+    );
+    assertValidResponse(eserviceCreationResponse);
+    const eserviceId = eserviceCreationResponse.data.id;
+    const descriptorId = eserviceCreationResponse.data.descriptorId;
+
+    await makePolling(
+      // to do: this might be unnecessary because there is polling on descriptor below
+      () =>
+        apiClient.producers.getProducerEServiceDetails(
+          eserviceId,
+          getAuthorizationHeader(token)
+        ),
+      (res) => res.status !== 404
+    );
+
+    await makePolling(
+      () =>
+        apiClient.producers.getProducerEServiceDescriptor(
+          eserviceId,
+          descriptorId,
+          getAuthorizationHeader(token)
+        ),
+      (res) => res.status !== 404
+    );
+
+    if (Object.keys(partialDescriptorSeed).length === 0) {
+      return { eserviceId, descriptorId };
+    }
+
+    await dataPreparationService.updateDraftDescriptor({
+      token,
+      eserviceId,
+      descriptorId,
+      partialDescriptorSeed,
+    });
+
+    return { eserviceId, descriptorId };
+  },
+
+  /*
+  async deprecated__createDraftDescriptor(
     token: string,
     eserviceId: string,
     partialEServiceDescriptorSeed: Partial<EServiceDescriptorSeed> = {}
@@ -175,6 +237,41 @@ export const dataPreparationService = {
         ),
       (res) => res.status !== 404
     );
+
+    return descriptorId;
+  },
+*/
+
+  async createNextDraftDescriptor(
+    token: string,
+    eserviceId: string,
+    partialDescriptorSeed: Partial<UpdateEServiceDescriptorSeed> = {}
+  ) {
+    const descriptorCreationResponse =
+      await apiClient.eservices.createDescriptor(
+        eserviceId,
+        getAuthorizationHeader(token)
+      );
+
+    assertValidResponse(descriptorCreationResponse);
+    const descriptorId = descriptorCreationResponse.data.id;
+
+    await makePolling(
+      () =>
+        apiClient.producers.getProducerEServiceDescriptor(
+          eserviceId,
+          descriptorId,
+          getAuthorizationHeader(token)
+        ),
+      (res) => res.status !== 404
+    );
+
+    await dataPreparationService.updateDraftDescriptor({
+      token,
+      eserviceId,
+      descriptorId,
+      partialDescriptorSeed,
+    });
 
     return descriptorId;
   },
@@ -549,8 +646,8 @@ export const dataPreparationService = {
       (res) => res.data.state === "REJECTED"
     );
   },
-
-  async createDescriptorWithGivenState({
+  /*
+  async deprecated__createDescriptorWithGivenState({
     token,
     eserviceId,
     descriptorState,
@@ -566,7 +663,7 @@ export const dataPreparationService = {
     agreementApprovalPolicy?: AgreementApprovalPolicy;
   }) {
     // 1. Create DRAFT descriptor
-    const descriptorId = await dataPreparationService.createDraftDescriptor(
+    const descriptorId = await dataPreparationService.deprecated__createDraftDescriptor(
       token,
       eserviceId,
       { attributes, agreementApprovalPolicy }
@@ -634,7 +731,154 @@ export const dataPreparationService = {
 
     // Create another DRAFT descriptor
     const secondDescriptorId =
-      await dataPreparationService.createDraftDescriptor(token, eserviceId);
+      await dataPreparationService.deprecated__createDraftDescriptor(token, eserviceId);
+
+    // Add interface to secondDescriptor
+    await dataPreparationService.addInterfaceToDescriptor(
+      token,
+      eserviceId,
+      secondDescriptorId
+    );
+
+    // Publish secondDescriptor
+    await dataPreparationService.publishDescriptor(
+      token,
+      eserviceId,
+      secondDescriptorId
+    );
+
+    // Check until the first descriptor is in desired state
+    await makePolling(
+      () =>
+        apiClient.producers.getProducerEServiceDescriptor(
+          eserviceId,
+          descriptorId,
+          getAuthorizationHeader(token)
+        ),
+      (res) => res.data.state === descriptorState
+    );
+
+    return result;
+  },
+*/
+
+  async updateDraftDescriptor({
+    token,
+    eserviceId,
+    descriptorId,
+    partialDescriptorSeed = {},
+  }: {
+    token: string;
+    eserviceId: string;
+    descriptorId: string;
+    partialDescriptorSeed: Partial<UpdateEServiceDescriptorSeed>;
+  }) {
+    const descriptor = await apiClient.producers.getProducerEServiceDescriptor(
+      eserviceId,
+      descriptorId,
+      getAuthorizationHeader(token)
+    );
+
+    const currentDescriptorSeed: UpdateEServiceDescriptorSeed = {
+      agreementApprovalPolicy: descriptor.data.agreementApprovalPolicy,
+      attributes: descriptor.data.attributes,
+      dailyCallsPerConsumer: descriptor.data.dailyCallsPerConsumer,
+      dailyCallsTotal: descriptor.data.dailyCallsTotal,
+      audience: descriptor.data.audience,
+      voucherLifespan: descriptor.data.voucherLifespan,
+    };
+
+    const descriptorSeed: UpdateEServiceDescriptorSeed = {
+      ...currentDescriptorSeed,
+      ...partialDescriptorSeed,
+    };
+
+    await apiClient.eservices.updateDraftDescriptor(
+      eserviceId,
+      descriptorId,
+      descriptorSeed,
+      getAuthorizationHeader(token)
+    );
+
+    // todo polling
+  },
+
+  async bringDescriptorToGivenState({
+    token,
+    eserviceId,
+    descriptorId,
+    descriptorState,
+    withDocument = false,
+  }: {
+    token: string;
+    eserviceId: string;
+    descriptorId: string;
+    descriptorState: EServiceDescriptorState;
+    withDocument?: boolean;
+  }) {
+    // 1.1 add document to descriptor
+    let documentId: string | undefined;
+    if (withDocument) {
+      documentId = await dataPreparationService.addDocumentToDescriptor(
+        token,
+        eserviceId,
+        descriptorId
+      );
+    }
+
+    const result = { descriptorId, documentId };
+
+    if (descriptorState === "DRAFT") {
+      return result;
+    }
+
+    // 2. Add interface to descriptor
+    await dataPreparationService.addInterfaceToDescriptor(
+      token,
+      eserviceId,
+      descriptorId
+    );
+
+    // 3. Publish Descriptor
+    await dataPreparationService.publishDescriptor(
+      token,
+      eserviceId,
+      descriptorId
+    );
+
+    if (descriptorState === "PUBLISHED") {
+      return result;
+    }
+
+    // 4. Suspend Descriptor
+    if (descriptorState === "SUSPENDED") {
+      await dataPreparationService.suspendDescriptor(
+        token,
+        eserviceId,
+        descriptorId
+      );
+      return result;
+    }
+
+    if (descriptorState === "DEPRECATED") {
+      // Optional. Create an agreement
+
+      const agreementId = await dataPreparationService.createAgreement(
+        token,
+        eserviceId,
+        descriptorId
+      );
+
+      await dataPreparationService.submitAgreement(
+        token,
+        agreementId,
+        "ACTIVE"
+      );
+    }
+
+    // Create another DRAFT descriptor
+    const secondDescriptorId =
+      await dataPreparationService.createNextDraftDescriptor(token, eserviceId);
 
     // Add interface to secondDescriptor
     await dataPreparationService.addInterfaceToDescriptor(
