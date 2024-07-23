@@ -175,28 +175,8 @@ export interface Mail {
   description?: string;
 }
 
-export interface EServiceDescriptorSeed {
-  description?: string;
-  audience: string[];
-  /** @format int32 */
-  voucherLifespan: number;
-  /**
-   * maximum number of daily calls that this descriptor can afford.
-   * @format int32
-   */
-  dailyCallsPerConsumer: number;
-  /**
-   * total daily calls available for this e-service.
-   * @format int32
-   */
-  dailyCallsTotal: number;
-  /**
-   * EService Descriptor policy for new Agreements approval.
-   * AUTOMATIC - the agreement will be automatically approved if Consumer attributes are met
-   * MANUAL - the Producer must approve every agreement for this Descriptor.
-   */
-  agreementApprovalPolicy: AgreementApprovalPolicy;
-  attributes: DescriptorAttributesSeed;
+export interface EServiceDescriptionSeed {
+  description: string;
 }
 
 export interface CatalogEServiceDescriptor {
@@ -622,6 +602,11 @@ export interface Pagination {
   totalCount: number;
 }
 
+export interface PresignedUrl {
+  /** @format uri */
+  url: string;
+}
+
 export interface ProducerEService {
   /** @format uuid */
   id: string;
@@ -1035,6 +1020,12 @@ export interface ExternalId {
   value: string;
 }
 
+export interface FileResource {
+  filename: string;
+  /** @format uri */
+  url: string;
+}
+
 export type MailKind = "CONTACT_EMAIL" | "DIGITAL_ADDRESS";
 
 /** A specific kind of mail */
@@ -1420,6 +1411,10 @@ export interface CreateEServiceDocumentPayload {
   prettyName: string;
   /** @format binary */
   doc: File;
+}
+
+export interface GetImportEservicePresignedUrlParams {
+  fileName: string;
 }
 
 export interface GetProducersParams {
@@ -2271,7 +2266,7 @@ export namespace Eservices {
     export type RequestHeaders = {
       "X-Correlation-Id": string;
     };
-    export type ResponseBody = CreatedResource;
+    export type ResponseBody = CreatedEServiceDescriptor;
   }
   /**
    * No description
@@ -2369,7 +2364,7 @@ export namespace Eservices {
       eServiceId: string;
     };
     export type RequestQuery = {};
-    export type RequestBody = EServiceDescriptorSeed;
+    export type RequestBody = never;
     export type RequestHeaders = {
       "X-Correlation-Id": string;
     };
@@ -2785,6 +2780,93 @@ export namespace Eservices {
       "X-Correlation-Id": string;
     };
     export type ResponseBody = void;
+  }
+  /**
+   * No description
+   * @tags eservices
+   * @name UpdateEServiceDescription
+   * @summary Update an e-service description
+   * @request POST:/eservices/{eServiceId}/update
+   * @secure
+   */
+  export namespace UpdateEServiceDescription {
+    export type RequestParams = {
+      /**
+       * the eservice id
+       * @format uuid
+       */
+      eServiceId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = EServiceDescriptionSeed;
+    export type RequestHeaders = {
+      "X-Correlation-Id": string;
+    };
+    export type ResponseBody = CreatedResource;
+  }
+}
+
+export namespace Export {
+  /**
+   * No description
+   * @tags eservices
+   * @name ExportEServiceDescriptor
+   * @summary Export EService descriptor
+   * @request GET:/export/eservices/{eserviceId}/descriptors/{descriptorId}
+   * @secure
+   */
+  export namespace ExportEServiceDescriptor {
+    export type RequestParams = {
+      /** @format uuid */
+      eserviceId: string;
+      /** @format uuid */
+      descriptorId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {
+      "X-Correlation-Id": string;
+    };
+    export type ResponseBody = FileResource;
+  }
+}
+
+export namespace Import {
+  /**
+   * No description
+   * @tags eservices
+   * @name GetImportEservicePresignedUrl
+   * @summary Get presigned URL
+   * @request GET:/import/eservices/presignedUrl
+   * @secure
+   */
+  export namespace GetImportEservicePresignedUrl {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      fileName: string;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {
+      "X-Correlation-Id": string;
+    };
+    export type ResponseBody = PresignedUrl;
+  }
+  /**
+   * No description
+   * @tags eservices
+   * @name ImportEService
+   * @summary Import EService
+   * @request POST:/import/eservices
+   * @secure
+   */
+  export namespace ImportEService {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = FileResource;
+    export type RequestHeaders = {
+      "X-Correlation-Id": string;
+    };
+    export type ResponseBody = CreatedEServiceDescriptor;
   }
 }
 
@@ -4333,34 +4415,6 @@ export namespace Clients {
     };
     export type ResponseBody = EncodedClientKey;
   }
-  /**
-   * @description Given a user and a client it returns its corresponding set of keys, if any
-   * @tags clients
-   * @name GetClientUserKeys
-   * @summary Returns a set of keys by user ID and client ID.
-   * @request GET:/clients/{clientId}/users/{userId}/keys
-   * @secure
-   */
-  export namespace GetClientUserKeys {
-    export type RequestParams = {
-      /**
-       * ID of the client holding the key
-       * @format uuid
-       */
-      clientId: string;
-      /**
-       * ID of the User that the added keys MUST belong to
-       * @format uuid
-       */
-      userId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
-    export type ResponseBody = PublicKeys;
-  }
 }
 
 export namespace Selfcare {
@@ -5099,7 +5153,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @secure
      */
     createEService: (data: EServiceSeed, params: RequestParams = {}) =>
-      this.request<CreatedResource, Problem>({
+      this.request<CreatedEServiceDescriptor, Problem>({
         path: `/eservices`,
         method: "POST",
         body: data,
@@ -5177,13 +5231,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request POST:/eservices/{eServiceId}/descriptors
      * @secure
      */
-    createDescriptor: (eServiceId: string, data: EServiceDescriptorSeed, params: RequestParams = {}) =>
+    createDescriptor: (eServiceId: string, params: RequestParams = {}) =>
       this.request<CreatedResource, Problem>({
         path: `/eservices/${eServiceId}/descriptors`,
         method: "POST",
-        body: data,
         secure: true,
-        type: ContentType.Json,
         format: "json",
         ...params,
       }),
@@ -5489,6 +5541,85 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         path: `/eservices/${eServiceId}/riskAnalysis/${riskAnalysisId}`,
         method: "DELETE",
         secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags eservices
+     * @name UpdateEServiceDescription
+     * @summary Update an e-service description
+     * @request POST:/eservices/{eServiceId}/update
+     * @secure
+     */
+    updateEServiceDescription: (eServiceId: string, data: EServiceDescriptionSeed, params: RequestParams = {}) =>
+      this.request<CreatedResource, Problem>({
+        path: `/eservices/${eServiceId}/update`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+  };
+  export = {
+    /**
+     * No description
+     *
+     * @tags eservices
+     * @name ExportEServiceDescriptor
+     * @summary Export EService descriptor
+     * @request GET:/export/eservices/{eserviceId}/descriptors/{descriptorId}
+     * @secure
+     */
+    exportEServiceDescriptor: (eserviceId: string, descriptorId: string, params: RequestParams = {}) =>
+      this.request<FileResource, Problem>({
+        path: `/export/eservices/${eserviceId}/descriptors/${descriptorId}`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+  };
+  import = {
+    /**
+     * No description
+     *
+     * @tags eservices
+     * @name GetImportEservicePresignedUrl
+     * @summary Get presigned URL
+     * @request GET:/import/eservices/presignedUrl
+     * @secure
+     */
+    getImportEservicePresignedUrl: (query: GetImportEservicePresignedUrlParams, params: RequestParams = {}) =>
+      this.request<PresignedUrl, Problem>({
+        path: `/import/eservices/presignedUrl`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags eservices
+     * @name ImportEService
+     * @summary Import EService
+     * @request POST:/import/eservices
+     * @secure
+     */
+    importEService: (data: FileResource, params: RequestParams = {}) =>
+      this.request<CreatedEServiceDescriptor, Problem>({
+        path: `/import/eservices`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
         ...params,
       }),
   };
@@ -6646,24 +6777,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     getEncodedClientKeyById: (clientId: string, keyId: string, params: RequestParams = {}) =>
       this.request<EncodedClientKey, Problem>({
         path: `/clients/${clientId}/encoded/keys/${keyId}`,
-        method: "GET",
-        secure: true,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * @description Given a user and a client it returns its corresponding set of keys, if any
-     *
-     * @tags clients
-     * @name GetClientUserKeys
-     * @summary Returns a set of keys by user ID and client ID.
-     * @request GET:/clients/{clientId}/users/{userId}/keys
-     * @secure
-     */
-    getClientUserKeys: (clientId: string, userId: string, params: RequestParams = {}) =>
-      this.request<PublicKeys, Problem>({
-        path: `/clients/${clientId}/users/${userId}/keys`,
         method: "GET",
         secure: true,
         format: "json",
