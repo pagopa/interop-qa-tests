@@ -33,8 +33,6 @@ Given(
       descriptorId: this.descriptorId,
       descriptorState,
     });
-
-    // this.descriptorId = descriptorId;
   }
 );
 
