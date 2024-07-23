@@ -28,13 +28,6 @@ Given(
     // 1. Create the draft e-services with draft descriptors
     const arr = new Array(TOTAL_ESERVICES).fill(0);
     const createEServiceWithDescriptor = async (i: number) => {
-      // const eserviceId = await dataPreparationService.deprecated__createEService(token, {
-      //   name: `eservice-${i}-${this.TEST_SEED}`,
-      // });
-      // const descriptorId = await dataPreparationService.deprecated__createDraftDescriptor(
-      //   token,
-      //   eserviceId
-      // );
       const { eserviceId, descriptorId } =
         await dataPreparationService.createEServiceAndDraftDescriptor(token, {
           name: `eservice-${i}-${this.TEST_SEED}`,
@@ -237,14 +230,6 @@ Given(
 
     const token = await getToken(tenantType);
     const eserviceName = `e-service-${this.TEST_SEED}-${keyword}`;
-    // this.eserviceId = await dataPreparationService.deprecated__createEService(token, {
-    //   name: eserviceName,
-    // });
-
-    // this.descriptorId = await dataPreparationService.deprecated__createDraftDescriptor(
-    //   token,
-    //   this.eserviceId
-    // );
 
     const { eserviceId, descriptorId } =
       await dataPreparationService.createEServiceAndDraftDescriptor(token, {

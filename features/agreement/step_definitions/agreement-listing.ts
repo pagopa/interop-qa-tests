@@ -87,14 +87,7 @@ Given(
       return [eserviceId, descriptorId];
     };
     await Promise.all(
-      eserviceIds.map(
-        (eserviceId) => descriptorCreation(eserviceId)
-        // dataPreparationService.deprecated__createDescriptorWithGivenState({
-        //   eserviceId,
-        //   token,
-        //   descriptorState: "PUBLISHED",
-        // })
-      )
+      eserviceIds.map((eserviceId) => descriptorCreation(eserviceId))
     );
   }
 );

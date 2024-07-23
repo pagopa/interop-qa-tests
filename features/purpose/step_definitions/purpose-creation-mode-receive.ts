@@ -53,9 +53,7 @@ Given(
       attributeId: z.string(),
     });
     const token = await getToken(tenantType);
-    // this.eserviceId = await dataPreparationService.deprecated__createEService(token, {
-    //   mode: "RECEIVE",
-    // });
+
     const { eserviceId, descriptorId } =
       await dataPreparationService.createEServiceAndDraftDescriptor(
         token,
@@ -81,26 +79,6 @@ Given(
 
     this.eserviceId = eserviceId;
     this.descriptorId = descriptorId;
-
-    // this.descriptorId = await dataPreparationService.deprecated__createDraftDescriptor(
-    //   token,
-    //   this.eserviceId,
-    //   {
-    //     agreementApprovalPolicy: approvalPolicy,
-    //     attributes: {
-    //       certified: [
-    //         [
-    //           {
-    //             id: this.attributeId,
-    //             explicitAttributeVerification: true,
-    //           },
-    //         ],
-    //       ],
-    //       declared: [],
-    //       verified: [],
-    //     },
-    //   }
-    // );
   }
 );
 
@@ -111,17 +89,6 @@ Given(
     approvalPolicy: AgreementApprovalPolicy
   ) {
     const token = await getToken(tenantType);
-    // this.eserviceId = await dataPreparationService.deprecated__createEService(token, {
-    //   mode: "RECEIVE",
-    // });
-
-    // this.descriptorId = await dataPreparationService.deprecated__createDraftDescriptor(
-    //   token,
-    //   this.eserviceId,
-    //   {
-    //     agreementApprovalPolicy: approvalPolicy,
-    //   }
-    // );
 
     const { eserviceId, descriptorId } =
       await dataPreparationService.createEServiceAndDraftDescriptor(

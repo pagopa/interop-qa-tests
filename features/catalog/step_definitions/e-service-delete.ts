@@ -14,7 +14,6 @@ Given(
   async function (tenantType: TenantType) {
     const token = await getToken(tenantType);
 
-    // this.eserviceId = await dataPreparationService.deprecated__createEService(token);
     const eserviceId =
       await dataPreparationService.createEServiceAndDraftDescriptor(token);
 

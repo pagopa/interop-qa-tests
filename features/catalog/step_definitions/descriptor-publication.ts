@@ -36,9 +36,6 @@ Given(
     descriptorState: EServiceDescriptorState
   ) {
     const token = await getToken(tenantType);
-    // this.eserviceId = await dataPreparationService.deprecated__createEService(token, {
-    //   mode,
-    // });
 
     const { eserviceId, descriptorId } =
       await dataPreparationService.createEServiceAndDraftDescriptor(token, {
@@ -60,13 +57,6 @@ Given(
           })
         );
     }
-
-    // const { descriptorId } =
-    //   await dataPreparationService.deprecated__createDescriptorWithGivenState({
-    //     token,
-    //     eserviceId: this.eserviceId,
-    //     descriptorState,
-    //   });
 
     await dataPreparationService.bringDescriptorToGivenState({
       token,

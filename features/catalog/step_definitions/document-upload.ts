@@ -17,17 +17,6 @@ Given(
   ) {
     const token = await getToken(tenantType);
 
-    // const eserviceId = await dataPreparationService.deprecated__createEService(token, {
-    //   technology,
-    // });
-
-    // const { descriptorId, documentId } =
-    //   await dataPreparationService.deprecated__createDescriptorWithGivenState({
-    //     token,
-    //     eserviceId,
-    //     descriptorState,
-    //   });
-
     const { eserviceId, descriptorId } =
       await dataPreparationService.createEServiceAndDraftDescriptor(
         token,

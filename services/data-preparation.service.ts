@@ -14,8 +14,6 @@ import {
   EServiceSeed,
   EServiceDescriptorState,
   EServiceRiskAnalysisSeed,
-  DescriptorAttributesSeed,
-  AgreementApprovalPolicy,
   AttributeKind,
   Attribute,
   PurposeVersionState,
@@ -97,43 +95,6 @@ const RISK_ANALYSIS_DATA: Record<
 };
 
 export const dataPreparationService = {
-  /*
-  async deprecated__createEService(
-    token: string,
-    partialEserviceSeed: Partial<EServiceSeed> = {}
-  ) {
-    const DEFAULT_ESERVICE_SEED: EServiceSeed = {
-      name: `e-service ${getRandomInt()}`,
-      description: "Descrizione e-service",
-      technology: "REST",
-      mode: "DELIVER",
-    };
-
-    const eserviceSeed: EServiceSeed = {
-      ...DEFAULT_ESERVICE_SEED,
-      ...partialEserviceSeed,
-    };
-
-    const eserviceCreationResponse = await apiClient.eservices.createEService(
-      eserviceSeed,
-      getAuthorizationHeader(token)
-    );
-    assertValidResponse(eserviceCreationResponse);
-    const eserviceId = eserviceCreationResponse.data.id;
-
-    await makePolling(
-      () =>
-        apiClient.producers.getProducerEServiceDetails(
-          eserviceId,
-          getAuthorizationHeader(token)
-        ),
-      (res) => res.status !== 404
-    );
-
-    return eserviceId;
-  },
-  */
-
   async createEServiceAndDraftDescriptor(
     token: string,
     partialEserviceSeed: Partial<EServiceSeed> = {},
@@ -192,55 +153,6 @@ export const dataPreparationService = {
 
     return { eserviceId, descriptorId };
   },
-
-  /*
-  async deprecated__createDraftDescriptor(
-    token: string,
-    eserviceId: string,
-    partialEServiceDescriptorSeed: Partial<EServiceDescriptorSeed> = {}
-  ) {
-    const DEFAULT_ESERVICE_DESCRIPTOR_SEED: EServiceDescriptorSeed = {
-      description: "Questo è un e-service di test",
-      audience: ["api/v1"],
-      voucherLifespan: 60,
-      dailyCallsPerConsumer: ESERVICE_DAILY_CALLS.perConsumer,
-      dailyCallsTotal: ESERVICE_DAILY_CALLS.total,
-      agreementApprovalPolicy: "AUTOMATIC",
-      attributes: {
-        certified: [],
-        declared: [],
-        verified: [],
-      },
-    };
-
-    const eserviceDescriptorSeed: EServiceDescriptorSeed = {
-      ...DEFAULT_ESERVICE_DESCRIPTOR_SEED,
-      ...partialEServiceDescriptorSeed,
-    };
-
-    const descriptorCreationResponse =
-      await apiClient.eservices.createDescriptor(
-        eserviceId,
-        eserviceDescriptorSeed,
-        getAuthorizationHeader(token)
-      );
-
-    assertValidResponse(descriptorCreationResponse);
-    const descriptorId = descriptorCreationResponse.data.id;
-
-    await makePolling(
-      () =>
-        apiClient.producers.getProducerEServiceDescriptor(
-          eserviceId,
-          descriptorId,
-          getAuthorizationHeader(token)
-        ),
-      (res) => res.status !== 404
-    );
-
-    return descriptorId;
-  },
-*/
 
   async createNextDraftDescriptor(
     token: string,
@@ -646,121 +558,6 @@ export const dataPreparationService = {
       (res) => res.data.state === "REJECTED"
     );
   },
-  /*
-  async deprecated__createDescriptorWithGivenState({
-    token,
-    eserviceId,
-    descriptorState,
-    withDocument = false,
-    attributes = { certified: [], declared: [], verified: [] },
-    agreementApprovalPolicy = "AUTOMATIC",
-  }: {
-    token: string;
-    eserviceId: string;
-    descriptorState: EServiceDescriptorState;
-    withDocument?: boolean;
-    attributes?: DescriptorAttributesSeed;
-    agreementApprovalPolicy?: AgreementApprovalPolicy;
-  }) {
-    // 1. Create DRAFT descriptor
-    const descriptorId = await dataPreparationService.deprecated__createDraftDescriptor(
-      token,
-      eserviceId,
-      { attributes, agreementApprovalPolicy }
-    );
-
-    // 1.1 add document to descriptor
-    let documentId: string | undefined;
-    if (withDocument) {
-      documentId = await dataPreparationService.addDocumentToDescriptor(
-        token,
-        eserviceId,
-        descriptorId
-      );
-    }
-
-    const result = { descriptorId, documentId };
-
-    if (descriptorState === "DRAFT") {
-      return result;
-    }
-
-    // 2. Add interface to descriptor
-    await dataPreparationService.addInterfaceToDescriptor(
-      token,
-      eserviceId,
-      descriptorId
-    );
-
-    // 3. Publish Descriptor
-    await dataPreparationService.publishDescriptor(
-      token,
-      eserviceId,
-      descriptorId
-    );
-
-    if (descriptorState === "PUBLISHED") {
-      return result;
-    }
-
-    // 4. Suspend Descriptor
-    if (descriptorState === "SUSPENDED") {
-      await dataPreparationService.suspendDescriptor(
-        token,
-        eserviceId,
-        descriptorId
-      );
-      return result;
-    }
-
-    if (descriptorState === "DEPRECATED") {
-      // Optional. Create an agreement
-
-      const agreementId = await dataPreparationService.createAgreement(
-        token,
-        eserviceId,
-        descriptorId
-      );
-
-      await dataPreparationService.submitAgreement(
-        token,
-        agreementId,
-        "ACTIVE"
-      );
-    }
-
-    // Create another DRAFT descriptor
-    const secondDescriptorId =
-      await dataPreparationService.deprecated__createDraftDescriptor(token, eserviceId);
-
-    // Add interface to secondDescriptor
-    await dataPreparationService.addInterfaceToDescriptor(
-      token,
-      eserviceId,
-      secondDescriptorId
-    );
-
-    // Publish secondDescriptor
-    await dataPreparationService.publishDescriptor(
-      token,
-      eserviceId,
-      secondDescriptorId
-    );
-
-    // Check until the first descriptor is in desired state
-    await makePolling(
-      () =>
-        apiClient.producers.getProducerEServiceDescriptor(
-          eserviceId,
-          descriptorId,
-          getAuthorizationHeader(token)
-        ),
-      (res) => res.data.state === descriptorState
-    );
-
-    return result;
-  },
-*/
 
   async updateDraftDescriptor({
     token,

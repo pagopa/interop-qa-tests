@@ -105,35 +105,6 @@ Given(
 
     this.eserviceId = eserviceId;
     this.descriptorId = descriptorId;
-
-    // const response =
-    //   await dataPreparationService.deprecated__createDescriptorWithGivenState({
-    //     token,
-    //     eserviceId: this.eserviceId,
-    //     descriptorState,
-    //     attributes: {
-    //       certified: requiredCertifiedAttributes.map((group) =>
-    //         group.map((attrId) => ({
-    //           id: attrId,
-    //           explicitAttributeVerification: true,
-    //         }))
-    //       ),
-    //       declared: requiredDeclaredAttributes.map((group) =>
-    //         group.map((attrId) => ({
-    //           id: attrId,
-    //           explicitAttributeVerification: true,
-    //         }))
-    //       ),
-    //       verified: requiredVerifiedAttributes.map((group) =>
-    //         group.map((attrId) => ({
-    //           id: attrId,
-    //           explicitAttributeVerification: true,
-    //         }))
-    //       ),
-    //     },
-    //     agreementApprovalPolicy,
-    //   });
-    // this.descriptorId = response.descriptorId;
   }
 );
 

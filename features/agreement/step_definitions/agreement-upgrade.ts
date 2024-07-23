@@ -35,19 +35,6 @@ Given(
       attributeId: z.string(),
     });
     const token = await getToken(tenantType);
-    // const response =
-    //   await dataPreparationService.deprecated__createDescriptorWithGivenState({
-    //     token,
-    //     eserviceId: this.eserviceId,
-    //     descriptorState: "PUBLISHED",
-    //     attributes: {
-    //       certified: [
-    //         [{ id: this.attributeId, explicitAttributeVerification: true }],
-    //       ],
-    //       declared: [],
-    //       verified: [],
-    //     },
-    //   });
 
     const descriptorId = await dataPreparationService.createNextDraftDescriptor(
       token,
@@ -62,12 +49,7 @@ Given(
         },
       }
     );
-    // await dataPreparationService.bringDescriptorToGivenState({
-    //   token,
-    //   eserviceId,
-    //   descriptorId,
-    //   descriptorState: "PUBLISHED",
-    // });
+
     this.descriptorId = descriptorId;
   }
 );
@@ -108,19 +90,6 @@ Given(
     );
 
     this.descriptorId = descriptorId;
-
-    // const response =
-    //   await dataPreparationService.deprecated__createDescriptorWithGivenState({
-    //     token,
-    //     eserviceId: this.eserviceId,
-    //     descriptorState: "PUBLISHED",
-    //     attributes: {
-    //       certified: kind === "CERTIFIED" ? seed : [],
-    //       declared: kind === "DECLARED" ? seed : [],
-    //       verified: kind === "VERIFIED" ? seed : [],
-    //     },
-    //   });
-    // this.descriptorId = response.descriptorId;
   }
 );
 

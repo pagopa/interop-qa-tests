@@ -22,13 +22,6 @@ Given(
 
     const token = await getToken(tenantType);
 
-    // const { descriptorId } =
-    //   await dataPreparationService.deprecated__createDescriptorWithGivenState({
-    //     token,
-    //     eserviceId: this.eserviceId,
-    //     descriptorState,
-    //   });
-
     this.descriptorId = await dataPreparationService.createNextDraftDescriptor(
       token,
       this.eserviceId

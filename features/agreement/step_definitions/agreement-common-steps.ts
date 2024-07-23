@@ -22,15 +22,6 @@ Given(
     agreementApprovalPolicy: AgreementApprovalPolicy
   ) {
     const token = await getToken(tenantType);
-    // this.eserviceId = await dataPreparationService.deprecated__createEService(token);
-    // const response =
-    //   await dataPreparationService.deprecated__createDescriptorWithGivenState({
-    //     token,
-    //     eserviceId: this.eserviceId,
-    //     descriptorState,
-    //     agreementApprovalPolicy,
-    //   });
-    // this.descriptorId = response.descriptorId;
 
     const { eserviceId, descriptorId } =
       await dataPreparationService.createEServiceAndDraftDescriptor(
@@ -59,15 +50,6 @@ Given(
 
     const arr = new Array(totalEservices).fill(0);
     const createEServiceWithPublishedDescriptor = async (i: number) => {
-      // const eserviceId = await dataPreparationService.deprecated__createEService(token, {
-      //   name: `eservice-${i}-${this.TEST_SEED}-${getRandomInt()}`,
-      // });
-      // const { descriptorId } =
-      //   await dataPreparationService.deprecated__createDescriptorWithGivenState({
-      //     token,
-      //     eserviceId,
-      //     descriptorState: "PUBLISHED",
-      //   });
 
       const { eserviceId, descriptorId } =
         await dataPreparationService.createEServiceAndDraftDescriptor(token, {

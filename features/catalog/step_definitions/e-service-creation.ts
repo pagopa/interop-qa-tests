@@ -32,9 +32,6 @@ Given(
       token: z.string(),
     });
     const eserviceName = `e-service-${getRandomInt()}`;
-    // const eserviceId = await dataPreparationService.deprecated__createEService(this.token, {
-    //   name: eserviceName,
-    // });
 
     const eserviceId =
       await dataPreparationService.createEServiceAndDraftDescriptor(
