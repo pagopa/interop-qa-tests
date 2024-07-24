@@ -601,8 +601,16 @@ export const dataPreparationService = {
       getAuthorizationHeader(token)
     );
 
-    await sleep(2000);
-    // todo polling
+    // await sleep(2000);
+    await makePolling(
+      () =>
+        apiClient.producers.getProducerEServiceDescriptor(
+          eserviceId,
+          descriptorId,
+          getAuthorizationHeader(token)
+        ),
+      (res) => res.data.audience[0] === "pagopa.it"
+    );
   },
 
   async bringDescriptorToGivenState({
