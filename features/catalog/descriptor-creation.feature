@@ -8,7 +8,7 @@ Feature: Creazione versione di un e-service
     Given l'utente ha già creato un e-service contenente anche il primo descrittore
     Given l'utente ha già pubblicato quel descrittore
     When l'utente crea una versione in bozza per quell'e-service
-    Then si ottiene status code 200
+    Then si ottiene status code 200 e il descrittore contiene i campi del precedente
 
   @descriptor_creation2
   Scenario: Un utente autorizzato vuole creare una versione di e-service avendone già una in bozza

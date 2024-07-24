@@ -38,8 +38,14 @@ Given(
 
     this.descriptorId = await dataPreparationService.createNextDraftDescriptor(
       token,
-      this.eserviceId,
-      {
+      this.eserviceId
+    );
+
+    await dataPreparationService.updateDraftDescriptor({
+      token,
+      eserviceId: this.eserviceId,
+      descriptorId: this.descriptorId,
+      partialDescriptorSeed: {
         attributes: {
           certified: [
             [{ id: this.attributeId, explicitAttributeVerification: true }],
@@ -47,8 +53,8 @@ Given(
           declared: [],
           verified: [],
         },
-      }
-    );
+      },
+    });
 
     await dataPreparationService.bringDescriptorToGivenState({
       token,
@@ -84,15 +90,21 @@ Given(
 
     this.descriptorId = await dataPreparationService.createNextDraftDescriptor(
       token,
-      this.eserviceId,
-      {
+      this.eserviceId
+    );
+
+    await dataPreparationService.updateDraftDescriptor({
+      token,
+      eserviceId: this.eserviceId,
+      descriptorId: this.descriptorId,
+      partialDescriptorSeed: {
         attributes: {
           certified: kind === "CERTIFIED" ? seed : [],
           declared: kind === "DECLARED" ? seed : [],
           verified: kind === "VERIFIED" ? seed : [],
         },
-      }
-    );
+      },
+    });
 
     await dataPreparationService.bringDescriptorToGivenState({
       token,

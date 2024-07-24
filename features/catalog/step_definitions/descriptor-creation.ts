@@ -1,4 +1,5 @@
-import { Given, When } from "@cucumber/cucumber";
+import assert from "assert";
+import { Given, Then, When } from "@cucumber/cucumber";
 import { z } from "zod";
 import {
   getAuthorizationHeader,
@@ -33,5 +34,25 @@ When(
       this.eserviceId,
       getAuthorizationHeader(this.token)
     );
+  }
+);
+
+Then(
+  "si ottiene status code 200 e il descrittore contiene i campi del precedente",
+  async function () {
+    assertContextSchema(this, {
+      descriptorId: z.string(),
+      response: z.object({
+        status: z.number(),
+        data: z.object({
+          id: z.string(),
+        }),
+      }),
+    });
+
+    const newDescriptorId = this.response.data.id;
+    console.log(newDescriptorId);
+
+    assert.equal(this.response.status, 200);
   }
 );

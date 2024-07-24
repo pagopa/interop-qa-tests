@@ -155,11 +155,7 @@ export const dataPreparationService = {
     return { eserviceId, descriptorId };
   },
 
-  async createNextDraftDescriptor(
-    token: string,
-    eserviceId: string,
-    partialDescriptorSeed: Partial<UpdateEServiceDescriptorSeed> = {}
-  ) {
+  async createNextDraftDescriptor(token: string, eserviceId: string) {
     const descriptorCreationResponse =
       await apiClient.eservices.createDescriptor(
         eserviceId,
@@ -178,13 +174,6 @@ export const dataPreparationService = {
         ),
       (res) => res.status !== 404
     );
-
-    await dataPreparationService.updateDraftDescriptor({
-      token,
-      eserviceId,
-      descriptorId,
-      partialDescriptorSeed,
-    });
 
     return descriptorId;
   },
@@ -288,13 +277,20 @@ export const dataPreparationService = {
     eserviceId: string,
     descriptorId: string
   ) {
-    const response = await apiClient.eservices.publishDescriptor(
+    await dataPreparationService.updateDraftDescriptor({
+      token,
+      eserviceId,
+      descriptorId,
+      partialDescriptorSeed: { audience: ["pagopa.it"] },
+    });
+
+    const publicationResponse = await apiClient.eservices.publishDescriptor(
       eserviceId,
       descriptorId,
       getAuthorizationHeader(token)
     );
 
-    assertValidResponse(response);
+    assertValidResponse(publicationResponse);
 
     await makePolling(
       () =>
@@ -613,12 +609,13 @@ export const dataPreparationService = {
       audience: ["pagopa.it"],
     };
 
-    await apiClient.eservices.updateDraftDescriptor(
+    const response = await apiClient.eservices.updateDraftDescriptor(
       eserviceId,
       descriptorId,
       descriptorSeed,
       getAuthorizationHeader(token)
     );
+    assertValidResponse(response);
 
     await sleep(2000);
     // await makePolling(
