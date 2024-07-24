@@ -64,6 +64,7 @@ Given(
         descriptorState,
         withDocument: true,
       });
+    this.eserviceId = eserviceId;
     this.descriptorId = descriptorId;
     this.documentId = documentId;
   }
