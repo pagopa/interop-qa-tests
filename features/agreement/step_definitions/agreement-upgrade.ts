@@ -93,6 +93,13 @@ Given(
         },
       }
     );
+
+    await dataPreparationService.bringDescriptorToGivenState({
+      token,
+      eserviceId: this.eserviceId,
+      descriptorId: this.descriptorId,
+      descriptorState: "PUBLISHED",
+    });
   }
 );
 
