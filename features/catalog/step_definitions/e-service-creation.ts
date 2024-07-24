@@ -33,7 +33,7 @@ Given(
     });
     const eserviceName = `e-service-${getRandomInt()}`;
 
-    const eserviceId =
+    const { eserviceId, descriptorId } =
       await dataPreparationService.createEServiceAndDraftDescriptor(
         this.token,
         { name: eserviceName }
@@ -41,6 +41,7 @@ Given(
 
     this.eserviceName = eserviceName;
     this.eserviceId = eserviceId;
+    this.descriptorId = descriptorId;
   }
 );
 
