@@ -53,7 +53,7 @@ Given(
     await dataPreparationService.bringDescriptorToGivenState({
       token,
       eserviceId: this.eserviceId,
-      descriptorId: this.decriptorId,
+      descriptorId: this.descriptorId,
       descriptorState: "PUBLISHED",
     });
   }
