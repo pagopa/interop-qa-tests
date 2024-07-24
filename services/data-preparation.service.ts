@@ -9,7 +9,6 @@ import {
   assertValidResponse,
   getToken,
   TenantType,
-  sleep,
 } from "../utils/commons";
 import {
   EServiceSeed,
@@ -601,7 +600,6 @@ export const dataPreparationService = {
       getAuthorizationHeader(token)
     );
 
-    // await sleep(2000);
     await makePolling(
       () =>
         apiClient.producers.getProducerEServiceDescriptor(
