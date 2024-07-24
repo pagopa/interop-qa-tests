@@ -31,4 +31,4 @@ Feature: Creazione e-service
     Given l'utente è un "admin" di "PA1"
     Given l'utente ha già creato un e-service contenente anche il primo descrittore
     When l'utente crea un e-service con lo stesso nome
-    Then la creazione restituisce errore - 409
+    Then si ottiene status code 409

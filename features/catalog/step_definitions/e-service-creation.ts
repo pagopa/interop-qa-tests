@@ -1,5 +1,4 @@
-import assert from "assert";
-import { Given, When, Then } from "@cucumber/cucumber";
+import { Given, When } from "@cucumber/cucumber";
 import { z } from "zod";
 import {
   getAuthorizationHeader,
@@ -60,13 +59,4 @@ When("l'utente crea un e-service", async function () {
   );
   this.eserviceName = eserviceName;
   this.response = response;
-});
-
-Then("la creazione restituisce errore - {int}", function (statusCode: number) {
-  assertContextSchema(this, {
-    response: z.object({
-      status: z.number(),
-    }),
-  });
-  assert.equal(this.response.status, statusCode);
 });
