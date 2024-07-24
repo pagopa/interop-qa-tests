@@ -1,0 +1,93 @@
+{
+  "name": "e-service-IMPORTED-6598111759780329",
+  "description": "Descrizione e-service",
+  "technology": "REST",
+  "mode": "RECEIVE",
+  "descriptor": {
+    "interface": {
+      "prettyName": "Interfaccia",
+      "path": "interface.yaml"
+    },
+    "docs": [],
+    "audience": [
+      "api/v1"
+    ],
+    "voucherLifespan": 60,
+    "dailyCallsPerConsumer": 50,
+    "dailyCallsTotal": 1000,
+    "description": "Questo è un e-service di test",
+    "agreementApprovalPolicy": "AUTOMATIC"
+  },
+  "riskAnalysis": [
+    {
+      "name": "finalità test",
+      "riskAnalysisForm": {
+        "version": "3.0",
+        "singleAnswers": [
+          {
+            "key": "dataDownload",
+            "value": "NO"
+          },
+          {
+            "key": "checkedExistenceMereCorrectnessInteropCatalogue",
+            "value": "true"
+          },
+          {
+            "key": "deliveryMethod",
+            "value": "CLEARTEXT"
+          },
+          {
+            "key": "confirmPricipleIntegrityAndDiscretion",
+            "value": "true"
+          },
+          {
+            "key": "usesThirdPartyData",
+            "value": "NO"
+          },
+          {
+            "key": "purpose",
+            "value": "INSTITUTIONAL"
+          },
+          {
+            "key": "doneDpia",
+            "value": "NO"
+          },
+          {
+            "key": "knowsDataQuantity",
+            "value": "NO"
+          },
+          {
+            "key": "institutionalPurpose",
+            "value": "test"
+          },
+          {
+            "key": "policyProvided",
+            "value": "YES"
+          },
+          {
+            "key": "declarationConfirmGDPR",
+            "value": "true"
+          },
+          {
+            "key": "purposePursuit",
+            "value": "MERE_CORRECTNESS"
+          }
+        ],
+        "multiAnswers": [
+          {
+            "key": "personalDataTypes",
+            "values": [
+              "WITH_NON_IDENTIFYING_DATA"
+            ]
+          },
+          {
+            "key": "legalBasis",
+            "values": [
+              "CONSENT"
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

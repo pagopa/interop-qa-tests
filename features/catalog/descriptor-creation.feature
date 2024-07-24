@@ -15,4 +15,4 @@ Feature: Creazione versione di un e-service
     Given l'utente è un "admin" di "PA1"
     Given l'utente ha già creato un e-service contenente anche il primo descrittore
     When l'utente crea una versione in bozza per quell'e-service
-    Then la creazione restituisce errore - 400
+    Then si ottiene status code 400
