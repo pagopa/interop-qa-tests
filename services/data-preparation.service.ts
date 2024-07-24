@@ -141,9 +141,9 @@ export const dataPreparationService = {
       (res) => res.status !== 404
     );
 
-    if (Object.keys(partialDescriptorSeed).length === 0) {
-      return { eserviceId, descriptorId };
-    }
+    // if (Object.keys(partialDescriptorSeed).length === 0) {
+    //   return { eserviceId, descriptorId };
+    // }
 
     await dataPreparationService.updateDraftDescriptor({
       token,
@@ -591,6 +591,7 @@ export const dataPreparationService = {
     const descriptorSeed: UpdateEServiceDescriptorSeed = {
       ...currentDescriptorSeed,
       ...partialDescriptorSeed,
+      audience: ["pagopa.it"],
     };
 
     await apiClient.eservices.updateDraftDescriptor(
