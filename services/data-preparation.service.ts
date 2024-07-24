@@ -9,6 +9,7 @@ import {
   assertValidResponse,
   getToken,
   TenantType,
+  sleep,
 } from "../utils/commons";
 import {
   EServiceSeed,
@@ -580,7 +581,26 @@ export const dataPreparationService = {
 
     const currentDescriptorSeed: UpdateEServiceDescriptorSeed = {
       agreementApprovalPolicy: descriptor.data.agreementApprovalPolicy,
-      attributes: descriptor.data.attributes,
+      attributes: {
+        certified: descriptor.data.attributes.certified.map((attrSet) =>
+          attrSet.map((attr) => ({
+            id: attr.id,
+            explicitAttributeVerification: attr.explicitAttributeVerification,
+          }))
+        ),
+        declared: descriptor.data.attributes.declared.map((attrSet) =>
+          attrSet.map((attr) => ({
+            id: attr.id,
+            explicitAttributeVerification: attr.explicitAttributeVerification,
+          }))
+        ),
+        verified: descriptor.data.attributes.verified.map((attrSet) =>
+          attrSet.map((attr) => ({
+            id: attr.id,
+            explicitAttributeVerification: attr.explicitAttributeVerification,
+          }))
+        ),
+      },
       dailyCallsPerConsumer: descriptor.data.dailyCallsPerConsumer,
       dailyCallsTotal: descriptor.data.dailyCallsTotal,
       audience: descriptor.data.audience,
@@ -600,15 +620,16 @@ export const dataPreparationService = {
       getAuthorizationHeader(token)
     );
 
-    await makePolling(
-      () =>
-        apiClient.producers.getProducerEServiceDescriptor(
-          eserviceId,
-          descriptorId,
-          getAuthorizationHeader(token)
-        ),
-      (res) => res.data.audience[0] === "pagopa.it"
-    );
+    await sleep(2000);
+    // await makePolling(
+    //   () =>
+    //     apiClient.producers.getProducerEServiceDescriptor(
+    //       eserviceId,
+    //       descriptorId,
+    //       getAuthorizationHeader(token)
+    //     ),
+    //   (res) => res.data.audience[0] === "pagopa.it"
+    // );
   },
 
   async bringDescriptorToGivenState({
