@@ -14,7 +14,7 @@ Given(
   async function (tenantType: TenantType) {
     const token = await getToken(tenantType);
 
-    const eserviceId =
+    const { eserviceId } =
       await dataPreparationService.createEServiceAndDraftDescriptor(token);
 
     this.eserviceId = eserviceId;
