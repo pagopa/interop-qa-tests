@@ -624,7 +624,7 @@ export const dataPreparationService = {
     descriptorState: EServiceDescriptorState;
     withDocument?: boolean;
   }) {
-    // 1.1 add document to descriptor
+    // 1 add document to descriptor
     let documentId: string | undefined;
     if (withDocument) {
       documentId = await dataPreparationService.addDocumentToDescriptor(
