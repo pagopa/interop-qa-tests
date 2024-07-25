@@ -618,15 +618,7 @@ export const dataPreparationService = {
     assertValidResponse(response);
 
     await sleep(2000);
-    // await makePolling(
-    //   () =>
-    //     apiClient.producers.getProducerEServiceDescriptor(
-    //       eserviceId,
-    //       descriptorId,
-    //       getAuthorizationHeader(token)
-    //     ),
-    //   (res) => res.data.audience[0] === "pagopa.it"
-    // );
+    // checking the result through polling would be complicated because we should retrieve which fields are being updated
   },
 
   async bringDescriptorToGivenState({
