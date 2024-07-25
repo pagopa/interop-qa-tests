@@ -37,7 +37,7 @@ Feature: Caricamento di una chiave pubblica contenuta in un client
     Then si ottiene status code 400
 
   @client_key_upload4 @wait_for_fix
-  Scenario Outline: Un utente admin; appartenente all'ente che ha creato il client; il quale utente è membro del client; richiede il caricamento di una chiave pubblica di tipo RSA, lunghezza NON 2048. Ottiene un errore
+  Scenario Outline: Un utente admin; appartenente all'ente che ha creato il client; il quale utente è membro del client; richiede il caricamento di una chiave pubblica di tipo RSA, lunghezza inferiore a 2048. Ottiene un errore
     Given l'utente è un "admin" di "PA1"
     Given "PA1" ha già creato 1 client "CONSUMER"
     Given "PA1" ha già inserito l'utente con ruolo "admin" come membro di quel client
