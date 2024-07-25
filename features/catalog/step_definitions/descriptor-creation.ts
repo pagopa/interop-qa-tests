@@ -50,9 +50,33 @@ Then(
       }),
     });
 
-    const newDescriptorId = this.response.data.id;
-    console.log(newDescriptorId);
+    const descriptor = (
+      await apiClient.producers.getProducerEServiceDescriptor(
+        this.eserviceId,
+        this.descriptorId,
+        getAuthorizationHeader(this.token)
+      )
+    ).data;
+
+    const newDescriptor = (
+      await apiClient.producers.getProducerEServiceDescriptor(
+        this.eserviceId,
+        this.descriptorId,
+        getAuthorizationHeader(this.token)
+      )
+    ).data;
 
     assert.equal(this.response.status, 200);
+    assert.equal(descriptor.description, newDescriptor.description);
+    assert.equal(descriptor.voucherLifespan, newDescriptor.voucherLifespan);
+    assert.equal(
+      descriptor.dailyCallsPerConsumer,
+      newDescriptor.dailyCallsPerConsumer
+    );
+    assert.equal(descriptor.dailyCallsTotal, newDescriptor.dailyCallsTotal);
+    assert.equal(
+      descriptor.agreementApprovalPolicy,
+      newDescriptor.agreementApprovalPolicy
+    );
   }
 );
