@@ -78,5 +78,6 @@ Then(
       descriptor.agreementApprovalPolicy,
       newDescriptor.agreementApprovalPolicy
     );
+    assert.deepEqual(descriptor.attributes, newDescriptor.attributes);
   }
 );
