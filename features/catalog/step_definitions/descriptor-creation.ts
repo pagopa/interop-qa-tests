@@ -4,6 +4,7 @@ import { z } from "zod";
 import {
   getAuthorizationHeader,
   assertContextSchema,
+  makePolling,
 } from "../../../utils/commons";
 import { apiClient } from "../../../api";
 import { dataPreparationService } from "../../../services/data-preparation.service";
@@ -41,6 +42,7 @@ Then(
   "si ottiene status code 200 e il descrittore contiene i campi del precedente",
   async function () {
     assertContextSchema(this, {
+      token: z.string(),
       descriptorId: z.string(),
       response: z.object({
         status: z.number(),
@@ -58,10 +60,22 @@ Then(
       )
     ).data;
 
+    const newDescriptorId = this.response.data.id;
+
+    await makePolling(
+      () =>
+        apiClient.producers.getProducerEServiceDescriptor(
+          this.eserviceId,
+          newDescriptorId,
+          getAuthorizationHeader(this.token)
+        ),
+      (res) => res.status !== 404
+    );
+
     const newDescriptor = (
       await apiClient.producers.getProducerEServiceDescriptor(
         this.eserviceId,
-        this.descriptorId,
+        newDescriptorId,
         getAuthorizationHeader(this.token)
       )
     ).data;
