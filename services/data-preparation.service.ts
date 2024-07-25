@@ -122,16 +122,6 @@ export const dataPreparationService = {
     const descriptorId = eserviceCreationResponse.data.descriptorId;
 
     await makePolling(
-      // to do: this might be unnecessary because there is polling on descriptor below
-      () =>
-        apiClient.producers.getProducerEServiceDetails(
-          eserviceId,
-          getAuthorizationHeader(token)
-        ),
-      (res) => res.status !== 404
-    );
-
-    await makePolling(
       () =>
         apiClient.producers.getProducerEServiceDescriptor(
           eserviceId,
