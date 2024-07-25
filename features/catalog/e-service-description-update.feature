@@ -29,8 +29,8 @@ Feature: Aggiornamento della descrizione di un e-service
       | PA1  | admin | DRAFT            |       409 |
 
   @eservice_description_update2
-  Scenario Outline: A fronte di una richiesta aggiornamento della descrizione di un e-service da parte di un utente autorizzato dell’ente che lo eroga, per un e-service senza descrittori, ottiene un errore
+  Scenario Outline: A fronte di una richiesta aggiornamento della descrizione di un e-service da parte di un utente autorizzato dell’ente che lo eroga, per un e-service con un descrittore in DRAFT, ottiene un errore
     Given l'utente è un "admin" di "PA1"
-    Given "PA1" ha già creato un e-service senza descrittore
+    Given "PA1" ha già creato un e-service con un descrittore in DRAFT
     When l'utente aggiorna la descrizione di quell'e-service
     Then si ottiene status code 409

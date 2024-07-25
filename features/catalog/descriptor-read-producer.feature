@@ -15,12 +15,12 @@ Feature: Lettura di un descrittore lato erogatore
       | PA1  | api          | DRAFT         |       200 |
       | PA1  | security     | DRAFT         |       404 |
       | PA1  | api,security | DRAFT         |       200 |
-      | PA1  | support      | DRAFT         |       404 |
+      | PA1  | support      | DRAFT         |       200 |
       | GSP  | admin        | DRAFT         |       200 |
       | GSP  | api          | DRAFT         |       200 |
       | GSP  | security     | DRAFT         |       404 |
       | GSP  | api,security | DRAFT         |       200 |
-      | GSP  | support      | DRAFT         |       404 |
+      | GSP  | support      | DRAFT         |       200 |
 
     Examples: # Test sugli stati
       | ente | ruolo | statoVersione | risultato |

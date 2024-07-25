@@ -30,7 +30,7 @@ Feature: Import di un descrittore
     Given l'utente ha già richiesto una presignedURL per il caricamento del pacchetto
     Given è già stato caricato il pacchetto nella presignedURL
     When l'utente effettua una richiesta di import del descrittore
-    Then si ottiene status code 500
+    Then si ottiene status code 403
 
     Examples:
       | ente | ruolo    |

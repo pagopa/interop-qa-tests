@@ -25,22 +25,32 @@ Given(
   ) {
     assertContextSchema(this, { attributeId: z.string() });
     const token = await getToken(tenantType);
-    this.eserviceId = await dataPreparationService.createEService(token);
-    const response =
-      await dataPreparationService.createDescriptorWithGivenState({
+
+    const { eserviceId, descriptorId } =
+      await dataPreparationService.createEServiceAndDraftDescriptor(
         token,
-        eserviceId: this.eserviceId,
-        descriptorState,
-        attributes: {
-          certified: [
-            [{ id: this.attributeId, explicitAttributeVerification: true }],
-          ],
-          declared: [],
-          verified: [],
-        },
-        agreementApprovalPolicy,
-      });
-    this.descriptorId = response.descriptorId;
+        {},
+        {
+          attributes: {
+            certified: [
+              [{ id: this.attributeId, explicitAttributeVerification: true }],
+            ],
+            declared: [],
+            verified: [],
+          },
+          agreementApprovalPolicy,
+        }
+      );
+
+    await dataPreparationService.bringDescriptorToGivenState({
+      token,
+      eserviceId,
+      descriptorId,
+      descriptorState,
+    });
+
+    this.eserviceId = eserviceId;
+    this.descriptorId = descriptorId;
   }
 );
 
@@ -127,13 +137,17 @@ Given(
       eserviceId: z.string(),
     });
     const token = await getToken(tenantType);
-    const response =
-      await dataPreparationService.createDescriptorWithGivenState({
-        token,
-        eserviceId: this.eserviceId,
-        descriptorState: "PUBLISHED",
-      });
-    this.descriptorId = response.descriptorId;
+
+    this.descriptorId = await dataPreparationService.createNextDraftDescriptor(
+      token,
+      this.eserviceId
+    );
+    await dataPreparationService.bringDescriptorToGivenState({
+      token,
+      eserviceId: this.eserviceId,
+      descriptorId: this.descriptorId,
+      descriptorState: "PUBLISHED",
+    });
   }
 );
 

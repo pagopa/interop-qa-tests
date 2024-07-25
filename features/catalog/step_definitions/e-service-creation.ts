@@ -24,18 +24,25 @@ When("l'utente crea un e-service con lo stesso nome", async function () {
   );
 });
 
-Given("l'utente ha già creato un e-service", async function () {
-  assertContextSchema(this, {
-    token: z.string(),
-  });
-  const eserviceName = `e-service-${getRandomInt()}`;
-  const eserviceId = await dataPreparationService.createEService(this.token, {
-    name: eserviceName,
-  });
+Given(
+  "l'utente ha già creato un e-service contenente anche il primo descrittore",
+  async function () {
+    assertContextSchema(this, {
+      token: z.string(),
+    });
+    const eserviceName = `e-service-${getRandomInt()}`;
 
-  this.eserviceName = eserviceName;
-  this.eserviceId = eserviceId;
-});
+    const { eserviceId, descriptorId } =
+      await dataPreparationService.createEServiceAndDraftDescriptor(
+        this.token,
+        { name: eserviceName }
+      );
+
+    this.eserviceName = eserviceName;
+    this.eserviceId = eserviceId;
+    this.descriptorId = descriptorId;
+  }
+);
 
 When("l'utente crea un e-service", async function () {
   assertContextSchema(this, {

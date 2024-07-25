@@ -53,29 +53,32 @@ Given(
       attributeId: z.string(),
     });
     const token = await getToken(tenantType);
-    this.eserviceId = await dataPreparationService.createEService(token, {
-      mode: "RECEIVE",
-    });
 
-    this.descriptorId = await dataPreparationService.createDraftDescriptor(
-      token,
-      this.eserviceId,
-      {
-        agreementApprovalPolicy: approvalPolicy,
-        attributes: {
-          certified: [
-            [
-              {
-                id: this.attributeId,
-                explicitAttributeVerification: true,
-              },
-            ],
-          ],
-          declared: [],
-          verified: [],
+    const { eserviceId, descriptorId } =
+      await dataPreparationService.createEServiceAndDraftDescriptor(
+        token,
+        {
+          mode: "RECEIVE",
         },
-      }
-    );
+        {
+          agreementApprovalPolicy: approvalPolicy,
+          attributes: {
+            certified: [
+              [
+                {
+                  id: this.attributeId,
+                  explicitAttributeVerification: true,
+                },
+              ],
+            ],
+            declared: [],
+            verified: [],
+          },
+        }
+      );
+
+    this.eserviceId = eserviceId;
+    this.descriptorId = descriptorId;
   }
 );
 
@@ -86,17 +89,20 @@ Given(
     approvalPolicy: AgreementApprovalPolicy
   ) {
     const token = await getToken(tenantType);
-    this.eserviceId = await dataPreparationService.createEService(token, {
-      mode: "RECEIVE",
-    });
 
-    this.descriptorId = await dataPreparationService.createDraftDescriptor(
-      token,
-      this.eserviceId,
-      {
-        agreementApprovalPolicy: approvalPolicy,
-      }
-    );
+    const { eserviceId, descriptorId } =
+      await dataPreparationService.createEServiceAndDraftDescriptor(
+        token,
+        {
+          mode: "RECEIVE",
+        },
+        {
+          agreementApprovalPolicy: approvalPolicy,
+        }
+      );
+
+    this.eserviceId = eserviceId;
+    this.descriptorId = descriptorId;
   }
 );
 
