@@ -16,12 +16,12 @@ Feature: Listing e-services lato erogatore
       | GSP  | api          |         6 |
       | GSP  | security     |         5 |
       | GSP  | api,security |         6 |
-      | GSP  | support      |         5 |
+      | GSP  | support      |         6 |
       | PA1  | admin        |         6 |
       | PA1  | api          |         6 |
       | PA1  | security     |         5 |
       | PA1  | api,security |         6 |
-      | PA1  | support      |         5 |
+      | PA1  | support      |         6 |
 
   @producer_listing2
   Scenario Outline: A fronte di 5 e-service in db, restituisce solo i primi 3 risultati di e-service

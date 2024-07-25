@@ -36,9 +36,14 @@ Given(
     descriptorState: EServiceDescriptorState
   ) {
     const token = await getToken(tenantType);
-    this.eserviceId = await dataPreparationService.createEService(token, {
-      mode,
-    });
+
+    const { eserviceId, descriptorId } =
+      await dataPreparationService.createEServiceAndDraftDescriptor(token, {
+        mode,
+      });
+
+    this.eserviceId = eserviceId;
+    this.descriptorId = descriptorId;
 
     // If descriptorState is not DRAFT we have to add a completed risk analysis in order to correctly publish the descriptor
     if (mode === "RECEIVE" && descriptorState !== "DRAFT") {
@@ -53,14 +58,12 @@ Given(
         );
     }
 
-    const { descriptorId } =
-      await dataPreparationService.createDescriptorWithGivenState({
-        token,
-        eserviceId: this.eserviceId,
-        descriptorState,
-      });
-
-    this.descriptorId = descriptorId;
+    await dataPreparationService.bringDescriptorToGivenState({
+      token,
+      eserviceId,
+      descriptorId,
+      descriptorState,
+    });
   }
 );
 

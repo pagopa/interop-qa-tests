@@ -17,9 +17,11 @@ Given(
 
     const token = await getToken(tenantType);
 
-    this.eserviceId = await dataPreparationService.createEService(token, {
-      mode,
-    });
+    const { eserviceId } =
+      await dataPreparationService.createEServiceAndDraftDescriptor(token, {
+        mode,
+      });
+    this.eserviceId = eserviceId;
   }
 );
 
