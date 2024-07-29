@@ -10,7 +10,7 @@ import { apiClient } from "../../../api";
 import { TenantType } from "../../../utils/commons";
 
 Given(
-  "{string} ha già creato un e-service senza descrittore",
+  "{string} ha già creato un e-service con un descrittore in DRAFT",
   async function (tenantType: TenantType) {
     const token = await getToken(tenantType);
 

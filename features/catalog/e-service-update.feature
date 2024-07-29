@@ -5,7 +5,7 @@ Feature: Aggiornamento di un e-service non pubblicato
   @eservice_updating1
   Scenario Outline: Per un e-service precedentemente creato, il quale non ha descrittori, l'aggiornamento dei campi dell'e-service avviene correttamente
     Given l'utente è un "<ruolo>" di "<ente>"
-    Given "<ente>" ha già creato un e-service senza descrittore
+    Given "<ente>" ha già creato un e-service con un descrittore in DRAFT
     When l'utente aggiorna quell'e-service
     Then si ottiene status code <risultato>
 
