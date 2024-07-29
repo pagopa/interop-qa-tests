@@ -12,6 +12,8 @@ Feature: Rimozione purpose dal client
     Given "<ente>" ha già associato la finalità a quel client
     When l'utente richiede la disassociazione della finalità dal client
     Then si ottiene status code <statusCode>
+    
+    # la finalità in stato WAITING_FOR_APPROVAL non può essere associata al client quindi non viene testata
 
     Examples:
       | ente | ruolo        | statoFinalità | statusCode |
@@ -27,9 +29,8 @@ Feature: Rimozione purpose dal client
       | PA1  | api,security | ACTIVE        |        403 |
 
     Examples:
-      | ente | ruolo | statoFinalità        | statusCode |
-      | PA1  | admin | SUSPENDED            |        204 |
-      #| PA1  | admin | WAITING_FOR_APPROVAL |        204 | non valido: non si può associare al client una purpose che è in è WAITING_FOR_APPROVAL
+      | ente | ruolo | statoFinalità | statusCode |
+      | PA1  | admin | SUSPENDED     |        204 |
 
   @client_purpose_remove1b
   Scenario Outline: Un utente con sufficienti permessi (admin) dell'ente che ha creato il client di tipo CONSUMER ed associato il client ad una finalità che si trova in stato ARCHIVED richiede la disassociazione del client dalla finalità. L'operazione va a buon fine
