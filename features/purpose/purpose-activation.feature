@@ -69,7 +69,7 @@ Feature: Attivazione e riattivazione di una finalità
   @purpose_activation5 @wait_for_fix @PIN-4856
   Scenario Outline: Per una finalità precedentemente creata da un fruitore e attivata da un erogatore, la quale è stata successivamente portata in stato SUSPENDED dall’erogatore; per la quale versione di e-service sia stata successivamente superata una delle soglie di carico; alla richiesta di riattivazione da parte di un utente con sufficienti permessi (admin) dell’ente erogatore, va a buon fine e la finalità passa in stato ACTIVE. Chiarimento: se è l’erogatore a riattivare una finalità sospesa, anche se questa è sopra soglia, passa in stato attivo; si intende che l’erogatore, riattivandola, approvi implicitamente che la finalità possa contribuire al carico sull’e-service.
     Given l'utente è un "admin" di "PA2"
-    Given "PA2" ha già creato e pubblicato un e-service con una soglia di carico tale da contenere una sola finalità
+    Given "PA2" ha già creato e pubblicato un e-service con una soglia di carico tale da gestire una sola chiamata
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given "PA1" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
     Given "PA2" ha già portato la finalità in stato "SUSPENDED"
@@ -81,7 +81,7 @@ Feature: Attivazione e riattivazione di una finalità
   @purpose_activation6 @wait_for_fix @PIN-4856 @PIN-4857
   Scenario Outline: Per una finalità precedentemente creata da un fruitore e attivata da un erogatore, la quale è stata successivamente portata in stato SUSPENDED dal fruitore; per la quale versione di e-service sia stata successivamente superata una delle soglie di carico; alla richiesta di riattivazione da parte di un utente con sufficienti permessi (admin) dell’ente fruitore, va a buon fine e la finalità passa in stato WAITING_FOR_APPROVAL. Chiarimento: se è il fruitore a riattivare una finalità sospesa, se questa è sopra soglia, passa in stato WAITING_FOR_APPROVAL; si intende che il fruitore, riattivandola, debba vedersi approvato il fatto che la finalità superi una o più delle soglie previste dall’erogatore. Questo perché, mentre la finalità era sospesa, è possibile che siano state attivate altre finalità, che abbiano contribuito ad aumentare il carico sull’e-service dell’erogatore.
     Given l'utente è un "admin" di "PA1"
-    Given "PA2" ha già creato e pubblicato un e-service con una soglia di carico tale da contenere una sola finalità
+    Given "PA2" ha già creato e pubblicato un e-service con una soglia di carico tale da gestire una sola chiamata
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given "PA1" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
     Given "PA1" ha già portato la finalità in stato "SUSPENDED"
