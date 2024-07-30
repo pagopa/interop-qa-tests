@@ -13,7 +13,7 @@ import { PurposeVersionState } from "../../../api/models";
 import { dataPreparationService } from "../../../services/data-preparation.service";
 
 Given(
-  "{string} ha già creato e pubblicato un e-service con una soglia di carico tale da contenere una sola finalità",
+  "{string} ha già creato e pubblicato un e-service con una soglia di carico tale da gestire una sola chiamata",
   async function (tenantType: TenantType) {
     assertContextSchema(this);
 

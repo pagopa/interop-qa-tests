@@ -7,19 +7,19 @@ Feature: Creazione di una nuova versione di finalità
     Given l'utente è un "admin" di "<ente>"
     Given "PA2" ha già creato e pubblicato 1 e-service
     Given "<ente>" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given "<ente>" ha già creato 1 finalità in stato "<statoFinalità>" per quell'eservice
-    When l'utente aggiorna la stima di carico per quella finalità
-    Then si ottiene status code 200 e la nuova versione della finalità è stata creata in stato "<statoFinalità>" con la nuova stima di carico
+    Given "<ente>" ha già creato 1 finalità in stato "<statoFinalitàEsistente>" per quell'eservice
+    When l'utente aggiorna la stima di carico per quella finalità restando entro la soglia
+    Then si ottiene status code 200 e la nuova versione della finalità è stata creata in stato "<statoNuovaFinalità>" con la nuova stima di carico
 
     Examples:
-      | ente    | statoFinalità |
-      | PA1     | ACTIVE        |
-      | GSP     | ACTIVE        |
-      | Privato | ACTIVE        |
+      | ente    | statoFinalitàEsistente | statoNuovaFinalità |
+      | PA1     | ACTIVE                 | ACTIVE             |
+      | GSP     | ACTIVE                 | ACTIVE             |
+      | Privato | ACTIVE                 | ACTIVE             |
 
     Examples:
-      | ente | statoFinalità |
-      | PA1  | SUSPENDED     |
+      | ente | statoFinalità | statoNuovaFinalità |
+      | PA1  | SUSPENDED     | ACTIVE             |
 
   @purpose_version_create1b
   Scenario Outline: Un utente senza sufficienti permessi; il cui ente ha già una finalità in stato ACTIVE o SUSPENDED e non ha versioni in stato WAITING_FOR_APPROVAL per una versione di e-service, aggiorna la stima di carico di una finalità. Ottiene un errore.
@@ -27,7 +27,7 @@ Feature: Creazione di una nuova versione di finalità
     Given "PA2" ha già creato e pubblicato 1 e-service
     Given "<ente>" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given "<ente>" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
-    When l'utente aggiorna la stima di carico per quella finalità
+    When l'utente aggiorna la stima di carico per quella finalità restando entro la soglia
     Then si ottiene status code 403
 
     Examples:
@@ -51,8 +51,8 @@ Feature: Creazione di una nuova versione di finalità
     Given "PA2" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given "PA1" ha già creato 1 finalità in stato "<statoFinalita>" per quell'eservice
-    Given l'utente crea una versione nuova della finalità in stato WAITING_FOR_APPROVAL
-    When l'utente aggiorna la stima di carico per quella finalità
+    Given l'utente ha già creato una versione nuova della finalità in stato WAITING_FOR_APPROVAL
+    When l'utente aggiorna la stima di carico per quella finalità restando entro la soglia
     Then si ottiene status code 409
 
     Examples:
@@ -60,13 +60,13 @@ Feature: Creazione di una nuova versione di finalità
       | ACTIVE        |
       | SUSPENDED     |
 
-  @purpose_version_create3 @wait_for_fix @IMN-400
+  @purpose_version_create3 @wait_for_fix @IMN-4765
   Scenario Outline: Un utente con sufficienti permessi; il cui ente ha già una finalità in stato DRAFT, WAITING_FOR_APPROVAL o ARCHIVED per una versione di e-service, aggiorna la stima di carico di una finalità. Ottiene un errore
     Given l'utente è un "admin" di "PA1"
     Given "PA2" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given "PA1" ha già creato 1 finalità in stato "<statoFinalita>" per quell'eservice
-    When l'utente aggiorna la stima di carico per quella finalità
+    When l'utente aggiorna la stima di carico per quella finalità restando entro la soglia
     Then si ottiene status code 409
 
     Examples:
@@ -81,5 +81,5 @@ Feature: Creazione di una nuova versione di finalità
     Given "PA2" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given "PA1" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
-    When l'utente aggiorna la stima di carico per quella finalità
+    When l'utente aggiorna la stima di carico per quella finalità superando la soglia
     Then si ottiene status code 200 e la nuova versione della finalità è stata creata in stato "WAITING_FOR_APPROVAL" con la nuova stima di carico

@@ -595,6 +595,8 @@ export const dataPreparationService = {
 
     const descriptorSeed: UpdateEServiceDescriptorSeed = {
       ...currentDescriptorSeed,
+      dailyCallsPerConsumer: ESERVICE_DAILY_CALLS.perConsumer,
+      dailyCallsTotal: ESERVICE_DAILY_CALLS.total,
       ...partialDescriptorSeed,
       audience: ["pagopa.it"],
     };
