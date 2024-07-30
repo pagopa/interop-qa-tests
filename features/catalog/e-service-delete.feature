@@ -40,7 +40,7 @@ Feature: Cancellazione di un e-service
   @eservice_delete3
   Scenario Outline: Per un e-service che ha un solo descrittore, il quale è in stato DRAFT, la cancellazione dell'e-service va a buon fine
     Given l'utente è un "admin" di "PA1"
-    Given "PA1" ha già creato un e-service con un descrittore in stato "DRAFT"
+    Given un "admin" di "PA1" ha già creato un e-service con un descrittore in stato "DRAFT"
     When l'utente cancella quell'e-service
     Then si ottiene status code 204
 
