@@ -5,7 +5,7 @@ Feature: Cancellazione client
   @client_delete1
   Scenario Outline: Un utente con sufficienti permessi (admin) dell'ente che ha creato il client, richiede la cancellazione del client. L'operazione va a buon fine
     Given l'utente è un "<ruolo>" di "<ente>"
-    Given "<ente>" ha già creato 1 client "e-service"
+    Given "<ente>" ha già creato 1 client "CONSUMER"
     When l'utente richiede una operazione di cancellazione di quel client
     Then si ottiene status code <statusCode>
 
@@ -30,6 +30,6 @@ Feature: Cancellazione client
   @client_delete2
   Scenario Outline: Un utente con sufficienti permessi (admin) non associato all’ente che ha creato il client, richiede la cancellazione del client. Ottiene un errore
     Given l'utente è un "admin" di "PA1"
-    Given "PA2" ha già creato 1 client "e-service"
+    Given "PA2" ha già creato 1 client "CONSUMER"
     When l'utente richiede una operazione di cancellazione di quel client
     Then si ottiene status code 403
