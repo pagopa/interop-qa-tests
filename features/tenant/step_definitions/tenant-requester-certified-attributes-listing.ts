@@ -4,6 +4,7 @@ import { z } from "zod";
 import {
   TenantType,
   assertContextSchema,
+  assertValidResponse,
   getAuthorizationHeader,
   getOrganizationId,
 } from "../../../utils/commons";
@@ -20,6 +21,19 @@ When(
       { limit: 50, offset: 0 },
       getAuthorizationHeader(this.token)
     );
+    let size = 50;
+    let offset = 0;
+    this.results = [];
+    while (size === 50) {
+      this.response = await apiClient.tenants.getRequesterCertifiedAttributes(
+        { limit: 50, offset },
+        getAuthorizationHeader(this.token)
+      );
+      assertValidResponse(this.response);
+      this.results = this.results.concat(this.response.data.results);
+      size = this.response.data.results.length;
+      offset = offset + size;
+    }
   }
 );
 
@@ -30,15 +44,13 @@ Then(
       attributeId: z.string(),
       response: z.object({
         status: z.number(),
-        data: z.object({
-          results: z.array(
-            z.object({
-              attributeId: z.string(),
-              tenantId: z.string(),
-            })
-          ),
-        }),
       }),
+      results: z.array(
+        z.object({
+          attributeId: z.string(),
+          tenantId: z.string(),
+        })
+      ),
     });
 
     assert.equal(this.response.status, 200);
@@ -46,7 +58,7 @@ Then(
     const tenantId = getOrganizationId(tenantType);
 
     assert.ok(
-      this.response.data.results.some(
+      this.results.some(
         (a) => a.attributeId === this.attributeId && a.tenantId === tenantId
       ),
       "L'attributo assegnato non è presente nella lista degli attributi certificati"
