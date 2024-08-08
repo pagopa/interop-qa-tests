@@ -24,6 +24,8 @@
     "bun:test:purpose": "pnpm cucumber:bun -p purpose -p onlyReady",
     "test:authorization": "pnpm cucumber:node -p authorization -p onlyReady",
     "bun:test:authorization": "pnpm cucumber:bun -p authorization -p onlyReady",
+    "test:tenant": "pnpm cucumber:node -p tenant -p onlyReady",
+    "bun:test:tenant": "pnpm cucumber:bun -p tenant -p onlyReady",
     "check-steps": "pnpm test -- -p validate",
     "bun:check-steps": "pnpm bun:test -p validate",
     "check-steps:usage": "pnpm check-steps --format usage",

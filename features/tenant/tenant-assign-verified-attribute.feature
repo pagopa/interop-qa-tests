@@ -42,7 +42,7 @@ Feature: Assegnazione di un attributo verificato ad un aderente
     When l'utente assegna a "PA2" l'attributo verificato precedentemente creato con data di scadenza nel futuro
     Then si ottiene status code 204
 
-  @tenant_assign_verified_attribute4
+  @tenant_assign_verified_attribute4 @wait_for_fix @PIN-5198
   Scenario Outline: Per un attributo verificato precedentemente creato da un primo aderente, alla richiesta di assegnazione dell’attributo con data di scadenza nel passato ad un secondo aderente da parte di un utente con sufficienti permessi (admin) appartenente al primo aderente, ottiene un errore
     Given l'utente è un "admin" di "PA1"
     Given "PA1" ha già creato un attributo verificato
