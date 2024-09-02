@@ -151,6 +151,8 @@ jobs:
         run: |
             set -euo pipefail
 
+            aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name ${{ secrets.EKS_CLUSTER_NAME }}
+
             echo "Scaling deployments to 0"
             kubectl scale deployment -n $K8S_NAMESPACE --replicas=0 --all
                  
@@ -249,7 +251,7 @@ jobs:
             AWS_REGION: ${{ secrets.AWS_REGION}}
             KAFKA_BROKERS: ${{ vars.KAFKA_BROKERS }}
             DOMAIN_TOPIC_PREFIX: ${{ vars.DOMAIN_TOPIC_PREFIX }}
-            TOPICS_PROPERTIES_PATH: ..../topics/${{ vars.NORM_ENV }}/
+            TOPICS_PROPERTIES_PATH: ../topics/${{ vars.NORM_ENV }}/
         run: |
           set -eou pipefail
 
