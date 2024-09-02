@@ -113,7 +113,7 @@ jobs:
     needs: svc_version_check
     runs-on: [self-hosted, "run_id:${{ inputs.environment }}-${{ github.run_id }}"]
     environment: ${{ inputs.environment }}
-    if: ${{ inputs.runDataPreparation }}
+    if: ${{ always() && inputs.runDataPreparation }}
     env: 
       K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE }}
       EVENT_STORE_HOST: ${{ secrets.EVENT_STORE_HOST }}
@@ -233,7 +233,7 @@ jobs:
       
       - name: Purge Kafka topics
         id: clean_kafka
-        if: ${{ inputs.kafkaPurgeTopics }}
+        if: ${{ always() && inputs.kafkaPurgeTopics }}
         shell: bash
         working-directory: scripts/kafka
         env: 
