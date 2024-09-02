@@ -82,6 +82,7 @@ jobs:
   svc_version_check:
     name: Check Deployed Versions
     needs: create_runner
+    if: ${{ inputs.environment == 'qa' || inputs.environment == 'es1-qa' }}
     runs-on: [self-hosted, "run_id:${{ inputs.environment }}-${{ github.run_id }}"]
     environment: ${{ inputs.environment }}
     steps:
