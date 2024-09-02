@@ -130,6 +130,10 @@ jobs:
       POLLING_SLEEP_TIME: "${{ vars.POLLING_SLEEP_TIME }}"
 
     steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3
+
       - name: Create dump dir
         id: mkdir_dump
         shell: bash
