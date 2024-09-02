@@ -33,7 +33,7 @@ const run = async () => {
         logInfo("Setup Kafka connection.");
         const kafka = new Kafka({
             clientId: 'kafka-scripts',
-            brokers: [process.env.KAFKA_BROKERS],
+            brokers: process.env.KAFKA_BROKERS.split(","),
             ssl: true,
             sasl: {
                 mechanism: 'oauthbearer',
