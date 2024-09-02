@@ -230,17 +230,26 @@ jobs:
           READ_MODEL_DB_NAME: ${{ vars.READ_MODEL_DB_NAME }}
         run: |
           $SCRIPTS_FOLDER/deleteReadModelItems.sh
+
+      - name: Checkout Kafka tools
+        id: kafka_tools
+        if: ${{ always() && inputs.kafkaPurgeTopics }}
+        uses: actions/checkout@v4
+        with:
+          repository: pagopa/pdnd-interop-platform-deployment
+          path: plat-dep
+          sparse-checkout: kafka
       
       - name: Purge Kafka topics
         id: clean_kafka
         if: ${{ always() && inputs.kafkaPurgeTopics }}
         shell: bash
-        working-directory: scripts/kafka
+        working-directory: plat-dep/kafka/scripts
         env: 
             AWS_REGION: ${{ secrets.AWS_REGION}}
             KAFKA_BROKERS: ${{ vars.KAFKA_BROKERS }}
             DOMAIN_TOPIC_PREFIX: ${{ vars.DOMAIN_TOPIC_PREFIX }}
-            TOPICS_PROPERTIES_PATH: ../../data/topics/${{ vars.NORM_ENV }}/
+            TOPICS_PROPERTIES_PATH: ..../topics/${{ vars.NORM_ENV }}/
         run: |
           set -eou pipefail
 
