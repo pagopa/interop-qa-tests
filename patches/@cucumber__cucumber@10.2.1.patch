@@ -1,0 +1,12 @@
+diff --git a/lib/wrapper.mjs b/lib/wrapper.mjs
+index ec151fe3b474a832e0058ffde9e6096b824638fe..2da9e5f16ee0b993ef9eef2eab23a144bb0a487a 100644
+--- a/lib/wrapper.mjs
++++ b/lib/wrapper.mjs
+@@ -35,6 +35,7 @@ export const Then = cucumber.Then
+ export const When = cucumber.When
+ export const World = cucumber.World
+ export const parallelCanAssignHelpers = cucumber.parallelCanAssignHelpers
++export const setParallelCanAssign = cucumber.setParallelCanAssign
+ 
+ export const wrapPromiseWithTimeout = cucumber.wrapPromiseWithTimeout
+ 
