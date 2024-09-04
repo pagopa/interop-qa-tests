@@ -14,7 +14,7 @@ import {
 import { PurposeVersion, PurposeVersionState } from "../../../api/models";
 
 When(
-  "l'utente aggiorna la stima di carico per quella finalità",
+  "l'utente aggiorna la stima di carico per quella finalità restando entro la soglia",
   async function () {
     assertContextSchema(this, {
       token: z.string(),
@@ -33,8 +33,28 @@ When(
   }
 );
 
+When(
+  "l'utente aggiorna la stima di carico per quella finalità superando la soglia",
+  async function () {
+    assertContextSchema(this, {
+      token: z.string(),
+      purposeId: z.string(),
+    });
+
+    this.newDailyCalls = ESERVICE_DAILY_CALLS.perConsumer + 1;
+
+    this.response = await apiClient.purposes.createPurposeVersion(
+      this.purposeId,
+      {
+        dailyCalls: this.newDailyCalls,
+      },
+      getAuthorizationHeader(this.token)
+    );
+  }
+);
+
 Given(
-  "l'utente crea una versione nuova della finalità in stato WAITING_FOR_APPROVAL",
+  "l'utente ha già creato una versione nuova della finalità in stato WAITING_FOR_APPROVAL",
   async function () {
     assertContextSchema(this, {
       token: z.string(),
