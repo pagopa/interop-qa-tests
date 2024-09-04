@@ -47,6 +47,7 @@ jobs:
         id: print_inputs
         run: |
           echo "- environment: \`${{ inputs.environment }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- normalized environment: \`${{ vars.NORM_ENV }}\`" >> $GITHUB_STEP_SUMMARY
           echo "- ref: \`${{ github.ref }}\`" >> $GITHUB_STEP_SUMMARY
           echo "- plat-dep versions: \`${{ vars.PLAT_DEP_VERSIONS_URL }}\`" >> $GITHUB_STEP_SUMMARY
           echo "- kafkaPurgeTopics: \`${{ inputs.kafkaPurgeTopics }}\`" >> $GITHUB_STEP_SUMMARY
@@ -81,6 +82,7 @@ jobs:
   svc_version_check:
     name: Check Deployed Versions
     needs: create_runner
+    if: ${{ inputs.environment == 'qa' || inputs.environment == 'es1-qa' }}
     runs-on: [self-hosted, "run_id:${{ inputs.environment }}-${{ github.run_id }}"]
     environment: ${{ inputs.environment }}
     steps:
@@ -111,7 +113,7 @@ jobs:
     needs: svc_version_check
     runs-on: [self-hosted, "run_id:${{ inputs.environment }}-${{ github.run_id }}"]
     environment: ${{ inputs.environment }}
-    if: ${{ inputs.runDataPreparation }}
+    if: ${{ always() && inputs.runDataPreparation }}
     env: 
       K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE }}
       EVENT_STORE_HOST: ${{ secrets.EVENT_STORE_HOST }}
@@ -128,6 +130,10 @@ jobs:
       POLLING_SLEEP_TIME: "${{ vars.POLLING_SLEEP_TIME }}"
 
     steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3
+
       - name: Create dump dir
         id: mkdir_dump
         shell: bash
@@ -148,6 +154,8 @@ jobs:
         shell: bash
         run: |
             set -euo pipefail
+
+            aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name ${{ secrets.EKS_CLUSTER_NAME }}
 
             echo "Scaling deployments to 0"
             kubectl scale deployment -n $K8S_NAMESPACE --replicas=0 --all
@@ -228,17 +236,26 @@ jobs:
           READ_MODEL_DB_NAME: ${{ vars.READ_MODEL_DB_NAME }}
         run: |
           $SCRIPTS_FOLDER/deleteReadModelItems.sh
+
+      - name: Checkout Kafka tools
+        id: kafka_tools
+        if: ${{ always() && inputs.kafkaPurgeTopics }}
+        uses: actions/checkout@v4
+        with:
+          repository: pagopa/pdnd-interop-platform-deployment
+          path: plat-dep
+          sparse-checkout: kafka
       
       - name: Purge Kafka topics
         id: clean_kafka
-        if: ${{ inputs.kafkaPurgeTopics }}
+        if: ${{ always() && inputs.kafkaPurgeTopics }}
         shell: bash
-        working-directory: scripts/kafka
+        working-directory: plat-dep/kafka/scripts
         env: 
             AWS_REGION: ${{ secrets.AWS_REGION}}
             KAFKA_BROKERS: ${{ vars.KAFKA_BROKERS }}
             DOMAIN_TOPIC_PREFIX: ${{ vars.DOMAIN_TOPIC_PREFIX }}
-            TOPICS_PROPERTIES_PATH: ../../data/topics/${{ inputs.environment }}/
+            TOPICS_PROPERTIES_PATH: ../topics/${{ vars.NORM_ENV }}/
         run: |
           set -eou pipefail
 

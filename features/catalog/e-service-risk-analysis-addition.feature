@@ -3,9 +3,9 @@ Feature: Aggiunta di un'analisi del rischio ad un e-service
   Tutti gli utenti autorizzati di enti erogatori possono aggiungere un'analisi del rischio all'e-service se è in mode RECEIVE
 
   @eservice_risk_analysis_addition1
-  Scenario Outline: Per un e-service creato in modalità "RECEIVE", il quale non ha descrittori, è possibile inserire una nuova analisi del rischio. L'analisi del rischio deve essere ben formattata ma non necessariamente completamente compilata. La richiesta va a buon fine
+  Scenario Outline: Per un e-service creato in modalità "RECEIVE", il quale ha un descrittore in DRAFT, è possibile inserire una nuova analisi del rischio. L'analisi del rischio deve essere ben formattata ma non necessariamente completamente compilata. La richiesta va a buon fine
     Given l'utente è un "<ruolo>" di "<ente>"
-    Given "<ente>" ha già creato un e-service in modalità "RECEIVE" senza descrittore
+    Given "<ente>" ha già creato un e-service in modalità "RECEIVE" con un descrittore in DRAFT
     When l'utente aggiunge un'analisi del rischio
     Then si ottiene status code <risultato>
 
@@ -32,7 +32,7 @@ Feature: Aggiunta di un'analisi del rischio ad un e-service
   @eservice_risk_analysis_addition3
   Scenario Outline: Per un e-service creato in modalità "DELIVER", il quale non ha descrittori, alla richiesta di inserimento di un'analisi del rischio, ottiene un errore
     Given l'utente è un "admin" di "PA1"
-    Given "PA1" ha già creato un e-service in modalità "DELIVER" senza descrittore
+    Given "PA1" ha già creato un e-service in modalità "DELIVER" con un descrittore in DRAFT
     When l'utente aggiunge un'analisi del rischio
     Then si ottiene status code 400
 
@@ -46,7 +46,7 @@ Feature: Aggiunta di un'analisi del rischio ad un e-service
   @eservice_risk_analysis_addition5
   Scenario Outline: Per un e-service creato in modalità "RECEIVE", il quale non ha descrittori, alla richiesta di inserimento di un'analisi del rischio ben formattata e dell'ultima versione per quella tipologia di ente ma della tipologia errata, ottiene un errore
     Given l'utente è un "admin" di "PA1"
-    Given "PA1" ha già creato un e-service in modalità "RECEIVE" senza descrittore
+    Given "PA1" ha già creato un e-service in modalità "RECEIVE" con un descrittore in DRAFT
     When l'utente aggiunge un'analisi del rischio non corretta per la tipologia di ente
     Then si ottiene status code 400
 
@@ -60,7 +60,7 @@ Feature: Aggiunta di un'analisi del rischio ad un e-service
   @eservice_risk_analysis_addition7
   Scenario Outline: Per un e-service creato in modalità "RECEIVE", il quale non ha descrittori, alla richiesta di inserimento di un'analisi del rischio ben formattata e della tipologia corretta per quella tipologia di ente ma in una versione che non è la “latest”, l’ultima disponibile, ottiene un errore
     Given l'utente è un "admin" di "PA1"
-    Given "PA1" ha già creato un e-service in modalità "RECEIVE" senza descrittore
+    Given "PA1" ha già creato un e-service in modalità "RECEIVE" con un descrittore in DRAFT
     When l'utente aggiunge un'analisi del rischio con versione template non aggiornata
     Then si ottiene status code 400
 
