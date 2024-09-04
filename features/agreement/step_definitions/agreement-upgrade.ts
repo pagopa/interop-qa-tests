@@ -35,11 +35,17 @@ Given(
       attributeId: z.string(),
     });
     const token = await getToken(tenantType);
-    const response =
-      await dataPreparationService.createDescriptorWithGivenState({
-        token,
-        eserviceId: this.eserviceId,
-        descriptorState: "PUBLISHED",
+
+    this.descriptorId = await dataPreparationService.createNextDraftDescriptor(
+      token,
+      this.eserviceId
+    );
+
+    await dataPreparationService.updateDraftDescriptor({
+      token,
+      eserviceId: this.eserviceId,
+      descriptorId: this.descriptorId,
+      partialDescriptorSeed: {
         attributes: {
           certified: [
             [{ id: this.attributeId, explicitAttributeVerification: true }],
@@ -47,8 +53,15 @@ Given(
           declared: [],
           verified: [],
         },
-      });
-    this.descriptorId = response.descriptorId;
+      },
+    });
+
+    await dataPreparationService.bringDescriptorToGivenState({
+      token,
+      eserviceId: this.eserviceId,
+      descriptorId: this.descriptorId,
+      descriptorState: "PUBLISHED",
+    });
   }
 );
 
@@ -75,18 +88,30 @@ Given(
       [{ id: attributeId, explicitAttributeVerification: true }],
     ];
 
-    const response =
-      await dataPreparationService.createDescriptorWithGivenState({
-        token,
-        eserviceId: this.eserviceId,
-        descriptorState: "PUBLISHED",
+    this.descriptorId = await dataPreparationService.createNextDraftDescriptor(
+      token,
+      this.eserviceId
+    );
+
+    await dataPreparationService.updateDraftDescriptor({
+      token,
+      eserviceId: this.eserviceId,
+      descriptorId: this.descriptorId,
+      partialDescriptorSeed: {
         attributes: {
           certified: kind === "CERTIFIED" ? seed : [],
           declared: kind === "DECLARED" ? seed : [],
           verified: kind === "VERIFIED" ? seed : [],
         },
-      });
-    this.descriptorId = response.descriptorId;
+      },
+    });
+
+    await dataPreparationService.bringDescriptorToGivenState({
+      token,
+      eserviceId: this.eserviceId,
+      descriptorId: this.descriptorId,
+      descriptorState: "PUBLISHED",
+    });
   }
 );
 

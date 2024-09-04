@@ -11,15 +11,17 @@ import { apiClient } from "../../../api";
 import { TenantType } from "../../../utils/commons";
 
 Given(
-  "{string} ha già creato un e-service in modalità {string} senza descrittore",
+  "{string} ha già creato un e-service in modalità {string} con un descrittore in DRAFT",
   async function (tenantType: TenantType, mode: EServiceMode) {
     assertContextSchema(this, { token: z.string() });
 
     const token = await getToken(tenantType);
 
-    this.eserviceId = await dataPreparationService.createEService(token, {
-      mode,
-    });
+    const { eserviceId } =
+      await dataPreparationService.createEServiceAndDraftDescriptor(token, {
+        mode,
+      });
+    this.eserviceId = eserviceId;
   }
 );
 

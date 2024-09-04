@@ -66,35 +66,45 @@ Given(
     const requiredVerifiedAttributes = this.requiredVerifiedAttributes ?? [];
 
     const token = await getToken(tenantType);
-    this.eserviceId = await dataPreparationService.createEService(token);
-    const response =
-      await dataPreparationService.createDescriptorWithGivenState({
+
+    const { eserviceId, descriptorId } =
+      await dataPreparationService.createEServiceAndDraftDescriptor(
         token,
-        eserviceId: this.eserviceId,
-        descriptorState,
-        attributes: {
-          certified: requiredCertifiedAttributes.map((group) =>
-            group.map((attrId) => ({
-              id: attrId,
-              explicitAttributeVerification: true,
-            }))
-          ),
-          declared: requiredDeclaredAttributes.map((group) =>
-            group.map((attrId) => ({
-              id: attrId,
-              explicitAttributeVerification: true,
-            }))
-          ),
-          verified: requiredVerifiedAttributes.map((group) =>
-            group.map((attrId) => ({
-              id: attrId,
-              explicitAttributeVerification: true,
-            }))
-          ),
-        },
-        agreementApprovalPolicy,
-      });
-    this.descriptorId = response.descriptorId;
+        {},
+        {
+          attributes: {
+            certified: requiredCertifiedAttributes.map((group) =>
+              group.map((attrId) => ({
+                id: attrId,
+                explicitAttributeVerification: true,
+              }))
+            ),
+            declared: requiredDeclaredAttributes.map((group) =>
+              group.map((attrId) => ({
+                id: attrId,
+                explicitAttributeVerification: true,
+              }))
+            ),
+            verified: requiredVerifiedAttributes.map((group) =>
+              group.map((attrId) => ({
+                id: attrId,
+                explicitAttributeVerification: true,
+              }))
+            ),
+          },
+          agreementApprovalPolicy,
+        }
+      );
+
+    await dataPreparationService.bringDescriptorToGivenState({
+      token,
+      eserviceId,
+      descriptorId,
+      descriptorState,
+    });
+
+    this.eserviceId = eserviceId;
+    this.descriptorId = descriptorId;
   }
 );
 

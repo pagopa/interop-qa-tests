@@ -179,30 +179,6 @@ export interface EServiceDescriptionSeed {
   description: string;
 }
 
-export interface EServiceDescriptorSeed {
-  description?: string;
-  audience: string[];
-  /** @format int32 */
-  voucherLifespan: number;
-  /**
-   * maximum number of daily calls that this descriptor can afford.
-   * @format int32
-   */
-  dailyCallsPerConsumer: number;
-  /**
-   * total daily calls available for this e-service.
-   * @format int32
-   */
-  dailyCallsTotal: number;
-  /**
-   * EService Descriptor policy for new Agreements approval.
-   * AUTOMATIC - the agreement will be automatically approved if Consumer attributes are met
-   * MANUAL - the Producer must approve every agreement for this Descriptor.
-   */
-  agreementApprovalPolicy: AgreementApprovalPolicy;
-  attributes: DescriptorAttributesSeed;
-}
-
 export interface CatalogEServiceDescriptor {
   /** @format uuid */
   id: string;
@@ -2290,7 +2266,7 @@ export namespace Eservices {
     export type RequestHeaders = {
       "X-Correlation-Id": string;
     };
-    export type ResponseBody = CreatedResource;
+    export type ResponseBody = CreatedEServiceDescriptor;
   }
   /**
    * No description
@@ -2388,7 +2364,7 @@ export namespace Eservices {
       eServiceId: string;
     };
     export type RequestQuery = {};
-    export type RequestBody = EServiceDescriptorSeed;
+    export type RequestBody = never;
     export type RequestHeaders = {
       "X-Correlation-Id": string;
     };
@@ -5177,7 +5153,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @secure
      */
     createEService: (data: EServiceSeed, params: RequestParams = {}) =>
-      this.request<CreatedResource, Problem>({
+      this.request<CreatedEServiceDescriptor, Problem>({
         path: `/eservices`,
         method: "POST",
         body: data,
@@ -5255,13 +5231,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request POST:/eservices/{eServiceId}/descriptors
      * @secure
      */
-    createDescriptor: (eServiceId: string, data: EServiceDescriptorSeed, params: RequestParams = {}) =>
+    createDescriptor: (eServiceId: string, params: RequestParams = {}) =>
       this.request<CreatedResource, Problem>({
         path: `/eservices/${eServiceId}/descriptors`,
         method: "POST",
-        body: data,
         secure: true,
-        type: ContentType.Json,
         format: "json",
         ...params,
       }),
