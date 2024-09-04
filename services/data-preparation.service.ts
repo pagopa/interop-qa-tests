@@ -9,14 +9,12 @@ import {
   assertValidResponse,
   getToken,
   TenantType,
+  sleep,
 } from "../utils/commons";
 import {
   EServiceSeed,
-  EServiceDescriptorSeed,
   EServiceDescriptorState,
   EServiceRiskAnalysisSeed,
-  DescriptorAttributesSeed,
-  AgreementApprovalPolicy,
   AttributeKind,
   Attribute,
   PurposeVersionState,
@@ -30,6 +28,7 @@ import {
   KeySeed,
   MailSeed,
   AgreementState,
+  UpdateEServiceDescriptorSeed,
 } from "./../api/models";
 
 export const ESERVICE_DAILY_CALLS: Readonly<{
@@ -97,9 +96,10 @@ const RISK_ANALYSIS_DATA: Record<
 };
 
 export const dataPreparationService = {
-  async createEService(
+  async createEServiceAndDraftDescriptor(
     token: string,
-    partialEserviceSeed: Partial<EServiceSeed> = {}
+    partialEserviceSeed: Partial<EServiceSeed> = {},
+    partialDescriptorSeed: Partial<UpdateEServiceDescriptorSeed> = {}
   ) {
     const DEFAULT_ESERVICE_SEED: EServiceSeed = {
       name: `e-service ${getRandomInt()}`,
@@ -119,47 +119,36 @@ export const dataPreparationService = {
     );
     assertValidResponse(eserviceCreationResponse);
     const eserviceId = eserviceCreationResponse.data.id;
+    const descriptorId = eserviceCreationResponse.data.descriptorId;
 
     await makePolling(
       () =>
-        apiClient.producers.getProducerEServiceDetails(
+        apiClient.producers.getProducerEServiceDescriptor(
           eserviceId,
+          descriptorId,
           getAuthorizationHeader(token)
         ),
       (res) => res.status !== 404
     );
 
-    return eserviceId;
+    // if (Object.keys(partialDescriptorSeed).length === 0) {
+    //   return { eserviceId, descriptorId };
+    // }
+
+    await dataPreparationService.updateDraftDescriptor({
+      token,
+      eserviceId,
+      descriptorId,
+      partialDescriptorSeed,
+    });
+
+    return { eserviceId, descriptorId };
   },
 
-  async createDraftDescriptor(
-    token: string,
-    eserviceId: string,
-    partialEServiceDescriptorSeed: Partial<EServiceDescriptorSeed> = {}
-  ) {
-    const DEFAULT_ESERVICE_DESCRIPTOR_SEED: EServiceDescriptorSeed = {
-      description: "Questo è un e-service di test",
-      audience: ["api/v1"],
-      voucherLifespan: 60,
-      dailyCallsPerConsumer: ESERVICE_DAILY_CALLS.perConsumer,
-      dailyCallsTotal: ESERVICE_DAILY_CALLS.total,
-      agreementApprovalPolicy: "AUTOMATIC",
-      attributes: {
-        certified: [],
-        declared: [],
-        verified: [],
-      },
-    };
-
-    const eserviceDescriptorSeed: EServiceDescriptorSeed = {
-      ...DEFAULT_ESERVICE_DESCRIPTOR_SEED,
-      ...partialEServiceDescriptorSeed,
-    };
-
+  async createNextDraftDescriptor(token: string, eserviceId: string) {
     const descriptorCreationResponse =
       await apiClient.eservices.createDescriptor(
         eserviceId,
-        eserviceDescriptorSeed,
         getAuthorizationHeader(token)
       );
 
@@ -277,13 +266,20 @@ export const dataPreparationService = {
     eserviceId: string,
     descriptorId: string
   ) {
-    const response = await apiClient.eservices.publishDescriptor(
+    await dataPreparationService.updateDraftDescriptor({
+      token,
+      eserviceId,
+      descriptorId,
+      partialDescriptorSeed: { audience: ["pagopa.it"] },
+    });
+
+    const publicationResponse = await apiClient.eservices.publishDescriptor(
       eserviceId,
       descriptorId,
       getAuthorizationHeader(token)
     );
 
-    assertValidResponse(response);
+    assertValidResponse(publicationResponse);
 
     await makePolling(
       () =>
@@ -551,29 +547,85 @@ export const dataPreparationService = {
     );
   },
 
-  async createDescriptorWithGivenState({
+  async updateDraftDescriptor({
     token,
     eserviceId,
-    descriptorState,
-    withDocument = false,
-    attributes = { certified: [], declared: [], verified: [] },
-    agreementApprovalPolicy = "AUTOMATIC",
+    descriptorId,
+    partialDescriptorSeed = {},
   }: {
     token: string;
     eserviceId: string;
-    descriptorState: EServiceDescriptorState;
-    withDocument?: boolean;
-    attributes?: DescriptorAttributesSeed;
-    agreementApprovalPolicy?: AgreementApprovalPolicy;
+    descriptorId: string;
+    partialDescriptorSeed: Partial<UpdateEServiceDescriptorSeed>;
   }) {
-    // 1. Create DRAFT descriptor
-    const descriptorId = await dataPreparationService.createDraftDescriptor(
-      token,
+    const descriptor = await apiClient.producers.getProducerEServiceDescriptor(
       eserviceId,
-      { attributes, agreementApprovalPolicy }
+      descriptorId,
+      getAuthorizationHeader(token)
     );
 
-    // 1.1 add document to descriptor
+    const currentDescriptorSeed: UpdateEServiceDescriptorSeed = {
+      agreementApprovalPolicy: descriptor.data.agreementApprovalPolicy,
+      attributes: {
+        certified: descriptor.data.attributes.certified.map((attrSet) =>
+          attrSet.map((attr) => ({
+            id: attr.id,
+            explicitAttributeVerification: attr.explicitAttributeVerification,
+          }))
+        ),
+        declared: descriptor.data.attributes.declared.map((attrSet) =>
+          attrSet.map((attr) => ({
+            id: attr.id,
+            explicitAttributeVerification: attr.explicitAttributeVerification,
+          }))
+        ),
+        verified: descriptor.data.attributes.verified.map((attrSet) =>
+          attrSet.map((attr) => ({
+            id: attr.id,
+            explicitAttributeVerification: attr.explicitAttributeVerification,
+          }))
+        ),
+      },
+      dailyCallsPerConsumer: descriptor.data.dailyCallsPerConsumer,
+      dailyCallsTotal: descriptor.data.dailyCallsTotal,
+      audience: descriptor.data.audience,
+      voucherLifespan: descriptor.data.voucherLifespan,
+    };
+
+    const descriptorSeed: UpdateEServiceDescriptorSeed = {
+      ...currentDescriptorSeed,
+      dailyCallsPerConsumer: ESERVICE_DAILY_CALLS.perConsumer,
+      dailyCallsTotal: ESERVICE_DAILY_CALLS.total,
+      ...partialDescriptorSeed,
+      audience: ["pagopa.it"],
+    };
+
+    const response = await apiClient.eservices.updateDraftDescriptor(
+      eserviceId,
+      descriptorId,
+      descriptorSeed,
+      getAuthorizationHeader(token)
+    );
+    assertValidResponse(response);
+
+    await sleep(2000);
+    // checking the result through polling would be complicated because we should retrieve which fields are being updated
+  },
+
+  async bringDescriptorToGivenState({
+    token,
+    eserviceId,
+    descriptorId,
+    descriptorState,
+    withDocument = false,
+  }: {
+    token: string;
+    eserviceId: string;
+    descriptorId: string;
+    descriptorState: EServiceDescriptorState;
+    withDocument?: boolean;
+  }) {
+    // 1 add document to descriptor
     let documentId: string | undefined;
     if (withDocument) {
       documentId = await dataPreparationService.addDocumentToDescriptor(
@@ -635,7 +687,7 @@ export const dataPreparationService = {
 
     // Create another DRAFT descriptor
     const secondDescriptorId =
-      await dataPreparationService.createDraftDescriptor(token, eserviceId);
+      await dataPreparationService.createNextDraftDescriptor(token, eserviceId);
 
     // Add interface to secondDescriptor
     await dataPreparationService.addInterfaceToDescriptor(
@@ -1215,13 +1267,23 @@ export const dataPreparationService = {
     return clientId;
   },
   async addMemberToClient(token: string, clientId: string, userId: string) {
-    const response = await apiClient.clients.addUserToClient(
-      clientId,
-      userId,
-      getAuthorizationHeader(token)
+    let response: AxiosResponse | undefined;
+
+    await makePolling(
+      () =>
+        apiClient.clients.addUserToClient(
+          clientId,
+          userId,
+          getAuthorizationHeader(token)
+        ),
+      (res) => {
+        // This is necessary because otherwise we receive a 429 (Too Many Requests)
+        response = res;
+        return res.status !== 500;
+      }
     );
 
-    assertValidResponse(response);
+    assertValidResponse(response!);
 
     await makePolling(
       () =>
@@ -1254,13 +1316,23 @@ export const dataPreparationService = {
     clientId: string,
     keySeed: KeySeed
   ) {
-    const response = await apiClient.clients.createKeys(
-      clientId,
-      [keySeed],
-      getAuthorizationHeader(token)
+    let response: AxiosResponse | undefined;
+
+    await makePolling(
+      () =>
+        apiClient.clients.createKeys(
+          clientId,
+          [keySeed],
+          getAuthorizationHeader(token)
+        ),
+      (res) => {
+        // This is necessary because otherwise we receive a 429 (Too Many Requests)
+        response = res;
+        return res.status !== 500;
+      }
     );
 
-    assertValidResponse(response);
+    assertValidResponse(response!);
 
     let kid: string | undefined;
 

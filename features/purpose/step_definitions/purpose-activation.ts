@@ -13,24 +13,24 @@ import { PurposeVersionState } from "../../../api/models";
 import { dataPreparationService } from "../../../services/data-preparation.service";
 
 Given(
-  "{string} ha già creato e pubblicato un e-service con una soglia di carico tale da contenere una sola finalità",
+  "{string} ha già creato e pubblicato un e-service con una soglia di carico tale da gestire una sola chiamata",
   async function (tenantType: TenantType) {
     assertContextSchema(this);
 
     const token = await getToken(tenantType);
     const eserviceName = `e-service-${this.TEST_SEED}}`;
-    this.eserviceId = await dataPreparationService.createEService(token, {
-      name: eserviceName,
-    });
 
-    this.descriptorId = await dataPreparationService.createDraftDescriptor(
-      token,
-      this.eserviceId,
-      {
-        dailyCallsPerConsumer: 1,
-        dailyCallsTotal: 1,
-      }
-    );
+    const { eserviceId, descriptorId } =
+      await dataPreparationService.createEServiceAndDraftDescriptor(
+        token,
+        {
+          name: eserviceName,
+        },
+        { dailyCallsPerConsumer: 1, dailyCallsTotal: 1 }
+      );
+
+    this.eserviceId = eserviceId;
+    this.descriptorId = descriptorId;
 
     await dataPreparationService.addInterfaceToDescriptor(
       token,

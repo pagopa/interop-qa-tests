@@ -22,14 +22,17 @@ Given(
 
     const token = await getToken(tenantType);
 
-    const { descriptorId } =
-      await dataPreparationService.createDescriptorWithGivenState({
-        token,
-        eserviceId: this.eserviceId,
-        descriptorState,
-      });
+    this.descriptorId = await dataPreparationService.createNextDraftDescriptor(
+      token,
+      this.eserviceId
+    );
 
-    this.descriptorId = descriptorId;
+    await dataPreparationService.bringDescriptorToGivenState({
+      token,
+      eserviceId: this.eserviceId,
+      descriptorId: this.descriptorId,
+      descriptorState,
+    });
   }
 );
 
