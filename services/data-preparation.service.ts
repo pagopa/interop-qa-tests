@@ -595,6 +595,8 @@ export const dataPreparationService = {
 
     const descriptorSeed: UpdateEServiceDescriptorSeed = {
       ...currentDescriptorSeed,
+      dailyCallsPerConsumer: ESERVICE_DAILY_CALLS.perConsumer,
+      dailyCallsTotal: ESERVICE_DAILY_CALLS.total,
       ...partialDescriptorSeed,
       audience: ["pagopa.it"],
     };
@@ -1286,13 +1288,23 @@ export const dataPreparationService = {
     return clientId;
   },
   async addMemberToClient(token: string, clientId: string, userId: string) {
-    const response = await apiClient.clients.addUserToClient(
-      clientId,
-      userId,
-      getAuthorizationHeader(token)
+    let response: AxiosResponse | undefined;
+
+    await makePolling(
+      () =>
+        apiClient.clients.addUserToClient(
+          clientId,
+          userId,
+          getAuthorizationHeader(token)
+        ),
+      (res) => {
+        // This is necessary because otherwise we receive a 429 (Too Many Requests)
+        response = res;
+        return res.status !== 500;
+      }
     );
 
-    assertValidResponse(response);
+    assertValidResponse(response!);
 
     await makePolling(
       () =>
@@ -1325,13 +1337,23 @@ export const dataPreparationService = {
     clientId: string,
     keySeed: KeySeed
   ) {
-    const response = await apiClient.clients.createKeys(
-      clientId,
-      [keySeed],
-      getAuthorizationHeader(token)
+    let response: AxiosResponse | undefined;
+
+    await makePolling(
+      () =>
+        apiClient.clients.createKeys(
+          clientId,
+          [keySeed],
+          getAuthorizationHeader(token)
+        ),
+      (res) => {
+        // This is necessary because otherwise we receive a 429 (Too Many Requests)
+        response = res;
+        return res.status !== 500;
+      }
     );
 
-    assertValidResponse(response);
+    assertValidResponse(response!);
 
     let kid: string | undefined;
 
