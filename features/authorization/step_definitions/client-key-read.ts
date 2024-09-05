@@ -23,12 +23,16 @@ Given(
 
     this.key = createBase64PublicKey();
 
-    await dataPreparationService.addPublicKeyToClient(token, this.clientId, {
-      use: "SIG",
-      alg: "RS256",
-      name: `key-${this.TEST_SEED}-${getRandomInt()}`,
-      key: this.key,
-    });
+    this.keyId = await dataPreparationService.addPublicKeyToClient(
+      token,
+      this.clientId,
+      {
+        use: "SIG",
+        alg: "RS256",
+        name: `key-${this.TEST_SEED}-${getRandomInt()}`,
+        key: this.key,
+      }
+    );
   }
 );
 
