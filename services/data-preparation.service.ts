@@ -317,6 +317,30 @@ export const dataPreparationService = {
     );
   },
 
+  async activateDescriptor(
+    token: string,
+    eserviceId: string,
+    descriptorId: string
+  ) {
+    const response = await apiClient.eservices.activateDescriptor(
+      eserviceId,
+      descriptorId,
+      getAuthorizationHeader(token)
+    );
+
+    assertValidResponse(response);
+
+    await makePolling(
+      () =>
+        apiClient.producers.getProducerEServiceDescriptor(
+          eserviceId,
+          descriptorId,
+          getAuthorizationHeader(token)
+        ),
+      (res) => res.data.state === "PUBLISHED"
+    );
+  },
+
   async createAgreement(
     token: string,
     eserviceId: string,

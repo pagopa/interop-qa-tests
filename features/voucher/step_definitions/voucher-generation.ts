@@ -25,20 +25,21 @@ When("l'utente richiede la generazione del voucher", async function () {
     privateKey,
   });
 
-  const result = await requestVoucher({
+  this.response = await requestVoucher({
     clientId,
     clientAssertion,
   });
-
-  this.result = result;
 });
 
 Then("si ottiene la corretta generazione del voucher", async function () {
   assertContextSchema(this, {
-    result: z.object({
-      access_token: z.string(),
-      expires_in: z.number(),
-      token_type: z.literal("Bearer"),
+    response: z.object({
+      data: z.object({
+        access_token: z.string(),
+        expires_in: z.number(),
+        token_type: z.literal("Bearer"),
+      }),
+      status: z.literal(200),
     }),
   });
 });
