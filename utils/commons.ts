@@ -236,7 +236,7 @@ export function createClientAssertion({
     aud: env.CLIENT_ASSERTION_JWT_AUDIENCE,
     purposeId,
     jti: randomUUID(),
-    iat: new Date(),
+    iat: issuedAt,
     exp: issuedAt + 43200 * 60, // 30 days
   };
 
@@ -263,12 +263,15 @@ export async function requestVoucher({
   const headers = {
     "Content-Type": "application/x-www-form-urlencoded",
   };
-
-  const response = await axios.post(
-    env.AUTHORIZATION_SERVER_TOKEN_CREATION_URL,
-    requestBody,
-    { headers }
-  );
-
-  return response.data;
+  try {
+    const response = await axios.post(
+      env.AUTHORIZATION_SERVER_TOKEN_CREATION_URL,
+      requestBody,
+      { headers }
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error.response.data);
+    return { data: error };
+  }
 }
