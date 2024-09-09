@@ -252,21 +252,21 @@ export async function requestVoucher({
   clientId: string;
   clientAssertion: string;
 }) {
-  const requestBody = {
+  const urlSearchparams = new URLSearchParams({
     Client_id: clientId,
     Client_assertion: clientAssertion,
     Client_assertion_type:
       "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
     Grant_type: "client_credentials",
-  };
+  });
 
   const headers = {
     "Content-Type": "application/x-www-form-urlencoded",
   };
   try {
     const response = await axios.post(
-      env.AUTHORIZATION_SERVER_TOKEN_CREATION_URL,
-      requestBody,
+      "https://auth.dev.interop.pagopa.it/token.oauth2",
+      urlSearchparams,
       { headers }
     );
     return response.data;
