@@ -265,6 +265,7 @@ export async function requestVoucher({
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
+      validateStatus: () => true,
     }
   );
 }

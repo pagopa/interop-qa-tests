@@ -48,7 +48,6 @@ Feature: Generazione del voucher richiesta da un Ente
   Scenario Outline: La generazione del Voucher va a buon fine per una Versione pubblicata dell'EService, quando esiste una Versione precedente sospesa
     Given l'utente è un "admin" di "PA1"
     Given "PA2" ha già creato e pubblicato 1 e-service
-    Given "GSP" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given "PA2" ha già sospeso quell'e-service
     Given "PA2" ha già pubblicato una nuova versione per quell'e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
@@ -76,7 +75,7 @@ Feature: Generazione del voucher richiesta da un Ente
     Then si ottiene la corretta generazione del voucher
 
   @voucher_generation_eservice6
-  Scenario Outline: La generazione del Voucher va a buon fine per una Versione deprecata dell'EService quando la Versione più recente è sospesa
+  Scenario Outline: La generazione del Voucher va a buon fine per una Versione pubblicata dell'EService quando esiste una Versione più recente in bozza
     Given l'utente è un "admin" di "PA1"
     Given "PA2" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
@@ -105,7 +104,7 @@ Feature: Generazione del voucher richiesta da un Ente
     Then si ottiene la corretta generazione del voucher
 
   @voucher_generation_eservice8
-  Scenario Outline: La generazione del Voucher va a buon fine per una Versione deprecata dell'EService
+  Scenario Outline: La generazione del Voucher va a buon fine per una Versione deprecata dell'EService che viene sospesa e poi riattivata
     Given l'utente è un "admin" di "PA1"
     Given "PA2" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
@@ -124,14 +123,13 @@ Feature: Generazione del voucher richiesta da un Ente
   Scenario Outline: La generazione del Voucher fallisce per una Versione sospesa dell'EService quando esiste una Versione più recente in bozza
     Given l'utente è un "admin" di "PA1"
     Given "PA2" ha già creato e pubblicato 1 e-service
-    Given "PA2" ha già sospeso quell'e-service 
-    # TODO Controllare se possibile creare richieste di fruizione con e-service in stato SUSPENDED
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given "PA1" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
     Given "PA1" ha già creato 1 client "CONSUMER"
     Given "PA1" ha già inserito l'utente con ruolo "admin" come membro di quel client
     Given "PA1" ha già associato la finalità a quel client
     Given un "admin" di "PA1" ha caricato una chiave pubblica nel client
+    Given "PA2" ha già sospeso quell'e-service 
     Given "PA2" ha già una nuova versione in stato DRAFT per quell'e-service
     When l'utente richiede la generazione del voucher
     Then la richiesta di generazione del Voucher non va a buon fine
@@ -156,9 +154,8 @@ Feature: Generazione del voucher richiesta da un Ente
   Scenario Outline: La generazione del Voucher fallisce per una Versione sospesa dell'EService quando esiste una Versione più recente pubblicata
     Given l'utente è un "admin" di "PA1"
     Given "PA2" ha già creato e pubblicato 1 e-service
-    Given "GSP" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given "PA2" ha già pubblicato una nuova versione per quell'e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
+    Given "PA2" ha già pubblicato una nuova versione per quell'e-service
     Given "PA1" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
     Given "PA1" ha già creato 1 client "CONSUMER"
     Given "PA1" ha già inserito l'utente con ruolo "admin" come membro di quel client

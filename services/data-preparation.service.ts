@@ -337,7 +337,7 @@ export const dataPreparationService = {
           descriptorId,
           getAuthorizationHeader(token)
         ),
-      (res) => res.data.state === "PUBLISHED"
+      (res) => res.data.state === "PUBLISHED" || res.data.state === "DEPRECATED"
     );
   },
 

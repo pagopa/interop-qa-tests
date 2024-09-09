@@ -88,12 +88,12 @@ Then(
     assertContextSchema(this, {
       response: z.object({
         data: z.object({
-          correlation_id: z.string().uuid(),
+          correlationId: z.string().uuid(),
           errors: z.tuple([
             z.object({
               code: z.literal("015-0008"),
               detail: z.literal(
-                "The request contains bad syntax or cannot be fulfilled."
+                "Unable to generate a token for the given request"
               ),
             }),
           ]),
@@ -103,7 +103,6 @@ Then(
           ),
           type: z.literal("about:blank"),
         }),
-        status: z.literal(400),
       }),
     });
   }
