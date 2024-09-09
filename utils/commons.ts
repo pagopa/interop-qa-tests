@@ -265,7 +265,7 @@ export async function requestVoucher({
   };
   try {
     const response = await axios.post(
-      "https://auth.dev.interop.pagopa.it/token.oauth2",
+      env.AUTHORIZATION_SERVER_TOKEN_CREATION_URL,
       urlSearchparams,
       { headers }
     );
