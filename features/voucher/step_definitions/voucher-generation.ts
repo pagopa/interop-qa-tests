@@ -15,15 +15,17 @@ When("l'utente richiede la generazione del voucher", async function () {
     publicKey: z.string(),
   });
 
+  const { publicKey, privateKey, clientId, purposeId } = this;
+
   const clientAssertion = createClientAssertion({
-    kid: calculateKidFromPublicKey(this.publicKey),
-    clientId: this.clientId,
-    purposeId: this.purposeId,
-    privateKey: this.privateKey,
+    kid: calculateKidFromPublicKey(publicKey),
+    clientId,
+    purposeId,
+    privateKey,
   });
 
   const result = await requestVoucher({
-    clientId: this.clientId,
+    clientId,
     clientAssertion,
   });
 
