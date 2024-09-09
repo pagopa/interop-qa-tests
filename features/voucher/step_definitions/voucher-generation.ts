@@ -35,7 +35,7 @@ Then("si ottiene la corretta generazione del voucher", async function () {
     result: z.object({
       access_token: z.string(),
       expires_in: z.number(),
-      token_type: z.string(),
+      token_type: z.literal("Bearer"),
     }),
   });
 });
