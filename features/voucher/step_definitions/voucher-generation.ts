@@ -27,9 +27,15 @@ When("l'utente richiede la generazione del voucher", async function () {
     clientAssertion,
   });
 
-  console.log(result);
+  this.result = result;
 });
 
-Then("si ottiene la corretta generazione del voucher", function () {
-  console.log("DOne");
+Then("si ottiene la corretta generazione del voucher", async function () {
+  assertContextSchema(this, {
+    result: z.object({
+      access_token: z.string(),
+      expires_in: z.number(),
+      token_type: z.string(),
+    }),
+  });
 });

@@ -253,25 +253,21 @@ export async function requestVoucher({
   clientAssertion: string;
 }) {
   const urlSearchparams = new URLSearchParams({
-    Client_id: clientId,
-    Client_assertion: clientAssertion,
-    Client_assertion_type:
+    client_id: clientId,
+    client_assertion: clientAssertion,
+    client_assertion_type:
       "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
-    Grant_type: "client_credentials",
+    grant_type: "client_credentials",
   });
 
   const headers = {
     "Content-Type": "application/x-www-form-urlencoded",
   };
-  try {
-    const response = await axios.post(
-      env.AUTHORIZATION_SERVER_TOKEN_CREATION_URL,
-      urlSearchparams,
-      { headers }
-    );
-    return response.data;
-  } catch (error) {
-    console.log(error.response.data);
-    return { data: error };
-  }
+
+  const response = await axios.post(
+    env.AUTHORIZATION_SERVER_TOKEN_CREATION_URL,
+    urlSearchparams,
+    { headers }
+  );
+  return response.data;
 }
