@@ -1,12 +1,13 @@
 import "../configs/env";
 import { createReadStream, readFileSync } from "fs";
-import crypto from "crypto";
+import crypto, { JsonWebKey, randomUUID } from "crypto";
 import { z } from "zod";
 import axios, { type AxiosResponse } from "axios";
 import {
   setParallelCanAssign,
   parallelCanAssignHelpers,
 } from "@cucumber/cucumber";
+import jwt from "jsonwebtoken";
 import { env } from "../configs/env";
 import { generateSessionTokens } from "./session-tokens";
 
@@ -120,12 +121,32 @@ export function assertValidResponse<T>(response: AxiosResponse<T>) {
   }
 }
 
-export function createBase64PublicKey(
+export function keyToBase64(key: string | Buffer, withDelimitators = true) {
+  if (withDelimitators) {
+    return Buffer.from(key).toString("base64");
+  }
+  return Buffer.from(
+    (key as string)
+      .replace("-----BEGIN RSA PUBLIC KEY-----", "")
+      .replace("-----END RSA PUBLIC KEY-----", "")
+  ).toString("base64");
+}
+
+function keyToPEM(
+  key: crypto.KeyObject,
+  keyType: "RSA" | "NON-RSA" = "RSA"
+): string | Buffer {
+  return key.export({
+    type: keyType === "RSA" ? "pkcs1" : "spki",
+    format: "pem",
+  });
+}
+
+export function createKeyPairPEM(
   keyType: "RSA" | "NON-RSA" = "RSA",
-  modulusLength = 2048,
-  withDelimitators = true
+  modulusLength = 2048
 ) {
-  const keyPair =
+  const { privateKey, publicKey } =
     keyType === "RSA"
       ? crypto.generateKeyPairSync("rsa", {
           modulusLength,
@@ -134,22 +155,20 @@ export function createBase64PublicKey(
           modulusLength,
         });
 
+  return {
+    privateKey: keyToPEM(privateKey),
+    publicKey: keyToPEM(publicKey),
+  };
+}
+
+export function createBase64PublicKey(
+  keyType: "RSA" | "NON-RSA" = "RSA",
+  modulusLength = 2048,
+  withDelimitators = true
+) {
+  const keyPair = createKeyPairPEM(keyType, modulusLength);
   const { publicKey } = keyPair;
-
-  const publicKeyPEM = publicKey.export({
-    type: keyType === "RSA" ? "pkcs1" : "spki",
-    format: "pem",
-  });
-
-  if (withDelimitators) {
-    return Buffer.from(publicKeyPEM).toString("base64");
-  }
-
-  return Buffer.from(
-    (publicKeyPEM as string)
-      .replace("-----BEGIN RSA PUBLIC KEY-----", "")
-      .replace("-----END RSA PUBLIC KEY-----", "")
-  ).toString("base64");
+  return keyToBase64(publicKey, withDelimitators);
 }
 
 export async function downloadFile(fileUrl: string): Promise<Buffer> {
@@ -178,4 +197,78 @@ export async function uploadFile(
   });
 
   assertValidResponse(response);
+}
+
+export function calculateKidFromPublicKey(publicKey: string): string {
+  const jwk = crypto.createPublicKey(publicKey).export({ format: "jwk" });
+  const sortedJwk = [...Object.keys(jwk)]
+    .sort()
+    .reduce<JsonWebKey>(
+      (prev, sortedKey) => ({ ...prev, [sortedKey]: jwk[sortedKey] }),
+      {}
+    );
+  const jwkString = JSON.stringify(sortedJwk);
+  return crypto.createHash("sha256").update(jwkString).digest("base64url");
+}
+
+export function createClientAssertion({
+  kid,
+  clientId,
+  purposeId,
+  privateKey,
+}: {
+  kid: string;
+  clientId: string;
+  purposeId: string;
+  privateKey: string;
+}): string {
+  const issuedAt = Math.round(new Date().getTime() / 1000);
+
+  const headersRsa = {
+    kid,
+    alg: "RS256",
+    typ: "JWT",
+  };
+
+  const payload = {
+    iss: clientId,
+    sub: clientId,
+    aud: env.CLIENT_ASSERTION_JWT_AUDIENCE,
+    purposeId,
+    jti: randomUUID(),
+    iat: new Date(),
+    exp: issuedAt + 43200 * 60, // 30 days
+  };
+
+  return jwt.sign(payload, privateKey, {
+    header: headersRsa,
+  });
+}
+
+export async function requestVoucher({
+  clientId,
+  clientAssertion,
+}: {
+  clientId: string;
+  clientAssertion: string;
+}) {
+  const requestBody = {
+    Client_id: clientId,
+    Client_assertion: clientAssertion,
+    Client_assertion_type:
+      "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
+    Grant_type: "client_credentials",
+  };
+
+  const headers = {
+    "Content-Type": "application/x-www-form-urlencoded",
+  };
+
+  const response = await axios.post(
+    env.AUTHORIZATION_SERVER_TOKEN_CREATION_URL,
+    requestBody,
+    { headers }
+  );
+
+  return response.data;
 }
