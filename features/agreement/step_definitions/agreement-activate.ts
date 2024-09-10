@@ -19,6 +19,8 @@ Given(
   async function (consumer: TenantType) {
     const token = await getToken(consumer);
 
+    console.log("1)tenantId: ", getOrganizationId(consumer));
+
     this.attributeId = await dataPreparationService.createAttribute(
       token,
       "VERIFIED"
@@ -34,6 +36,8 @@ Given(
     assertContextSchema(this, {
       attributeId: z.string(),
     });
+
+    console.log("2)AttributeId", this.attribteId);
 
     const token = await getToken(verifier);
     this.consumerId = getOrganizationId(consumer);
@@ -66,6 +70,8 @@ Given(
     const requiredVerifiedAttributes = this.requiredVerifiedAttributes ?? [];
 
     const token = await getToken(tenantType);
+
+    console.log("2)tenantId: ", getOrganizationId(tenantType));
 
     const { eserviceId, descriptorId } =
       await dataPreparationService.createEServiceAndDraftDescriptor(

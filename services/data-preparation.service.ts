@@ -1440,4 +1440,78 @@ export const dataPreparationService = {
       (res) => res.data.contactMail?.address === mailSeed.address
     );
   },
+  async revokeTenantAttribute(
+    token: string,
+    attributeKind: AttributeKind,
+    tenantId: string,
+    attributeId: string
+  ) {
+    switch (attributeKind) {
+      case "CERTIFIED":
+        const certifiedResponse =
+          await apiClient.tenants.revokeCertifiedAttribute(
+            tenantId,
+            attributeId,
+            getAuthorizationHeader(token)
+          );
+        assertValidResponse(certifiedResponse);
+        await makePolling(
+          () =>
+            apiClient.tenants.getCertifiedAttributes(
+              tenantId,
+              getAuthorizationHeader(token)
+            ),
+          (res) =>
+            res.data.attributes.some(
+              (attr) => attr.id === attributeId && attr.revocationTimestamp
+            )
+        );
+        break;
+
+      case "VERIFIED":
+        const verifiedResponse =
+          await apiClient.tenants.revokeVerifiedAttribute(
+            tenantId,
+            attributeId,
+            getAuthorizationHeader(token)
+          );
+        console.log(verifiedResponse.data);
+        assertValidResponse(verifiedResponse);
+        await makePolling(
+          () =>
+            apiClient.tenants.getVerifiedAttributes(
+              tenantId,
+              getAuthorizationHeader(token)
+            ),
+          (res) =>
+            res.data.attributes.some(
+              (attr) =>
+                attr.id === attributeId &&
+                attr.revokedBy.map((r) => r.revocationDate !== undefined)
+            )
+        );
+        break;
+      case "DECLARED":
+        const declaredResponse =
+          await apiClient.tenants.revokeDeclaredAttribute(
+            attributeId,
+            getAuthorizationHeader(token)
+          );
+        assertValidResponse(declaredResponse);
+        await makePolling(
+          () =>
+            apiClient.tenants.getDeclaredAttributes(
+              tenantId,
+              getAuthorizationHeader(token)
+            ),
+          (res) =>
+            res.data.attributes.some(
+              (attr) => attr.id === attributeId && attr.revocationTimestamp
+            )
+        );
+        break;
+      default:
+        break;
+    }
+  },
 };
