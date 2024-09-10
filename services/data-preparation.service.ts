@@ -1135,6 +1135,26 @@ export const dataPreparationService = {
     };
   },
 
+  async deletePurposeVersion(
+    token: string,
+    purposeId: string,
+    waitingForApprovalVersionId: string
+  ): Promise<void> {
+    const response = await apiClient.purposes.deletePurposeVersion(
+      purposeId,
+      waitingForApprovalVersionId,
+      getAuthorizationHeader(token)
+    );
+
+    assertValidResponse(response);
+
+    await makePolling(
+      () =>
+        apiClient.purposes.getPurpose(purposeId, getAuthorizationHeader(token)),
+      (res) => !res.data.waitingForApprovalVersion
+    );
+  },
+
   async rejectPurposeVersion(
     token: string,
     purposeId: string,
@@ -1268,7 +1288,8 @@ export const dataPreparationService = {
 
     await makePolling(
       () => apiClient.purposes.getPurpose(purposeId, authHeader),
-      (res) => res.data.currentVersion?.state === "ACTIVE"
+      (res) =>
+        res.data.versions.find((v) => v.id === versionId)?.state === "ACTIVE"
     );
 
     return response.data;
