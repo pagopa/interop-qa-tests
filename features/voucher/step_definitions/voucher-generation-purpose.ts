@@ -1,3 +1,4 @@
+import { randomUUID } from "crypto";
 import { Given } from "@cucumber/cucumber";
 import { z } from "zod";
 import {
@@ -62,7 +63,7 @@ Given(
 );
 
 Given(
-  "{string} ha già sospeso la finalità",
+  "{string} ha già sospeso la finalità che risulta sospesa dal fruitore",
   async function (tenantType: TenantType) {
     assertContextSchema(this, {
       purposeId: z.string(),
@@ -74,13 +75,33 @@ Given(
     await dataPreparationService.suspendPurpose(
       token,
       this.purposeId,
-      this.currentVersionId
+      this.currentVersionId,
+      "CONSUMER"
     );
   }
 );
 
 Given(
-  "{string} ha già riattivato la finalità sospesa",
+  "{string} ha già sospeso la finalità che risulta sospesa dall'erogatore",
+  async function (tenantType: TenantType) {
+    assertContextSchema(this, {
+      purposeId: z.string(),
+      currentVersionId: z.string(),
+    });
+
+    const token = await getToken(tenantType);
+
+    await dataPreparationService.suspendPurpose(
+      token,
+      this.purposeId,
+      this.currentVersionId,
+      "PROVIDER"
+    );
+  }
+);
+
+Given(
+  "{string} ha già riattivato la finalità sospesa dal fruitore",
   async function (tenantType: TenantType) {
     assertContextSchema(this, {
       purposeId: z.string(),
@@ -92,7 +113,34 @@ Given(
     await dataPreparationService.activatePurposeVersion(
       token,
       this.purposeId,
-      this.currentVersionId
+      this.currentVersionId,
+      "CONSUMER"
     );
+  }
+);
+
+Given(
+  "{string} ha già riattivato la finalità sospesa dall'erogatore",
+  async function (tenantType: TenantType) {
+    assertContextSchema(this, {
+      purposeId: z.string(),
+      currentVersionId: z.string(),
+    });
+
+    const token = await getToken(tenantType);
+
+    await dataPreparationService.activatePurposeVersion(
+      token,
+      this.purposeId,
+      this.currentVersionId,
+      "PRODUCER"
+    );
+  }
+);
+
+Given(
+  "l'utente possiede un identificativo di una purpose che non esiste",
+  function () {
+    this.purposeId = randomUUID();
   }
 );
