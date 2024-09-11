@@ -99,3 +99,55 @@ Given(
     );
   }
 );
+
+Given(
+  "{string} ha già pubblicato una nuova versione per quell'e-service con approvazione manuale",
+  async function (tenantType: TenantType) {
+    assertContextSchema(this, {
+      eserviceId: z.string(),
+    });
+    const token = await getToken(tenantType);
+
+    const descriptorId = await dataPreparationService.createNextDraftDescriptor(
+      token,
+      this.eserviceId
+    );
+
+    await dataPreparationService.updateDraftDescriptor({
+      token,
+      eserviceId: this.eserviceId,
+      descriptorId,
+      partialDescriptorSeed: { agreementApprovalPolicy: "MANUAL" },
+    });
+
+    await dataPreparationService.bringDescriptorToGivenState({
+      token,
+      eserviceId: this.eserviceId,
+      descriptorId,
+      descriptorState: "PUBLISHED",
+    });
+
+    this.nextDescriptorId = descriptorId;
+  }
+);
+
+Given(
+  "la richiesta di fruizione è stata aggiornata all'ultima versione dell'eservice ed è in stato {string}",
+  async function (state: "ACTIVE" | "PENDING" | undefined) {
+    assertContextSchema(this, {
+      token: z.string(),
+      agreementId: z.string(),
+    });
+
+    await apiClient.agreements.upgradeAgreement(
+      this.agreementId,
+      getAuthorizationHeader(this.token)
+    );
+
+    await dataPreparationService.submitAgreement(
+      this.token,
+      this.agreementId,
+      state
+    );
+  }
+);

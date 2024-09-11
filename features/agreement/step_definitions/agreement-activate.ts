@@ -37,8 +37,6 @@ Given(
       attributeId: z.string(),
     });
 
-    console.log("2)AttributeId", this.attribteId);
-
     const token = await getToken(verifier);
     this.consumerId = getOrganizationId(consumer);
     const verifierId = getOrganizationId(verifier);
@@ -70,8 +68,6 @@ Given(
     const requiredVerifiedAttributes = this.requiredVerifiedAttributes ?? [];
 
     const token = await getToken(tenantType);
-
-    console.log("2)tenantId: ", getOrganizationId(tenantType));
 
     const { eserviceId, descriptorId } =
       await dataPreparationService.createEServiceAndDraftDescriptor(
