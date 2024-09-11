@@ -2,7 +2,6 @@ import { Then, When } from "@cucumber/cucumber";
 import { z } from "zod";
 import {
   assertContextSchema,
-  calculateKidFromPublicKey,
   createClientAssertion,
   requestVoucher,
 } from "../../../utils/commons";
@@ -16,12 +15,11 @@ When("l'utente richiede la generazione del voucher", async function () {
   });
 
   const { publicKey, privateKey, clientId, purposeId } = this;
-  const kid = calculateKidFromPublicKey(publicKey);
 
   const clientAssertion = createClientAssertion({
-    kid,
     clientId,
     purposeId,
+    publicKey,
     privateKey,
   });
 
