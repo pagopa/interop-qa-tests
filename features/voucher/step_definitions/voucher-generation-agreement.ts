@@ -4,11 +4,9 @@ import { dataPreparationService } from "../../../services/data-preparation.servi
 import {
   TenantType,
   assertContextSchema,
-  getAuthorizationHeader,
   getOrganizationId,
   getToken,
 } from "../../../utils/commons";
-import { apiClient } from "../../../api";
 import { AttributeKind } from "../../../api/models";
 
 Given(
@@ -86,68 +84,17 @@ Given(
 );
 
 Given(
-  "la richiesta di fruizione è stata aggiornata all'ultima versione dell'eservice",
-  async function () {
-    assertContextSchema(this, {
-      token: z.string(),
-      agreementId: z.string(),
-    });
-
-    await apiClient.agreements.upgradeAgreement(
-      this.agreementId,
-      getAuthorizationHeader(this.token)
-    );
-  }
-);
-
-Given(
-  "{string} ha già pubblicato una nuova versione per quell'e-service con approvazione manuale",
+  "{string} ha già aggiornato la richiesta di fruizione all'ultima versione dell'eservice",
   async function (tenantType: TenantType) {
     assertContextSchema(this, {
-      eserviceId: z.string(),
-    });
-    const token = await getToken(tenantType);
-
-    const descriptorId = await dataPreparationService.createNextDraftDescriptor(
-      token,
-      this.eserviceId
-    );
-
-    await dataPreparationService.updateDraftDescriptor({
-      token,
-      eserviceId: this.eserviceId,
-      descriptorId,
-      partialDescriptorSeed: { agreementApprovalPolicy: "MANUAL" },
-    });
-
-    await dataPreparationService.bringDescriptorToGivenState({
-      token,
-      eserviceId: this.eserviceId,
-      descriptorId,
-      descriptorState: "PUBLISHED",
-    });
-
-    this.nextDescriptorId = descriptorId;
-  }
-);
-
-Given(
-  "la richiesta di fruizione è stata aggiornata all'ultima versione dell'eservice ed è in stato {string}",
-  async function (state: "ACTIVE" | "PENDING" | undefined) {
-    assertContextSchema(this, {
-      token: z.string(),
       agreementId: z.string(),
     });
 
-    await apiClient.agreements.upgradeAgreement(
-      this.agreementId,
-      getAuthorizationHeader(this.token)
-    );
+    const token = await getToken(tenantType);
 
-    await dataPreparationService.submitAgreement(
-      this.token,
-      this.agreementId,
-      state
+    this.agreementId = await dataPreparationService.upgradeAgreement(
+      token,
+      this.agreementId
     );
   }
 );

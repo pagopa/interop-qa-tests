@@ -111,11 +111,11 @@ Scenario Outline: La generazione del Voucher va a buon fine quando la richiesta 
     Given "PA1" ha già associato la finalità a quel client
     Given un "admin" di "PA1" ha caricato una chiave pubblica nel client
     Given "PA2" ha già pubblicato una nuova versione per quell'e-service
-    Given la richiesta di fruizione è stata aggiornata all'ultima versione dell'eservice
+    Given "PA1" ha già aggiornato la richiesta di fruizione all'ultima versione dell'eservice
     When l'utente richiede la generazione del voucher
     Then si ottiene la corretta generazione del voucher
 
-@voucher_generation_agreement8
+@voucher_generation_agreement8 @waiting_for_clarification
 Scenario Outline: La generazione del Voucher va a buon fine quando la richiesta di fruizione attiva subisce un upgrade verso una Versione dell’EService più recente, e la richiesta rimane in attesa di approvazione
     Given l'utente è un "admin" di "PA1"
     Given "PA2" ha già creato e pubblicato 1 e-service
@@ -125,12 +125,12 @@ Scenario Outline: La generazione del Voucher va a buon fine quando la richiesta 
     Given "PA1" ha già inserito l'utente con ruolo "admin" come membro di quel client
     Given "PA1" ha già associato la finalità a quel client
     Given un "admin" di "PA1" ha caricato una chiave pubblica nel client
-    Given "PA2" ha già pubblicato una nuova versione per quell'e-service con approvazione manuale
-    Given la richiesta di fruizione è stata aggiornata all'ultima versione dell'eservice ed è in stato "PENDING"
+    Given "PA2" ha già pubblicato una nuova versione per quell'e-service
+    Given "PA1" ha già aggiornato la richiesta di fruizione all'ultima versione dell'eservice
     When l'utente richiede la generazione del voucher
     Then si ottiene la corretta generazione del voucher
 
-@voucher_generation_agreement9
+@voucher_generation_agreement9 @waiting_for_clarification
 Scenario Outline: La generazione del Voucher va a buon fine quando la richiesta di fruizione attiva subisce un upgrade verso una Versione dell’EService più recente, e la richiesta passa in attesa di approvazione e poi approvata dall’erogatore
     Given l'utente è un "admin" di "PA1"
     Given "PA2" ha già creato e pubblicato 1 e-service
@@ -146,7 +146,7 @@ Scenario Outline: La generazione del Voucher va a buon fine quando la richiesta 
     When l'utente richiede la generazione del voucher
     Then si ottiene la corretta generazione del voucher
 
-@voucher_generation_agreement10
+@voucher_generation_agreement10 @waiting_for_clarification
 Scenario Outline: La generazione del Voucher va a buon fine quando la richiesta di fruizione attiva subisce un upgrade verso una Versione dell’EService più recente, e la richiesta passa in attesa di approvazione e poi rifiutata dall’erogatore
     Given l'utente è un "admin" di "PA1"
     Given "PA2" ha già creato e pubblicato 1 e-service
@@ -167,7 +167,7 @@ Scenario Outline: La generazione del Voucher va a buon fine quando la richiesta 
 Scenario Outline: La generazione del Voucher fallisce quando la richiesta di fruizione è sospesa dall’erogatore
     Given l'utente è un "admin" di "PA1"
     Given "PA2" ha già creato e pubblicato 1 e-service
-    Given "PA1" ha una richiesta di fruizione in stato "SUSPENDED" per quell'e-service
+    Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given "PA1" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
     Given "PA1" ha già creato 1 client "CONSUMER"
     Given "PA1" ha già inserito l'utente con ruolo "admin" come membro di quel client

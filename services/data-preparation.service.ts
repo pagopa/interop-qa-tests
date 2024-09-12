@@ -367,6 +367,28 @@ export const dataPreparationService = {
     return agreementId;
   },
 
+  async upgradeAgreement(token: string, agreementId: string): Promise<string> {
+    const response = await apiClient.agreements.upgradeAgreement(
+      agreementId,
+      getAuthorizationHeader(token)
+    );
+
+    assertValidResponse(response);
+
+    const newAgreementId = response.data.id;
+
+    await makePolling(
+      () =>
+        apiClient.agreements.getAgreementById(
+          newAgreementId,
+          getAuthorizationHeader(token)
+        ),
+      (res) => res.status === 200
+    );
+
+    return newAgreementId;
+  },
+
   async createAgreementWithGivenState(
     token: string,
     agreementState: AgreementState,
