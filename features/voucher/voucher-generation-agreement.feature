@@ -64,20 +64,23 @@ Scenario Outline: La generazione del Voucher va a buon fine quando il fruitore p
     When l'utente richiede la generazione del voucher
     Then si ottiene la corretta generazione del voucher
 
-@voucher_generation_agreement5 @da_controllare
+@voucher_generation_agreement5
 Scenario Outline: La generazione del Voucher va a buon fine quando il fruitore perde e poi riottiene un attributo verificato necessario all’utilizzo dell’EService
     Given l'utente è un "admin" di "PA1"
     Given "PA1" ha già creato un attributo verificato
     Given "GSP" ha già creato un e-service in stato "PUBLISHED" che richiede quegli attributi con approvazione "AUTOMATIC"
+    Given "PA1" ha una richiesta di fruizione in stato "PENDING" per quell'e-service
     Given "GSP" ha già verificato l'attributo verificato a "PA1"
-    Given "GSP" ha già revocato quell'attributo "VERIFIED" a "PA1"
-    Given "GSP" ha già assegnato nuovamente quell'attributo "VERIFIED" a "PA1"
-    Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
+    Given "GSP" ha già approvato quella richiesta di fruizione
     Given "PA1" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
     Given "PA1" ha già creato 1 client "CONSUMER"
     Given "PA1" ha già inserito l'utente con ruolo "admin" come membro di quel client
     Given "PA1" ha già associato la finalità a quel client
     Given un "admin" di "PA1" ha caricato una chiave pubblica nel client
+    Given "GSP" ha già revocato quell'attributo "VERIFIED" a "PA1"
+    Given la richiesta di fruizione è passata in stato "SUSPENDED"
+    Given "GSP" ha già verificato l'attributo verificato a "PA1"
+    Given la richiesta di fruizione è passata in stato "ACTIVE"
     When l'utente richiede la generazione del voucher
     Then si ottiene la corretta generazione del voucher
 

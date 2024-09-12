@@ -869,6 +869,7 @@ export const dataPreparationService = {
     );
 
     assertValidResponse(response);
+
     await makePolling(
       () =>
         apiClient.tenants.getVerifiedAttributes(
@@ -879,8 +880,7 @@ export const dataPreparationService = {
         res.data.attributes.some(
           (attr) =>
             attr.id === attributeId &&
-            attr.verifiedBy.some((verifier) => verifier.id === verifierId) &&
-            !attr.revokedBy.some((revoker) => revoker.id === verifierId)
+            attr.verifiedBy.some((verifier) => verifier.id === verifierId)
         )
     );
   },

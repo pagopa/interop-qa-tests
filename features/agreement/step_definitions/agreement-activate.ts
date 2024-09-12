@@ -19,8 +19,6 @@ Given(
   async function (consumer: TenantType) {
     const token = await getToken(consumer);
 
-    console.log("1)tenantId: ", getOrganizationId(consumer));
-
     this.attributeId = await dataPreparationService.createAttribute(
       token,
       "VERIFIED"
