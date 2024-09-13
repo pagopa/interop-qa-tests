@@ -98,3 +98,19 @@ Given(
     );
   }
 );
+
+Given(
+  "{string} ha già archiviato quella richiesta di fruizione",
+  async function (tenantType: TenantType) {
+    assertContextSchema(this, {
+      agreementId: z.string(),
+    });
+
+    const token = await getToken(tenantType);
+
+    this.response = await dataPreparationService.archiveAgreement(
+      token,
+      this.agreementId
+    );
+  }
+);

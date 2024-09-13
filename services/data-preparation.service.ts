@@ -1497,7 +1497,6 @@ export const dataPreparationService = {
             attributeId,
             getAuthorizationHeader(token)
           );
-        console.log(verifiedResponse.data);
         assertValidResponse(verifiedResponse);
         await makePolling(
           () =>
