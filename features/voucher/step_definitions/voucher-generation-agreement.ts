@@ -4,11 +4,9 @@ import { dataPreparationService } from "../../../services/data-preparation.servi
 import {
   TenantType,
   assertContextSchema,
-  getAuthorizationHeader,
   getOrganizationId,
   getToken,
 } from "../../../utils/commons";
-import { apiClient } from "../../../api";
 import { AttributeKind } from "../../../api/models";
 
 Given(
@@ -86,16 +84,33 @@ Given(
 );
 
 Given(
-  "la richiesta di fruizione è stata aggiornata all'ultima versione dell'eservice",
-  async function () {
+  "{string} ha già aggiornato la richiesta di fruizione all'ultima versione dell'eservice",
+  async function (tenantType: TenantType) {
     assertContextSchema(this, {
-      token: z.string(),
       agreementId: z.string(),
     });
 
-    await apiClient.agreements.upgradeAgreement(
-      this.agreementId,
-      getAuthorizationHeader(this.token)
+    const token = await getToken(tenantType);
+
+    this.agreementId = await dataPreparationService.upgradeAgreement(
+      token,
+      this.agreementId
+    );
+  }
+);
+
+Given(
+  "{string} ha già archiviato quella richiesta di fruizione",
+  async function (tenantType: TenantType) {
+    assertContextSchema(this, {
+      agreementId: z.string(),
+    });
+
+    const token = await getToken(tenantType);
+
+    this.response = await dataPreparationService.archiveAgreement(
+      token,
+      this.agreementId
     );
   }
 );

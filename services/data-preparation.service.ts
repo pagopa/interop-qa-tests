@@ -367,6 +367,28 @@ export const dataPreparationService = {
     return agreementId;
   },
 
+  async upgradeAgreement(token: string, agreementId: string): Promise<string> {
+    const response = await apiClient.agreements.upgradeAgreement(
+      agreementId,
+      getAuthorizationHeader(token)
+    );
+
+    assertValidResponse(response);
+
+    const newAgreementId = response.data.id;
+
+    await makePolling(
+      () =>
+        apiClient.agreements.getAgreementById(
+          newAgreementId,
+          getAuthorizationHeader(token)
+        ),
+      (res) => res.status === 200
+    );
+
+    return newAgreementId;
+  },
+
   async createAgreementWithGivenState(
     token: string,
     agreementState: AgreementState,
@@ -869,6 +891,7 @@ export const dataPreparationService = {
     );
 
     assertValidResponse(response);
+
     await makePolling(
       () =>
         apiClient.tenants.getVerifiedAttributes(
@@ -879,8 +902,7 @@ export const dataPreparationService = {
         res.data.attributes.some(
           (attr) =>
             attr.id === attributeId &&
-            attr.verifiedBy.some((verifier) => verifier.id === verifierId) &&
-            !attr.revokedBy.some((revoker) => revoker.id === verifierId)
+            attr.verifiedBy.some((verifier) => verifier.id === verifierId)
         )
     );
   },
@@ -1524,7 +1546,6 @@ export const dataPreparationService = {
             attributeId,
             getAuthorizationHeader(token)
           );
-        console.log(verifiedResponse.data);
         assertValidResponse(verifiedResponse);
         await makePolling(
           () =>
