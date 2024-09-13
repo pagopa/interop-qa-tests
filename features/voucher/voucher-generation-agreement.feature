@@ -256,7 +256,7 @@ Scenario Outline: La generazione del Voucher fallisce quando il fruitore perde u
     When l'utente richiede la generazione del voucher
     Then la richiesta di generazione del Voucher non va a buon fine
 
-@voucher_generation_agreement17 @waiting_for_clarification
+@voucher_generation_agreement17
 Scenario Outline: La generazione del Voucher fallisce quando il fruitore perde un attributo dichiarato necessario all’utilizzo dell’EService
     Given l'utente è un "admin" di "PA1"
     Given "PA1" ha già dichiarato un attributo
@@ -268,6 +268,7 @@ Scenario Outline: La generazione del Voucher fallisce quando il fruitore perde u
     Given "PA1" ha già associato la finalità a quel client
     Given un "admin" di "PA1" ha caricato una chiave pubblica nel client
     Given "PA1" ha già revocato quell'attributo "DECLARED" a "PA1"
+    Given la richiesta di fruizione è passata in stato "SUSPENDED"
     When l'utente richiede la generazione del voucher
     Then la richiesta di generazione del Voucher non va a buon fine
 
