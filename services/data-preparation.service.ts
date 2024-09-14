@@ -1584,4 +1584,57 @@ export const dataPreparationService = {
         break;
     }
   },
+
+  async deleteClientKeyById(token: string, clientId: string, keyId: string) {
+    const response = await apiClient.clients.deleteClientKeyById(
+      clientId,
+      keyId,
+      getAuthorizationHeader(token)
+    );
+
+    assertValidResponse(response);
+
+    await makePolling(
+      () =>
+        apiClient.clients.getClientKeyById(
+          clientId,
+          keyId,
+          getAuthorizationHeader(token)
+        ),
+      (res) => res.data.keyId !== keyId
+    );
+    return response.data;
+  },
+
+  async deletePurpose(token: string, purposeId: string) {
+    const response = await apiClient.purposes.deletePurpose(
+      purposeId,
+      getAuthorizationHeader(token)
+    );
+
+    assertValidResponse(response);
+
+    await makePolling(
+      () =>
+        apiClient.purposes.getPurpose(purposeId, getAuthorizationHeader(token)),
+      (res) => res.data.id !== purposeId
+    );
+    return response.data;
+  },
+
+  async deleteClient(token: string, clientId: string) {
+    const response = await apiClient.clients.deleteClient(
+      clientId,
+      getAuthorizationHeader(token)
+    );
+
+    assertValidResponse(response);
+
+    await makePolling(
+      () =>
+        apiClient.clients.getClient(clientId, getAuthorizationHeader(token)),
+      (res) => res.data.id !== clientId
+    );
+    return response.data;
+  },
 };
