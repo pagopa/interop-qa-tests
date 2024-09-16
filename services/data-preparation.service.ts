@@ -1637,4 +1637,24 @@ export const dataPreparationService = {
     );
     return response.data;
   },
+
+  async deletePurposeFromClient(
+    token: string,
+    clientId: string,
+    purposeId: string
+  ) {
+    const response = await apiClient.clients.removeClientPurpose(
+      clientId,
+      purposeId,
+      getAuthorizationHeader(token)
+    );
+
+    assertValidResponse(response);
+
+    await makePolling(
+      () =>
+        apiClient.clients.getClient(clientId, getAuthorizationHeader(token)),
+      (res) => !res.data.purposes.some((p) => p.purposeId === purposeId)
+    );
+  },
 };

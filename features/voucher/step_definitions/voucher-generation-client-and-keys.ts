@@ -1,3 +1,4 @@
+import { randomUUID } from "crypto";
 import { Given } from "@cucumber/cucumber";
 import { z } from "zod";
 import {
@@ -11,7 +12,6 @@ import {
   TenantType,
 } from "../../../utils/commons";
 import { dataPreparationService } from "../../../services/data-preparation.service";
-import { PurposeVersionState } from "../../../api/models";
 
 Given(
   "{string} rimuove quella nuova chiave dal client",
@@ -21,13 +21,30 @@ Given(
       newKeyId: z.string(),
     });
 
-    console.log(this.newKeyId);
     const token = await getToken(tenantType);
 
     await dataPreparationService.deleteClientKeyById(
+      token,
       this.clientId,
-      this.newKeyId,
-      token
+      this.newKeyId
+    );
+  }
+);
+
+Given(
+  "{string} rimuove quella chiave dal client",
+  async function (tenantType: TenantType) {
+    assertContextSchema(this, {
+      clientId: z.string(),
+      keyId: z.string(),
+    });
+
+    const token = await getToken(tenantType);
+
+    await dataPreparationService.deleteClientKeyById(
+      token,
+      this.clientId,
+      this.keyId
     );
   }
 );
@@ -36,12 +53,35 @@ Given(
   "{string} rimuove quella nuova finalità dal client",
   async function (tenantType: TenantType) {
     assertContextSchema(this, {
+      clientId: z.string(),
       newPurposeId: z.string(),
     });
 
     const token = await getToken(tenantType);
 
-    await dataPreparationService.deletePurpose(this.newPurposeId, token);
+    await dataPreparationService.deletePurposeFromClient(
+      token,
+      this.clientId,
+      this.newPurposeId
+    );
+  }
+);
+
+Given(
+  "{string} rimuove quella finalità dal client",
+  async function (tenantType: TenantType) {
+    assertContextSchema(this, {
+      clientId: z.string(),
+      purposeId: z.string(),
+    });
+
+    const token = await getToken(tenantType);
+
+    await dataPreparationService.deletePurposeFromClient(
+      token,
+      this.clientId,
+      this.purposeId
+    );
   }
 );
 
@@ -52,7 +92,7 @@ Given("{string} cancella quel client", async function (tenantType: TenantType) {
 
   const token = await getToken(tenantType);
 
-  await dataPreparationService.deleteClient(this.clientId, token);
+  await dataPreparationService.deleteClient(token, this.clientId);
 });
 
 Given(
@@ -60,19 +100,11 @@ Given(
   async function (role: Role, tenantType: TenantType) {
     assertContextSchema(this, {
       clientId: z.string(),
-      keyId: z.string(),
     });
-
-    console.log("keyId", this.keyId);
 
     const token = await getToken(tenantType, role);
 
-    const { privateKey, publicKey } = createKeyPairPEM();
-
-    this.newPrivateKey = privateKey;
-    this.newPublicKey = publicKey;
-
-    this.newKey = keyToBase64(publicKey);
+    const { publicKey } = createKeyPairPEM();
 
     this.newKeyId = await dataPreparationService.addPublicKeyToClient(
       token,
@@ -81,20 +113,31 @@ Given(
         use: "SIG",
         alg: "RS256",
         name: `newKey-${this.TEST_SEED}-${getRandomInt()}`,
-        key: this.newKey,
+        key: keyToBase64(publicKey),
       }
     );
-    console.log("newKeyId", this.newKeyId);
   }
 );
 
 Given(
-  "{string} ha già creato {int} nuov(a)(e) finalità in stato {string} per quell'eservice",
-  async function (
-    tenantType: TenantType,
-    n: number,
-    purposeState: PurposeVersionState
-  ) {
+  "{string} ha già creato una nuova chiave pubblica senza associarla al client",
+  async function (_tenantType: TenantType) {
+    assertContextSchema(this, {
+      clientId: z.string(),
+    });
+
+    const { publicKey, privateKey } = createKeyPairPEM();
+
+    this.publicKey = publicKey;
+    this.privateKey = privateKey;
+
+    this.keyId = randomUUID();
+  }
+);
+
+Given(
+  "{string} ha già creato una nuova finalità attiva per quell'eservice",
+  async function (tenantType: TenantType) {
     assertContextSchema(this, {
       eserviceId: z.string(),
     });
@@ -106,34 +149,20 @@ Given(
       tenantType,
     });
 
-    this.newPurposesIds = this.newPurposesIds || [];
-    this.newCurrentVersionIds = this.newCurrentVersionIds || [];
-    this.neWaitingForApprovalVersionIds =
-      this.neWaitingForApprovalVersionIds || [];
-    for (let index = 0; index < n; index++) {
-      const { purposeId, currentVersionId, waitingForApprovalVersionId } =
-        await dataPreparationService.createPurposeWithGivenState({
-          token,
-          testSeed: this.TEST_SEED,
-          eserviceMode: "DELIVER",
-          payload: {
-            eserviceId: this.eserviceId,
-            consumerId,
-            riskAnalysisForm,
-          },
-          purposeState,
-        });
-      this.newPurposesIds.push(purposeId);
-      this.newCurrentVersionIds.push(currentVersionId);
-      this.neWaitingForApprovalVersionIds.push(waitingForApprovalVersionId);
-    }
-    this.newPurposeId = this.newPurposesIds[this.newPurposesIds.length - 1];
-    this.newCurrentVersionId =
-      this.newCurrentVersionIds[this.newCurrentVersionIds.length - 1];
-    this.neWaitingForApprovalVersionId =
-      this.neWaitingForApprovalVersionIds[
-        this.neWaitingForApprovalVersionIds.length - 1
-      ];
+    const { purposeId } =
+      await dataPreparationService.createPurposeWithGivenState({
+        token,
+        testSeed: this.TEST_SEED,
+        eserviceMode: "DELIVER",
+        payload: {
+          eserviceId: this.eserviceId,
+          consumerId,
+          riskAnalysisForm,
+        },
+        purposeState: "ACTIVE",
+      });
+
+    this.newPurposeId = purposeId;
   }
 );
 
