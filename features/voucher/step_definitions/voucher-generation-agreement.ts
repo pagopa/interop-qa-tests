@@ -114,3 +114,54 @@ Given(
     );
   }
 );
+
+Given(
+  "{string} ha già pubblicato una nuova versione per quell'e-service che richiede quell'attributo verificato",
+  async function (tenantType: TenantType) {
+    assertContextSchema(this, {
+      eserviceId: z.string(),
+      attributeId: z.string(),
+    });
+    const token = await getToken(tenantType);
+
+    this.descriptorId = await dataPreparationService.createNextDraftDescriptor(
+      token,
+      this.eserviceId
+    );
+
+    await dataPreparationService.updateDraftDescriptor({
+      token,
+      eserviceId: this.eserviceId,
+      descriptorId: this.descriptorId,
+      partialDescriptorSeed: {
+        attributes: {
+          certified: [],
+          declared: [],
+          verified: [
+            [{ id: this.attributeId, explicitAttributeVerification: true }],
+          ],
+        },
+      },
+    });
+
+    await dataPreparationService.bringDescriptorToGivenState({
+      token,
+      eserviceId: this.eserviceId,
+      descriptorId: this.descriptorId,
+      descriptorState: "PUBLISHED",
+    });
+  }
+);
+
+Given(
+  "{string} approva quella richiesta di fruizione",
+  async function (tenantType: TenantType) {
+    assertContextSchema(this, {
+      agreementId: z.string(),
+    });
+
+    const token = await getToken(tenantType);
+
+    await dataPreparationService.activateAgreement(token, this.agreementId);
+  }
+);
