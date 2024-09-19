@@ -367,6 +367,28 @@ export const dataPreparationService = {
     return agreementId;
   },
 
+  async upgradeAgreement(token: string, agreementId: string): Promise<string> {
+    const response = await apiClient.agreements.upgradeAgreement(
+      agreementId,
+      getAuthorizationHeader(token)
+    );
+
+    assertValidResponse(response);
+
+    const newAgreementId = response.data.id;
+
+    await makePolling(
+      () =>
+        apiClient.agreements.getAgreementById(
+          newAgreementId,
+          getAuthorizationHeader(token)
+        ),
+      (res) => res.status === 200
+    );
+
+    return newAgreementId;
+  },
+
   async createAgreementWithGivenState(
     token: string,
     agreementState: AgreementState,
@@ -869,6 +891,7 @@ export const dataPreparationService = {
     );
 
     assertValidResponse(response);
+
     await makePolling(
       () =>
         apiClient.tenants.getVerifiedAttributes(
@@ -879,8 +902,7 @@ export const dataPreparationService = {
         res.data.attributes.some(
           (attr) =>
             attr.id === attributeId &&
-            attr.verifiedBy.some((verifier) => verifier.id === verifierId) &&
-            !attr.revokedBy.some((revoker) => revoker.id === verifierId)
+            attr.verifiedBy.some((verifier) => verifier.id === verifierId)
         )
     );
   },
@@ -1135,6 +1157,26 @@ export const dataPreparationService = {
     };
   },
 
+  async deletePurposeVersion(
+    token: string,
+    purposeId: string,
+    waitingForApprovalVersionId: string
+  ): Promise<void> {
+    const response = await apiClient.purposes.deletePurposeVersion(
+      purposeId,
+      waitingForApprovalVersionId,
+      getAuthorizationHeader(token)
+    );
+
+    assertValidResponse(response);
+
+    await makePolling(
+      () =>
+        apiClient.purposes.getPurpose(purposeId, getAuthorizationHeader(token)),
+      (res) => !res.data.waitingForApprovalVersion
+    );
+  },
+
   async rejectPurposeVersion(
     token: string,
     purposeId: string,
@@ -1176,7 +1218,12 @@ export const dataPreparationService = {
     return response.data;
   },
 
-  async suspendPurpose(token: string, purposeId: string, versionId: string) {
+  async suspendPurpose(
+    token: string,
+    purposeId: string,
+    versionId: string,
+    checkSuspendedBy?: "CONSUMER" | "PROVIDER"
+  ) {
     const response = await apiClient.purposes.suspendPurposeVersion(
       purposeId,
       versionId,
@@ -1188,7 +1235,18 @@ export const dataPreparationService = {
     await makePolling(
       () =>
         apiClient.purposes.getPurpose(purposeId, getAuthorizationHeader(token)),
-      (res) => res.data.currentVersion?.state === "SUSPENDED"
+      (res) => {
+        const isSuspended = res.data.currentVersion?.state === "SUSPENDED";
+        if (!checkSuspendedBy) {
+          return isSuspended;
+        }
+        switch (checkSuspendedBy) {
+          case "CONSUMER":
+            return Boolean(res.data.suspendedByConsumer);
+          case "PROVIDER":
+            return Boolean(res.data.suspendedByProducer);
+        }
+      }
     );
     return response.data;
   },
@@ -1254,7 +1312,8 @@ export const dataPreparationService = {
   async activatePurposeVersion(
     token: string,
     purposeId: string,
-    versionId: string
+    versionId: string,
+    checkNotSuspendedBy?: "CONSUMER" | "PRODUCER"
   ) {
     const authHeader = getAuthorizationHeader(token);
 
@@ -1268,7 +1327,19 @@ export const dataPreparationService = {
 
     await makePolling(
       () => apiClient.purposes.getPurpose(purposeId, authHeader),
-      (res) => res.data.currentVersion?.state === "ACTIVE"
+      (res) => {
+        const isActive =
+          res.data.versions.find((v) => v.id === versionId)?.state === "ACTIVE";
+        if (!checkNotSuspendedBy) {
+          return isActive;
+        }
+        switch (checkNotSuspendedBy) {
+          case "CONSUMER":
+            return !res.data.suspendedByConsumer;
+          case "PRODUCER":
+            return !res.data.suspendedByProducer;
+        }
+      }
     );
 
     return response.data;
@@ -1438,6 +1509,152 @@ export const dataPreparationService = {
       () =>
         apiClient.tenants.getTenant(tenantId, getAuthorizationHeader(token)),
       (res) => res.data.contactMail?.address === mailSeed.address
+    );
+  },
+  async revokeTenantAttribute(
+    token: string,
+    attributeKind: AttributeKind,
+    tenantId: string,
+    attributeId: string
+  ) {
+    switch (attributeKind) {
+      case "CERTIFIED":
+        const certifiedResponse =
+          await apiClient.tenants.revokeCertifiedAttribute(
+            tenantId,
+            attributeId,
+            getAuthorizationHeader(token)
+          );
+        assertValidResponse(certifiedResponse);
+        await makePolling(
+          () =>
+            apiClient.tenants.getCertifiedAttributes(
+              tenantId,
+              getAuthorizationHeader(token)
+            ),
+          (res) =>
+            res.data.attributes.some(
+              (attr) => attr.id === attributeId && attr.revocationTimestamp
+            )
+        );
+        break;
+
+      case "VERIFIED":
+        const verifiedResponse =
+          await apiClient.tenants.revokeVerifiedAttribute(
+            tenantId,
+            attributeId,
+            getAuthorizationHeader(token)
+          );
+        assertValidResponse(verifiedResponse);
+        await makePolling(
+          () =>
+            apiClient.tenants.getVerifiedAttributes(
+              tenantId,
+              getAuthorizationHeader(token)
+            ),
+          (res) =>
+            res.data.attributes.some(
+              (attr) =>
+                attr.id === attributeId &&
+                attr.revokedBy.map((r) => r.revocationDate !== undefined)
+            )
+        );
+        break;
+      case "DECLARED":
+        const declaredResponse =
+          await apiClient.tenants.revokeDeclaredAttribute(
+            attributeId,
+            getAuthorizationHeader(token)
+          );
+        assertValidResponse(declaredResponse);
+        await makePolling(
+          () =>
+            apiClient.tenants.getDeclaredAttributes(
+              tenantId,
+              getAuthorizationHeader(token)
+            ),
+          (res) =>
+            res.data.attributes.some(
+              (attr) => attr.id === attributeId && attr.revocationTimestamp
+            )
+        );
+        break;
+      default:
+        break;
+    }
+  },
+
+  async deleteClientKeyById(token: string, clientId: string, keyId: string) {
+    const response = await apiClient.clients.deleteClientKeyById(
+      clientId,
+      keyId,
+      getAuthorizationHeader(token)
+    );
+
+    assertValidResponse(response);
+
+    await makePolling(
+      () =>
+        apiClient.clients.getClientKeyById(
+          clientId,
+          keyId,
+          getAuthorizationHeader(token)
+        ),
+      (res) => res.data.keyId !== keyId
+    );
+    return response.data;
+  },
+
+  async deletePurpose(token: string, purposeId: string) {
+    const response = await apiClient.purposes.deletePurpose(
+      purposeId,
+      getAuthorizationHeader(token)
+    );
+
+    assertValidResponse(response);
+
+    await makePolling(
+      () =>
+        apiClient.purposes.getPurpose(purposeId, getAuthorizationHeader(token)),
+      (res) => res.data.id !== purposeId
+    );
+    return response.data;
+  },
+
+  async deleteClient(token: string, clientId: string) {
+    const response = await apiClient.clients.deleteClient(
+      clientId,
+      getAuthorizationHeader(token)
+    );
+
+    assertValidResponse(response);
+
+    await makePolling(
+      () =>
+        apiClient.clients.getClient(clientId, getAuthorizationHeader(token)),
+      (res) => res.data.id !== clientId
+    );
+    return response.data;
+  },
+
+  async deletePurposeFromClient(
+    token: string,
+    clientId: string,
+    purposeId: string
+  ) {
+    const response = await apiClient.clients.removeClientPurpose(
+      clientId,
+      purposeId,
+      getAuthorizationHeader(token)
+    );
+
+    assertValidResponse(response);
+
+    await makePolling(
+      () =>
+        apiClient.clients.getClient(clientId, getAuthorizationHeader(token)),
+      (res) => !res.data.purposes.some((p) => p.purposeId === purposeId)
     );
   },
 };
