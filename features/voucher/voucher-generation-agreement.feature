@@ -115,50 +115,60 @@ Scenario Outline: La generazione del Voucher va a buon fine quando la richiesta 
     When l'utente richiede la generazione del voucher
     Then si ottiene la corretta generazione del voucher
 
-@voucher_generation_agreement8 @waiting_for_clarification
+@voucher_generation_agreement8 @waiting_for_clarification @TEST
 Scenario Outline: La generazione del Voucher va a buon fine quando la richiesta di fruizione attiva subisce un upgrade verso una Versione dell’EService più recente, e la richiesta rimane in attesa di approvazione
     Given l'utente è un "admin" di "PA1"
-    Given "PA2" ha già creato e pubblicato 1 e-service
+    Given "GSP" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given "PA1" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
     Given "PA1" ha già creato 1 client "CONSUMER"
     Given "PA1" ha già inserito l'utente con ruolo "admin" come membro di quel client
     Given "PA1" ha già associato la finalità a quel client
     Given un "admin" di "PA1" ha caricato una chiave pubblica nel client
-    Given "PA2" ha già pubblicato una nuova versione per quell'e-service
+    Given "PA1" ha già creato un attributo verificato
+    Given "PA2" ha già pubblicato una nuova versione per quell'e-service che richiede quell'attributo verificato
     Given "PA1" ha già aggiornato la richiesta di fruizione all'ultima versione dell'eservice
+    Given la richiesta di fruizione è passata in stato "PENDING"
     When l'utente richiede la generazione del voucher
     Then si ottiene la corretta generazione del voucher
 
-@voucher_generation_agreement9 @waiting_for_clarification
+@voucher_generation_agreement9 @waiting_for_clarification @TEST
 Scenario Outline: La generazione del Voucher va a buon fine quando la richiesta di fruizione attiva subisce un upgrade verso una Versione dell’EService più recente, e la richiesta passa in attesa di approvazione e poi approvata dall’erogatore
     Given l'utente è un "admin" di "PA1"
-    Given "PA2" ha già creato e pubblicato 1 e-service
+    Given "PA2" ha già creato un e-service in stato "PUBLISHED" con approvazione "MANUAL"
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given "PA1" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
     Given "PA1" ha già creato 1 client "CONSUMER"
     Given "PA1" ha già inserito l'utente con ruolo "admin" come membro di quel client
     Given "PA1" ha già associato la finalità a quel client
     Given un "admin" di "PA1" ha caricato una chiave pubblica nel client
-    Given "PA2" ha già pubblicato una nuova versione per quell'e-service con approvazione manuale
-    Given la richiesta di fruizione è stata aggiornata all'ultima versione dell'eservice ed è in stato "PENDING"
-    Given "PA2" ha già approvato quella richiesta di fruizione
+    Given "PA1" ha già creato un attributo verificato
+    Given "PA2" ha già pubblicato una nuova versione per quell'e-service che richiede quell'attributo verificato
+    Given "PA1" ha già aggiornato la richiesta di fruizione all'ultima versione dell'eservice
+    Given la richiesta di fruizione è passata in stato "PENDING"
+    Given "GSP" ha già verificato l'attributo verificato a "PA1"
+    Given "PA2" approva quella richiesta di fruizione
+    Given la richiesta di fruizione è passata in stato "ACTIVE"
     When l'utente richiede la generazione del voucher
     Then si ottiene la corretta generazione del voucher
 
-@voucher_generation_agreement10 @waiting_for_clarification
+@voucher_generation_agreement10 @waiting_for_clarification @TEST
 Scenario Outline: La generazione del Voucher va a buon fine quando la richiesta di fruizione attiva subisce un upgrade verso una Versione dell’EService più recente, e la richiesta passa in attesa di approvazione e poi rifiutata dall’erogatore
-    Given l'utente è un "admin" di "PA1"
-    Given "PA2" ha già creato e pubblicato 1 e-service
+       Given l'utente è un "admin" di "PA1"
+    Given "PA2" ha già creato un e-service in stato "PUBLISHED" con approvazione "MANUAL"
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given "PA1" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
     Given "PA1" ha già creato 1 client "CONSUMER"
     Given "PA1" ha già inserito l'utente con ruolo "admin" come membro di quel client
     Given "PA1" ha già associato la finalità a quel client
     Given un "admin" di "PA1" ha caricato una chiave pubblica nel client
-    Given "PA2" ha già pubblicato una nuova versione per quell'e-service con approvazione manuale
-    Given la richiesta di fruizione è stata aggiornata all'ultima versione dell'eservice ed è in stato "PENDING"
+    Given "PA1" ha già creato un attributo verificato
+    Given "PA2" ha già pubblicato una nuova versione per quell'e-service che richiede quell'attributo verificato
+    Given "PA1" ha già aggiornato la richiesta di fruizione all'ultima versione dell'eservice
+    Given la richiesta di fruizione è passata in stato "PENDING"
+    Given "GSP" ha già verificato l'attributo verificato a "PA1"
     Given "PA2" ha già rifiutato quella richiesta di fruizione
+    Given la richiesta di fruizione è passata in stato "ACTIVE"
     When l'utente richiede la generazione del voucher
     Then si ottiene la corretta generazione del voucher
 
@@ -191,7 +201,22 @@ Scenario Outline: La generazione del Voucher fallisce quando la richiesta di fru
     When l'utente richiede la generazione del voucher
     Then la richiesta di generazione del Voucher non va a buon fine
 
-@voucher_generation_agreement13
+@voucher_generation_agreement13 @TEST
+Scenario Outline: La generazione del Voucher fallisce quando la richiesta di fruizione è sospesa sia dall’erogatore che dal fruitore
+    Given l'utente è un "admin" di "PA1"
+    Given "PA2" ha già creato e pubblicato 1 e-service
+    Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
+    Given "PA1" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
+    Given "PA1" ha già creato 1 client "CONSUMER"
+    Given "PA1" ha già inserito l'utente con ruolo "admin" come membro di quel client
+    Given "PA1" ha già associato la finalità a quel client
+    Given un "admin" di "PA1" ha caricato una chiave pubblica nel client
+    Given "PA1" ha già sospeso quella richiesta di fruizione come "CONSUMER"
+    Given "PA2" ha già sospeso quella richiesta di fruizione come "PRODUCER"
+    When l'utente richiede la generazione del voucher
+    Then la richiesta di generazione del Voucher non va a buon fine
+
+@voucher_generation_agreement14
 Scenario Outline: La generazione del Voucher fallisce quando la richiesta di fruizione è sospesa sia dall’erogatore che dal fruitore, e poi riattivata dal fruitore
     Given l'utente è un "admin" di "PA1"
     Given "PA2" ha già creato e pubblicato 1 e-service
@@ -207,7 +232,7 @@ Scenario Outline: La generazione del Voucher fallisce quando la richiesta di fru
     When l'utente richiede la generazione del voucher
     Then la richiesta di generazione del Voucher non va a buon fine
 
-@voucher_generation_agreement14
+@voucher_generation_agreement15
 Scenario Outline: La generazione del Voucher fallisce quando la richiesta di fruizione è sospesa sia dall’erogatore che dal fruitore, e poi riattivata dall’erogatore
     Given l'utente è un "admin" di "PA1"
     Given "PA2" ha già creato e pubblicato 1 e-service
@@ -223,7 +248,7 @@ Scenario Outline: La generazione del Voucher fallisce quando la richiesta di fru
     When l'utente richiede la generazione del voucher
     Then la richiesta di generazione del Voucher non va a buon fine
 
-@voucher_generation_agreement15
+@voucher_generation_agreement16
 Scenario Outline: La generazione del Voucher fallisce quando il fruitore perde un attributo certificato necessario all’utilizzo dell’EService
     Given l'utente è un "admin" di "PA1"
     Given "PA2" ha creato un attributo certificato e lo ha assegnato a "PA1"
@@ -238,7 +263,7 @@ Scenario Outline: La generazione del Voucher fallisce quando il fruitore perde u
     When l'utente richiede la generazione del voucher
     Then la richiesta di generazione del Voucher non va a buon fine
 
-@voucher_generation_agreement16
+@voucher_generation_agreement17
 Scenario Outline: La generazione del Voucher fallisce quando il fruitore perde un attributo verificato necessario all’utilizzo dell’EService
     Given l'utente è un "admin" di "PA1"
     Given "PA1" ha già creato un attributo verificato
@@ -256,7 +281,7 @@ Scenario Outline: La generazione del Voucher fallisce quando il fruitore perde u
     When l'utente richiede la generazione del voucher
     Then la richiesta di generazione del Voucher non va a buon fine
 
-@voucher_generation_agreement17 @waiting_for_clarification
+@voucher_generation_agreement18
 Scenario Outline: La generazione del Voucher fallisce quando il fruitore perde un attributo dichiarato necessario all’utilizzo dell’EService
     Given l'utente è un "admin" di "PA1"
     Given "PA1" ha già dichiarato un attributo
@@ -268,10 +293,11 @@ Scenario Outline: La generazione del Voucher fallisce quando il fruitore perde u
     Given "PA1" ha già associato la finalità a quel client
     Given un "admin" di "PA1" ha caricato una chiave pubblica nel client
     Given "PA1" ha già revocato quell'attributo "DECLARED" a "PA1"
+    Given la richiesta di fruizione è passata in stato "SUSPENDED"
     When l'utente richiede la generazione del voucher
     Then la richiesta di generazione del Voucher non va a buon fine
 
-@voucher_generation_agreement18
+@voucher_generation_agreement19
 Scenario Outline: La generazione del Voucher fallisce quando la richiesta di fruizione viene archiviata dal fruitore
     Given l'utente è un "admin" di "PA1"
     Given "PA2" ha già creato e pubblicato 1 e-service 
@@ -285,7 +311,7 @@ Scenario Outline: La generazione del Voucher fallisce quando la richiesta di fru
     When l'utente richiede la generazione del voucher
     Then la richiesta di generazione del Voucher non va a buon fine
 
-@voucher_generation_agreement19
+@voucher_generation_agreement20
 Scenario Outline: La generazione del Voucher fallisce quando la richiesta di fruizione sospesa subisce un upgrade verso una Versione dell’EService più recente, e l’upgrade viene completato direttamente
     Given l'utente è un "admin" di "PA1"
     Given "PA2" ha già creato e pubblicato 1 e-service
