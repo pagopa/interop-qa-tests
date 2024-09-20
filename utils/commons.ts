@@ -211,18 +211,25 @@ export function calculateKidFromPublicKey(publicKey: string): string {
   return crypto.createHash("sha256").update(jwkString).digest("base64url");
 }
 
-export function createClientAssertion({
-  clientId,
-  purposeId,
-  publicKey,
-  privateKey,
-}: {
-  clientId: string;
-  purposeId: string;
-  publicKey: string;
-  privateKey: string;
-}): string {
+export function createClientAssertion(
+  options:
+    | {
+        clientType: "CONSUMER";
+        clientId: string;
+        purposeId: string;
+        publicKey: string;
+        privateKey: string;
+      }
+    | {
+        clientType: "API";
+        clientId: string;
+        publicKey: string;
+        privateKey: string;
+      }
+): string {
   const issuedAt = Math.round(new Date().getTime() / 1000);
+
+  const { publicKey, privateKey, clientId, clientType } = options;
 
   const kid = calculateKidFromPublicKey(publicKey);
 
@@ -236,10 +243,10 @@ export function createClientAssertion({
     iss: clientId,
     sub: clientId,
     aud: env.CLIENT_ASSERTION_JWT_AUDIENCE,
-    purposeId,
     jti: randomUUID(),
     iat: issuedAt,
     exp: issuedAt + 43200 * 60, // 30 days
+    ...(clientType === "CONSUMER" ? { purposeId: options.purposeId } : {}),
   };
 
   return jwt.sign(payload, privateKey, {
@@ -274,3 +281,64 @@ export async function requestVoucher({
     }
   );
 }
+
+// export function createM2MClientAssertion({
+//   clientId,
+//   publicKey,
+//   privateKey,
+// }: {
+//   clientId: string;
+//   publicKey: string;
+//   privateKey: string;
+// }): string {
+//   const issuedAt = Math.round(new Date().getTime() / 1000);
+
+//   const kid = calculateKidFromPublicKey(publicKey);
+
+//   const headersRsa = {
+//     kid,
+//     alg: "RS256",
+//     typ: "JWT",
+//   };
+
+//   const payload = {
+//     iss: clientId,
+//     sub: clientId,
+//     aud: env.CLIENT_ASSERTION_JWT_AUDIENCE,
+//     jti: randomUUID(),
+//     iat: issuedAt,
+//     exp: issuedAt + 43200 * 60, // 30 days
+//   };
+
+//   return jwt.sign(payload, privateKey, {
+//     header: headersRsa,
+//   });
+// }
+
+// export async function requestVoucher({
+//   clientId,
+//   clientAssertion,
+//   clientAssertionType = "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
+//   grantType = "client_credentials",
+// }: {
+//   clientId: string;
+//   clientAssertion: string;
+//   clientAssertionType?: string;
+//   grantType?: string;
+// }) {
+//   return await axios.post(
+//     env.AUTHORIZATION_SERVER_TOKEN_CREATION_URL,
+//     new URLSearchParams({
+//       client_id: clientId,
+//       client_assertion: clientAssertion,
+//       client_assertion_type: clientAssertionType,
+//       grant_type: grantType,
+//     }),
+//     {
+//       headers: {
+//         "Content-Type": "application/x-www-form-urlencoded",
+//       },
+//       validateStatus: () => true,
+//     }
+//   );
+// }
