@@ -31,7 +31,7 @@ Feature: Generazione del voucher m2m richiesta da un Ente
     When l'utente richiede la generazione del voucher M2M
     Then si ottiene la corretta generazione del voucher
 
-  @voucher_generation_m2m4
+@voucher_generation_m2m4
   Scenario Outline: La generazione del JWT fallisce quando l’unica chiave presente viene rimossa dal client
     Given l'utente è un "admin" di "PA1"
     Given "PA1" ha già creato 1 client "API"
@@ -50,7 +50,7 @@ Scenario Outline: La generazione del JWT fallisce quando una chiave viene rimoss
     Given un "admin" di "PA1" ha aggiunto una nuova chiave pubblica al client
     Given "PA1" rimuove quella chiave dal client
     When l'utente richiede la generazione del voucher M2M
-    Then si ottiene la corretta generazione del voucher
+    Then la richiesta di generazione del Voucher non va a buon fine
 
 @voucher_generation_m2m6
 Scenario Outline: La generazione del JWT fallisce quando la chiave non è associata al client richiesto

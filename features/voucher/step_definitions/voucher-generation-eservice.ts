@@ -85,8 +85,6 @@ Given(
 Then(
   "la richiesta di generazione del Voucher non va a buon fine",
   async function () {
-    console.log(JSON.stringify(this.response.data, null, 2));
-
     assertContextSchema(this, {
       response: z.object({
         data: z.object({
