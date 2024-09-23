@@ -211,16 +211,40 @@ export function calculateKidFromPublicKey(publicKey: string): string {
   return crypto.createHash("sha256").update(jwkString).digest("base64url");
 }
 
+export function createSHA256Digest({
+  digestPayload,
+  kid,
+  privateKey,
+}: {
+  digestPayload: Record<string, string>;
+  kid: string;
+  privateKey: string;
+}): string {
+  const jwsHeader = {
+    kid,
+    alg: "RS256",
+    typ: "JWT",
+  };
+
+  const jws = jwt.sign(digestPayload, privateKey, {
+    header: jwsHeader,
+  });
+
+  return crypto.createHash("sha256").update(jws).digest("hex");
+}
+
 export function createClientAssertion({
   kid,
   clientId,
   purposeId,
   privateKey,
+  digestPayload,
 }: {
   kid: string;
   clientId: string;
   purposeId: string;
   privateKey: string;
+  digestPayload?: Record<string, string>;
 }): string {
   const issuedAt = Math.round(new Date().getTime() / 1000);
 
@@ -238,6 +262,9 @@ export function createClientAssertion({
     jti: randomUUID(),
     iat: issuedAt,
     exp: issuedAt + 43200 * 60, // 30 days
+    digest: digestPayload
+      ? createSHA256Digest({ digestPayload, kid, privateKey })
+      : undefined,
   };
 
   return jwt.sign(payload, privateKey, {
