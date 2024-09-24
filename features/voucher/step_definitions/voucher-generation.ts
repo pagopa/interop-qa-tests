@@ -51,9 +51,7 @@ When(
       clientId,
       purposeId,
       privateKey,
-      digestPayload: {
-        test: "test",
-      },
+      includeDigest: true,
     });
 
     const result = await requestVoucher({
