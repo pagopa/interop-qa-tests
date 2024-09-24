@@ -556,8 +556,11 @@ export const dataPreparationService = {
       (res) => res.data.state === "ARCHIVED"
     );
   },
-
-  async activateAgreement(token: string, agreementId: string) {
+  async activateAgreement(
+    token: string,
+    agreementId: string,
+    reactivatedBy?: "PRODUCER" | "CONSUMER"
+  ) {
     const response = await apiClient.agreements.activateAgreement(
       agreementId,
       getAuthorizationHeader(token)
@@ -571,7 +574,17 @@ export const dataPreparationService = {
           agreementId,
           getAuthorizationHeader(token)
         ),
-      (res) => res.data.state === "ACTIVE"
+      (res) => {
+        if (!reactivatedBy) {
+          return res.data.state === "ACTIVE";
+        }
+
+        if (reactivatedBy === "CONSUMER") {
+          return !res.data.suspendedByConsumer;
+        }
+
+        return !res.data.suspendedByProducer;
+      }
     );
   },
 
@@ -902,7 +915,8 @@ export const dataPreparationService = {
         res.data.attributes.some(
           (attr) =>
             attr.id === attributeId &&
-            attr.verifiedBy.some((verifier) => verifier.id === verifierId)
+            attr.verifiedBy.some((verifier) => verifier.id === verifierId) &&
+            !attr.revokedBy.some((revoker) => revoker.id === verifierId)
         )
     );
   },
@@ -1466,7 +1480,8 @@ export const dataPreparationService = {
     token: string,
     attributeKind: AttributeKind,
     tenantId: string,
-    attributeId: string
+    attributeId: string,
+    revokerId: string
   ) {
     switch (attributeKind) {
       case "CERTIFIED":
@@ -1508,7 +1523,7 @@ export const dataPreparationService = {
             res.data.attributes.some(
               (attr) =>
                 attr.id === attributeId &&
-                attr.revokedBy.map((r) => r.revocationDate !== undefined)
+                attr.revokedBy.some((t) => t.id === revokerId)
             )
         );
         break;
@@ -1530,8 +1545,6 @@ export const dataPreparationService = {
               (attr) => attr.id === attributeId && attr.revocationTimestamp
             )
         );
-        break;
-      default:
         break;
     }
   },
