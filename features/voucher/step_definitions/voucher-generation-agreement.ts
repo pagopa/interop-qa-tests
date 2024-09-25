@@ -78,14 +78,30 @@ Given(
     const token = await getToken(ente);
     const revokerId = getOrganizationId(ente);
     const tenantId = getOrganizationId(tenantType);
-
-    await dataPreparationService.revokeTenantAttribute(
-      token,
-      attributeKind,
-      tenantId,
-      this.attributeId,
-      revokerId
-    );
+    switch (attributeKind) {
+      case "CERTIFIED":
+        await dataPreparationService.revokeCertifiedAttributeToTenant(
+          token,
+          tenantId,
+          this.attributeId
+        );
+        break;
+      case "VERIFIED":
+        await dataPreparationService.revokeVerifiedAttributeToTenant(
+          token,
+          tenantId,
+          this.attributeId,
+          revokerId
+        );
+        break;
+      case "DECLARED":
+        await dataPreparationService.revokeDeclaredAttributeToTenant(
+          token,
+          tenantId,
+          this.attributeId
+        );
+        break;
+    }
   }
 );
 

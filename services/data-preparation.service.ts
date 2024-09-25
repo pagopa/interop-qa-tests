@@ -1476,76 +1476,54 @@ export const dataPreparationService = {
       (res) => res.data.contactMail?.address === mailSeed.address
     );
   },
-  async revokeTenantAttribute(
+
+  async revokeVerifiedAttributeToTenant(
     token: string,
-    attributeKind: AttributeKind,
     tenantId: string,
     attributeId: string,
     revokerId: string
   ) {
-    switch (attributeKind) {
-      case "CERTIFIED":
-        const certifiedResponse =
-          await apiClient.tenants.revokeCertifiedAttribute(
-            tenantId,
-            attributeId,
-            getAuthorizationHeader(token)
-          );
-        assertValidResponse(certifiedResponse);
-        await makePolling(
-          () =>
-            apiClient.tenants.getCertifiedAttributes(
-              tenantId,
-              getAuthorizationHeader(token)
-            ),
-          (res) =>
-            res.data.attributes.some(
-              (attr) => attr.id === attributeId && attr.revocationTimestamp
-            )
-        );
-        break;
+    const response = await apiClient.tenants.revokeVerifiedAttribute(
+      tenantId,
+      attributeId,
+      getAuthorizationHeader(token)
+    );
+    assertValidResponse(response);
+    await makePolling(
+      () =>
+        apiClient.tenants.getVerifiedAttributes(
+          tenantId,
+          getAuthorizationHeader(token)
+        ),
+      (res) =>
+        res.data.attributes.some(
+          (attr) =>
+            attr.id === attributeId &&
+            attr.revokedBy.some((t) => t.id === revokerId)
+        )
+    );
+  },
 
-      case "VERIFIED":
-        const verifiedResponse =
-          await apiClient.tenants.revokeVerifiedAttribute(
-            tenantId,
-            attributeId,
-            getAuthorizationHeader(token)
-          );
-        assertValidResponse(verifiedResponse);
-        await makePolling(
-          () =>
-            apiClient.tenants.getVerifiedAttributes(
-              tenantId,
-              getAuthorizationHeader(token)
-            ),
-          (res) =>
-            res.data.attributes.some(
-              (attr) =>
-                attr.id === attributeId &&
-                attr.revokedBy.some((t) => t.id === revokerId)
-            )
-        );
-        break;
-      case "DECLARED":
-        const declaredResponse =
-          await apiClient.tenants.revokeDeclaredAttribute(
-            attributeId,
-            getAuthorizationHeader(token)
-          );
-        assertValidResponse(declaredResponse);
-        await makePolling(
-          () =>
-            apiClient.tenants.getDeclaredAttributes(
-              tenantId,
-              getAuthorizationHeader(token)
-            ),
-          (res) =>
-            res.data.attributes.some(
-              (attr) => attr.id === attributeId && attr.revocationTimestamp
-            )
-        );
-        break;
-    }
+  async revokeDeclaredAttributeToTenant(
+    token: string,
+    tenantId: string,
+    attributeId: string
+  ) {
+    const response = await apiClient.tenants.revokeDeclaredAttribute(
+      attributeId,
+      getAuthorizationHeader(token)
+    );
+    assertValidResponse(response);
+    await makePolling(
+      () =>
+        apiClient.tenants.getDeclaredAttributes(
+          tenantId,
+          getAuthorizationHeader(token)
+        ),
+      (res) =>
+        res.data.attributes.some(
+          (attr) => attr.id === attributeId && attr.revocationTimestamp
+        )
+    );
   },
 };
