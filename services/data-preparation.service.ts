@@ -1601,23 +1601,7 @@ export const dataPreparationService = {
           keyId,
           getAuthorizationHeader(token)
         ),
-      (res) => res.data.keyId !== keyId
-    );
-    return response.data;
-  },
-
-  async deletePurpose(token: string, purposeId: string) {
-    const response = await apiClient.purposes.deletePurpose(
-      purposeId,
-      getAuthorizationHeader(token)
-    );
-
-    assertValidResponse(response);
-
-    await makePolling(
-      () =>
-        apiClient.purposes.getPurpose(purposeId, getAuthorizationHeader(token)),
-      (res) => res.data.id !== purposeId
+      (res) => res.status === 404
     );
     return response.data;
   },
@@ -1633,7 +1617,7 @@ export const dataPreparationService = {
     await makePolling(
       () =>
         apiClient.clients.getClient(clientId, getAuthorizationHeader(token)),
-      (res) => res.data.id !== clientId
+      (res) => res.status === 404
     );
     return response.data;
   },
