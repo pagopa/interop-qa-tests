@@ -1,11 +1,11 @@
 @eservice_delete
 Feature: Cancellazione di un e-service
-  Tutti gli utenti autorizzati di enti erogatori possono cancellare un proprio e-service che non ha descrittori
+  Tutti gli utenti autorizzati di enti erogatori possono cancellare un proprio e-service con un solo descrittore in DRAFT
 
   @eservice_delete1
-  Scenario Outline: Per un e-service precedentemente creato, il quale non ha descrittori, la cancellazione dell'e-service avviene correttamente per i ruoli autorizzati
+  Scenario Outline: Per un e-service precedentemente creato, con un solo descrittore, la cancellazione dell'e-service avviene correttamente per i ruoli autorizzati
     Given l'utente è un "<ruolo>" di "<ente>"
-    Given "<ente>" ha già creato un e-service senza descrittore
+    Given "<ente>" ha già creato un e-service con un descrittore in DRAFT
     When l'utente cancella quell'e-service
     Then si ottiene status code <risultato>
 
