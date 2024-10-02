@@ -176,8 +176,7 @@ Scenario Outline: La generazione del Voucher fallisce quando la chiave non esist
     When l'utente richiede la generazione del voucher 
     Then la richiesta di generazione del Voucher non va a buon fine
 
-# N.B. Ordine di creazione client non è importante, importante avere due client con chiave diverse associate pronte per erogare
-@voucher_generation_client_and_keys13 @TO_DO
+@voucher_generation_client_and_keys13
 Scenario Outline: La generazione del Voucher fallisce quando la chiave non esiste
     Given l'utente è un "admin" di "PA1"
     Given "GSP" ha già creato e pubblicato 1 e-service
@@ -186,12 +185,12 @@ Scenario Outline: La generazione del Voucher fallisce quando la chiave non esist
     Given "PA1" ha già creato 1 client "CONSUMER"
     Given "PA1" ha già creato 1 nuovo client "CONSUMER"
     Given "PA1" ha già inserito l'utente con ruolo "admin" come membro di quel client
-    Given "PA1" ha già inserito l'utente con ruolo "admin" come membro nel nuovo client
+    Given "PA1" ha già inserito l'utente con ruolo "admin" come membro di quel nuovo client
     Given un "admin" di "PA1" ha caricato una chiave pubblica nel client
     Given un "admin" di "PA1" ha caricato una chiave pubblica nel nuovo client
     Given "PA1" ha già associato la finalità a quel client
     Given "PA1" ha già associato la finalità al nuovo client
-    When l'utente richiede la generazione del voucher indicando la chiave appartanente all'altro client
+    When l'utente richiede la generazione del voucher
     Then la richiesta di generazione del Voucher non va a buon fine
 
 @voucher_generation_client_and_keys14
