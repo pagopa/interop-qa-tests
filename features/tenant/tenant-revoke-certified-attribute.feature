@@ -2,7 +2,7 @@
 Feature: Revoca di un attributo certificato posseduto da uno specifico aderente
   Tutti gli utenti autorizzati degli enti certificatori possono revocare uno degli attributi certificati che hanno assegnato precedentemente
 
-  @tenant_revoke_certified_attribute1
+  @tenant_revoke_certified_attribute1 @no-parallel
   Scenario Outline: Per un attributo certificato precedentemente creato da un aderente, il quale ha la qualifica di ente certificatore (certifier), che lo assegna ad un altro ente, alla richiesta di revoca da parte di un utente con sufficienti permessi (admin), va a buon fine, altrimenti ottiene un errore
     Given l'utente è un "<ruolo>" di "PA2"
     Given "PA2" ha creato un attributo certificato e lo ha assegnato a "PA1"

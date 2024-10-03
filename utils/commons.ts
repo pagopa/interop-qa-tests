@@ -3,8 +3,15 @@ import { createReadStream, readFileSync } from "fs";
 import crypto from "crypto";
 import { z } from "zod";
 import axios, { type AxiosResponse } from "axios";
+import {
+  setParallelCanAssign,
+  parallelCanAssignHelpers,
+} from "@cucumber/cucumber";
 import { env } from "../configs/env";
 import { generateSessionTokens } from "./session-tokens";
+
+const { atMostOnePicklePerTag } = parallelCanAssignHelpers;
+setParallelCanAssign(atMostOnePicklePerTag(["@no-parallel"]));
 
 export type FileType = "yaml" | "wsdl";
 
