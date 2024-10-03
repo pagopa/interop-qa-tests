@@ -9,20 +9,20 @@ Feature: Listing finalità lato erogatore
     Given "PA2" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given "PA2" ha già creato 5 finalità in stato "ACTIVE" per quell'eservice
     When l'utente erogatore richiede una operazione di listing delle finalità limitata alle prime 3 finalità
-    Then si ottiene status code <risultato> e la lista di 3 finalità
+    Then si ottiene status code 200 e la lista di 3 finalità
 
-    Examples: 
-      | ente | ruolo        | risultato |
-      | PA1  | admin        |       200 |
-      | PA1  | api          |       200 |
-      | PA1  | security     |       200 |
-      | PA1  | api,security |       200 |
-      | PA1  | support      |       200 |
-      | GSP  | admin        |       200 |
-      | GSP  | api          |       200 |
-      | GSP  | security     |       200 |
-      | GSP  | api,security |       200 |
-      | GSP  | support      |       200 |
+    Examples:
+      | ente | ruolo        |
+      | PA1  | admin        |
+      | PA1  | api          |
+      | PA1  | security     |
+      | PA1  | api,security |
+      | PA1  | support      |
+      | GSP  | admin        |
+      | GSP  | api          |
+      | GSP  | security     |
+      | GSP  | api,security |
+      | GSP  | support      |
 
   @purpose_listing_producer2
   Scenario Outline: A fronte di 5 finalità in db e una richiesta di offset 2, restituisce solo 3 risultati
@@ -54,7 +54,7 @@ Feature: Listing finalità lato erogatore
     Given "GSP" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given "GSP" ha già creato 2 finalità in stato "ACTIVE" per quell'eservice
     When l'utente erogatore richiede una operazione di listing delle finalità filtrata per fruitore "PA2"
-    Then si ottiene status code 200 e la lista di 2 finalità 
+    Then si ottiene status code 200 e la lista di 2 finalità
 
   @purpose_listing_producer5
   Scenario Outline: Restituisce le finalità associate ad alcuni specifici e-service (scopo del test è verificare che funzioni il filtro per e-servicesIds)
@@ -79,7 +79,7 @@ Feature: Listing finalità lato erogatore
     When l'utente erogatore richiede una operazione di listing delle finalità in stato "<statoFinalita>"
     Then si ottiene status code 200 e la lista di 1 finalità
 
-    Examples: 
+    Examples:
       | statoFinalita |
       | ACTIVE        |
       | SUSPENDED     |
