@@ -163,7 +163,7 @@ Scenario Outline: La generazione del Voucher fallisce quando la finalità viene 
     Then la richiesta di generazione del Voucher non va a buon fine
 
 @voucher_generation_client_and_keys12
-Scenario Outline: La generazione del Voucher fallisce quando la chiave non esiste
+Scenario Outline: La generazione del Voucher fallisce quando la chiave non è associata a un client
     Given l'utente è un "admin" di "PA1"
     Given "GSP" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
