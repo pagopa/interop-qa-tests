@@ -16,7 +16,7 @@ Feature: Generazione del voucher m2m richiesta da un Ente
     Given "PA1" ha già creato 1 client "API"
     Given "PA1" ha già inserito l'utente con ruolo "admin" come membro di quel client
     Given un "admin" di "PA1" ha caricato una chiave pubblica nel client
-    Given un "admin" di "PA1" ha aggiunto una nuova chiave pubblica al client
+    Given un "admin" di "PA1" ha caricato una chiave pubblica nel client
     When l'utente richiede la generazione del voucher M2M
     Then si ottiene la corretta generazione del voucher
 
@@ -42,7 +42,7 @@ Feature: Generazione del voucher m2m richiesta da un Ente
     Then la richiesta di generazione del Voucher non va a buon fine
 
 @voucher_generation_m2m5
-Scenario Outline: La generazione del JWT fallisce quando una chiave viene rimossa dal client
+Scenario Outline: La generazione del JWT fallisce quando una delle chiavi nel client viene rimossa
     Given l'utente è un "admin" di "PA1"
     Given "PA1" ha già creato 1 client "API"
     Given "PA1" ha già inserito l'utente con ruolo "admin" come membro di quel client
@@ -53,15 +53,27 @@ Scenario Outline: La generazione del JWT fallisce quando una chiave viene rimoss
     Then la richiesta di generazione del Voucher non va a buon fine
 
 @voucher_generation_m2m6
-Scenario Outline: La generazione del JWT fallisce quando la chiave non è associata al client richiesto
+Scenario Outline: La generazione del JWT fallisce quando la chiave non è associata a un client
     Given l'utente è un "admin" di "PA1"
     Given "PA1" ha già creato 1 client "API"
     Given "PA1" ha già inserito l'utente con ruolo "admin" come membro di quel client
-    Given "PA1" ha già creato una nuova chiave pubblica senza associarla al client
-    When l'utente richiede la generazione del voucher M2M
+    Given un "admin" di "PA1" ha caricato una chiave pubblica nel client
+    When l'utente richiede la generazione del voucher M2M con una chiave associata a nessun client
     Then la richiesta di generazione del Voucher non va a buon fine
 
 @voucher_generation_m2m7
+Scenario Outline: La generazione del JWT fallisce quando la chiave non è associata al client richiesto
+    Given l'utente è un "admin" di "PA1"
+    Given "PA1" ha già creato 1 client "API"
+    Given "PA1" ha già creato 1 nuovo client "API"
+    Given "PA1" ha già inserito l'utente con ruolo "admin" come membro di quel client
+    Given "PA1" ha già inserito l'utente con ruolo "admin" come membro di quel nuovo client
+    Given un "admin" di "PA1" ha caricato una chiave pubblica nel client
+    Given un "admin" di "PA1" ha caricato una chiave pubblica nel nuovo client
+    When l'utente richiede la generazione del voucher M2M
+    Then la richiesta di generazione del Voucher non va a buon fine
+
+@voucher_generation_m2m8
 Scenario Outline: La generazione del JWT fallisce quando il client viene cancellato
     Given l'utente è un "admin" di "PA1"
     Given "PA1" ha già creato 1 client "API"
@@ -70,3 +82,4 @@ Scenario Outline: La generazione del JWT fallisce quando il client viene cancell
     Given "PA1" cancella quel client
     When l'utente richiede la generazione del voucher M2M
     Then la richiesta di generazione del Voucher non va a buon fine
+
