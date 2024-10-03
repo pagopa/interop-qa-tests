@@ -79,7 +79,7 @@ Feature: Archiviazione richiesta di fruizione
     When l'utente richiede una operazione di archiviazione della richiesta di fruizione
     Then si ottiene status code 400
 
-  @agreement_archive3d
+  @agreement_archive3d @no-parallel
   Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fruitore e attivata da un erogatore, la quale è in stato MISSING_CERTIFIED_ATTRIBUTES alla richiesta di archiviazione da parte di un utente con sufficienti permessi dell’ente fruitore, ottiene un errore
     Given l'utente è un "admin" di "<enteFruitore>"
     Given "<enteCertificatore>" ha creato un attributo certificato e lo ha assegnato a "<enteFruitore>"
