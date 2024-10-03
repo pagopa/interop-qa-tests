@@ -77,7 +77,7 @@ When(
     });
 
     this.response = await requestVoucher({
-      clientId: randomUUID(),
+      clientId: this.clientId,
       clientAssertion: "unknown",
     });
   }

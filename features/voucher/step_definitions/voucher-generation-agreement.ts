@@ -10,14 +10,21 @@ import {
 import { AttributeKind } from "../../../api/models";
 
 Given(
-  "{string} ha già attivato nuovamente quella richiesta di fruizione",
-  async function (tenantType: TenantType) {
+  "{string} ha già attivato nuovamente quella richiesta di fruizione come {string}",
+  async function (
+    tenantType: TenantType,
+    reactivatedBy: "PRODUCER" | "CONSUMER"
+  ) {
     assertContextSchema(this, {
       agreementId: z.string(),
     });
 
     const token = await getToken(tenantType);
-    await dataPreparationService.activateAgreement(token, this.agreementId);
+    await dataPreparationService.activateAgreement(
+      token,
+      this.agreementId,
+      reactivatedBy
+    );
   }
 );
 
@@ -56,9 +63,6 @@ Given(
           this.attributeId
         );
         break;
-
-      default:
-        break;
     }
   }
 );
@@ -72,14 +76,32 @@ Given(
   ) {
     assertContextSchema(this, { attributeId: z.string() });
     const token = await getToken(ente);
+    const revokerId = getOrganizationId(ente);
     const tenantId = getOrganizationId(tenantType);
-
-    await dataPreparationService.revokeTenantAttribute(
-      token,
-      attributeKind,
-      tenantId,
-      this.attributeId
-    );
+    switch (attributeKind) {
+      case "CERTIFIED":
+        await dataPreparationService.revokeCertifiedAttributeToTenant(
+          token,
+          tenantId,
+          this.attributeId
+        );
+        break;
+      case "VERIFIED":
+        await dataPreparationService.revokeVerifiedAttributeToTenant(
+          token,
+          tenantId,
+          this.attributeId,
+          revokerId
+        );
+        break;
+      case "DECLARED":
+        await dataPreparationService.revokeDeclaredAttributeToTenant(
+          token,
+          tenantId,
+          this.attributeId
+        );
+        break;
+    }
   }
 );
 

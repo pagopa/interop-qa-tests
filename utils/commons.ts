@@ -215,6 +215,7 @@ export function createClientAssertion(
   options:
     | {
         clientType: "CONSUMER";
+        includeDigest?: boolean;
         clientId: string;
         purposeId: string;
         publicKey: string;
@@ -222,6 +223,7 @@ export function createClientAssertion(
       }
     | {
         clientType: "API";
+        includeDigest?: boolean;
         clientId: string;
         publicKey: string;
         privateKey: string;
@@ -247,6 +249,13 @@ export function createClientAssertion(
     iat: issuedAt,
     exp: issuedAt + 43200 * 60, // 30 days
     ...(clientType === "CONSUMER" ? { purposeId: options.purposeId } : {}),
+    digest: includeDigest
+      ? {
+          alg: "SHA256",
+          value:
+            "5db26201b684761d2b970329ab8596773164ba1b43b1559980e20045941b8065",
+        }
+      : undefined,
   };
 
   return jwt.sign(payload, privateKey, {
