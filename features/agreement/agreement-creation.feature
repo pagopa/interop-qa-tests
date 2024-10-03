@@ -79,7 +79,7 @@ Feature: Creazione nuova richiesta di fruizione
       | PA1          | PA2               | GSP           | ACTIVE         | AUTOMATIC        |
       | PA1          | PA2               | GSP           | SUSPENDED      | AUTOMATIC        |
 
-  @agreement_creation4b
+  @agreement_creation4b @no-parallel
   Scenario Outline: Un utente con sufficienti permessi, il cui ente rispetta i requisiti (attributi certificati), con una richiesta di fruizione in stato MISSING_CERTIFIED_ATTRIBUTES per un e-service, crea una nuova richiesta di fruizione in bozza per l’ultima versione disponibile di quell'e-service, la quale è in stato PUBLISHED. Ottiene un errore.
     Given l'utente è un "admin" di "<enteFruitore>"
     Given "<enteCertificatore>" ha creato un attributo certificato e lo ha assegnato a "<enteFruitore>"
