@@ -7,11 +7,13 @@ import {
   getOrganizationId,
   getRandomInt,
   getToken,
+  getUserId,
   keyToBase64,
   Role,
   TenantType,
 } from "../../../utils/commons";
 import { dataPreparationService } from "../../../services/data-preparation.service";
+import { ClientKind } from "../../../api/models";
 
 Given(
   "{string} rimuove quella nuova chiave dal client",
@@ -180,6 +182,86 @@ Given(
       token,
       this.clientId,
       this.newPurposeId
+    );
+  }
+);
+
+Given(
+  "{string} ha già creato 1 nuovo client {string}",
+  async function (tenantType: TenantType, cliendKind: ClientKind) {
+    assertContextSchema(this);
+    const token = await getToken(tenantType);
+
+    this.newClientId = await dataPreparationService.createClient(
+      token,
+      cliendKind,
+      {
+        name: `client-${this.TEST_SEED}-${getRandomInt()}`,
+      }
+    );
+  }
+);
+
+Given(
+  "{string} ha già inserito l'utente con ruolo {string} come membro di quel nuovo client",
+  async function (tenantType: TenantType, roleOfMemberToAdd: Role) {
+    assertContextSchema(this, {
+      newClientId: z.string(),
+    });
+    const token = await getToken(tenantType);
+    this.clientMemberUserId = getUserId(tenantType, roleOfMemberToAdd);
+
+    await dataPreparationService.addMemberToClient(
+      token,
+      this.newClientId,
+      this.clientMemberUserId
+    );
+  }
+);
+
+Given(
+  "un {string} di {string} ha caricato una chiave pubblica nel nuovo client",
+  async function (role: Role, tenantType: TenantType) {
+    assertContextSchema(this, {
+      newClientId: z.string(),
+    });
+
+    const token = await getToken(tenantType, role);
+
+    const { privateKey, publicKey } = createKeyPairPEM();
+
+    this.privateKey = privateKey;
+    this.publicKey = publicKey;
+
+    this.key = keyToBase64(publicKey);
+
+    this.keyId = await dataPreparationService.addPublicKeyToClient(
+      token,
+      this.newClientId,
+      {
+        use: "SIG",
+        alg: "RS256",
+        name: `key-${this.TEST_SEED}-${getRandomInt()}`,
+        key: this.key,
+      }
+    );
+  }
+);
+
+Given(
+  "{string} ha già associato la finalità al nuovo client",
+  async function (tenantType: TenantType) {
+    assertContextSchema(this, {
+      purposeId: z.string(),
+      newClientId: z.string(),
+    });
+
+    const token = await getToken(tenantType);
+
+    this.response = await dataPreparationService.addPurposeToClient(
+      token,
+      this.newClientId,
+      this.purposeId
     );
   }
 );

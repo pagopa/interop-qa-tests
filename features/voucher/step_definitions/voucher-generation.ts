@@ -29,6 +29,36 @@ When("l'utente richiede la generazione del voucher", async function () {
   });
 });
 
+When(
+  "l'utente richiede la generazione del voucher con digest",
+  async function () {
+    assertContextSchema(this, {
+      clientId: z.string(),
+      purposeId: z.string(),
+      privateKey: z.string(),
+      publicKey: z.string(),
+    });
+
+    const { publicKey, privateKey, clientId, purposeId } = this;
+    const kid = calculateKidFromPublicKey(publicKey);
+
+    const clientAssertion = createClientAssertion({
+      kid,
+      clientId,
+      purposeId,
+      privateKey,
+      includeDigest: true,
+    });
+
+    const result = await requestVoucher({
+      clientId,
+      clientAssertion,
+    });
+
+    this.result = result;
+  }
+);
+
 Then("si ottiene la corretta generazione del voucher", async function () {
   assertContextSchema(this, {
     response: z.object({

@@ -216,11 +216,13 @@ export function createClientAssertion({
   purposeId,
   publicKey,
   privateKey,
+  includeDigest,
 }: {
   clientId: string;
   purposeId: string;
   publicKey: string;
   privateKey: string;
+  includeDigest?: boolean;
 }): string {
   const issuedAt = Math.round(new Date().getTime() / 1000);
 
@@ -240,6 +242,13 @@ export function createClientAssertion({
     jti: randomUUID(),
     iat: issuedAt,
     exp: issuedAt + 43200 * 60, // 30 days
+    digest: includeDigest
+      ? {
+          alg: "SHA256",
+          value:
+            "5db26201b684761d2b970329ab8596773164ba1b43b1559980e20045941b8065",
+        }
+      : undefined,
   };
 
   return jwt.sign(payload, privateKey, {
