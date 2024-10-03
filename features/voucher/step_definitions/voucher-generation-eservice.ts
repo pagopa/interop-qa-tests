@@ -85,32 +85,34 @@ Given(
 Then(
   "la richiesta di generazione del Voucher non va a buon fine",
   async function () {
-    console.log(JSON.stringify(this.response.data, null, 2));
-
     assertContextSchema(this, {
       response: z.object({
-        data: z.object({
-          correlationId: z.string().uuid().optional(),
-          errors: z.tuple([
-            z.union([
+        data: z.union([
+          z.object({
+            correlationId: z.string().uuid(),
+            errors: z.tuple([
               z.object({
                 code: z.literal("015-0008"),
                 detail: z.literal(
                   "Unable to generate a token for the given request"
                 ),
               }),
+            ]),
+          }),
+          z.object({
+            errors: z.tuple([
               z.object({
                 code: z.literal("015-9000"),
                 detail: z.string(),
               }),
             ]),
-          ]),
-          status: z.literal(400),
-          title: z.literal(
-            "The request contains bad syntax or cannot be fulfilled."
-          ),
-          type: z.literal("about:blank"),
-        }),
+          }),
+        ]),
+        status: z.literal(400),
+        title: z.literal(
+          "The request contains bad syntax or cannot be fulfilled."
+        ),
+        type: z.literal("about:blank"),
       }),
     });
   }
