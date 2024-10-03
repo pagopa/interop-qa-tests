@@ -3,7 +3,7 @@ Feature: Listing richieste di fruizione
   Tutti gli utenti autorizzati di enti PA, GSP e privati possono ottenere la lista delle richieste di fruizione
   NB: Gli e-service creati devono essere il minimo numero sufficiente per far passare il test, in caso contrario il sistema potrebbe sovraccaricarsi e non rispondere nei tempi attesi
 
-  @agreement_listing1
+  @agreement_listing1 @no-parallel
   Scenario Outline: A fronte di 5 richieste di fruizione in db, restituisce solo i primi 3 risultati
     Given l'utente è un "<ruolo>" di "<ente>"
     Given "PA1" ha già creato e pubblicato 5 e-services
@@ -37,7 +37,7 @@ Feature: Listing richieste di fruizione
     When l'utente richiede una operazione di listing con offset 3
     Then si ottiene status code 200 e la lista di 2 richieste di fruizione
 
-  @agreement_listing3
+  @agreement_listing3 @no-parallel
   Scenario Outline: Restituisce le richieste di fruizione che un erogatore si trova create dai fruitori dei propri e-service
     Given l'utente è un "admin" di "PA1"
     Given "PA1" ha già creato e pubblicato 5 e-services
