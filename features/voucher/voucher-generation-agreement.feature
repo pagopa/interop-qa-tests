@@ -132,7 +132,7 @@ Scenario Outline: La generazione del Voucher va a buon fine quando la richiesta 
     Given "PA2" ha già creato un attributo verificato
     Given "PA2" ha già pubblicato una nuova versione per quell'e-service che richiede quell'attributo verificato
     Given "PA1" ha già aggiornato la richiesta di fruizione all'ultima versione dell'eservice
-    Given la richiesta di fruizione è passata in stato "PENDING"
+    Given "PA1" ha già richiesto la pubblicazione della richiesta aggiornata che và in stato PENDING
     When l'utente richiede la generazione del voucher
     Then si ottiene la corretta generazione del voucher
 
