@@ -1316,9 +1316,9 @@ export const dataPreparationService = {
 
     await makePolling(
       () =>
-        apiClient.clients.addUserToClient(
+        apiClient.clients.addUsersToClient(
           clientId,
-          userId,
+          { userIds: [userId] },
           getAuthorizationHeader(token)
         ),
       (res) => {
