@@ -45,7 +45,7 @@ Scenario Outline: La generazione del Voucher va a buon fine quando viene aggiunt
     When l'utente richiede la generazione del voucher
     Then si ottiene la corretta generazione del voucher
 
-@voucher_generation_client_and_keys4
+@voucher_generation_client_and_keys4 @no-parallel
 Scenario Outline: La generazione del Voucher va a buon fine quando viene rimossa una finalità dal client
     Given l'utente è un "admin" di "PA1"
     Given "GSP" ha già creato e pubblicato 1 e-service
@@ -97,7 +97,7 @@ Scenario Outline: La generazione del Voucher va a buon fine quando l’unica fin
     Given "PA1" ha già inserito l'utente con ruolo "admin" come membro di quel client
     Given un "admin" di "PA1" ha caricato una chiave pubblica nel client
     Given "PA1" ha già associato la finalità a quel client
-    Given "PA1" rimuove quella nuova finalità dal client
+    Given "PA1" rimuove quella finalità dal client
     Given "PA1" ha già creato 1 finalità in stato "ACTIVE" per quell'eservice
     Given "PA1" ha già associato la finalità a quel client
     When l'utente richiede la generazione del voucher

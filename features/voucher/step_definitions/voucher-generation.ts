@@ -61,6 +61,34 @@ When(
   }
 );
 
+When(
+  "l'utente richiede la generazione del voucher indicando il primo client ma con la chiave caricata nel secondo",
+  async function () {
+    assertContextSchema(this, {
+      clientId: z.string(),
+      purposeId: z.string(),
+      newClientPrivateKey: z.string(),
+      newClientPublicKey: z.string(),
+    });
+
+    const { newClientPublicKey, newClientPrivateKey, clientId, purposeId } =
+      this;
+    const kid = calculateKidFromPublicKey(newClientPublicKey);
+
+    const clientAssertion = createClientAssertion({
+      kid,
+      clientId,
+      purposeId,
+      privateKey: newClientPrivateKey,
+    });
+
+    this.response = await requestVoucher({
+      clientId,
+      clientAssertion,
+    });
+  }
+);
+
 Then("si ottiene la corretta generazione del voucher", async function () {
   assertContextSchema(this, {
     response: z.object({
