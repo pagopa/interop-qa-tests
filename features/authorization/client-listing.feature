@@ -3,28 +3,28 @@ Feature: Listing client
   Tutti gli utenti autenticati possono leggere la lista dei client
 
   @client_listing1
-  Scenario Outline: A fronte di una richiesta di listing restituisce 200 per tutti i ruoli di API
+  Scenario Outline: A fronte di una richiesta di listing restituisce 200 per tutti i ruoli
     Given l'utente è un "<ruolo>" di "<ente>"
     When l'utente richiede una operazione di listing dei client
-    Then si ottiene status code <statusCode>
+    Then si ottiene status code 200
 
     Examples:
-      | ente    | ruolo        | statusCode |
-      | GSP     | admin        |        200 |
-      | GSP     | api          |        403 |
-      | GSP     | security     |        200 |
-      | GSP     | support      |        200 |
-      | GSP     | api,security |        200 |
-      | PA1     | admin        |        200 |
-      | PA1     | api          |        403 |
-      | PA1     | security     |        200 |
-      | PA1     | support      |        200 |
-      | PA1     | api,security |        200 |
-      | Privato | admin        |        200 |
-      | Privato | api          |        403 |
-      | Privato | security     |        200 |
-      | Privato | support      |        200 |
-      | Privato | api,security |        200 |
+      | ente    | ruolo        |
+      | GSP     | admin        |
+      | GSP     | api          |
+      | GSP     | security     |
+      | GSP     | support      |
+      | GSP     | api,security |
+      | PA1     | admin        |
+      | PA1     | api          |
+      | PA1     | security     |
+      | PA1     | support      |
+      | PA1     | api,security |
+      | Privato | admin        |
+      | Privato | api          |
+      | Privato | security     |
+      | Privato | support      |
+      | Privato | api,security |
 
   @client_listing2
   Scenario Outline: A fronte di 5 client in db, restituisce solo i primi 3 risultati

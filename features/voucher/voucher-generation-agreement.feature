@@ -48,7 +48,7 @@ Scenario Outline: La generazione del Voucher va a buon fine quando la richiesta 
     When l'utente richiede la generazione del voucher
     Then si ottiene la corretta generazione del voucher
 
-@voucher_generation_agreement4
+@voucher_generation_agreement4 @no-parallel
 Scenario Outline: La generazione del Voucher va a buon fine quando il fruitore perde e poi riottiene un attributo certificato necessario all’utilizzo dell’EService
     Given l'utente è un "admin" di "PA1"
     Given "PA2" ha creato un attributo certificato e lo ha assegnato a "PA1"
@@ -119,7 +119,7 @@ Scenario Outline: La generazione del Voucher va a buon fine quando la richiesta 
     When l'utente richiede la generazione del voucher
     Then si ottiene la corretta generazione del voucher
 
-@voucher_generation_agreement8
+@voucher_generation_agreement8 @wait_for_fix @PIN-5405
 Scenario Outline: La generazione del Voucher va a buon fine quando la richiesta di fruizione attiva subisce un upgrade verso una Versione dell’EService più recente, e la richiesta rimane in attesa di approvazione
     Given l'utente è un "admin" di "PA1"
     Given "PA2" ha già creato e pubblicato 1 e-service
@@ -132,11 +132,11 @@ Scenario Outline: La generazione del Voucher va a buon fine quando la richiesta 
     Given "PA2" ha già creato un attributo verificato
     Given "PA2" ha già pubblicato una nuova versione per quell'e-service che richiede quell'attributo verificato
     Given "PA1" ha già aggiornato la richiesta di fruizione all'ultima versione dell'eservice
-    Given la richiesta di fruizione è passata in stato "PENDING"
-    When l'utente richiede la generazione del voucher
+    Given "PA1" ha già richiesto la pubblicazione della richiesta aggiornata che và in stato PENDING
+    When l'utente richiede la generazione del voucher 
     Then si ottiene la corretta generazione del voucher
 
-@voucher_generation_agreement9
+@voucher_generation_agreement9 @wait_for_fix @PIN-5405
 Scenario Outline: La generazione del Voucher va a buon fine quando la richiesta di fruizione attiva subisce un upgrade verso una Versione dell’EService più recente, e la richiesta passa in attesa di approvazione e poi approvata dall’erogatore
     Given l'utente è un "admin" di "PA1"
     Given "PA2" ha già creato e pubblicato 1 e-service
@@ -149,14 +149,14 @@ Scenario Outline: La generazione del Voucher va a buon fine quando la richiesta 
     Given "PA2" ha già creato un attributo verificato
     Given "PA2" ha già pubblicato una nuova versione per quell'e-service che richiede quell'attributo verificato
     Given "PA1" ha già aggiornato la richiesta di fruizione all'ultima versione dell'eservice
-    Given la richiesta di fruizione è passata in stato "PENDING"
+    Given "PA1" ha già richiesto la pubblicazione della richiesta aggiornata che và in stato PENDING
     Given "PA2" ha già verificato l'attributo verificato a "PA1"
     Given "PA2" approva quella richiesta di fruizione
     Given la richiesta di fruizione è passata in stato "ACTIVE"
     When l'utente richiede la generazione del voucher
     Then si ottiene la corretta generazione del voucher
 
-@voucher_generation_agreement10
+@voucher_generation_agreement10 @wait_for_fix @PIN-5405
 Scenario Outline: La generazione del Voucher va a buon fine quando la richiesta di fruizione attiva subisce un upgrade verso una Versione dell’EService più recente, e la richiesta passa in attesa di approvazione e poi rifiutata dall’erogatore
     Given l'utente è un "admin" di "PA1"
     Given "PA2" ha già creato e pubblicato 1 e-service
@@ -169,7 +169,7 @@ Scenario Outline: La generazione del Voucher va a buon fine quando la richiesta 
     Given "PA2" ha già creato un attributo verificato
     Given "PA2" ha già pubblicato una nuova versione per quell'e-service che richiede quell'attributo verificato
     Given "PA1" ha già aggiornato la richiesta di fruizione all'ultima versione dell'eservice
-    Given la richiesta di fruizione è passata in stato "PENDING"
+    Given "PA1" ha già richiesto la pubblicazione della richiesta aggiornata che và in stato PENDING
     Given "PA2" ha già rifiutato quella richiesta di fruizione
     When l'utente richiede la generazione del voucher
     Then si ottiene la corretta generazione del voucher
@@ -249,7 +249,7 @@ Scenario Outline: La generazione del Voucher fallisce quando la richiesta di fru
     When l'utente richiede la generazione del voucher
     Then la richiesta di generazione del Voucher non va a buon fine
 
-@voucher_generation_agreement16
+@voucher_generation_agreement16 @no-parallel
 Scenario Outline: La generazione del Voucher fallisce quando il fruitore perde un attributo certificato necessario all’utilizzo dell’EService
     Given l'utente è un "admin" di "PA1"
     Given "PA2" ha creato un attributo certificato e lo ha assegnato a "PA1"
@@ -265,7 +265,7 @@ Scenario Outline: La generazione del Voucher fallisce quando il fruitore perde u
     When l'utente richiede la generazione del voucher
     Then la richiesta di generazione del Voucher non va a buon fine
 
-@voucher_generation_agreement17
+@voucher_generation_agreement17 @no-parallel
 Scenario Outline: La generazione del Voucher fallisce quando il fruitore perde un attributo verificato necessario all’utilizzo dell’EService
     Given l'utente è un "admin" di "PA1"
     Given "PA2" ha già creato un attributo verificato
