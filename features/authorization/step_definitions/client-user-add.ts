@@ -18,9 +18,9 @@ When(
 
     const userId = getUserId(tenantType, "admin");
 
-    this.response = await apiClient.clients.addUserToClient(
+    this.response = await apiClient.clients.addUsersToClient(
       this.clientId,
-      userId,
+      { userIds: [userId] },
       getAuthorizationHeader(this.token)
     );
   }
