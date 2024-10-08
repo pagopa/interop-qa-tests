@@ -230,8 +230,8 @@ Given(
 
     const { privateKey, publicKey } = createKeyPairPEM();
 
-    this.privateKey = privateKey;
-    this.publicKey = publicKey;
+    this.newClientPrivateKey = privateKey;
+    this.newClientPublicKey = publicKey;
 
     this.key = keyToBase64(publicKey);
 
