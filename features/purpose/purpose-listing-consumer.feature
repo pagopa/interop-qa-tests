@@ -1,33 +1,33 @@
-@purpose_consumer_listing
+@purpose_consumer_listing 
 Feature: Lista delle finalità lato fruitore
   Tutti gli utenti possono ottenere la lista delle finalità di cui sono fruitori
 
-  @purpose_consumer_listing1 @wait_for_fix @IMN-398
+  @purpose_consumer_listing1 @fixed_in_node
   Scenario Outline: A fronte di 5 finalità in db, restituisce solo i primi 3 risultati (scopo del test è verificare il corretto funzionamento del parametro limit)
     Given l'utente è un "<ruolo>" di "<ente>"
     Given "PA2" ha già creato e pubblicato 1 e-service
     Given "<ente>" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given "<ente>" ha già creato 5 finalità in stato "ACTIVE" per quell'eservice
     When l'utente fruitore richiede una operazione di listing delle finalità limitata ai primi 3 risultati
-    Then si ottiene status code <risultato> e la lista di 3 finalità
+    Then si ottiene status code 200 e la lista di 3 finalità
 
-    Examples: 
-      | ente    | ruolo        | risultato |
-      | PA1     | admin        |       200 |
-      | PA1     | api          |       200 |
-      | PA1     | security     |       200 |
-      | PA1     | api,security |       200 |
-      | PA1     | support      |       200 |
-      | GSP     | admin        |       200 |
-      | GSP     | api          |       200 |
-      | GSP     | security     |       200 |
-      | GSP     | api,security |       200 |
-      | GSP     | support      |       200 |
-      | Privato | admin        |       200 |
-      | Privato | api          |       200 |
-      | Privato | security     |       200 |
-      | Privato | api,security |       200 |
-      | Privato | support      |       200 |
+    Examples:
+      | ente    | ruolo        |
+      | PA1     | admin        |
+      | PA1     | api          |
+      | PA1     | security     |
+      | PA1     | api,security |
+      | PA1     | support      |
+      | GSP     | admin        |
+      | GSP     | api          |
+      | GSP     | security     |
+      | GSP     | api,security |
+      | GSP     | support      |
+      | Privato | admin        |
+      | Privato | api          |
+      | Privato | security     |
+      | Privato | api,security |
+      | Privato | support      |
 
   @purpose_consumer_listing2
   Scenario Outline: A fronte di 5 finalità in db e una richiesta di offset 2, restituisce solo 3 risultati
@@ -69,7 +69,7 @@ Feature: Lista delle finalità lato fruitore
     When l'utente fruitore richiede una operazione di listing delle finalità in stato "<statoFinalita>"
     Then si ottiene status code 200 e la lista di 1 finalità
 
-    Examples: 
+    Examples:
       | statoFinalita |
       | ACTIVE        |
       | SUSPENDED     |
