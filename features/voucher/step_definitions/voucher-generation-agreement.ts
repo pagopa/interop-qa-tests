@@ -122,6 +122,23 @@ Given(
 );
 
 Given(
+  "{string} ha già richiesto la pubblicazione della richiesta aggiornata che và in stato PENDING",
+  async function (tenantType: TenantType) {
+    assertContextSchema(this, {
+      agreementId: z.string(),
+    });
+
+    const token = await getToken(tenantType);
+
+    await dataPreparationService.submitAgreement(
+      token,
+      this.agreementId,
+      "PENDING"
+    );
+  }
+);
+
+Given(
   "{string} ha già archiviato quella richiesta di fruizione",
   async function (tenantType: TenantType) {
     assertContextSchema(this, {

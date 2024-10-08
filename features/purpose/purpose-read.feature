@@ -36,7 +36,7 @@ Feature: Lettura singola finalità
       | PA1  | admin | ARCHIVED             |       200 |
       | PA1  | admin | DRAFT                |       200 |
 
-  @purpose_read2
+  @purpose_read2 @no-parallel
   Scenario Outline: Per una finalità precedentemente creata da un fruitore, la quale prima versione è in stato NON DRAFT (WAITING_FOR_APPROVAL, ACTIVE, SUSPENDED, ARCHIVED), alla richiesta di lettura da parte dell’erogatore, va a buon fine
     Given l'utente è un "admin" di "PA2"
     Given "PA2" ha già creato e pubblicato 1 e-service
