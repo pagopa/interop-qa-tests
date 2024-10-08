@@ -161,7 +161,7 @@ Feature: Generazione del voucher richiesta da un Ente
     When l'utente richiede la generazione del voucher
     Then la richiesta di generazione del Voucher non va a buon fine
 
-  @voucher_generation_purpose12
+  @voucher_generation_purpose12 @no-parallel
   Scenario Outline: La generazione del Voucher fallisce quando la finalità viene sospesa dall’erogatore
     Given l'utente è un "admin" di "PA1"
     Given "PA2" ha già creato e pubblicato 1 e-service
@@ -221,7 +221,7 @@ Feature: Generazione del voucher richiesta da un Ente
     When l'utente richiede la generazione del voucher
     Then la richiesta di generazione del Voucher non va a buon fine
 
-  @voucher_generation_purpose16
+  @voucher_generation_purpose16 @wait_for_fix @PIN-5318
   Scenario Outline: La generazione del Voucher fallisce quando la finalità sospesa dal fruitore con una stima di carico superiore ai limiti della Versione dell’EService viene riattivata dal fruitore
     Given l'utente è un "admin" di "PA1"
     Given "PA2" ha già creato e pubblicato 1 e-service

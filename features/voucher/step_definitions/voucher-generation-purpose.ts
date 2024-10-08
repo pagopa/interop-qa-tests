@@ -41,6 +41,8 @@ Given(
       this.purposeId,
       this.waitingForApprovalVersionId
     );
+
+    this.currentVersionId = this.waitingForApprovalVersionId;
   }
 );
 
