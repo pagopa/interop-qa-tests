@@ -211,20 +211,27 @@ export function calculateKidFromPublicKey(publicKey: string): string {
   return crypto.createHash("sha256").update(jwkString).digest("base64url");
 }
 
-export function createClientAssertion({
-  clientId,
-  purposeId,
-  publicKey,
-  privateKey,
-  includeDigest,
-}: {
-  clientId: string;
-  purposeId: string;
-  publicKey: string;
-  privateKey: string;
-  includeDigest?: boolean;
-}): string {
+export function createClientAssertion(
+  options:
+    | {
+        clientType: "CONSUMER";
+        includeDigest?: boolean;
+        clientId: string;
+        purposeId: string;
+        publicKey: string;
+        privateKey: string;
+      }
+    | {
+        clientType: "API";
+        includeDigest?: boolean;
+        clientId: string;
+        publicKey: string;
+        privateKey: string;
+      }
+): string {
   const issuedAt = Math.round(new Date().getTime() / 1000);
+
+  const { publicKey, privateKey, clientId, clientType } = options;
 
   const kid = calculateKidFromPublicKey(publicKey);
 
@@ -238,11 +245,11 @@ export function createClientAssertion({
     iss: clientId,
     sub: clientId,
     aud: env.CLIENT_ASSERTION_JWT_AUDIENCE,
-    purposeId,
     jti: randomUUID(),
     iat: issuedAt,
     exp: issuedAt + 43200 * 60, // 30 days
-    digest: includeDigest
+    ...(clientType === "CONSUMER" ? { purposeId: options.purposeId } : {}),
+    digest: options.includeDigest
       ? {
           alg: "SHA256",
           value:
