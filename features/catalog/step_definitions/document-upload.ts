@@ -58,7 +58,7 @@ When(
     const blobFile = new Blob([readFileSync(`./data/${fileName}`)]);
     const file = new File([blobFile], fileName);
 
-    this.response = apiClient.eservices.createEServiceDocument(
+    this.response = await apiClient.eservices.createEServiceDocument(
       this.eserviceId,
       this.descriptorId,
       {
@@ -84,7 +84,7 @@ When(
     const blobFile = new Blob([readFileSync(`./data/${fileName}`)]);
     const file = new File([blobFile], fileName);
 
-    this.response = apiClient.eservices.createEServiceDocument(
+    this.response = await apiClient.eservices.createEServiceDocument(
       this.eserviceId,
       this.descriptorId,
       {
