@@ -52,12 +52,10 @@ When(
       includeDigest: true,
     });
 
-    const result = await requestVoucher({
+    this.response = await requestVoucher({
       clientId,
       clientAssertion,
     });
-
-    this.result = result;
   }
 );
 
