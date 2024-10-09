@@ -1171,6 +1171,26 @@ export const dataPreparationService = {
     };
   },
 
+  async deletePurposeVersion(
+    token: string,
+    purposeId: string,
+    waitingForApprovalVersionId: string
+  ): Promise<void> {
+    const response = await apiClient.purposes.deletePurposeVersion(
+      purposeId,
+      waitingForApprovalVersionId,
+      getAuthorizationHeader(token)
+    );
+
+    assertValidResponse(response);
+
+    await makePolling(
+      () =>
+        apiClient.purposes.getPurpose(purposeId, getAuthorizationHeader(token)),
+      (res) => !res.data.waitingForApprovalVersion
+    );
+  },
+
   async rejectPurposeVersion(
     token: string,
     purposeId: string,
@@ -1212,7 +1232,12 @@ export const dataPreparationService = {
     return response.data;
   },
 
-  async suspendPurpose(token: string, purposeId: string, versionId: string) {
+  async suspendPurpose(
+    token: string,
+    purposeId: string,
+    versionId: string,
+    checkSuspendedBy?: "CONSUMER" | "PROVIDER"
+  ) {
     const response = await apiClient.purposes.suspendPurposeVersion(
       purposeId,
       versionId,
@@ -1224,7 +1249,18 @@ export const dataPreparationService = {
     await makePolling(
       () =>
         apiClient.purposes.getPurpose(purposeId, getAuthorizationHeader(token)),
-      (res) => res.data.currentVersion?.state === "SUSPENDED"
+      (res) => {
+        const isSuspended = res.data.currentVersion?.state === "SUSPENDED";
+        if (!checkSuspendedBy) {
+          return isSuspended;
+        }
+        switch (checkSuspendedBy) {
+          case "CONSUMER":
+            return Boolean(res.data.suspendedByConsumer);
+          case "PROVIDER":
+            return Boolean(res.data.suspendedByProducer);
+        }
+      }
     );
     return response.data;
   },
@@ -1290,7 +1326,8 @@ export const dataPreparationService = {
   async activatePurposeVersion(
     token: string,
     purposeId: string,
-    versionId: string
+    versionId: string,
+    checkNotSuspendedBy?: "CONSUMER" | "PRODUCER"
   ) {
     const authHeader = getAuthorizationHeader(token);
 
@@ -1304,7 +1341,19 @@ export const dataPreparationService = {
 
     await makePolling(
       () => apiClient.purposes.getPurpose(purposeId, authHeader),
-      (res) => res.data.currentVersion?.state === "ACTIVE"
+      (res) => {
+        const isActive =
+          res.data.versions.find((v) => v.id === versionId)?.state === "ACTIVE";
+        if (!checkNotSuspendedBy) {
+          return isActive;
+        }
+        switch (checkNotSuspendedBy) {
+          case "CONSUMER":
+            return !res.data.suspendedByConsumer;
+          case "PRODUCER":
+            return !res.data.suspendedByProducer;
+        }
+      }
     );
 
     return response.data;
