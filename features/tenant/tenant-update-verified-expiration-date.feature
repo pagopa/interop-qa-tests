@@ -2,7 +2,7 @@
 Feature: Aggiornamento della data di scadenza di un attributo verificato ad un aderente
   Tutti gli utenti autorizzati di enti che possono erogare eservice possono aggiornare la data di scadenza di un proprio attributo verificato
 
-  @tenant_update_verified_expiration_date1
+  @tenant_update_verified_expiration_date1 @no-parallel
   Scenario Outline: Per un attributo verificato precedentemente creato e assegnato da un primo aderente ad un secondo aderente, alla richiesta di aggiornamento di un attributo che non ha data di scadenza ad una data nel futuro da parte di un utente con sufficienti permessi (admin) appartenente al primo aderente, va a buon fine
     Given l'utente è un "<ruolo>" di "<ente>"
     Given "<ente>" ha già creato un attributo verificato
@@ -25,7 +25,7 @@ Feature: Aggiornamento della data di scadenza di un attributo verificato ad un a
       | GSP  | support      |        403 |
       | GSP  | api,security |        403 |
 
-  @tenant_update_verified_expiration_date2
+  @tenant_update_verified_expiration_date2 @no-parallel
   Scenario Outline: Per un attributo verificato precedentemente creato e assegnato da un primo aderente ad un secondo aderente, alla richiesta di aggiornamento di un attributo che ha già una scadenza ad un’altra data nel futuro da parte di un utente con sufficienti permessi (admin) appartenente al primo aderente, va a buon fine
     Given l'utente è un "admin" di "PA1"
     Given "PA1" ha già creato un attributo verificato
@@ -35,7 +35,7 @@ Feature: Aggiornamento della data di scadenza di un attributo verificato ad un a
     When l'utente richiede l'aggiornamento di quell'attributo di "PA2" con una data di scadenza nel futuro
     Then si ottiene status code 204
 
-  @tenant_update_verified_expiration_date3
+  @tenant_update_verified_expiration_date3 @no-parallel
   Scenario Outline: Per un attributo verificato precedentemente creato e assegnato da un primo aderente ad un secondo aderente, alla richiesta di aggiornamento di un attributo che ha già una scadenza rimuovendo la scadenza (expirationDate == undefined) da parte di un utente con sufficienti permessi (admin) appartenente al primo aderente, va a buon fine
     Given l'utente è un "admin" di "PA1"
     Given "PA1" ha già creato un attributo verificato

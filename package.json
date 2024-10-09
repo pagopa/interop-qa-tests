@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "postinstall": "patch-package",
     "lint": "tsc --noEmit && gherkin-lint . && eslint .",
     "generate-model": "node ./scripts/generate-api-models.mjs",
     "cucumber:bun": "bun --bun run cucumber-js -p base",
@@ -42,6 +43,7 @@
     "adm-zip": "^0.5.14",
     "axios": "^1.6.2",
     "dotenv": "^16.3.1",
+    "jsonwebtoken": "^9.0.2",
     "lodash": "^4.17.21",
     "openapi-fetch": "^0.8.2",
     "swagger-typescript-api": "^13.0.3",
@@ -51,12 +53,19 @@
   },
   "devDependencies": {
     "@pagopa/eslint-config": "^3.0.0",
+    "@types/jsonwebtoken": "^9.0.6",
     "@types/node": "^20.10.4",
     "gherkin-lint": "^4.2.4",
     "openapi-typescript": "^6.7.3",
+    "patch-package": "^8.0.0",
     "prettier": "^3.1.1",
     "swagger-typescript-api": "^13.0.3",
     "typescript": "^5.3.3"
   },
-  "packageManager": "pnpm@8.15.8+sha512.d1a029e1a447ad90bc96cd58b0fad486d2993d531856396f7babf2d83eb1823bb83c5a3d0fc18f675b2d10321d49eb161fece36fe8134aa5823ecd215feed392"
+  "packageManager": "pnpm@8.15.8+sha512.d1a029e1a447ad90bc96cd58b0fad486d2993d531856396f7babf2d83eb1823bb83c5a3d0fc18f675b2d10321d49eb161fece36fe8134aa5823ecd215feed392",
+  "pnpm": {
+    "patchedDependencies": {
+      "@cucumber/cucumber@10.2.1": "patches/@cucumber__cucumber@10.2.1.patch"
+    }
+  }
 }

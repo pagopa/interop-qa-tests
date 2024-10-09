@@ -2,7 +2,7 @@
 Feature: Revoca di un attributo verificato posseduto da uno specifico aderente
   Tutti gli utenti autorizzati degli enti erogatori possono revocare uno degli attributi verificati che hanno assegnato precedentemente
 
-  @tenant_revoke_verified_attribute1
+  @tenant_revoke_verified_attribute1 @no-parallel
   Scenario Outline: Per un attributo precedentemente verificato da un primo aderente ad un secondo aderente, alla richiesta di revoca da parte di un utente con sufficienti permessi (admin) appartenente al primo aderente, va a buon fine
     Given l'utente è un "<ruolo>" di "PA2"
     Given "PA2" ha già creato un attributo verificato
@@ -20,7 +20,7 @@ Feature: Revoca di un attributo verificato posseduto da uno specifico aderente
       | support      |        403 |
       | api,security |        403 |
 
-  @tenant_revoke_verified_attribute2
+  @tenant_revoke_verified_attribute2 @no-parallel
   Scenario Outline: Per un attributo precedentemente verificato da un primo aderente ad un secondo aderente, e poi successivamente verificato da un terzo aderente sempre al secondo aderente, alla richiesta di revoca da parte di un utente con sufficienti permessi (admin) appartenente al primo aderente, va a buon fine. Inoltre, l’istanza dell’attributo verificato dal terzo aderente rimane verificata
     Given l'utente è un "admin" di "PA2"
     Given "PA2" ha già creato un attributo verificato

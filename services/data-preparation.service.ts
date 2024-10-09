@@ -316,6 +316,30 @@ export const dataPreparationService = {
     );
   },
 
+  async activateDescriptor(
+    token: string,
+    eserviceId: string,
+    descriptorId: string
+  ) {
+    const response = await apiClient.eservices.activateDescriptor(
+      eserviceId,
+      descriptorId,
+      getAuthorizationHeader(token)
+    );
+
+    assertValidResponse(response);
+
+    await makePolling(
+      () =>
+        apiClient.producers.getProducerEServiceDescriptor(
+          eserviceId,
+          descriptorId,
+          getAuthorizationHeader(token)
+        ),
+      (res) => res.data.state === "PUBLISHED" || res.data.state === "DEPRECATED"
+    );
+  },
+
   async createAgreement(
     token: string,
     eserviceId: string,
@@ -340,6 +364,28 @@ export const dataPreparationService = {
     );
 
     return agreementId;
+  },
+
+  async upgradeAgreement(token: string, agreementId: string): Promise<string> {
+    const response = await apiClient.agreements.upgradeAgreement(
+      agreementId,
+      getAuthorizationHeader(token)
+    );
+
+    assertValidResponse(response);
+
+    const newAgreementId = response.data.id;
+
+    await makePolling(
+      () =>
+        apiClient.agreements.getAgreementById(
+          newAgreementId,
+          getAuthorizationHeader(token)
+        ),
+      (res) => res.status === 200
+    );
+
+    return newAgreementId;
   },
 
   async createAgreementWithGivenState(
@@ -509,8 +555,11 @@ export const dataPreparationService = {
       (res) => res.data.state === "ARCHIVED"
     );
   },
-
-  async activateAgreement(token: string, agreementId: string) {
+  async activateAgreement(
+    token: string,
+    agreementId: string,
+    reactivatedBy?: "PRODUCER" | "CONSUMER"
+  ) {
     const response = await apiClient.agreements.activateAgreement(
       agreementId,
       getAuthorizationHeader(token)
@@ -524,7 +573,17 @@ export const dataPreparationService = {
           agreementId,
           getAuthorizationHeader(token)
         ),
-      (res) => res.data.state === "ACTIVE"
+      (res) => {
+        if (!reactivatedBy) {
+          return res.data.state === "ACTIVE";
+        }
+
+        if (reactivatedBy === "CONSUMER") {
+          return !res.data.suspendedByConsumer;
+        }
+
+        return !res.data.suspendedByProducer;
+      }
     );
   },
 
@@ -844,6 +903,7 @@ export const dataPreparationService = {
     );
 
     assertValidResponse(response);
+
     await makePolling(
       () =>
         apiClient.tenants.getVerifiedAttributes(
@@ -1110,6 +1170,26 @@ export const dataPreparationService = {
     };
   },
 
+  async deletePurposeVersion(
+    token: string,
+    purposeId: string,
+    waitingForApprovalVersionId: string
+  ): Promise<void> {
+    const response = await apiClient.purposes.deletePurposeVersion(
+      purposeId,
+      waitingForApprovalVersionId,
+      getAuthorizationHeader(token)
+    );
+
+    assertValidResponse(response);
+
+    await makePolling(
+      () =>
+        apiClient.purposes.getPurpose(purposeId, getAuthorizationHeader(token)),
+      (res) => !res.data.waitingForApprovalVersion
+    );
+  },
+
   async rejectPurposeVersion(
     token: string,
     purposeId: string,
@@ -1151,7 +1231,12 @@ export const dataPreparationService = {
     return response.data;
   },
 
-  async suspendPurpose(token: string, purposeId: string, versionId: string) {
+  async suspendPurpose(
+    token: string,
+    purposeId: string,
+    versionId: string,
+    checkSuspendedBy?: "CONSUMER" | "PROVIDER"
+  ) {
     const response = await apiClient.purposes.suspendPurposeVersion(
       purposeId,
       versionId,
@@ -1163,7 +1248,18 @@ export const dataPreparationService = {
     await makePolling(
       () =>
         apiClient.purposes.getPurpose(purposeId, getAuthorizationHeader(token)),
-      (res) => res.data.currentVersion?.state === "SUSPENDED"
+      (res) => {
+        const isSuspended = res.data.currentVersion?.state === "SUSPENDED";
+        if (!checkSuspendedBy) {
+          return isSuspended;
+        }
+        switch (checkSuspendedBy) {
+          case "CONSUMER":
+            return Boolean(res.data.suspendedByConsumer);
+          case "PROVIDER":
+            return Boolean(res.data.suspendedByProducer);
+        }
+      }
     );
     return response.data;
   },
@@ -1209,7 +1305,8 @@ export const dataPreparationService = {
   async activatePurposeVersion(
     token: string,
     purposeId: string,
-    versionId: string
+    versionId: string,
+    checkNotSuspendedBy?: "CONSUMER" | "PRODUCER"
   ) {
     const authHeader = getAuthorizationHeader(token);
 
@@ -1223,7 +1320,19 @@ export const dataPreparationService = {
 
     await makePolling(
       () => apiClient.purposes.getPurpose(purposeId, authHeader),
-      (res) => res.data.currentVersion?.state === "ACTIVE"
+      (res) => {
+        const isActive =
+          res.data.versions.find((v) => v.id === versionId)?.state === "ACTIVE";
+        if (!checkNotSuspendedBy) {
+          return isActive;
+        }
+        switch (checkNotSuspendedBy) {
+          case "CONSUMER":
+            return !res.data.suspendedByConsumer;
+          case "PRODUCER":
+            return !res.data.suspendedByProducer;
+        }
+      }
     );
 
     return response.data;
@@ -1271,9 +1380,9 @@ export const dataPreparationService = {
 
     await makePolling(
       () =>
-        apiClient.clients.addUserToClient(
+        apiClient.clients.addUsersToClient(
           clientId,
-          userId,
+          { userIds: [userId] },
           getAuthorizationHeader(token)
         ),
       (res) => {
@@ -1393,6 +1502,113 @@ export const dataPreparationService = {
       () =>
         apiClient.tenants.getTenant(tenantId, getAuthorizationHeader(token)),
       (res) => res.data.contactMail?.address === mailSeed.address
+    );
+  },
+
+  async revokeVerifiedAttributeToTenant(
+    token: string,
+    tenantId: string,
+    attributeId: string,
+    revokerId: string
+  ) {
+    const response = await apiClient.tenants.revokeVerifiedAttribute(
+      tenantId,
+      attributeId,
+      getAuthorizationHeader(token)
+    );
+    assertValidResponse(response);
+    await makePolling(
+      () =>
+        apiClient.tenants.getVerifiedAttributes(
+          tenantId,
+          getAuthorizationHeader(token)
+        ),
+      (res) =>
+        res.data.attributes.some(
+          (attr) =>
+            attr.id === attributeId &&
+            attr.revokedBy.some((t) => t.id === revokerId)
+        )
+    );
+  },
+
+  async revokeDeclaredAttributeToTenant(
+    token: string,
+    tenantId: string,
+    attributeId: string
+  ) {
+    const response = await apiClient.tenants.revokeDeclaredAttribute(
+      attributeId,
+      getAuthorizationHeader(token)
+    );
+    assertValidResponse(response);
+    await makePolling(
+      () =>
+        apiClient.tenants.getDeclaredAttributes(
+          tenantId,
+          getAuthorizationHeader(token)
+        ),
+      (res) =>
+        res.data.attributes.some(
+          (attr) => attr.id === attributeId && attr.revocationTimestamp
+        )
+    );
+  },
+
+  async deleteClientKeyById(token: string, clientId: string, keyId: string) {
+    const response = await apiClient.clients.deleteClientKeyById(
+      clientId,
+      keyId,
+      getAuthorizationHeader(token)
+    );
+
+    assertValidResponse(response);
+
+    await makePolling(
+      () =>
+        apiClient.clients.getClientKeyById(
+          clientId,
+          keyId,
+          getAuthorizationHeader(token)
+        ),
+      (res) => res.status === 404
+    );
+    return response.data;
+  },
+
+  async deleteClient(token: string, clientId: string) {
+    const response = await apiClient.clients.deleteClient(
+      clientId,
+      getAuthorizationHeader(token)
+    );
+
+    assertValidResponse(response);
+
+    await makePolling(
+      () =>
+        apiClient.clients.getClient(clientId, getAuthorizationHeader(token)),
+      (res) => res.status === 404
+    );
+    return response.data;
+  },
+
+  async deletePurposeFromClient(
+    token: string,
+    clientId: string,
+    purposeId: string
+  ) {
+    const response = await apiClient.clients.removeClientPurpose(
+      clientId,
+      purposeId,
+      getAuthorizationHeader(token)
+    );
+
+    assertValidResponse(response);
+
+    await makePolling(
+      () =>
+        apiClient.clients.getClient(clientId, getAuthorizationHeader(token)),
+      (res) => !res.data.purposes.some((p) => p.purposeId === purposeId)
     );
   },
 };

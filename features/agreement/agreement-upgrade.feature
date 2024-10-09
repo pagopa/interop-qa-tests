@@ -2,7 +2,7 @@
 Feature: Upgrade di una richiesta di fruizione
   Tutti gli utenti autorizzati possono effettuare l'upgrade di una propria richiesta di fruizione
 
-  @agreement_upgrade1a
+  @agreement_upgrade1a @no-parallel
   Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fruitore e attivata da un erogatore, la quale è in stato ACTIVE, e associata ad una versione di e-service antecedente all’ultima versione pubblicata, alla richiesta di aggiornamento da parte di un utente con sufficienti permessi dell’ente fruitore, va a buon fine
     Given l'utente è un "<ruolo>" di "<ente>"
     Given "PA2" ha già creato un e-service in stato "PUBLISHED" con approvazione "AUTOMATIC"

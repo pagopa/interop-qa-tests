@@ -2,7 +2,7 @@
 Feature: Creazione nuova richiesta di fruizione
   Tutti gli utenti autorizzati possono ottenere la lista dei fruitori dei propri e-service
 
-  @agreement_creation1
+  @agreement_creation1 @no-parallel
   Scenario Outline: Un utente con sufficienti permessi (admin), il cui ente rispetta i requisiti (attributi certificati), senza altre richieste di fruizione per un e-service, crea una nuova richiesta di fruizione in bozza per l’ultima versione disponibile di quell'e-service, la quale è in stato PUBLISHED. La richiesta va a buon fine
     Given l'utente è un "<ruolo>" di "<enteFruitore>"
     Given "<enteCertificatore>" ha creato un attributo certificato e lo ha assegnato a "<enteFruitore>"
@@ -42,7 +42,7 @@ Feature: Creazione nuova richiesta di fruizione
       | enteFruitore | enteCertificatore | enteErogatore |
       | PA1          | PA2               | GSP           |
 
-  @agreement_creation2b
+  @agreement_creation2b @no-parallel
   Scenario Outline: Un utente con sufficienti permessi il cui ente rispetta i requisiti (attributi certificati), con altre richieste di fruizione in stato ARCHIVED per un e-service, crea una nuova richiesta di fruizione in bozza per l’ultima versione disponibile di quell'e-service, la quale è in stato PUBLISHED. La richiesta va a buon fine.
     Given l'utente è un "admin" di "<enteFruitore>"
     Given "<enteCertificatore>" ha creato un attributo certificato e lo ha assegnato a "<enteFruitore>"
@@ -63,7 +63,7 @@ Feature: Creazione nuova richiesta di fruizione
     When l'utente crea una richiesta di fruizione in bozza per l'ultima versione di quell'e-service
     Then si ottiene status code 200
 
-  @agreement_creation4a
+  @agreement_creation4a @no-parallel
   Scenario Outline: Un utente con sufficienti permessi il cui ente rispetta i requisiti (attributi certificati), con una richiesta di fruizione in stato DRAFT, PENDING, ACTIVE o SUSPENDED per un e-service, crea una nuova richiesta di fruizione in bozza per l’ultima versione disponibile di quell'e-service, la quale è in stato PUBLISHED. Ottiene un errore.
     Given l'utente è un "admin" di "<enteFruitore>"
     Given "<enteCertificatore>" ha creato un attributo certificato e lo ha assegnato a "<enteFruitore>"
@@ -79,7 +79,7 @@ Feature: Creazione nuova richiesta di fruizione
       | PA1          | PA2               | GSP           | ACTIVE         | AUTOMATIC        |
       | PA1          | PA2               | GSP           | SUSPENDED      | AUTOMATIC        |
 
-  @agreement_creation4b
+  @agreement_creation4b @no-parallel
   Scenario Outline: Un utente con sufficienti permessi, il cui ente rispetta i requisiti (attributi certificati), con una richiesta di fruizione in stato MISSING_CERTIFIED_ATTRIBUTES per un e-service, crea una nuova richiesta di fruizione in bozza per l’ultima versione disponibile di quell'e-service, la quale è in stato PUBLISHED. Ottiene un errore.
     Given l'utente è un "admin" di "<enteFruitore>"
     Given "<enteCertificatore>" ha creato un attributo certificato e lo ha assegnato a "<enteFruitore>"
@@ -94,7 +94,7 @@ Feature: Creazione nuova richiesta di fruizione
       | enteFruitore | enteCertificatore | enteErogatore |
       | PA1          | PA2               | GSP           |
 
-  @agreement_creation5
+  @agreement_creation5 @no-parallel
   Scenario Outline: Un utente con sufficienti permessi, il cui ente rispetta i requisiti (attributi certificati), senza altre richieste di fruizione per un e-service, crea una nuova richiesta di fruizione in bozza per la penultima versione disponibile di quell'e-service, la quale è in stato DEPRECATED. Ottiene un errore.
     Given l'utente è un "admin" di "<enteFruitore>"
     Given "<enteCertificatore>" ha creato un attributo certificato e lo ha assegnato a "<enteFruitore>"

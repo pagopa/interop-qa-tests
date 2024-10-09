@@ -27,7 +27,7 @@ Feature: Attivazione richiesta di fruizione
       | GSP          | PA2               | PA1           | support      |       403 |
       | GSP          | PA2               | PA1           | api,security |       403 |
 
-  @agreement_activate2
+  @agreement_activate2 @no-parallel
   Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fruitore, la quale è in stato SUSPENDED (riattivazione), con tutti gli attributi richiesti certificati, tutti gli attributi richiesti dichiarati dal fruitore, e tutti gli attributi richiesti verificati dall’erogatore, alla richiesta di attivazione da parte di un utente con sufficienti permessi dell’ente erogatore, va a buon fine.
     Given l'utente è un "admin" di "<enteErogatore>"
     Given "<enteCertificatore>" ha creato un attributo certificato e lo ha assegnato a "<enteFruitore>"
@@ -46,7 +46,7 @@ Feature: Attivazione richiesta di fruizione
       | enteFruitore | enteCertificatore | enteErogatore |
       | PA1          | PA2               | GSP           |
 
-  @agreement_activate3
+  @agreement_activate3 @no-parallel
   Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fruitore, la quale è in stato PENDING o SUSPENDED; con tutti gli attributi richiesti certificati, i quali sono due gruppi di due, dei quali il fruitore ne possiede uno per gruppo; tutti gli attributi richiesti dichiarati dal fruitore, i quali sono due gruppi di due, dei quali il fruitore ne possiede uno per gruppo; tutti gli attributi richiesti verificati dall’erogatore, i quali sono due gruppi di due, dei quali il fruitore ne possiede uno per gruppo; alla richiesta di attivazione da parte di un utente con sufficienti permessi dell’ente erogatore, va a buon fine.
     Given l'utente è un "admin" di "<enteErogatore>"
     Given due gruppi di due attributi certificati da "<enteCertificatore>", dei quali "<enteFruitore>" ne possiede uno per gruppo
@@ -75,7 +75,7 @@ Feature: Attivazione richiesta di fruizione
       | ACTIVE         |
       | ARCHIVED       |
 
-  @agreement_activate4b
+  @agreement_activate4b @no-parallel
   Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fruitore, la quale è in stato MISSING_CERTIFIED_ATTRIBUTES, alla richiesta di attivazione da parte di un utente con sufficienti permessi dell’ente erogatore, ottiene un errore
     Given l'utente è un "admin" di "<enteErogatore>"
     Given "<enteCertificatore>" ha creato un attributo certificato e lo ha assegnato a "<enteFruitore>"
@@ -107,7 +107,7 @@ Feature: Attivazione richiesta di fruizione
     When l'utente richiede una operazione di attivazione di quella richiesta di fruizione
     Then si ottiene status code 403
 
-  @agreement_activate6
+  @agreement_activate6 @no-parallel
   Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fruitore, la quale è in stato SUSPENDED (riattivazione), con uno o più attributi richiesti non posseduti dal fruitore, alla richiesta di attivazione da parte di un utente con sufficienti permessi dell’ente erogatore, va a buon fine ma la richiesta di fruizione resta in stato "SUSPENDED"
     Given l'utente è un "admin" di "<enteErogatore>"
     Given "<enteCertificatore>" ha creato un attributo certificato e lo ha assegnato a "<enteFruitore>"
