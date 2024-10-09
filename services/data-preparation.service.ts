@@ -1575,4 +1575,61 @@ export const dataPreparationService = {
         )
     );
   },
+
+  async deleteClientKeyById(token: string, clientId: string, keyId: string) {
+    const response = await apiClient.clients.deleteClientKeyById(
+      clientId,
+      keyId,
+      getAuthorizationHeader(token)
+    );
+
+    assertValidResponse(response);
+
+    await makePolling(
+      () =>
+        apiClient.clients.getClientKeyById(
+          clientId,
+          keyId,
+          getAuthorizationHeader(token)
+        ),
+      (res) => res.status === 404
+    );
+    return response.data;
+  },
+
+  async deleteClient(token: string, clientId: string) {
+    const response = await apiClient.clients.deleteClient(
+      clientId,
+      getAuthorizationHeader(token)
+    );
+
+    assertValidResponse(response);
+
+    await makePolling(
+      () =>
+        apiClient.clients.getClient(clientId, getAuthorizationHeader(token)),
+      (res) => res.status === 404
+    );
+    return response.data;
+  },
+
+  async deletePurposeFromClient(
+    token: string,
+    clientId: string,
+    purposeId: string
+  ) {
+    const response = await apiClient.clients.removeClientPurpose(
+      clientId,
+      purposeId,
+      getAuthorizationHeader(token)
+    );
+
+    assertValidResponse(response);
+
+    await makePolling(
+      () =>
+        apiClient.clients.getClient(clientId, getAuthorizationHeader(token)),
+      (res) => !res.data.purposes.some((p) => p.purposeId === purposeId)
+    );
+  },
 };
