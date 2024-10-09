@@ -367,6 +367,28 @@ export const dataPreparationService = {
     return agreementId;
   },
 
+  async upgradeAgreement(token: string, agreementId: string): Promise<string> {
+    const response = await apiClient.agreements.upgradeAgreement(
+      agreementId,
+      getAuthorizationHeader(token)
+    );
+
+    assertValidResponse(response);
+
+    const newAgreementId = response.data.id;
+
+    await makePolling(
+      () =>
+        apiClient.agreements.getAgreementById(
+          newAgreementId,
+          getAuthorizationHeader(token)
+        ),
+      (res) => res.status === 200
+    );
+
+    return newAgreementId;
+  },
+
   async createAgreementWithGivenState(
     token: string,
     agreementState: AgreementState,
@@ -534,8 +556,11 @@ export const dataPreparationService = {
       (res) => res.data.state === "ARCHIVED"
     );
   },
-
-  async activateAgreement(token: string, agreementId: string) {
+  async activateAgreement(
+    token: string,
+    agreementId: string,
+    reactivatedBy?: "PRODUCER" | "CONSUMER"
+  ) {
     const response = await apiClient.agreements.activateAgreement(
       agreementId,
       getAuthorizationHeader(token)
@@ -549,7 +574,17 @@ export const dataPreparationService = {
           agreementId,
           getAuthorizationHeader(token)
         ),
-      (res) => res.data.state === "ACTIVE"
+      (res) => {
+        if (!reactivatedBy) {
+          return res.data.state === "ACTIVE";
+        }
+
+        if (reactivatedBy === "CONSUMER") {
+          return !res.data.suspendedByConsumer;
+        }
+
+        return !res.data.suspendedByProducer;
+      }
     );
   },
 
@@ -869,6 +904,7 @@ export const dataPreparationService = {
     );
 
     assertValidResponse(response);
+
     await makePolling(
       () =>
         apiClient.tenants.getVerifiedAttributes(
@@ -1438,6 +1474,56 @@ export const dataPreparationService = {
       () =>
         apiClient.tenants.getTenant(tenantId, getAuthorizationHeader(token)),
       (res) => res.data.contactMail?.address === mailSeed.address
+    );
+  },
+
+  async revokeVerifiedAttributeToTenant(
+    token: string,
+    tenantId: string,
+    attributeId: string,
+    revokerId: string
+  ) {
+    const response = await apiClient.tenants.revokeVerifiedAttribute(
+      tenantId,
+      attributeId,
+      getAuthorizationHeader(token)
+    );
+    assertValidResponse(response);
+    await makePolling(
+      () =>
+        apiClient.tenants.getVerifiedAttributes(
+          tenantId,
+          getAuthorizationHeader(token)
+        ),
+      (res) =>
+        res.data.attributes.some(
+          (attr) =>
+            attr.id === attributeId &&
+            attr.revokedBy.some((t) => t.id === revokerId)
+        )
+    );
+  },
+
+  async revokeDeclaredAttributeToTenant(
+    token: string,
+    tenantId: string,
+    attributeId: string
+  ) {
+    const response = await apiClient.tenants.revokeDeclaredAttribute(
+      attributeId,
+      getAuthorizationHeader(token)
+    );
+    assertValidResponse(response);
+    await makePolling(
+      () =>
+        apiClient.tenants.getDeclaredAttributes(
+          tenantId,
+          getAuthorizationHeader(token)
+        ),
+      (res) =>
+        res.data.attributes.some(
+          (attr) => attr.id === attributeId && attr.revocationTimestamp
+        )
     );
   },
 };

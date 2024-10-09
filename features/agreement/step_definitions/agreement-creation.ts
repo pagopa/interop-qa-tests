@@ -119,6 +119,7 @@ Given(
   "la richiesta di fruizione è passata in stato {string}",
   async function (agreementState: AgreementState) {
     assertContextSchema(this, { agreementId: z.string(), token: z.string() });
+
     await makePolling(
       () =>
         apiClient.agreements.getAgreementById(
