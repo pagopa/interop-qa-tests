@@ -43,6 +43,7 @@ When(
     const { publicKey, privateKey, clientId, purposeId } = this;
 
     const clientAssertion = createClientAssertion({
+      clientType: "CONSUMER",
       clientId,
       purposeId,
       publicKey,
@@ -71,6 +72,7 @@ When(
       this;
 
     const clientAssertion = createClientAssertion({
+      clientType: "CONSUMER",
       clientId,
       purposeId,
       publicKey: newClientPublicKey,

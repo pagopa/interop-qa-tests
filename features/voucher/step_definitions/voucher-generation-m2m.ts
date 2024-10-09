@@ -30,6 +30,31 @@ When("l'utente richiede la generazione del voucher M2M", async function () {
 });
 
 When(
+  "l'utente richiede la generazione del voucher M2M indicando il primo client ma con la chiave caricata nel secondo",
+  async function () {
+    assertContextSchema(this, {
+      clientId: z.string(),
+      newClientPrivateKey: z.string(),
+      newClientPublicKey: z.string(),
+    });
+
+    const { newClientPublicKey, newClientPrivateKey, clientId } = this;
+
+    const clientAssertion = createClientAssertion({
+      clientType: "API",
+      clientId,
+      publicKey: newClientPublicKey,
+      privateKey: newClientPrivateKey,
+    });
+
+    this.response = await requestVoucher({
+      clientId,
+      clientAssertion,
+    });
+  }
+);
+
+When(
   "l'utente richiede la generazione del voucher M2M con una chiave associata a nessun client",
   async function () {
     assertContextSchema(this, {

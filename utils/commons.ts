@@ -249,7 +249,7 @@ export function createClientAssertion(
     iat: issuedAt,
     exp: issuedAt + 43200 * 60, // 30 days
     ...(clientType === "CONSUMER" ? { purposeId: options.purposeId } : {}),
-    digest: includeDigest
+    digest: options.includeDigest
       ? {
           alg: "SHA256",
           value:

@@ -70,7 +70,7 @@ Scenario Outline: La generazione del JWT fallisce quando la chiave non è associ
     Given "PA1" ha già inserito l'utente con ruolo "admin" come membro di quel nuovo client
     Given un "admin" di "PA1" ha caricato una chiave pubblica nel client
     Given un "admin" di "PA1" ha caricato una chiave pubblica nel nuovo client
-    When l'utente richiede la generazione del voucher M2M
+    When l'utente richiede la generazione del voucher M2M indicando il primo client ma con la chiave caricata nel secondo
     Then la richiesta di generazione del Voucher non va a buon fine
 
 @voucher_generation_m2m8
