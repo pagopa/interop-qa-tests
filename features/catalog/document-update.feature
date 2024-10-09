@@ -34,3 +34,11 @@ Feature: Aggiornamento del nome di un documento
     Given "PA1" ha già creato un e-service con un descrittore in stato "ARCHIVED" e un documento già caricato
     When l'utente aggiorna il nome di quel documento
     Then si ottiene status code 400
+
+  @document_update3
+  Scenario Outline: Per un e-service che ha un solo descrittore, il quale è in stato DRAFT, e che ha almeno due documenti già caricati, alla richiesta di aggiornamento del nome di uno di quelli, se il nome aggiornato è già in uso da uno degli altri documenti si ottiene un errore
+    Given l'utente è un "admin" di "PA1"
+    Given "PA1" ha già creato un e-service con un descrittore in stato "DRAFT"
+    Given "PA1" ha già caricato due documenti con nome "test 1" e "test 2" in quel descrittore
+    When l'utente modifica il nome del secondo documento in "test 1"
+    Then si ottiene status code 409
