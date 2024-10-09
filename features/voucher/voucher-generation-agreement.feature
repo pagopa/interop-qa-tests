@@ -86,7 +86,7 @@ Scenario Outline: La generazione del Voucher va a buon fine quando il fruitore p
     When l'utente richiede la generazione del voucher
     Then si ottiene la corretta generazione del voucher
 
-@voucher_generation_agreement6 
+@voucher_generation_agreement6 @no-parallel
 Scenario Outline: La generazione del Voucher va a buon fine quando il fruitore perde e poi riottiene un attributo dichiarato necessario all’utilizzo dell’EService
     Given l'utente è un "admin" di "PA1"
     Given "PA1" ha già dichiarato un attributo
