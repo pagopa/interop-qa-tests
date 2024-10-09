@@ -135,9 +135,11 @@ Given(
   async function (tenantType: TenantType) {
     assertContextSchema(this, {
       eserviceId: z.string(),
+      descriptorId: z.string().optional(),
     });
     const token = await getToken(tenantType);
 
+    this.oldDescriptorId = this.descriptorId;
     this.descriptorId = await dataPreparationService.createNextDraftDescriptor(
       token,
       this.eserviceId

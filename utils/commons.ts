@@ -261,7 +261,7 @@ export async function requestVoucher({
   clientId: string;
   clientAssertion: string;
 }) {
-  const response = await axios.post(
+  return await axios.post(
     env.AUTHORIZATION_SERVER_TOKEN_CREATION_URL,
     new URLSearchParams({
       client_id: clientId,
@@ -274,8 +274,7 @@ export async function requestVoucher({
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
+      validateStatus: () => true,
     }
   );
-
-  return response.data;
 }
