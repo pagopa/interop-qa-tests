@@ -283,7 +283,7 @@ Scenario Outline: La generazione del Voucher fallisce quando il fruitore perde u
     When l'utente richiede la generazione del voucher
     Then la richiesta di generazione del Voucher non va a buon fine
 
-@voucher_generation_agreement18
+@voucher_generation_agreement18 @no-parallel
 Scenario Outline: La generazione del Voucher fallisce quando il fruitore perde un attributo dichiarato necessario all’utilizzo dell’EService
     Given l'utente è un "admin" di "PA1"
     Given "PA1" ha già dichiarato un attributo
