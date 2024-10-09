@@ -4,10 +4,11 @@ import {
   Role,
   TenantType,
   assertContextSchema,
-  createBase64PublicKey,
+  createKeyPairPEM,
   getAuthorizationHeader,
   getRandomInt,
   getToken,
+  keyToBase64,
 } from "../../../utils/commons";
 import { apiClient } from "../../../api";
 import { dataPreparationService } from "../../../services/data-preparation.service";
@@ -21,7 +22,12 @@ Given(
 
     const token = await getToken(tenantType, role);
 
-    this.key = createBase64PublicKey();
+    const { privateKey, publicKey } = createKeyPairPEM();
+
+    this.privateKey = privateKey;
+    this.publicKey = publicKey;
+
+    this.key = keyToBase64(publicKey);
 
     this.keyId = await dataPreparationService.addPublicKeyToClient(
       token,

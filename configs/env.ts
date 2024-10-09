@@ -12,6 +12,8 @@ const envSchema = z.object({
   MAX_POLLING_TRIES: z.coerce.number(),
   POLLING_SLEEP_TIME: z.coerce.number(),
   CUCUMBER_OPTS_PARALLEL: z.coerce.number(),
+  AUTHORIZATION_SERVER_TOKEN_CREATION_URL: z.string(),
+  CLIENT_ASSERTION_JWT_AUDIENCE: z.string(),
 });
 
 const parsedEnv = envSchema.safeParse(process.env);
