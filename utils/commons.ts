@@ -212,19 +212,21 @@ export function calculateKidFromPublicKey(publicKey: string): string {
 }
 
 export function createClientAssertion({
-  kid,
   clientId,
   purposeId,
+  publicKey,
   privateKey,
   includeDigest,
 }: {
-  kid: string;
   clientId: string;
   purposeId: string;
+  publicKey: string;
   privateKey: string;
   includeDigest?: boolean;
 }): string {
   const issuedAt = Math.round(new Date().getTime() / 1000);
+
+  const kid = calculateKidFromPublicKey(publicKey);
 
   const headersRsa = {
     kid,
@@ -257,18 +259,21 @@ export function createClientAssertion({
 export async function requestVoucher({
   clientId,
   clientAssertion,
+  clientAssertionType = "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
+  grantType = "client_credentials",
 }: {
   clientId: string;
   clientAssertion: string;
+  clientAssertionType?: string;
+  grantType?: string;
 }) {
   return await axios.post(
     env.AUTHORIZATION_SERVER_TOKEN_CREATION_URL,
     new URLSearchParams({
       client_id: clientId,
       client_assertion: clientAssertion,
-      client_assertion_type:
-        "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
-      grant_type: "client_credentials",
+      client_assertion_type: clientAssertionType,
+      grant_type: grantType,
     }),
     {
       headers: {
