@@ -40,22 +40,19 @@ When(
     });
 
     const { publicKey, privateKey, clientId, purposeId } = this;
-    const kid = calculateKidFromPublicKey(publicKey);
 
     const clientAssertion = createClientAssertion({
-      kid,
       clientId,
       purposeId,
+      publicKey,
       privateKey,
       includeDigest: true,
     });
 
-    const result = await requestVoucher({
+    this.response = await requestVoucher({
       clientId,
       clientAssertion,
     });
-
-    this.result = result;
   }
 );
 
@@ -71,12 +68,11 @@ When(
 
     const { newClientPublicKey, newClientPrivateKey, clientId, purposeId } =
       this;
-    const kid = calculateKidFromPublicKey(newClientPublicKey);
 
     const clientAssertion = createClientAssertion({
-      kid,
       clientId,
       purposeId,
+      publicKey: newClientPublicKey,
       privateKey: newClientPrivateKey,
     });
 
