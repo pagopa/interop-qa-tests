@@ -83,36 +83,51 @@ Given(
 );
 
 Then(
+  "la richiesta di generazione del Voucher non va a buon fine per il parametro grant_type",
+  async function () {
+    assertContextSchema(this, {
+      response: z.object({
+        data: z.object({
+          errors: z.tuple([
+            z.object({
+              code: z.literal("015-9000"),
+              detail: z.literal(
+                'Invalid parameter found - [Path \'/grant_type\'] Instance value ("unknown") not found in enum (possible values: ["client_credentials"])'
+              ),
+            }),
+          ]),
+          status: z.literal(400),
+          title: z.literal(
+            "The request contains bad syntax or cannot be fulfilled."
+          ),
+          type: z.literal("about:blank"),
+        }),
+      }),
+    });
+  }
+);
+
+Then(
   "la richiesta di generazione del Voucher non va a buon fine",
   async function () {
     assertContextSchema(this, {
       response: z.object({
-        data: z.union([
-          z.object({
-            correlationId: z.string().uuid(),
-            errors: z.tuple([
-              z.object({
-                code: z.literal("015-0008"),
-                detail: z.literal(
-                  "Unable to generate a token for the given request"
-                ),
-              }),
-            ]),
-          }),
-          z.object({
-            errors: z.tuple([
-              z.object({
-                code: z.literal("015-9000"),
-                detail: z.string(),
-              }),
-            ]),
-          }),
-        ]),
-        status: z.literal(400),
-        title: z.literal(
-          "The request contains bad syntax or cannot be fulfilled."
-        ),
-        type: z.literal("about:blank"),
+        data: z.object({
+          correlationId: z.string().uuid(),
+          errors: z.tuple([
+            z.object({
+              code: z.literal("015-0008"),
+              detail: z.literal(
+                "Unable to generate a token for the given request"
+              ),
+            }),
+          ]),
+          status: z.literal(400),
+          title: z.literal(
+            "The request contains bad syntax or cannot be fulfilled."
+          ),
+          type: z.literal("about:blank"),
+        }),
       }),
     });
   }

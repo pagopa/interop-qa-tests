@@ -25,7 +25,7 @@ Feature: Generazione del voucher richiesta da un Ente
     Given "PA1" ha già associato la finalità a quel client
     Given un "admin" di "PA1" ha caricato una chiave pubblica nel client
     When l'utente richiede la generazione del voucher con il parametro "grant_type" diverso da quello atteso
-    Then la richiesta di generazione del Voucher non va a buon fine
+    Then la richiesta di generazione del Voucher non va a buon fine per il parametro grant_type
 
   @voucher_generation_params-validation3
   Scenario Outline: La generazione del Voucher fallisce quando il parametro client_id è diverso dal claim sub nella client assertion
