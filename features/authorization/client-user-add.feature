@@ -11,12 +11,12 @@ Feature: Aggiunta di un membro ad un client
 
     Examples:
       | ente | ruolo        | statusCode |
-      | GSP  | admin        |        200 |
+      | GSP  | admin        |        204 |
       | GSP  | api          |        403 |
       | GSP  | security     |        403 |
       | GSP  | support      |        403 |
       | GSP  | api,security |        403 |
-      | PA1  | admin        |        200 |
+      | PA1  | admin        |        204 |
       | PA1  | api          |        403 |
       | PA1  | security     |        403 |
       | PA1  | support      |        403 |
