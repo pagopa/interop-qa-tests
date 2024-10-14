@@ -110,7 +110,7 @@ jobs:
   
   data_prep:
     name: Data Preparation
-    needs: svc_version_check
+    needs: [svc_version_check, create_runner]
     runs-on: [self-hosted, "run_id:${{ inputs.environment }}-${{ github.run_id }}"]
     environment: ${{ inputs.environment }}
     if: ${{ always() && inputs.runDataPreparation }}
@@ -294,7 +294,7 @@ jobs:
   run_test:
     name: Run Cucumber Test Suite
     if: ${{ always() && inputs.runTests }}
-    needs: [data_prep]
+    needs: [data_prep, create_runner]
     runs-on: [self-hosted, "run_id:${{ inputs.environment }}-${{ github.run_id }}"]
     environment: ${{ inputs.environment }}
     env: 
