@@ -113,7 +113,7 @@ jobs:
     needs: [svc_version_check, create_runner]
     runs-on: [self-hosted, "run_id:${{ inputs.environment }}-${{ github.run_id }}"]
     environment: ${{ inputs.environment }}
-    if: ${{ always() && inputs.runDataPreparation }}
+    if: ${{ always() && inputs.runDataPreparation && needs.create_runner.result == 'success' }}
     env: 
       K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE }}
       EVENT_STORE_HOST: ${{ secrets.EVENT_STORE_HOST }}
