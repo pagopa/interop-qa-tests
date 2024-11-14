@@ -132,16 +132,6 @@ export function keyToBase64(key: string | Buffer, withDelimitators = true) {
   ).toString("base64");
 }
 
-function keyToPEM(
-  key: crypto.KeyObject,
-  keyType: "RSA" | "NON-RSA" = "RSA"
-): string | Buffer {
-  return key.export({
-    type: keyType === "RSA" ? "pkcs1" : "spki",
-    format: "pem",
-  });
-}
-
 export function createKeyPairPEM(
   keyType: "RSA" | "NON-RSA" = "RSA",
   modulusLength = 2048
@@ -149,15 +139,31 @@ export function createKeyPairPEM(
   const { privateKey, publicKey } =
     keyType === "RSA"
       ? crypto.generateKeyPairSync("rsa", {
+          publicKeyEncoding: {
+            type: "pkcs1",
+            format: "pem",
+          },
+          privateKeyEncoding: {
+            type: "pkcs1",
+            format: "pem",
+          },
           modulusLength,
         })
       : crypto.generateKeyPairSync("ed25519", {
+          publicKeyEncoding: {
+            type: "spki",
+            format: "pem",
+          },
+          privateKeyEncoding: {
+            type: "pkcs8",
+            format: "pem",
+          },
           modulusLength,
         });
 
   return {
-    privateKey: keyToPEM(privateKey),
-    publicKey: keyToPEM(publicKey),
+    privateKey,
+    publicKey,
   };
 }
 
