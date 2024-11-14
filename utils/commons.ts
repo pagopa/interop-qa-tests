@@ -1,6 +1,6 @@
 import "../configs/env";
 import { createReadStream, readFileSync } from "fs";
-import crypto, { JsonWebKey, randomUUID } from "crypto";
+import crypto, { JsonWebKey, KeyObject, randomUUID } from "crypto";
 import { z } from "zod";
 import axios, { type AxiosResponse } from "axios";
 import {
@@ -121,9 +121,9 @@ export function assertValidResponse<T>(response: AxiosResponse<T>) {
   }
 }
 
-export function keyToBase64(key: string | Buffer, withDelimitators = true) {
+export function keyToBase64(key: string | KeyObject, withDelimitators = true) {
   if (withDelimitators) {
-    return Buffer.from(key).toString("base64");
+    return Buffer.from(key as string).toString("base64");
   }
   return Buffer.from(
     (key as string)
