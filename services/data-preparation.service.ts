@@ -198,6 +198,8 @@ export const dataPreparationService = {
         ),
       (res) => res.data.interface !== undefined
     );
+
+    return response.data.id;
   },
 
   async addDocumentToDescriptor(
