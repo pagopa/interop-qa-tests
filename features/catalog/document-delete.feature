@@ -34,3 +34,24 @@ Feature: Cancellazione di un documento
     Given "PA1" ha già creato un e-service con un descrittore in stato "ARCHIVED" e un documento già caricato
     When l'utente cancella quel documento
     Then si ottiene status code 400
+
+  @document_delete3
+  Scenario Outline: Per un e-service che ha un solo descrittore, il quale è in stato DRAFT, alla richiesta di cancellazione di un'interfaccia precedentemente caricata, l'operazione va a buon fine
+    Given l'utente è un "admin" di "PA1"
+    Given "PA1" ha già creato un e-service con un descrittore in stato DRAFT con un'interfaccia già caricata
+    When l'utente cancella quell'interfaccia
+    Then si ottiene status code 204
+
+  @document_delete4
+  Scenario Outline: Per un e-service che ha un solo descrittore, il quale è in uno dei sequenti stati: (PUBLISHED, ARCHIVED, DEPRECATED, SUSPENDED), alla richiesta di cancellazione di un'interfaccia precedentemente caricata, si ottiene un errore
+    Given l'utente è un "admin" di "PA1"
+    Given "PA1" ha già creato un e-service con un descrittore in stato DRAFT con un'interfaccia già caricata
+    When l'utente cancella quell'interfaccia
+    Then si ottiene status code 400
+
+    Examples: # Test sugli stati
+      | statoDescrittore |
+      | PUBLISHED        |
+      | SUSPENDED        |
+      | DEPRECATED       |
+      | ARCHIVED         |
