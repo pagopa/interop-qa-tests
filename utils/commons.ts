@@ -1,6 +1,6 @@
 import "../configs/env";
 import { createReadStream, readFileSync } from "fs";
-import crypto, { JsonWebKey, randomUUID } from "crypto";
+import crypto, { JsonWebKey, KeyObject, randomUUID } from "crypto";
 import { z } from "zod";
 import axios, { type AxiosResponse } from "axios";
 import {
@@ -121,25 +121,15 @@ export function assertValidResponse<T>(response: AxiosResponse<T>) {
   }
 }
 
-export function keyToBase64(key: string | Buffer, withDelimitators = true) {
+export function keyToBase64(key: string | KeyObject, withDelimitators = true) {
   if (withDelimitators) {
-    return Buffer.from(key).toString("base64");
+    return Buffer.from(key as string).toString("base64");
   }
   return Buffer.from(
     (key as string)
       .replace("-----BEGIN RSA PUBLIC KEY-----", "")
       .replace("-----END RSA PUBLIC KEY-----", "")
   ).toString("base64");
-}
-
-function keyToPEM(
-  key: crypto.KeyObject,
-  keyType: "RSA" | "NON-RSA" = "RSA"
-): string | Buffer {
-  return key.export({
-    type: keyType === "RSA" ? "pkcs1" : "spki",
-    format: "pem",
-  });
 }
 
 export function createKeyPairPEM(
@@ -149,15 +139,31 @@ export function createKeyPairPEM(
   const { privateKey, publicKey } =
     keyType === "RSA"
       ? crypto.generateKeyPairSync("rsa", {
+          publicKeyEncoding: {
+            type: "pkcs1",
+            format: "pem",
+          },
+          privateKeyEncoding: {
+            type: "pkcs1",
+            format: "pem",
+          },
           modulusLength,
         })
       : crypto.generateKeyPairSync("ed25519", {
+          publicKeyEncoding: {
+            type: "spki",
+            format: "pem",
+          },
+          privateKeyEncoding: {
+            type: "pkcs8",
+            format: "pem",
+          },
           modulusLength,
         });
 
   return {
-    privateKey: keyToPEM(privateKey),
-    publicKey: keyToPEM(publicKey),
+    privateKey,
+    publicKey,
   };
 }
 
