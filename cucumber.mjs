@@ -76,6 +76,14 @@ export const tenant = {
   ],
 };
 
+export const voucher = {
+  paths: ["features/voucher/*.feature"],
+  require: [
+    "./features/**/step_definitions/**/*.ts",
+    "./features/common-steps.ts",
+  ],
+};
+
 export const onlyReady = {
   tags: "(not @wait_for_fix) and (not @resource_intensive) and (not @wait_for_clarification) and (not @fixed_in_node)",
 };
