@@ -18,12 +18,15 @@ When(
       token: z.string(),
       consumerId: z.string(),
       attributeId: z.string(),
+      agreementId: z.string(),
     });
     this.response = await apiClient.tenants.revokeVerifiedAttribute(
       this.consumerId,
       this.attributeId,
+      { agreementId: this.agreementId },
       getAuthorizationHeader(this.token)
     );
+    console.dir(this.response, { depth: null });
   }
 );
 Then(

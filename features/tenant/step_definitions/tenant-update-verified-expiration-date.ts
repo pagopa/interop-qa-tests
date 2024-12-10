@@ -18,18 +18,20 @@ Given(
     assertContextSchema(this, {
       token: z.string(),
       attributeId: z.string(),
+      agreementId: z.string(),
     });
     const date = new Date();
     date.setDate(date.getDate() + 7);
     const verifierId = getOrganizationId(verifierTenantType);
     const tenantId = getOrganizationId(targetTenantType);
-    await dataPreparationService.assignVerifiedAttributeToTenant(
-      this.token,
+    await dataPreparationService.assignVerifiedAttributeToTenant({
+      token: this.token,
       tenantId,
       verifierId,
-      this.attributeId,
-      date.toISOString()
-    );
+      attributeId: this.attributeId,
+      agreementId: this.agreementId,
+      expirationDate: date.toISOString(),
+    });
   }
 );
 

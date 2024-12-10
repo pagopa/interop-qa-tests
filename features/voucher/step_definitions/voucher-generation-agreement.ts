@@ -35,7 +35,10 @@ Given(
     attributeKind: AttributeKind,
     tenantType: TenantType
   ) {
-    assertContextSchema(this, { attributeId: z.string() });
+    assertContextSchema(this, {
+      attributeId: z.string(),
+      agreementId: z.string(),
+    });
     const tenantId = getOrganizationId(tenantType);
     const token = await getToken(ente);
 
@@ -49,12 +52,13 @@ Given(
         break;
       case "VERIFIED":
         const verifierId = getOrganizationId(ente);
-        await dataPreparationService.assignVerifiedAttributeToTenant(
+        await dataPreparationService.assignVerifiedAttributeToTenant({
           token,
           tenantId,
           verifierId,
-          this.attributeId
-        );
+          agreementId: this.agreementId,
+          attributeId: this.attributeId,
+        });
         break;
       case "DECLARED":
         await dataPreparationService.declareDeclaredAttribute(
@@ -74,7 +78,10 @@ Given(
     attributeKind: AttributeKind,
     tenantType: TenantType
   ) {
-    assertContextSchema(this, { attributeId: z.string() });
+    assertContextSchema(this, {
+      attributeId: z.string(),
+      agreementId: z.string(),
+    });
     const token = await getToken(ente);
     const revokerId = getOrganizationId(ente);
     const tenantId = getOrganizationId(tenantType);
@@ -91,6 +98,7 @@ Given(
           token,
           tenantId,
           this.attributeId,
+          this.agreementId,
           revokerId
         );
         break;
