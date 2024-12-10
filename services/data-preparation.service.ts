@@ -888,17 +888,26 @@ export const dataPreparationService = {
     );
   },
 
-  async assignVerifiedAttributeToTenant(
-    token: string,
-    tenantId: string,
-    verifierId: string,
-    attributeId: string,
-    expirationDate?: string
-  ) {
+  async assignVerifiedAttributeToTenant({
+    token,
+    tenantId,
+    verifierId,
+    attributeId,
+    agreementId,
+    expirationDate,
+  }: {
+    token: string;
+    tenantId: string;
+    verifierId: string;
+    attributeId: string;
+    agreementId: string;
+    expirationDate?: string;
+  }) {
     const response = await apiClient.tenants.verifyVerifiedAttribute(
       tenantId,
       {
         id: attributeId,
+        agreementId,
         expirationDate,
       },
       getAuthorizationHeader(token)
@@ -1511,11 +1520,13 @@ export const dataPreparationService = {
     token: string,
     tenantId: string,
     attributeId: string,
+    agreementId: string,
     revokerId: string
   ) {
     const response = await apiClient.tenants.revokeVerifiedAttribute(
       tenantId,
       attributeId,
+      { agreementId },
       getAuthorizationHeader(token)
     );
     assertValidResponse(response);

@@ -115,6 +115,7 @@ export interface UpdateEServiceSeed {
   technology: EServiceTechnology;
   /** Risk Analysis Mode */
   mode: EServiceMode;
+  isSignalHubEnabled?: boolean;
 }
 
 export interface EServiceSeed {
@@ -124,6 +125,7 @@ export interface EServiceSeed {
   technology: EServiceTechnology;
   /** Risk Analysis Mode */
   mode: EServiceMode;
+  isSignalHubEnabled?: boolean;
 }
 
 export interface UpdateEServiceDescriptorQuotas {
@@ -177,6 +179,10 @@ export interface Mail {
 
 export interface EServiceDescriptionSeed {
   description: string;
+}
+
+export interface RejectDelegatedEServiceDescriptorSeed {
+  rejectionReason: string;
 }
 
 export interface CatalogEServiceDescriptor {
@@ -264,6 +270,7 @@ export interface CatalogDescriptorEService {
   isSubscribed: boolean;
   activeDescriptor?: CompactDescriptor;
   mail?: Mail;
+  isSignalHubEnabled?: boolean;
 }
 
 export interface ProducerEServiceDetails {
@@ -276,6 +283,7 @@ export interface ProducerEServiceDetails {
   /** Risk Analysis Mode */
   mode: EServiceMode;
   riskAnalysis: EServiceRiskAnalysis[];
+  isSignalHubEnabled?: boolean;
 }
 
 /** Risk Analysis Mode */
@@ -327,6 +335,7 @@ export interface ProducerEServiceDescriptor {
   agreementApprovalPolicy: AgreementApprovalPolicy;
   eservice: ProducerDescriptorEService;
   attributes: DescriptorAttributes;
+  rejectionReasons?: DescriptorRejectionReason[];
 }
 
 export interface ProducerDescriptorEService {
@@ -342,6 +351,7 @@ export interface ProducerDescriptorEService {
   descriptors: CompactDescriptor[];
   draftDescriptor?: CompactDescriptor;
   mail?: Mail;
+  isSignalHubEnabled?: boolean;
 }
 
 export interface EServiceDoc {
@@ -354,6 +364,12 @@ export interface EServiceDoc {
 
 export interface UpdateEServiceDescriptorDocumentSeed {
   prettyName: string;
+}
+
+export interface DescriptorRejectionReason {
+  rejectionReason: string;
+  /** @format date-time */
+  rejectedAt: string;
 }
 
 /**
@@ -555,7 +571,7 @@ export interface CompactOrganization {
   contactMail?: Mail;
 }
 
-export type TenantKind = "PA" | "PRIVATE" | "GSP";
+export type TenantKind = "PA" | "PRIVATE" | "GSP" | "SCP";
 
 export interface CompactOrganizations {
   results: CompactOrganization[];
@@ -607,26 +623,29 @@ export interface PresignedUrl {
   url: string;
 }
 
+export interface CompactProducerDescriptor {
+  /** @format uuid */
+  id: string;
+  /** EService Descriptor State */
+  state: EServiceDescriptorState;
+  version: string;
+  audience: string[];
+  requireCorrections?: boolean;
+}
+
 export interface ProducerEService {
   /** @format uuid */
   id: string;
   name: string;
   /** Risk Analysis Mode */
   mode: EServiceMode;
-  activeDescriptor?: CompactDescriptor;
-  draftDescriptor?: CompactDescriptor;
+  activeDescriptor?: CompactProducerDescriptor;
+  draftDescriptor?: CompactProducerDescriptor;
 }
 
 export interface ProducerEServices {
   results: ProducerEService[];
   pagination: Pagination;
-}
-
-export interface ProductInfo {
-  id: string;
-  role: string;
-  /** @format date-time */
-  createdAt: string;
 }
 
 export interface SelfcareProduct {
@@ -909,7 +928,13 @@ export interface AgreementsEService {
 }
 
 /** EService Descriptor State */
-export type EServiceDescriptorState = "DRAFT" | "PUBLISHED" | "DEPRECATED" | "SUSPENDED" | "ARCHIVED";
+export type EServiceDescriptorState =
+  | "DRAFT"
+  | "PUBLISHED"
+  | "DEPRECATED"
+  | "SUSPENDED"
+  | "ARCHIVED"
+  | "WAITING_FOR_APPROVAL";
 
 /** EService Descriptor State */
 export type EServiceTechnology = "REST" | "SOAP";
@@ -1091,14 +1116,27 @@ export interface Tenants {
   pagination: Pagination;
 }
 
-export interface TenantFeature {
-  /** Certifier Tenant Feature */
-  certifier?: Certifier;
-}
+export type TenantFeatureType = "PERSISTENT_CERTIFIER" | "DELEGATED_PRODUCER";
+
+export type TenantFeature =
+  | {
+      /** Certifier Tenant Feature */
+      certifier?: Certifier;
+    }
+  | {
+      /** Delegated producer Tenant Feature */
+      delegatedProducer?: DelegatedProducer;
+    };
 
 /** Certifier Tenant Feature */
 export interface Certifier {
   certifierId: string;
+}
+
+/** Delegated producer Tenant Feature */
+export interface DelegatedProducer {
+  /** @format date-time */
+  availabilityTimestamp: string;
 }
 
 export interface CompactTenant {
@@ -1160,6 +1198,8 @@ export interface UpdateVerifiedTenantAttributeSeed {
 export interface VerifiedTenantAttributeSeed {
   /** @format uuid */
   id: string;
+  /** @format uuid */
+  agreementId: string;
   /** @format date-time */
   expirationDate?: string;
 }
@@ -1195,6 +1235,8 @@ export interface TenantVerifier {
   expirationDate?: string;
   /** @format date-time */
   extensionDate?: string;
+  /** @format uuid */
+  delegationId?: string;
 }
 
 export interface TenantRevoker {
@@ -1208,6 +1250,8 @@ export interface TenantRevoker {
   extensionDate?: string;
   /** @format date-time */
   revocationDate: string;
+  /** @format uuid */
+  delegationId?: string;
 }
 
 export interface TokenGenerationValidationResult {
@@ -1271,6 +1315,74 @@ export interface PublicKeys {
 export interface CertifiedTenantAttributeSeed {
   /** @format uuid */
   id: string;
+}
+
+/** Delegation State */
+export type DelegationKind = "DELEGATED_PRODUCER" | "DELEGATED_CONSUMER";
+
+/** Delegation State */
+export type DelegationState = "WAITING_FOR_APPROVAL" | "ACTIVE" | "REJECTED" | "REVOKED";
+
+export interface DelegationTenant {
+  /** @format uuid */
+  id: string;
+  name: string;
+}
+
+export interface DelegationEService {
+  /** @format uuid */
+  id: string;
+  name: string;
+  description?: string;
+  /** @format uuid */
+  producerId: string;
+  producerName: string;
+  descriptors: CompactDescriptor[];
+}
+
+export interface Delegation {
+  /** @format uuid */
+  id: string;
+  eservice: DelegationEService;
+  delegate: DelegationTenant;
+  delegator: DelegationTenant;
+  activationContract?: Document;
+  revocationContract?: Document;
+  /** @format date-time */
+  submittedAt?: string;
+  rejectionReason?: string;
+  /** Delegation State */
+  state: DelegationState;
+  /** Delegation State */
+  kind: DelegationKind;
+}
+
+export interface CompactDelegation {
+  /** @format uuid */
+  id: string;
+  eservice?: CompactEServiceLight;
+  delegate: DelegationTenant;
+  delegator: DelegationTenant;
+  /** Delegation State */
+  state: DelegationState;
+  /** Delegation State */
+  kind: DelegationKind;
+}
+
+export interface CompactDelegations {
+  results: CompactDelegation[];
+  pagination: Pagination;
+}
+
+export interface DelegationSeed {
+  /** @format uuid */
+  eserviceId: string;
+  /** @format uuid */
+  delegateId: string;
+}
+
+export interface RejectDelegationPayload {
+  rejectionReason: string;
 }
 
 export interface Problem {
@@ -1483,6 +1595,8 @@ export interface GetProducerEServicesParams {
    * @default []
    */
   consumersIds?: string[];
+  /** if true only delegated e-services will be returned, if false only non-delegated e-services will be returned, if not present all e-services will be returned */
+  delegated?: boolean;
   /**
    * @format int32
    * @min 0
@@ -1637,6 +1751,11 @@ export interface GetConsumerPurposesParams {
   limit: number;
 }
 
+export interface RevokeVerifiedAttributePayload {
+  /** @format uuid */
+  agreementId: string;
+}
+
 export interface GetAttributesParams {
   /** Query to filter Attributes by name */
   q?: string;
@@ -1653,6 +1772,11 @@ export interface GetAttributesParams {
 
 export interface GetTenantsParams {
   name?: string;
+  /**
+   * comma separated feature types to filter the teanants with
+   * @default []
+   */
+  features?: TenantFeatureType[];
   /**
    * @format int32
    * @min 1
@@ -1755,6 +1879,39 @@ export interface GetProducerKeysParams {
    * @format uuid
    */
   producerKeychainId: string;
+}
+
+export interface GetDelegationsParams {
+  /**
+   * @format int32
+   * @min 0
+   */
+  offset: number;
+  /**
+   * @format int32
+   * @min 1
+   * @max 50
+   */
+  limit: number;
+  /**
+   * comma separated sequence of delegation states to filter the results with
+   * @default []
+   */
+  states?: DelegationState[];
+  /**
+   * The delegator ids to filter by
+   * @default []
+   */
+  delegatorIds?: string[];
+  /**
+   * The delegated ids to filter by
+   * @default []
+   */
+  delegateIds?: string[];
+  /** The delegation kind to filter by */
+  kind?: DelegationKind;
+  /** @default [] */
+  eserviceIds?: string[];
 }
 
 export namespace Agreements {
@@ -2908,6 +3065,62 @@ export namespace Eservices {
     };
     export type ResponseBody = CreatedResource;
   }
+  /**
+   * No description
+   * @tags eservices
+   * @name ApproveDelegatedEServiceDescriptor
+   * @summary approve a delegated new e-service version
+   * @request POST:/eservices/{eServiceId}/descriptors/{descriptorId}/approve
+   * @secure
+   */
+  export namespace ApproveDelegatedEServiceDescriptor {
+    export type RequestParams = {
+      /**
+       * the eservice id
+       * @format uuid
+       */
+      eServiceId: string;
+      /**
+       * the descriptor id
+       * @format uuid
+       */
+      descriptorId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {
+      "X-Correlation-Id": string;
+    };
+    export type ResponseBody = CreatedResource;
+  }
+  /**
+   * No description
+   * @tags eservices
+   * @name RejectDelegatedEServiceDescriptor
+   * @summary reject a delegated new e-service version
+   * @request POST:/eservices/{eServiceId}/descriptors/{descriptorId}/reject
+   * @secure
+   */
+  export namespace RejectDelegatedEServiceDescriptor {
+    export type RequestParams = {
+      /**
+       * the eservice id
+       * @format uuid
+       */
+      eServiceId: string;
+      /**
+       * the descriptor id
+       * @format uuid
+       */
+      descriptorId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = RejectDelegatedEServiceDescriptorSeed;
+    export type RequestHeaders = {
+      "X-Correlation-Id": string;
+    };
+    export type ResponseBody = CreatedResource;
+  }
 }
 
 export namespace Export {
@@ -3015,6 +3228,8 @@ export namespace Producers {
        * @default []
        */
       consumersIds?: string[];
+      /** if true only delegated e-services will be returned, if false only non-delegated e-services will be returned, if not present all e-services will be returned */
+      delegated?: boolean;
       /**
        * @format int32
        * @min 0
@@ -3484,7 +3699,7 @@ export namespace Tenants {
       attributeId: string;
     };
     export type RequestQuery = {};
-    export type RequestBody = never;
+    export type RequestBody = RevokeVerifiedAttributePayload;
     export type RequestHeaders = {};
     export type ResponseBody = void;
   }
@@ -3571,6 +3786,11 @@ export namespace Tenants {
     export type RequestQuery = {
       name?: string;
       /**
+       * comma separated feature types to filter the teanants with
+       * @default []
+       */
+      features?: TenantFeatureType[];
+      /**
        * @format int32
        * @min 1
        * @max 50
@@ -3582,6 +3802,36 @@ export namespace Tenants {
       "X-Correlation-Id": string;
     };
     export type ResponseBody = Tenants;
+  }
+  /**
+   * No description
+   * @tags tenants
+   * @name AssignTenantDelegatedProducerFeature
+   * @summary Assign delegated producer feature to tenant caller
+   * @request POST:/tenants/delegatedProducer
+   * @secure
+   */
+  export namespace AssignTenantDelegatedProducerFeature {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = void;
+  }
+  /**
+   * No description
+   * @tags tenants
+   * @name DeleteTenantDelegatedProducerFeature
+   * @summary Delete delegated producer feature to tenant caller
+   * @request DELETE:/tenants/delegatedProducer
+   * @secure
+   */
+  export namespace DeleteTenantDelegatedProducerFeature {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = void;
   }
 }
 
@@ -3985,6 +4235,89 @@ export namespace Producer {
       "X-Correlation-Id": string;
     };
     export type ResponseBody = Purposes;
+  }
+  /**
+   * @description creates the producer delegation
+   * @tags producerDelegations
+   * @name CreateProducerDelegation
+   * @summary Producer delegation creation
+   * @request POST:/producer/delegations
+   * @secure
+   */
+  export namespace CreateProducerDelegation {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = DelegationSeed;
+    export type RequestHeaders = {
+      "X-Correlation-Id": string;
+    };
+    export type ResponseBody = CreatedResource;
+  }
+  /**
+   * @description Approves a producer delegation
+   * @tags producerDelegations
+   * @name ApproveDelegation
+   * @summary Approves a producer delegation
+   * @request POST:/producer/delegations/{delegationId}/approve
+   * @secure
+   */
+  export namespace ApproveDelegation {
+    export type RequestParams = {
+      /**
+       * The identifier of the delegation
+       * @format uuid
+       */
+      delegationId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {
+      "X-Correlation-Id": string;
+    };
+    export type ResponseBody = void;
+  }
+  /**
+   * @description Rejects a producer delegation
+   * @tags producerDelegations
+   * @name RejectDelegation
+   * @summary Rejects a producer delegation
+   * @request POST:/producer/delegations/{delegationId}/reject
+   * @secure
+   */
+  export namespace RejectDelegation {
+    export type RequestParams = {
+      /**
+       * The identifier of the delegation
+       * @format uuid
+       */
+      delegationId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = RejectDelegationPayload;
+    export type RequestHeaders = {
+      "X-Correlation-Id": string;
+    };
+    export type ResponseBody = void;
+  }
+  /**
+   * @description Revokes a producer delegation
+   * @tags producerDelegations
+   * @name RevokeProducerDelegation
+   * @summary Revokes a producer delegation
+   * @request DELETE:/producer/delegations/{delegationId}
+   * @secure
+   */
+  export namespace RevokeProducerDelegation {
+    export type RequestParams = {
+      /** The delegation id */
+      delegationId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {
+      "X-Correlation-Id": string;
+    };
+    export type ResponseBody = void;
   }
 }
 
@@ -5026,6 +5359,99 @@ export namespace ProducerKeychains {
   }
 }
 
+export namespace Delegations {
+  /**
+   * @description List delegations
+   * @tags delegations
+   * @name GetDelegations
+   * @summary List delegations
+   * @request GET:/delegations
+   * @secure
+   */
+  export namespace GetDelegations {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      /**
+       * @format int32
+       * @min 0
+       */
+      offset: number;
+      /**
+       * @format int32
+       * @min 1
+       * @max 50
+       */
+      limit: number;
+      /**
+       * comma separated sequence of delegation states to filter the results with
+       * @default []
+       */
+      states?: DelegationState[];
+      /**
+       * The delegator ids to filter by
+       * @default []
+       */
+      delegatorIds?: string[];
+      /**
+       * The delegated ids to filter by
+       * @default []
+       */
+      delegateIds?: string[];
+      /** The delegation kind to filter by */
+      kind?: DelegationKind;
+      /** @default [] */
+      eserviceIds?: string[];
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {
+      "X-Correlation-Id": string;
+    };
+    export type ResponseBody = CompactDelegations;
+  }
+  /**
+   * @description Retrieves delegation
+   * @tags delegations
+   * @name GetDelegation
+   * @summary Retrieves delegation
+   * @request GET:/delegations/{delegationId}
+   * @secure
+   */
+  export namespace GetDelegation {
+    export type RequestParams = {
+      /** The delegation id */
+      delegationId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {
+      "X-Correlation-Id": string;
+    };
+    export type ResponseBody = Delegation;
+  }
+  /**
+   * @description Retrieve a contract of a delegation
+   * @tags delegations
+   * @name GetDelegationContract
+   * @summary Retrieve a contract of a delegation
+   * @request GET:/delegations/{delegationId}/contracts/{contractId}
+   * @secure
+   */
+  export namespace GetDelegationContract {
+    export type RequestParams = {
+      /** @format uuid */
+      delegationId: string;
+      /** @format uuid */
+      contractId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {
+      "X-Correlation-Id": string;
+    };
+    export type ResponseBody = File;
+  }
+}
+
 export namespace Status {
   /**
    * @description Return ok
@@ -6020,6 +6446,49 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         format: "json",
         ...params,
       }),
+
+    /**
+     * No description
+     *
+     * @tags eservices
+     * @name ApproveDelegatedEServiceDescriptor
+     * @summary approve a delegated new e-service version
+     * @request POST:/eservices/{eServiceId}/descriptors/{descriptorId}/approve
+     * @secure
+     */
+    approveDelegatedEServiceDescriptor: (eServiceId: string, descriptorId: string, params: RequestParams = {}) =>
+      this.request<CreatedResource, Problem>({
+        path: `/eservices/${eServiceId}/descriptors/${descriptorId}/approve`,
+        method: "POST",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags eservices
+     * @name RejectDelegatedEServiceDescriptor
+     * @summary reject a delegated new e-service version
+     * @request POST:/eservices/{eServiceId}/descriptors/{descriptorId}/reject
+     * @secure
+     */
+    rejectDelegatedEServiceDescriptor: (
+      eServiceId: string,
+      descriptorId: string,
+      data: RejectDelegatedEServiceDescriptorSeed,
+      params: RequestParams = {},
+    ) =>
+      this.request<CreatedResource, Problem>({
+        path: `/eservices/${eServiceId}/descriptors/${descriptorId}/reject`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
   };
   export = {
     /**
@@ -6467,11 +6936,18 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request DELETE:/tenants/{tenantId}/attributes/verified/{attributeId}
      * @secure
      */
-    revokeVerifiedAttribute: (tenantId: string, attributeId: string, params: RequestParams = {}) =>
+    revokeVerifiedAttribute: (
+      tenantId: string,
+      attributeId: string,
+      data: RevokeVerifiedAttributePayload,
+      params: RequestParams = {},
+    ) =>
       this.request<void, Problem>({
         path: `/tenants/${tenantId}/attributes/verified/${attributeId}`,
         method: "DELETE",
+        body: data,
         secure: true,
+        type: ContentType.Json,
         ...params,
       }),
 
@@ -6544,6 +7020,40 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         query: query,
         secure: true,
         format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags tenants
+     * @name AssignTenantDelegatedProducerFeature
+     * @summary Assign delegated producer feature to tenant caller
+     * @request POST:/tenants/delegatedProducer
+     * @secure
+     */
+    assignTenantDelegatedProducerFeature: (params: RequestParams = {}) =>
+      this.request<void, Problem>({
+        path: `/tenants/delegatedProducer`,
+        method: "POST",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags tenants
+     * @name DeleteTenantDelegatedProducerFeature
+     * @summary Delete delegated producer feature to tenant caller
+     * @request DELETE:/tenants/delegatedProducer
+     * @secure
+     */
+    deleteTenantDelegatedProducerFeature: (params: RequestParams = {}) =>
+      this.request<void, Problem>({
+        path: `/tenants/delegatedProducer`,
+        method: "DELETE",
+        secure: true,
         ...params,
       }),
   };
@@ -6864,6 +7374,79 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         query: query,
         secure: true,
         format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description creates the producer delegation
+     *
+     * @tags producerDelegations
+     * @name CreateProducerDelegation
+     * @summary Producer delegation creation
+     * @request POST:/producer/delegations
+     * @secure
+     */
+    createProducerDelegation: (data: DelegationSeed, params: RequestParams = {}) =>
+      this.request<CreatedResource, Problem>({
+        path: `/producer/delegations`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Approves a producer delegation
+     *
+     * @tags producerDelegations
+     * @name ApproveDelegation
+     * @summary Approves a producer delegation
+     * @request POST:/producer/delegations/{delegationId}/approve
+     * @secure
+     */
+    approveDelegation: (delegationId: string, params: RequestParams = {}) =>
+      this.request<void, Problem>({
+        path: `/producer/delegations/${delegationId}/approve`,
+        method: "POST",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Rejects a producer delegation
+     *
+     * @tags producerDelegations
+     * @name RejectDelegation
+     * @summary Rejects a producer delegation
+     * @request POST:/producer/delegations/{delegationId}/reject
+     * @secure
+     */
+    rejectDelegation: (delegationId: string, data: RejectDelegationPayload, params: RequestParams = {}) =>
+      this.request<void, Problem>({
+        path: `/producer/delegations/${delegationId}/reject`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * @description Revokes a producer delegation
+     *
+     * @tags producerDelegations
+     * @name RevokeProducerDelegation
+     * @summary Revokes a producer delegation
+     * @request DELETE:/producer/delegations/{delegationId}
+     * @secure
+     */
+    revokeProducerDelegation: (delegationId: string, params: RequestParams = {}) =>
+      this.request<void, Problem>({
+        path: `/producer/delegations/${delegationId}`,
+        method: "DELETE",
+        secure: true,
         ...params,
       }),
   };
@@ -7652,6 +8235,61 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         method: "GET",
         secure: true,
         format: "json",
+        ...params,
+      }),
+  };
+  delegations = {
+    /**
+     * @description List delegations
+     *
+     * @tags delegations
+     * @name GetDelegations
+     * @summary List delegations
+     * @request GET:/delegations
+     * @secure
+     */
+    getDelegations: (query: GetDelegationsParams, params: RequestParams = {}) =>
+      this.request<CompactDelegations, Problem>({
+        path: `/delegations`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Retrieves delegation
+     *
+     * @tags delegations
+     * @name GetDelegation
+     * @summary Retrieves delegation
+     * @request GET:/delegations/{delegationId}
+     * @secure
+     */
+    getDelegation: (delegationId: string, params: RequestParams = {}) =>
+      this.request<Delegation, Problem>({
+        path: `/delegations/${delegationId}`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Retrieve a contract of a delegation
+     *
+     * @tags delegations
+     * @name GetDelegationContract
+     * @summary Retrieve a contract of a delegation
+     * @request GET:/delegations/{delegationId}/contracts/{contractId}
+     * @secure
+     */
+    getDelegationContract: (delegationId: string, contractId: string, params: RequestParams = {}) =>
+      this.request<File, Problem>({
+        path: `/delegations/${delegationId}/contracts/${contractId}`,
+        method: "GET",
+        secure: true,
         ...params,
       }),
   };

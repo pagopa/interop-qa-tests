@@ -33,18 +33,20 @@ Given(
   async function (verifier: TenantType, consumer: TenantType) {
     assertContextSchema(this, {
       attributeId: z.string(),
+      agreementId: z.string(),
     });
 
     const token = await getToken(verifier);
     this.consumerId = getOrganizationId(consumer);
     const verifierId = getOrganizationId(verifier);
 
-    await dataPreparationService.assignVerifiedAttributeToTenant(
+    await dataPreparationService.assignVerifiedAttributeToTenant({
       token,
-      this.consumerId,
+      tenantId: this.consumerId,
+      agreementId: this.agreementId,
       verifierId,
-      this.attributeId
-    );
+      attributeId: this.attributeId,
+    });
   }
 );
 
@@ -228,6 +230,7 @@ Given(
   async function (verifier: TenantType, consumer: TenantType) {
     assertContextSchema(this, {
       requiredVerifiedAttributes: z.array(z.array(z.string())),
+      agreementId: z.string(),
     });
     const verifierToken = await getToken(verifier);
     const verifierId = getOrganizationId(verifier);
@@ -238,12 +241,13 @@ Given(
     );
 
     for (const attributeId of attributeIdsToVerify) {
-      await dataPreparationService.assignVerifiedAttributeToTenant(
-        verifierToken,
-        consumerId,
+      await dataPreparationService.assignVerifiedAttributeToTenant({
+        token: verifierToken,
+        tenantId: consumerId,
         verifierId,
-        attributeId
-      );
+        attributeId,
+        agreementId: this.agreementId,
+      });
     }
   }
 );
