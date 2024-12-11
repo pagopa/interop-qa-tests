@@ -28,8 +28,8 @@ Feature: Revoca di un attributo verificato posseduto da uno specifico aderente
     Given "PA1" ha una richiesta di fruizione in stato "PENDING" per quell'e-service
     Given "PA2" ha già verificato l'attributo verificato a "PA1"
     Given "GSP" ha già creato un e-service in stato "PUBLISHED" che richiede quegli attributi con approvazione "MANUAL"
-    Given "PA1" ha una richiesta di fruizione in stato "PENDING" per quell'e-service
-    Given "GSP" ha già verificato l'attributo verificato a "PA1"
+    Given "PA1" ha un'altra richiesta di fruizione in stato "PENDING" per quell'e-service
+    Given "GSP" ha già verificato l'attributo verificato a "PA1" sull'altra richiesta di fruizione
     When l'utente revoca l'attributo precedentemente verificato
     Then si ottiene status code 204
     And l'attributo di "PA1" rimane verificato da "GSP"
