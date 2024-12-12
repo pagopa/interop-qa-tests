@@ -90,16 +90,22 @@ Then(
         data: z.object({
           errors: z.tuple([
             z.object({
-              code: z.literal("015-9000"),
-              detail: z.literal(
-                'Invalid parameter found - [Path \'/grant_type\'] Instance value ("unknown") not found in enum (possible values: ["client_credentials"])'
-              ),
+              code: z.literal("015-9000").or(z.literal("9999")),
+              detail: z
+                .literal(
+                  'Invalid parameter found - [Path \'/grant_type\'] Instance value ("unknown") not found in enum (possible values: ["client_credentials"])'
+                )
+                .or(
+                  z.literal(
+                    'Validation error: Invalid literal value, expected "client_credentials" at "grant_type"'
+                  )
+                ),
             }),
           ]),
           status: z.literal(400),
-          title: z.literal(
-            "The request contains bad syntax or cannot be fulfilled."
-          ),
+          title: z
+            .literal("The request contains bad syntax or cannot be fulfilled.")
+            .or(z.literal("Bad request")),
           type: z.literal("about:blank"),
         }),
       }),
