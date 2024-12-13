@@ -258,13 +258,18 @@ jobs:
         env: 
             AWS_REGION: ${{ secrets.AWS_REGION}}
             KAFKA_BROKERS: ${{ vars.KAFKA_BROKERS }}
-            DOMAIN_TOPIC_PREFIX: ${{ vars.DOMAIN_TOPIC_PREFIX }}
             TOPICS_PROPERTIES_PATH: ../topics/${{ vars.NORM_ENV }}/
         run: |
           set -eou pipefail
 
           npm ci
+
+          export DOMAIN_TOPIC_PREFIX="${{ vars.EVENT_STORE_DOMAIN_TOPIC_PREFIX }}"
           npm run kafka:deleteTopics
+
+          export DOMAIN_TOPIC_PREFIX="${{ vars.OUTBOUND_DOMAIN_TOPIC_PREFIX }}"
+          npm run kafka:deleteTopics
+
           npm run kafka:createTopics
 
       - name: Restore Dump
