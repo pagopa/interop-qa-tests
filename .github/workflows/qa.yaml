@@ -41,17 +41,17 @@ on:
 
 
 defaults:
-  run:
-    shell: bash
+    run:
+      shell: bash
 
 permissions:
   id-token: write
   contents: read
 
 env:
-  skip_checkUserMembership: "true"
-  skip_failNotSelectedEnvTagRef: "true"
-  SCRIPTS_FOLDER: "./scripts"
+   skip_checkUserMembership: "true"
+   skip_failNotSelectedEnvTagRef: "true"
+   SCRIPTS_FOLDER: "./scripts"
 
 jobs:
   inputs:
@@ -84,16 +84,16 @@ jobs:
         id: start_runner
         uses: pagopa/interop-github-runner-aws-create-action@main
         with:
-          environment: ${{ inputs.environment }}
-          aws_region: ${{ secrets.AWS_REGION }}
-          iam_role_arn: ${{ secrets.ECS_IAM_ROLE_ARN }}
-          ecs_cluster_name: ${{ secrets.ECS_CLUSTER_NAME }}
-          ecs_task_definition: ${{ secrets.ECS_TASK_DEFINITION }}
-          ecs_container_name: ${{ vars.ECS_TASK_CONTAINER_NAME }}
-          ecs_task_max_duration_seconds: ${{ vars.ECS_TASK_MAX_DURATION_SECONDS }}
-          ecs_task_subnet_id: ${{ secrets.SUBNET_ID }}
-          ecs_task_sec_group: ${{ secrets.SEC_GROUP_ID }}
-          pat_token: ${{ secrets.BOT_TOKEN }}
+            environment: ${{ inputs.environment }}
+            aws_region: ${{ secrets.AWS_REGION }}
+            iam_role_arn: ${{ secrets.ECS_IAM_ROLE_ARN }}
+            ecs_cluster_name: ${{ secrets.ECS_CLUSTER_NAME }}
+            ecs_task_definition: ${{ secrets.ECS_TASK_DEFINITION }}
+            ecs_container_name: ${{ vars.ECS_TASK_CONTAINER_NAME }}
+            ecs_task_max_duration_seconds: ${{ vars.ECS_TASK_MAX_DURATION_SECONDS }}
+            ecs_task_subnet_id: ${{ secrets.SUBNET_ID }}
+            ecs_task_sec_group: ${{ secrets.SEC_GROUP_ID }}
+            pat_token: ${{ secrets.BOT_TOKEN }}
 
   svc_version_check:
     name: Check Deployed Versions
@@ -112,17 +112,17 @@ jobs:
 
       - name: Set kubeconfig
         run: |
-          aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name ${{ secrets.EKS_CLUSTER_NAME }}
+            aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name ${{ secrets.EKS_CLUSTER_NAME }}
 
       - name: Check deployed versions
         id: check_svc_version
         shell: bash
         env:
-          AWS_REGION: ${{ secrets.AWS_REGION}}
-          EKS_CLUSTER_NAME: ${{ secrets.EKS_CLUSTER_NAME}}
-          K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE }}
+            AWS_REGION: ${{ secrets.AWS_REGION}}
+            EKS_CLUSTER_NAME: ${{ secrets.EKS_CLUSTER_NAME}}
+            K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE }}
         run: |
-          $SCRIPTS_FOLDER/checkSvcVersion.sh ./plat_dep_versions.sh
+           $SCRIPTS_FOLDER/checkSvcVersion.sh ./plat_dep_versions.sh
   
   data_prep:
     name: Data Preparation
@@ -154,40 +154,40 @@ jobs:
         id: mkdir_dump
         shell: bash
         run: |
-          set -euo pipefail
-          
-          mkdir -p $LOCAL_TENANT_DUMPS
-          mkdir -p $LOCAL_ATTRIBUTE_REGISTRY_DUMPS
+            set -euo pipefail
+
+            mkdir -p $LOCAL_TENANT_DUMPS
+            mkdir -p $LOCAL_ATTRIBUTE_REGISTRY_DUMPS
 
       - name: Get dump from S3
         id: get_data_dumps
         env:
-          AWS_REGION: ${{ secrets.AWS_REGION}}
+            AWS_REGION: ${{ secrets.AWS_REGION}}
         run: |
-          set -euo pipefail
-          
-          aws s3 cp "s3://${{ vars.DATA_PREPARATION_BUCKET }}/${{ vars.TENANT_DUMP_S3_PREFIX }}" $LOCAL_TENANT_DUMPS --recursive
-          aws s3 cp "s3://${{ vars.DATA_PREPARATION_BUCKET }}/${{ vars.ATTRIBUTE_REGISTRY_DUMP_S3_PREFIX }}" $LOCAL_ATTRIBUTE_REGISTRY_DUMPS --recursive
+            set -euo pipefail
+
+            aws s3 cp "s3://${{ vars.DATA_PREPARATION_BUCKET }}/${{ vars.TENANT_DUMP_S3_PREFIX }}" $LOCAL_TENANT_DUMPS --recursive
+            aws s3 cp "s3://${{ vars.DATA_PREPARATION_BUCKET }}/${{ vars.ATTRIBUTE_REGISTRY_DUMP_S3_PREFIX }}" $LOCAL_ATTRIBUTE_REGISTRY_DUMPS --recursive
 
       - name: Scale service Deployments to 0
         id: svc_scale_to_0
         shell: bash
         run: |
-          set -euo pipefail
-          
-          aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name ${{ secrets.EKS_CLUSTER_NAME }}
-          
-          echo "Scaling deployments to 0"
-          kubectl scale deployment -n $K8S_NAMESPACE --replicas=0 --all
-          
-          echo "Waiting for pods deletion"
-          ACTIVE_PODS_COUNT=$(kubectl get pods -n $K8S_NAMESPACE -o json | jq '.items | length')
-          while [[ $ACTIVE_PODS_COUNT -gt 0 ]]; do
-            sleep 2 
+            set -euo pipefail
+
+            aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name ${{ secrets.EKS_CLUSTER_NAME }}
+
+            echo "Scaling deployments to 0"
+            kubectl scale deployment -n $K8S_NAMESPACE --replicas=0 --all
+                 
+            echo "Waiting for pods deletion"
             ACTIVE_PODS_COUNT=$(kubectl get pods -n $K8S_NAMESPACE -o json | jq '.items | length')
-          done
+            while [[ $ACTIVE_PODS_COUNT -gt 0 ]]; do
+              sleep 2 
+              ACTIVE_PODS_COUNT=$(kubectl get pods -n $K8S_NAMESPACE -o json | jq '.items | length')
+            done
           
-          echo "All the deployments have been scaled down to 0 replicas."
+            echo "All the deployments have been scaled down to 0 replicas."
 
       - name: Get EventStore DB Credentials
         id: get_evtstore_db_credentials
@@ -195,24 +195,24 @@ jobs:
           EVENT_STORE_SECRET_ARN: ${{ secrets.EVENT_STORE_SECRET_ARN }}
         shell: bash
         run: |
-          set -euo pipefail
-          
-          echo "Retrieving event store credentials..."
-          
-          EVENT_STORE_CREDENTIALS="$(aws secretsmanager get-secret-value --secret-id $EVENT_STORE_SECRET_ARN)"
-          #echo "::add-mask::$EVENT_STORE_CREDENTIALS"
-          
-          echo "Retrieve EventStore username"
-          EVENT_STORE_USERNAME="$(echo $EVENT_STORE_CREDENTIALS | jq -r '.SecretString | fromjson | .username')"
-          echo "::add-mask::$EVENT_STORE_USERNAME"
-          
-          echo "Retrieve EventStore password"
-          EVENT_STORE_PASSWORD="$(echo $EVENT_STORE_CREDENTIALS | jq -r '.SecretString | fromjson | .password')"
-          echo "::add-mask::$EVENT_STORE_PASSWORD"
-          
-          echo "Update env vars with EventStore credentials"
-          echo "EVENT_STORE_USERNAME=$EVENT_STORE_USERNAME" >> "$GITHUB_ENV"
-          echo "EVENT_STORE_PASSWORD=$EVENT_STORE_PASSWORD" >> "$GITHUB_ENV"
+            set -euo pipefail
+
+            echo "Retrieving event store credentials..."
+            
+            EVENT_STORE_CREDENTIALS="$(aws secretsmanager get-secret-value --secret-id $EVENT_STORE_SECRET_ARN)"
+            #echo "::add-mask::$EVENT_STORE_CREDENTIALS"
+            
+            echo "Retrieve EventStore username"
+            EVENT_STORE_USERNAME="$(echo $EVENT_STORE_CREDENTIALS | jq -r '.SecretString | fromjson | .username')"
+            echo "::add-mask::$EVENT_STORE_USERNAME"
+            
+            echo "Retrieve EventStore password"
+            EVENT_STORE_PASSWORD="$(echo $EVENT_STORE_CREDENTIALS | jq -r '.SecretString | fromjson | .password')"
+            echo "::add-mask::$EVENT_STORE_PASSWORD"
+            
+            echo "Update env vars with EventStore credentials"
+            echo "EVENT_STORE_USERNAME=$EVENT_STORE_USERNAME" >> "$GITHUB_ENV"
+            echo "EVENT_STORE_PASSWORD=$EVENT_STORE_PASSWORD" >> "$GITHUB_ENV"
 
       - name: Get ReadModel DB Credentials
         id: get_readmodel_db_credentials
@@ -220,24 +220,24 @@ jobs:
           READ_MODEL_SECRET_ARN: ${{ secrets.READ_MODEL_SECRET_ARN }}
         shell: bash
         run: |
-          set -euo pipefail
-          
-          echo "Retrieving read model credentials..."
-          
-          READ_MODEL_CREDENTIALS="$(aws secretsmanager get-secret-value --secret-id $READ_MODEL_SECRET_ARN)"
-          #echo "::add-mask::$READ_MODEL_CREDENTIALS"
-          
-          echo "Retrieve ReadModel username"
-          READ_MODEL_USERNAME="$(echo $READ_MODEL_CREDENTIALS | jq -r '.SecretString | fromjson | .username')"
-          echo "::add-mask::$READ_MODEL_USERNAME"
-          
-          echo "Retrieve ReadModel password"
-          READ_MODEL_PASSWORD="$(echo $READ_MODEL_CREDENTIALS | jq -r '.SecretString | fromjson | .password')"
-          echo "::add-mask::$READ_MODEL_PASSWORD"
-          
-          echo "Update env vars with ReadModel credentials"
-          echo "READ_MODEL_USERNAME=$READ_MODEL_USERNAME" >> "$GITHUB_ENV"
-          echo "READ_MODEL_PASSWORD=$READ_MODEL_PASSWORD" >> "$GITHUB_ENV"
+            set -euo pipefail
+
+            echo "Retrieving read model credentials..."
+            
+            READ_MODEL_CREDENTIALS="$(aws secretsmanager get-secret-value --secret-id $READ_MODEL_SECRET_ARN)"
+            #echo "::add-mask::$READ_MODEL_CREDENTIALS"
+            
+            echo "Retrieve ReadModel username"
+            READ_MODEL_USERNAME="$(echo $READ_MODEL_CREDENTIALS | jq -r '.SecretString | fromjson | .username')"
+            echo "::add-mask::$READ_MODEL_USERNAME"
+
+            echo "Retrieve ReadModel password"
+            READ_MODEL_PASSWORD="$(echo $READ_MODEL_CREDENTIALS | jq -r '.SecretString | fromjson | .password')"
+            echo "::add-mask::$READ_MODEL_PASSWORD"
+            
+            echo "Update env vars with ReadModel credentials"
+            echo "READ_MODEL_USERNAME=$READ_MODEL_USERNAME" >> "$GITHUB_ENV"
+            echo "READ_MODEL_PASSWORD=$READ_MODEL_PASSWORD" >> "$GITHUB_ENV"
 
       - name: Truncate EventStore DB Tables
         id: event_store_db_truncate
@@ -272,9 +272,9 @@ jobs:
         shell: bash
         working-directory: plat-dep/kafka/scripts
         env:
-          AWS_REGION: ${{ secrets.AWS_REGION}}
-          KAFKA_BROKERS: ${{ vars.KAFKA_BROKERS }}
-          TOPICS_PROPERTIES_PATH: ../topics/${{ vars.NORM_ENV }}/
+            AWS_REGION: ${{ secrets.AWS_REGION}}
+            KAFKA_BROKERS: ${{ vars.KAFKA_BROKERS }}
+            TOPICS_PROPERTIES_PATH: ../topics/${{ vars.NORM_ENV }}/
         run: |
           set -eou pipefail
 
@@ -309,11 +309,11 @@ jobs:
           echo "Waiting for pods readiness"
           while [[ $PODS_NOT_READY_COUNT -gt 0 ]]; do
             sleep 2
-          
+           
             PODS_NOT_READY_COUNT=$(kubectl get pods -n "$K8S_NAMESPACE" -o json | 
               jq '[ .items[] | select(.status.phase != "Running" or ([ .status.conditions[] | select(.type == "Ready" and .state == false) ] | length ) == 1 ) ] | length')
           done
-          
+        
           echo "All the deployments have been scaled up to 1 replicas."
   
   run_test:
@@ -395,8 +395,8 @@ jobs:
         id: stop_runner
         uses: pagopa/interop-github-runner-aws-cleanup-action@main
         with:
-          environment: ${{ inputs.environment }}
-          aws_region: ${{ secrets.AWS_REGION }}
-          iam_role_arn: ${{ secrets.ECS_IAM_ROLE_ARN }}
-          ecs_cluster_name: ${{ secrets.ECS_CLUSTER_NAME }}
-          pat_token: ${{ secrets.BOT_TOKEN }}
+            environment: ${{ inputs.environment }}
+            aws_region: ${{ secrets.AWS_REGION }}
+            iam_role_arn: ${{ secrets.ECS_IAM_ROLE_ARN }}
+            ecs_cluster_name: ${{ secrets.ECS_CLUSTER_NAME }}
+            pat_token: ${{ secrets.BOT_TOKEN }}
