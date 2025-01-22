@@ -17,7 +17,7 @@ on:
         required: true
         default: false
         type: boolean
-      runTests:
+      runJSTests:
         description: 'Run test suite'
         required: true
         default: false
@@ -68,7 +68,7 @@ jobs:
           echo "- plat-dep versions: \`${{ vars.PLAT_DEP_VERSIONS_URL }}\`" >> $GITHUB_STEP_SUMMARY
           echo "- kafkaPurgeTopics: \`${{ inputs.kafkaPurgeTopics }}\`" >> $GITHUB_STEP_SUMMARY
           echo "- runDataPreparation: \`${{ inputs.runDataPreparation }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- runTests: \`${{ inputs.runTests }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- runTests: \`${{ inputs.runJSTests }}\`" >> $GITHUB_STEP_SUMMARY
 
   create_runner:
     name: Create Self-Hosted Runner
@@ -318,7 +318,7 @@ jobs:
   
   run_test:
     name: Run Cucumber Test Suite
-    if: ${{ always() && inputs.runTests }}
+    if: ${{ always() && inputs.runJSTests }}
     needs: [data_prep, create_runner]
     runs-on: [self-hosted, "run_id:${{ inputs.environment }}-${{ github.run_id }}"]
     environment: ${{ inputs.environment }}
@@ -354,7 +354,7 @@ jobs:
 
   run_java_test:
     name: Run Java Cucumber Test Suite
-    if: ${{ !inputs.runTests && inputs.runJavaTests }}
+    if: ${{ always() && !inputs.runJSTests && inputs.runJavaTests }}
     needs: [run_test]
     runs-on: [self-hosted, "run_id:${{ inputs.environment }}-${{ github.run_id }}"]
     environment: ${{ inputs.environment }}
