@@ -377,7 +377,7 @@ jobs:
         run: |
           set -uo pipefail
           echo "Running tests..."
-          cd ./pn-b2b-client/interop-qa-tests && ./mvnw -Dtest=it.pagopa.pn.interop.cucumber.${{ inputs.javaTestSuite }} clean verify
+          cd ./pn-b2b-client/interop-qa-tests && mvn -Dtest=it.pagopa.pn.interop.cucumber.${{ inputs.javaTestSuite }} clean verify
 
   delete_runner:
     name: Delete Self-Hosted Runner
