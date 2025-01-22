@@ -18,7 +18,7 @@ on:
         default: false
         type: boolean
       runJSTests:
-        description: 'Run test suite'
+        description: 'Run JavaScript test suite'
         required: true
         default: false
         type: boolean
@@ -319,8 +319,8 @@ jobs:
         
           echo "All the deployments have been scaled up to 1 replicas."
   
-  run_test:
-    name: Run Cucumber Test Suite
+  run_js_test:
+    name: Run JavaScript Cucumber Test Suite
     if: ${{ always() && inputs.runJSTests }}
     needs: [data_prep, create_runner]
     runs-on: [self-hosted, "run_id:${{ inputs.environment }}-${{ github.run_id }}"]
@@ -358,7 +358,7 @@ jobs:
   run_java_test:
     name: Run Java Cucumber Test Suite
     if: ${{ always() && !inputs.runJSTests && inputs.runJavaTests }}
-    needs: [run_test]
+    needs: [run_js_test]
     runs-on: [self-hosted, "run_id:${{ inputs.environment }}-${{ github.run_id }}"]
     environment: ${{ inputs.environment }}
     env:
@@ -380,11 +380,11 @@ jobs:
         run: |
           set -uo pipefail
           echo "Running tests..."
-          cd ./pn-b2b-client/interop-qa-tests && ./mvnw -Dtest=it.pagopa.pn.interop.cucumber.${{ inputs.javaTestSuite }} clean verify
+          cd ./pn-b2b-client/interop-qa-tests && mvn -Dtest=it.pagopa.pn.interop.cucumber.${{ inputs.javaTestSuite }} clean verify
 
   delete_runner:
     name: Delete Self-Hosted Runner
-    needs: [create_runner, svc_version_check, data_prep, run_test, run_java_test]
+    needs: [create_runner, svc_version_check, data_prep, run_js_test, run_java_test]
     if: ${{ always() }}
     runs-on: ubuntu-22.04
     strategy:
