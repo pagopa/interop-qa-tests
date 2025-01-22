@@ -28,12 +28,12 @@ on:
         required: true
         default: false
         type: boolean
-      testSuite:
+      javaTestSuite:
         description: 'Choose which Java test suite to run'
         required: false
         default: NrtTest
         type: string
-      branchName:
+      javaBranchName:
         description: 'Provide the branch name for pn-b2b-client to clone'
         required: false
         default: main
@@ -368,7 +368,7 @@ jobs:
         shell: bash
         run: |
           echo "Cloning pn-b2b-client repo.."
-          git clone --depth 1 --branch ${{ inputs.branchName }} https://github.com/pagopa/pn-b2b-client.git
+          git clone --depth 1 --branch ${{ inputs.javaBranchName }} https://github.com/pagopa/pn-b2b-client.git
           echo "pn-b2b-client repo has been cloned"
 
       - name: Run QA tests
@@ -377,11 +377,11 @@ jobs:
         run: |
           set -uo pipefail
           echo "Running tests..."
-          cd ./pn-b2b-client/interop-qa-tests && ./mvnw -Dtest=it.pagopa.pn.interop.cucumber.${{ inputs.testSuite }} clean verify
+          cd ./pn-b2b-client/interop-qa-tests && ./mvnw -Dtest=it.pagopa.pn.interop.cucumber.${{ inputs.javaTestSuite }} clean verify
 
   delete_runner:
     name: Delete Self-Hosted Runner
-    needs: [run_java_test]
+    needs: [create_runner, svc_version_check, data_prep, run_test, run_java_test]
     if: ${{ always() }}
     runs-on: ubuntu-22.04
     strategy:
