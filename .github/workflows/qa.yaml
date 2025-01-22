@@ -366,6 +366,12 @@ jobs:
       ST_VERBOSE_MODE: ${{ vars.ST_VERBOSE_MODE }}
 
     steps:
+      - name: Set up Maven
+        uses: s4u/setup-maven-action@v1.12.0
+        with:
+          java-version: 17
+          maven-version: 3.9.8
+
       - name: Clone the pn-b2b-client repo
         id: clone_pn-b2b-client
         shell: bash
