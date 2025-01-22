@@ -18,7 +18,7 @@ on:
         default: false
         type: boolean
       runJSTests:
-        description: 'Run test suite'
+        description: 'Run JavaScript test suite'
         required: true
         default: false
         type: boolean
@@ -179,6 +179,9 @@ jobs:
 
             echo "Scaling deployments to 0"
             kubectl scale deployment -n $K8S_NAMESPACE --replicas=0 --all
+
+            echo "Delete active jobs"
+            kubectl delete jobs -n $K8S_NAMESPACE --all
                  
             echo "Waiting for pods deletion"
             ACTIVE_PODS_COUNT=$(kubectl get pods -n $K8S_NAMESPACE -o json | jq '.items | length')
@@ -316,8 +319,8 @@ jobs:
         
           echo "All the deployments have been scaled up to 1 replicas."
   
-  run_test:
-    name: Run Cucumber Test Suite
+  run_js_test:
+    name: Run JavaScript Cucumber Test Suite
     if: ${{ always() && inputs.runJSTests }}
     needs: [data_prep, create_runner]
     runs-on: [self-hosted, "run_id:${{ inputs.environment }}-${{ github.run_id }}"]
@@ -355,7 +358,7 @@ jobs:
   run_java_test:
     name: Run Java Cucumber Test Suite
     if: ${{ always() && !inputs.runJSTests && inputs.runJavaTests }}
-    needs: [run_test]
+    needs: [run_js_test]
     runs-on: [self-hosted, "run_id:${{ inputs.environment }}-${{ github.run_id }}"]
     environment: ${{ inputs.environment }}
     env:
@@ -381,7 +384,7 @@ jobs:
 
   delete_runner:
     name: Delete Self-Hosted Runner
-    needs: [create_runner, svc_version_check, data_prep, run_test, run_java_test]
+    needs: [create_runner, svc_version_check, data_prep, run_js_test, run_java_test]
     if: ${{ always() }}
     runs-on: ubuntu-22.04
     strategy:
