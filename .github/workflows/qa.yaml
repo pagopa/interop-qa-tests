@@ -1,6 +1,6 @@
 name: QA workflow
 
-on: 
+on:
   workflow_dispatch:
     inputs:
       environment:
@@ -17,26 +17,42 @@ on:
         required: true
         default: false
         type: boolean
-      runTests:
+      runJSTests:
         description: 'Run test suite'
         required: true
         default: false
         type: boolean
+      # The inputs below are specific for running the Java test suites defined in pn-b2b-client.
+      runJavaTests:
+        description: 'Run Java test in pn-b2b-client'
+        required: true
+        default: false
+        type: boolean
+      javaTestSuite:
+        description: 'Choose which Java test suite to run'
+        required: false
+        default: NrtTest
+        type: string
+      javaBranchName:
+        description: 'Provide the branch name for pn-b2b-client to clone'
+        required: false
+        default: main
+        type: string
 
 
 defaults:
     run:
       shell: bash
-      
+
 permissions:
   id-token: write
   contents: read
-  
+
 env:
    skip_checkUserMembership: "true"
    skip_failNotSelectedEnvTagRef: "true"
    SCRIPTS_FOLDER: "./scripts"
-   
+
 jobs:
   inputs:
     runs-on: ubuntu-22.04
@@ -52,7 +68,7 @@ jobs:
           echo "- plat-dep versions: \`${{ vars.PLAT_DEP_VERSIONS_URL }}\`" >> $GITHUB_STEP_SUMMARY
           echo "- kafkaPurgeTopics: \`${{ inputs.kafkaPurgeTopics }}\`" >> $GITHUB_STEP_SUMMARY
           echo "- runDataPreparation: \`${{ inputs.runDataPreparation }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- runTests: \`${{ inputs.runTests }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- runTests: \`${{ inputs.runJSTests }}\`" >> $GITHUB_STEP_SUMMARY
 
   create_runner:
     name: Create Self-Hosted Runner
@@ -101,7 +117,7 @@ jobs:
       - name: Check deployed versions
         id: check_svc_version
         shell: bash
-        env: 
+        env:
             AWS_REGION: ${{ secrets.AWS_REGION}}
             EKS_CLUSTER_NAME: ${{ secrets.EKS_CLUSTER_NAME}}
             K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE }}
@@ -114,7 +130,7 @@ jobs:
     runs-on: [self-hosted, "run_id:${{ inputs.environment }}-${{ github.run_id }}"]
     environment: ${{ inputs.environment }}
     if: ${{ always() && inputs.runDataPreparation && needs.create_runner.result == 'success' }}
-    env: 
+    env:
       K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE }}
       EVENT_STORE_HOST: ${{ secrets.EVENT_STORE_HOST }}
       EVENT_STORE_DB_NAME: ${{ vars.EVENT_STORE_DB_NAME }}
@@ -145,7 +161,7 @@ jobs:
 
       - name: Get dump from S3
         id: get_data_dumps
-        env: 
+        env:
             AWS_REGION: ${{ secrets.AWS_REGION}}
         run: |
             set -euo pipefail
@@ -197,7 +213,7 @@ jobs:
             echo "Update env vars with EventStore credentials"
             echo "EVENT_STORE_USERNAME=$EVENT_STORE_USERNAME" >> "$GITHUB_ENV"
             echo "EVENT_STORE_PASSWORD=$EVENT_STORE_PASSWORD" >> "$GITHUB_ENV"
-      
+
       - name: Get ReadModel DB Credentials
         id: get_readmodel_db_credentials
         env:
@@ -222,13 +238,13 @@ jobs:
             echo "Update env vars with ReadModel credentials"
             echo "READ_MODEL_USERNAME=$READ_MODEL_USERNAME" >> "$GITHUB_ENV"
             echo "READ_MODEL_PASSWORD=$READ_MODEL_PASSWORD" >> "$GITHUB_ENV"
-      
+
       - name: Truncate EventStore DB Tables
         id: event_store_db_truncate
         shell: bash
         run: |
           $SCRIPTS_FOLDER/truncateEventStore.sh
-          
+
       - name: Clear ReadModel Collections
         id: read_model_db_clear
         shell: bash
@@ -249,13 +265,13 @@ jobs:
           repository: pagopa/pdnd-interop-platform-deployment
           path: plat-dep
           sparse-checkout: kafka
-      
+
       - name: Purge Kafka topics
         id: clean_kafka
         if: ${{ always() && inputs.kafkaPurgeTopics }}
         shell: bash
         working-directory: plat-dep/kafka/scripts
-        env: 
+        env:
             AWS_REGION: ${{ secrets.AWS_REGION}}
             KAFKA_BROKERS: ${{ vars.KAFKA_BROKERS }}
             TOPICS_PROPERTIES_PATH: ../topics/${{ vars.NORM_ENV }}/
@@ -277,7 +293,7 @@ jobs:
         shell: bash
         run: |
           $SCRIPTS_FOLDER/restoreEventStore.sh
-          
+
       - name: Scale service Deployments to 1
         id: svc_scale_to_1
         shell: bash
@@ -302,11 +318,11 @@ jobs:
   
   run_test:
     name: Run Cucumber Test Suite
-    if: ${{ always() && inputs.runTests }}
+    if: ${{ always() && inputs.runJSTests }}
     needs: [data_prep, create_runner]
     runs-on: [self-hosted, "run_id:${{ inputs.environment }}-${{ github.run_id }}"]
     environment: ${{ inputs.environment }}
-    env: 
+    env:
       ENVIRONMENT: ${{ vars.ENVIRONMENT }}
       SESSION_TOKENS_DURATION_SECONDS: ${{ vars.SESSION_TOKENS_DURATION_SECONDS }}
       REMOTE_WELLKNOWN_URL: ${{ vars.REMOTE_WELLKNOWN_URL }}
@@ -322,7 +338,7 @@ jobs:
           git clone --branch main --depth 1 ${{ vars.QA_TESTS_REPO_URL }}
           echo "interop-qa-tests repo has been cloned"
 
-       
+
       - name: Run QA tests
         id: run_qa_tests
         shell: bash
@@ -336,9 +352,36 @@ jobs:
           echo "Run test command"
           pnpm test
 
+  run_java_test:
+    name: Run Java Cucumber Test Suite
+    if: ${{ always() && !inputs.runJSTests && inputs.runJavaTests }}
+    needs: [run_test]
+    runs-on: [self-hosted, "run_id:${{ inputs.environment }}-${{ github.run_id }}"]
+    environment: ${{ inputs.environment }}
+    env:
+      ENVIRONMENT: ${{ vars.ENVIRONMENT }}
+      ST_VERBOSE_MODE: ${{ vars.ST_VERBOSE_MODE }}
+
+    steps:
+      - name: Clone the pn-b2b-client repo
+        id: clone_pn-b2b-client
+        shell: bash
+        run: |
+          echo "Cloning pn-b2b-client repo.."
+          git clone --depth 1 --branch ${{ inputs.javaBranchName }} https://github.com/pagopa/pn-b2b-client.git
+          echo "pn-b2b-client repo has been cloned"
+
+      - name: Run QA tests
+        id: run_pn-b2b-client_tests
+        shell: bash
+        run: |
+          set -uo pipefail
+          echo "Running tests..."
+          cd ./pn-b2b-client/interop-qa-tests && ./mvnw -Dtest=it.pagopa.pn.interop.cucumber.${{ inputs.javaTestSuite }} clean verify
+
   delete_runner:
     name: Delete Self-Hosted Runner
-    needs: [create_runner, svc_version_check, data_prep, run_test]
+    needs: [create_runner, svc_version_check, data_prep, run_test, run_java_test]
     if: ${{ always() }}
     runs-on: ubuntu-22.04
     strategy:
