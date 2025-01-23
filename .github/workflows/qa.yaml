@@ -263,7 +263,7 @@ jobs:
       - name: Checkout Kafka tools
         id: kafka_tools
         if: ${{ always() && inputs.kafkaPurgeTopics }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
         with:
           repository: pagopa/pdnd-interop-platform-deployment
           path: plat-dep
@@ -367,7 +367,7 @@ jobs:
 
     steps:
       - name: Set up Maven
-        uses: s4u/setup-maven-action@v1.12.0
+        uses: s4u/setup-maven-action@6d44c18d67d9e1549907b8815efa5e4dada1801b # v1.12.0
         with:
           java-version: 17
           maven-version: 3.9.8
