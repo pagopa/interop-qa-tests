@@ -68,7 +68,9 @@ jobs:
           echo "- plat-dep versions: \`${{ vars.PLAT_DEP_VERSIONS_URL }}\`" >> $GITHUB_STEP_SUMMARY
           echo "- kafkaPurgeTopics: \`${{ inputs.kafkaPurgeTopics }}\`" >> $GITHUB_STEP_SUMMARY
           echo "- runDataPreparation: \`${{ inputs.runDataPreparation }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- runTests: \`${{ inputs.runJSTests }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- runJavaTests: \`${{ inputs.runJavaTests }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- javaTestSuite: \`${{ inputs.javaTestSuite || 'null' }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- javaBranchName: \`${{ inputs.javaBranchName || 'null' }}\`" >> $GITHUB_STEP_SUMMARY
 
   create_runner:
     name: Create Self-Hosted Runner
