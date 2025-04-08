@@ -19,7 +19,7 @@ When(
     });
 
     this.response = await apiClient.clients.getClientKeys(
-      { clientId: this.clientId },
+      { clientId: this.clientId, limit: 50, offset: 0 },
       getAuthorizationHeader(this.token)
     );
   }
@@ -55,6 +55,8 @@ When(
       {
         userIds: [getUserId(this.tenantType as TenantType, role)],
         clientId: this.clientId,
+        limit: 50,
+        offset: 0,
       },
       getAuthorizationHeader(this.token)
     );

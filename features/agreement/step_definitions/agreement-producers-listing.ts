@@ -13,7 +13,7 @@ When(
     assertContextSchema(this, {
       token: z.string(),
     });
-    this.response = await apiClient.agreements.getAgreementProducers(
+    this.response = await apiClient.agreements.getAgreementsProducers(
       { limit, offset: 0 },
       getAuthorizationHeader(this.token)
     );
@@ -26,12 +26,12 @@ When(
     assertContextSchema(this, {
       token: z.string(),
     });
-    this.responseOffsetOne = await apiClient.agreements.getAgreementProducers(
+    this.responseOffsetOne = await apiClient.agreements.getAgreementsProducers(
       { limit: 50, offset },
       getAuthorizationHeader(this.token)
     );
 
-    this.responseOffsetTwo = await apiClient.agreements.getAgreementProducers(
+    this.responseOffsetTwo = await apiClient.agreements.getAgreementsProducers(
       { limit: 50, offset: offset + 1 },
       getAuthorizationHeader(this.token)
     );
@@ -44,7 +44,7 @@ When(
     assertContextSchema(this, {
       token: z.string(),
     });
-    this.response = await apiClient.agreements.getAgreementProducers(
+    this.response = await apiClient.agreements.getAgreementsProducers(
       { q: keyword, limit: 50, offset: 0 },
       getAuthorizationHeader(this.token)
     );

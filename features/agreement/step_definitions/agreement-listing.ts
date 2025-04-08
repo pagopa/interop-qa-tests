@@ -102,7 +102,7 @@ When(
     const eservicesIds = this.publishedEservicesIds.map(
       ([eserviceId]) => eserviceId
     );
-    this.response = await apiClient.agreements.getAgreements(
+    this.response = await apiClient.consumers.getConsumerAgreements(
       {
         eservicesIds,
         limit,
@@ -123,7 +123,7 @@ When(
     const eservicesIds = this.publishedEservicesIds.map(
       ([eserviceId]) => eserviceId
     );
-    this.response = await apiClient.agreements.getAgreements(
+    this.response = await apiClient.consumers.getConsumerAgreements(
       {
         eservicesIds,
         limit: 12,
@@ -145,7 +145,7 @@ When(
     const eservicesIds = this.publishedEservicesIds.map(
       ([eserviceId]) => eserviceId
     );
-    this.response = await apiClient.agreements.getAgreements(
+    this.response = await apiClient.consumers.getConsumerAgreements(
       {
         eservicesIds,
         limit: 12,
@@ -168,12 +168,12 @@ When(
     const eservicesIds = this.publishedEservicesIds.map(
       ([eserviceId]) => eserviceId
     );
-    this.response = await apiClient.agreements.getAgreements(
+    this.response = await apiClient.consumers.getConsumerAgreements(
       {
         eservicesIds,
         limit: 12,
         offset: 0,
-        consumersIds: [getOrganizationId(this.tenantType)],
+        // consumersIds: [getOrganizationId(this.tenantType)],
       },
       getAuthorizationHeader(this.token)
     );
@@ -191,7 +191,7 @@ When(
     const eservicesIds = this.publishedEservicesIds
       .map(([eserviceId]) => eserviceId)
       .slice(0, numberEservices);
-    this.response = await apiClient.agreements.getAgreements(
+    this.response = await apiClient.consumers.getConsumerAgreements(
       {
         eservicesIds,
         limit: 12,
@@ -217,12 +217,12 @@ When(
     const eservicesIds = this.publishedEservicesIds.map(
       ([eserviceId]) => eserviceId
     );
-    this.response = await apiClient.agreements.getAgreements(
+    this.response = await apiClient.consumers.getConsumerAgreements(
       {
         eservicesIds,
         limit: 12,
         offset: 0,
-        consumersIds: [getOrganizationId(consumer)],
+        // consumersIds: [getOrganizationId(consumer)],
         producersIds: [getOrganizationId(this.tenantType)],
         states: [agreementState1, agreementState2],
       },
@@ -241,7 +241,7 @@ When(
     const eservicesIds = this.publishedEservicesIds.map(
       ([eserviceId]) => eserviceId
     );
-    this.response = await apiClient.agreements.getAgreements(
+    this.response = await apiClient.consumers.getConsumerAgreements(
       {
         eservicesIds,
         limit: 12,
@@ -263,7 +263,7 @@ When(
     const eservicesIds = this.publishedEservicesIds.map(
       ([eserviceId]) => eserviceId
     );
-    this.response = await apiClient.agreements.getAgreements(
+    this.response = await apiClient.consumers.getConsumerAgreements(
       {
         eservicesIds,
         limit: 12,
