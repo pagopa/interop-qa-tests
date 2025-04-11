@@ -13,7 +13,7 @@ When(
       token: z.string(),
     });
 
-    this.response = await apiClient.consumers.getAgreementEServiceConsumers(
+    this.response = await apiClient.consumers.getAgreementsConsumerEServices(
       { q: this.TEST_SEED, offset: 0, limit: 50 },
       getAuthorizationHeader(this.token)
     );
@@ -27,7 +27,7 @@ When(
       token: z.string(),
     });
 
-    this.response = await apiClient.consumers.getAgreementEServiceConsumers(
+    this.response = await apiClient.consumers.getAgreementsConsumerEServices(
       { q: this.TEST_SEED, offset: 0, limit },
       getAuthorizationHeader(this.token)
     );
@@ -41,7 +41,7 @@ When(
       token: z.string(),
     });
 
-    this.response = await apiClient.consumers.getAgreementEServiceConsumers(
+    this.response = await apiClient.consumers.getAgreementsConsumerEServices(
       { q: this.TEST_SEED, offset, limit: 50 },
       getAuthorizationHeader(this.token)
     );
@@ -55,7 +55,7 @@ When(
       token: z.string(),
     });
 
-    this.response = await apiClient.consumers.getAgreementEServiceConsumers(
+    this.response = await apiClient.consumers.getAgreementsConsumerEServices(
       {
         q: `${this.TEST_SEED}-${keyword}`,
         offset: 0,

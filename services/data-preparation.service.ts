@@ -1278,6 +1278,7 @@ export const dataPreparationService = {
   async retrieveCurrentRiskAnalysisConfiguration(token: string) {
     const response =
       await apiClient.purposes.retrieveLatestRiskAnalysisConfiguration(
+        {},
         getAuthorizationHeader(token)
       );
 
@@ -1440,9 +1441,9 @@ export const dataPreparationService = {
 
     await makePolling(
       () =>
-        apiClient.clients.createKeys(
+        apiClient.clients.createKey(
           clientId,
-          [keySeed],
+          keySeed,
           getAuthorizationHeader(token)
         ),
       (res) => {
@@ -1459,7 +1460,7 @@ export const dataPreparationService = {
     await makePolling(
       () =>
         apiClient.clients.getClientKeys(
-          { clientId },
+          { clientId, limit: 50, offset: 0 },
           getAuthorizationHeader(token)
         ),
       (res) => {

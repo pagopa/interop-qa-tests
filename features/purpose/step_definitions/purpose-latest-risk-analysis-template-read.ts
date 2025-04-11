@@ -12,6 +12,7 @@ When(
     assertContextSchema(this, { token: z.string() });
     this.response =
       await apiClient.purposes.retrieveLatestRiskAnalysisConfiguration(
+        {},
         getAuthorizationHeader(this.token)
       );
   }
