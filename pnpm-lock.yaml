@@ -26,8 +26,8 @@ importers:
         specifier: ^9.0.8
         version: 9.0.8
       adm-zip:
-        specifier: ^0.5.14
-        version: 0.5.14
+        specifier: ^0.5.15
+        version: 0.5.16
       axios:
         specifier: ^1.6.2
         version: 1.7.4
@@ -671,8 +671,8 @@ packages:
     engines: {node: '>=0.4.0'}
     hasBin: true
 
-  adm-zip@0.5.14:
-    resolution: {integrity: sha512-DnyqqifT4Jrcvb8USYjp6FHtBpEIz1mnXu6pTRHZ0RL69LbQYiO+0lDFg5+OKA7U29oWSs3a/i8fhn8ZcceIWg==}
+  adm-zip@0.5.16:
+    resolution: {integrity: sha512-TGw5yVi4saajsSEgz25grObGHEUaDrniwvA2qwSC060KfqGPdglhvPMA2lPIoxs3PQIItj2iag35fONcQqgUaQ==}
     engines: {node: '>=12.0'}
 
   ajv@6.12.6:
@@ -3461,7 +3461,7 @@ snapshots:
 
   acorn@8.11.2: {}
 
-  adm-zip@0.5.14: {}
+  adm-zip@0.5.16: {}
 
   ajv@6.12.6:
     dependencies:

@@ -42,7 +42,7 @@
     "@cucumber/cucumber": "^10.2.1",
     "@types/adm-zip": "^0.5.5",
     "@types/uuid": "^9.0.8",
-    "adm-zip": "^0.5.14",
+    "adm-zip": "^0.5.15",
     "axios": "^1.6.2",
     "dotenv": "^16.3.1",
     "jsonwebtoken": "^9.0.2",
