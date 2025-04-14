@@ -1,5 +1,5 @@
 import "../configs/env";
-import { readFileSync, statSync } from "fs";
+import { readFileSync } from "fs";
 import crypto, { JsonWebKey, KeyObject, randomUUID } from "crypto";
 import { z } from "zod";
 import axios, { type AxiosResponse } from "axios";
