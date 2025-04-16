@@ -68,6 +68,7 @@ Feature: Listing richieste di fruizione
   Scenario Outline: Restituisce le richieste di fruizione di uno specifico fruitore che sono in uno o più specifici stati
     Given l'utente è un "admin" di "PA1"
     Given "PA1" ha già creato e pubblicato 5 e-services
+    Given "PA2" ha un agreement in stato "ACTIVE" per l'e-service numero 1 di "PA1"
     Given "GSP" ha un agreement in stato "ACTIVE" per l'e-service numero 1 di "PA1"
     Given "GSP" ha un agreement in stato "DRAFT" per l'e-service numero 2 di "PA1"
     Given "GSP" ha un agreement in stato "SUSPENDED" per l'e-service numero 3 di "PA1"

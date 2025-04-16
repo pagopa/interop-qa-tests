@@ -217,13 +217,13 @@ When(
     const eservicesIds = this.publishedEservicesIds.map(
       ([eserviceId]) => eserviceId
     );
-    this.response = await apiClient.consumers.getConsumerAgreements(
+    this.response = await apiClient.producers.getProducerAgreements(
       {
         eservicesIds,
         limit: 12,
         offset: 0,
-        // consumersIds: [getOrganizationId(consumer)],
-        producersIds: [getOrganizationId(this.tenantType)],
+        consumersIds: [getOrganizationId(consumer)],
+        // producersIds: [getOrganizationId(this.tenantType)],
         states: [agreementState1, agreementState2],
       },
       getAuthorizationHeader(this.token)
