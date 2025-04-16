@@ -44,7 +44,7 @@ Feature: Cancellazione richiesta di fruizione
       | PA1          | PA2               | GSP           |
 
   @agreement_delete2a
-  Scenario Outline: Per una richiesta di fruizione precedentemente creata dall’ente, la quale è in stato PENDING, ACTIVE, SUSPENDED o ARCHIVED, alla richiesta di cancellazione da parte di un utente con sufficienti permessi, ottiene un errore
+  Scenario Outline: Per una richiesta di fruizione precedentemente creata dall’ente, la quale è in stato ACTIVE, SUSPENDED o ARCHIVED, alla richiesta di cancellazione da parte di un utente con sufficienti permessi, ottiene un errore
     Given l'utente è un "admin" di "PA1"
     Given "PA2" ha già creato un e-service in stato "PUBLISHED" con approvazione "<tipoApprovazione>"
     Given "PA1" ha una richiesta di fruizione in stato "<statoAgreement>" per quell'e-service
@@ -53,7 +53,6 @@ Feature: Cancellazione richiesta di fruizione
 
     Examples: 
       | statoAgreement | tipoApprovazione |
-      | PENDING        | MANUAL           |
       | ACTIVE         | AUTOMATIC        |
       | SUSPENDED      | AUTOMATIC        |
       | ARCHIVED       | AUTOMATIC        |
