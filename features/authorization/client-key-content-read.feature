@@ -48,6 +48,7 @@ Feature: Lettura di una chiave pubblica contenuta in un client
   Scenario Outline: Un utente con permessi security; appartenente all'ente che ha creato il client; il quale utente è membro del client; nel quale client c'è una chiave pubblica; la quale chiave non è stata caricata dall’utente stesso; richiede la lettura del contenuto della chiave. L'operazione va a buon fine
     Given l'utente è un "security" di "PA1"
     Given "PA1" ha già creato 1 client "CONSUMER"
+    Given "PA1" ha già inserito l'utente con ruolo "security" come membro di quel client
     Given "PA1" ha già inserito l'utente con ruolo "admin" come membro di quel client
     Given un "admin" di "PA1" ha caricato una chiave pubblica in quel client
     When l'utente richiede la lettura del contenuto della chiave pubblica
