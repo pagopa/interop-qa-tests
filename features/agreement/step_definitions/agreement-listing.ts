@@ -145,12 +145,12 @@ When(
     const eservicesIds = this.publishedEservicesIds.map(
       ([eserviceId]) => eserviceId
     );
-    this.response = await apiClient.consumers.getConsumerAgreements(
+
+    this.response = await apiClient.producers.getProducerAgreements(
       {
         eservicesIds,
         limit: 12,
         offset: 0,
-        producersIds: [getOrganizationId(this.tenantType)],
       },
       getAuthorizationHeader(this.token)
     );
