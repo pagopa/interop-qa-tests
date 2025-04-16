@@ -23,6 +23,18 @@ Feature: Lettura richiesta di fruizione
       | GSP     | security     |
       | GSP     | api,security |
       | GSP     | support      |
+  
+  @agreement_read1a
+  Scenario Outline: Per una richiesta di fruizione, la quale è in stato REJECTED, precedentemente creata da un ente diverso da quello richiedente la lettura, non va a buon fine
+    Given l'utente è un "<ruolo>" di "<ente>"
+    Given "PA1" ha già creato un e-service in stato "PUBLISHED" con approvazione "MANUAL"
+    Given "GSP" ha già creato e inviato una richiesta di fruizione per quell'e-service ed è in attesa di approvazione
+    Given "PA1" ha già rifiutato quella richiesta di fruizione
+    When l'utente richiede una operazione di lettura di quell'agreement
+    Then si ottiene status code 403
+
+    Examples: 
+      | ente    | ruolo        |
       | Privato | admin        |
       | Privato | api          |
       | Privato | security     |
