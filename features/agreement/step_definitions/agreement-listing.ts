@@ -191,7 +191,7 @@ When(
     const eservicesIds = this.publishedEservicesIds
       .map(([eserviceId]) => eserviceId)
       .slice(0, numberEservices);
-    this.response = await apiClient.consumers.getConsumerAgreements(
+    this.response = await apiClient.producers.getProducerAgreements(
       {
         eservicesIds,
         limit: 12,
