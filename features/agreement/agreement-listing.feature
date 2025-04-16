@@ -31,7 +31,7 @@ Feature: Listing richieste di fruizione
 
   @agreement_listing2
   Scenario Outline: A fronte di 5 richieste di fruizione in db e una richiesta di offset 3, restituisce solo 2 risultati
-    Given l'utente è un "admin" di "PA2"
+    Given l'utente è un "admin" di "GSP"
     Given "PA1" ha già creato e pubblicato 5 e-services
     Given "GSP" ha un agreement attivo per ciascun e-service di "PA1"
     When l'utente richiede una operazione di listing con offset 3
