@@ -65,3 +65,11 @@ Feature: Cancellazione richiesta di fruizione
     Given "PA2" ha già rifiutato quella richiesta di fruizione
     When l'utente richiede una operazione di cancellazione della richiesta di fruizione
     Then si ottiene status code 400
+
+  @agreement_delete2c
+  Scenario Outline: Per una richiesta di fruizione precedentemente creata dall’ente, la quale è in stato PENDING, alla richiesta di cancellazione da parte di un utente con sufficienti permessi, va a buon fine
+    Given l'utente è un "admin" di "PA1"
+    Given "PA2" ha già creato un e-service in stato "PUBLISHED" con approvazione "MANUAL"
+    Given "PA1" ha una richiesta di fruizione in stato "PENDING" per quell'e-service
+    When l'utente richiede una operazione di cancellazione della richiesta di fruizione
+    Then si ottiene status code 204
