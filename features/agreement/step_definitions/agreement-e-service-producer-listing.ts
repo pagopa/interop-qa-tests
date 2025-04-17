@@ -13,7 +13,7 @@ When(
       token: z.string(),
     });
 
-    this.response = await apiClient.producers.getAgreementEServiceProducers(
+    this.response = await apiClient.producers.getAgreementsProducerEServices(
       { q: this.TEST_SEED, limit: 50, offset: 0 },
       getAuthorizationHeader(this.token)
     );
@@ -27,7 +27,7 @@ When(
       token: z.string(),
     });
 
-    this.response = await apiClient.producers.getAgreementEServiceProducers(
+    this.response = await apiClient.producers.getAgreementsProducerEServices(
       { q: this.TEST_SEED, limit, offset: 0 },
       getAuthorizationHeader(this.token)
     );
@@ -41,7 +41,7 @@ When(
       token: z.string(),
     });
 
-    this.response = await apiClient.producers.getAgreementEServiceProducers(
+    this.response = await apiClient.producers.getAgreementsProducerEServices(
       { q: this.TEST_SEED, limit: 10, offset },
       getAuthorizationHeader(this.token)
     );
@@ -55,7 +55,7 @@ When(
       token: z.string(),
     });
 
-    this.response = await apiClient.producers.getAgreementEServiceProducers(
+    this.response = await apiClient.producers.getAgreementsProducerEServices(
       {
         q: `${this.TEST_SEED}-${keyword}`,
         limit: 10,

@@ -67,7 +67,7 @@ Feature: Sospensione di una finalità
       | DRAFT                |
       | ARCHIVED             |
 
-  @purpose_suspend4b @fixed_in_node
+  @purpose_suspend4b
   Scenario Outline: Per una finalità precedentemente creata da un fruitore, la quale è in stato REJECTED, alla richiesta di sospensione da parte di un utente con sufficienti permessi, ottiene un errore
     Given l'utente è un "admin" di "PA1"
     Given "PA2" ha già creato e pubblicato 1 e-service

@@ -85,7 +85,7 @@ export const voucher = {
 };
 
 export const onlyReady = {
-  tags: "(not @wait_for_fix) and (not @resource_intensive) and (not @wait_for_clarification) and (not @fixed_in_node)",
+  tags: "(not @wait_for_fix) and (not @resource_intensive) and (not @wait_for_clarification)",
 };
 
 export default {};

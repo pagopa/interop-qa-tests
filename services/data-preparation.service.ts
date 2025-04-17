@@ -685,7 +685,11 @@ export const dataPreparationService = {
     descriptorId: string;
     descriptorState: EServiceDescriptorState;
     withDocument?: boolean;
-  }) {
+  }): Promise<{
+    descriptorId: string;
+    documentId?: string;
+    interfaceId?: string;
+  }> {
     // 1 add document to descriptor
     let documentId: string | undefined;
     if (withDocument) {
@@ -696,18 +700,17 @@ export const dataPreparationService = {
       );
     }
 
-    const result = { descriptorId, documentId };
-
     if (descriptorState === "DRAFT") {
-      return result;
+      return { descriptorId, documentId, interfaceId: undefined };
     }
 
     // 2. Add interface to descriptor
-    await dataPreparationService.addInterfaceToDescriptor(
+    const interfaceId = await dataPreparationService.addInterfaceToDescriptor(
       token,
       eserviceId,
       descriptorId
     );
+    const result = { descriptorId, documentId, interfaceId };
 
     // 3. Publish Descriptor
     await dataPreparationService.publishDescriptor(
@@ -1278,6 +1281,7 @@ export const dataPreparationService = {
   async retrieveCurrentRiskAnalysisConfiguration(token: string) {
     const response =
       await apiClient.purposes.retrieveLatestRiskAnalysisConfiguration(
+        {},
         getAuthorizationHeader(token)
       );
 
@@ -1440,9 +1444,9 @@ export const dataPreparationService = {
 
     await makePolling(
       () =>
-        apiClient.clients.createKeys(
+        apiClient.clients.createKey(
           clientId,
-          [keySeed],
+          keySeed,
           getAuthorizationHeader(token)
         ),
       (res) => {
@@ -1459,7 +1463,7 @@ export const dataPreparationService = {
     await makePolling(
       () =>
         apiClient.clients.getClientKeys(
-          { clientId },
+          { clientId, limit: 50, offset: 0 },
           getAuthorizationHeader(token)
         ),
       (res) => {

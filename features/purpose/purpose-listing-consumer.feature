@@ -2,7 +2,7 @@
 Feature: Lista delle finalità lato fruitore
   Tutti gli utenti possono ottenere la lista delle finalità di cui sono fruitori
 
-  @purpose_consumer_listing1 @fixed_in_node
+  @purpose_consumer_listing1
   Scenario Outline: A fronte di 5 finalità in db, restituisce solo i primi 3 risultati (scopo del test è verificare il corretto funzionamento del parametro limit)
     Given l'utente è un "<ruolo>" di "<ente>"
     Given "PA2" ha già creato e pubblicato 1 e-service
