@@ -64,8 +64,8 @@ Feature: Lettura client singolo
     Then si ottiene status code 403
 
   @client_read7
-  Scenario Outline: A fronte di una richiesta di lettura da parte di un ente, di un client creato da un altro ente, la richiesta va a buon fine
+  Scenario Outline: A fronte di una richiesta di lettura da parte di un ente, di un client creato da un altro ente, la richiesta non  va a buon fine
     Given l'utente è un "admin" di "PA1"
     Given "PA2" ha già creato 1 client "CONSUMER"
     When l'utente richiede una operazione di lettura di quel client
-    Then si ottiene status code 200
+    Then si ottiene status code 403
