@@ -35,7 +35,7 @@ Feature: Rifiuto di una versione di una finalità
     Then si ottiene status code 204
     And la versione precedente della finalità rimane nello stato in cui si trovava prima del rifiuto
 
-  @purpose_reject3 @fixed_in_node
+  @purpose_reject3
   Scenario Outline: Per una finalità precedentemente creata da un fruitore in stato NON WAITING_FOR_APPROVAL (DRAFT, ACTIVE, SUSPENDED, ARCHIVED), alla richiesta di rifiuto con motivazione da parte di un utente con sufficienti permessi (admin) dell’ente erogatore, ottiene un errore
     Given l'utente è un "admin" di "PA1"
     Given "PA1" ha già creato e pubblicato 1 e-service
@@ -51,7 +51,7 @@ Feature: Rifiuto di una versione di una finalità
       | SUSPENDED     |
       | ARCHIVED      |
 
-  @purpose_reject4 @fixed_in_node
+  @purpose_reject4
   Scenario Outline: Per una finalità precedentemente creata e presentata da un fruitore sopra una delle soglie dell’e-service dell’erogatore, la quale prima versione è quindi in stato WAITING_FOR_APPROVAL, alla richiesta di rifiuto SENZA motivazione da parte di un utente con sufficienti permessi (admin) dell’ente erogatore, ottiene un errore
     Given l'utente è un "admin" di "PA1"
     Given "PA1" ha già creato e pubblicato 1 e-service
