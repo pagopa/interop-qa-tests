@@ -52,14 +52,14 @@ Feature: Lettura singola finalità
       | WAITING_FOR_APPROVAL |
       | ARCHIVED             |
 
-  @purpose_read3 @wait_for_clarification @PIN-4805
-  Scenario Outline: Per una finalità precedentemente creata da un fruitore, la quale prima versione è in qualsiasi stato (DRAFT, WAITING_FOR_APPROVAL, ACTIVE, SUSPENDED, ARCHIVED), alla richiesta di lettura da parte di un ente che non è né l'erogatore, né il fruitore, va a buon fine ma non ottiene l'analisi del rischio
+  @purpose_read3 @PIN-4805
+  Scenario Outline: Per una finalità precedentemente creata da un fruitore, la quale prima versione è in qualsiasi stato (DRAFT, WAITING_FOR_APPROVAL, ACTIVE, SUSPENDED, ARCHIVED), alla richiesta di lettura da parte di un ente che non è né l'erogatore, né il fruitore, non va a buon fine
     Given l'utente è un "admin" di "GSP"
     Given "PA2" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given "PA1" ha già creato 1 finalità in stato "<statoFinalita>" per quell'eservice
     When l'utente richiede la lettura della finalità
-    Then si ottiene status code 200 ma non l'analisi del rischio
+    Then si ottiene status code 403
 
     Examples: 
       | statoFinalita        |
