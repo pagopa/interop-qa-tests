@@ -32,7 +32,7 @@ When(
     );
 
     this.responseOffsetTwo = await apiClient.agreements.getAgreementsProducers(
-      { limit: 50, offset: offset + 1 },
+      { limit: 50, offset: offset - 1 },
       getAuthorizationHeader(this.token)
     );
   }
@@ -93,7 +93,6 @@ Then(
         }),
       }),
     });
-
     assert.equal(this.responseOffsetOne.status, 200);
     assert.equal(this.responseOffsetTwo.status, 200);
 
