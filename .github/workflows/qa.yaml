@@ -92,6 +92,8 @@ jobs:
             ecs_cluster_name: ${{ secrets.ECS_CLUSTER_NAME }}
             ecs_task_definition: ${{ secrets.ECS_TASK_DEFINITION }}
             ecs_container_name: ${{ vars.ECS_TASK_CONTAINER_NAME }}
+            ecs_task_cpu: ${{ vars.ECS_TASK_CPU }}
+            ecs_task_memory: ${{ vars.ECS_TASK_MEMORY }}
             ecs_task_max_duration_seconds: ${{ vars.ECS_TASK_MAX_DURATION_SECONDS }}
             ecs_task_subnet_id: ${{ secrets.SUBNET_ID }}
             ecs_task_sec_group: ${{ secrets.SEC_GROUP_ID }}
