@@ -1,4 +1,4 @@
-@agreement_consumers_listing @resource_intensive
+@agreement_consumers_listing
 Feature: Listing fruitori con richieste di fruizione
   Tutti gli utenti autorizzati di enti PA e GSP possono ottenere la lista dei fruitori dei propri e-service
 

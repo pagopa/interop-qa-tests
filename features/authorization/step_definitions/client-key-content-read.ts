@@ -2,7 +2,6 @@ import { When } from "@cucumber/cucumber";
 import { z } from "zod";
 import {
   assertContextSchema,
-  assertValidResponse,
   getAuthorizationHeader,
 } from "../../../utils/commons";
 import { apiClient } from "../../../api";
@@ -21,7 +20,5 @@ When(
       this.keyId,
       getAuthorizationHeader(this.token)
     );
-
-    assertValidResponse(this.response);
   }
 );

@@ -18,7 +18,7 @@ Feature: Lettura di una chiave pubblica contenuta in un client
       | PA1     |
       | Privato |
 
-  @client_key_content_read2 @wait_for_fix @PIN-5007
+  @client_key_content_read2
   Scenario Outline: Un utente di qualsiasi ruolo; appartenente all'ente che ha creato il client; il quale utente non è membro del client; nel quale client c'è una chiave pubblica; richiede la lettura del contenuto della chiave. L'operazione va a buon fine solo per admin e support
     Given l'utente è un "<ruolo>" di "PA1"
     Given "PA1" ha già creato 1 client "CONSUMER"

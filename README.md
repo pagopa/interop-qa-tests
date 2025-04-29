@@ -45,7 +45,6 @@ Output example:
 Tests are labeled with the following special tags:
 
 - `@wait_for_fix`: test bug affected, waiting for resolution, don't execute in test suite
-- `@resource_intensive`: test resource consuming, to run only in environment with high performance
 
 ## Running test
 
@@ -60,7 +59,7 @@ pnpm test
 ### Test script
 
 ```shell
-# Run all test, excluding test labeled with "special" tag: @wait_for_fix, @resouce_intensive, @wait_for_clarification
+# Run all test, excluding test labeled with "special" tag: @wait_for_fix, @resouce_intensive
 pnpm test:ready
 ```
 
