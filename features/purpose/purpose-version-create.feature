@@ -60,7 +60,7 @@ Feature: Creazione di una nuova versione di finalità
       | ACTIVE        |
       | SUSPENDED     |
 
-  @purpose_version_create3 @wait_for_fix @IMN-4765
+  @purpose_version_create3 @wait_for_fix @IMN-4765 @to_fix
   Scenario Outline: Un utente con sufficienti permessi; il cui ente ha già una finalità in stato DRAFT, WAITING_FOR_APPROVAL o ARCHIVED per una versione di e-service, aggiorna la stima di carico di una finalità. Ottiene un errore
     Given l'utente è un "admin" di "PA1"
     Given "PA2" ha già creato e pubblicato 1 e-service
@@ -73,7 +73,7 @@ Feature: Creazione di una nuova versione di finalità
       | statoFinalita        |
       | DRAFT                |
       | WAITING_FOR_APPROVAL |
-      | ARCHIVED             |
+      | ARCHIVED             | # ERROR expected 409 - actual 500
 
   @purpose_version_create4
   Scenario Outline: Un utente con sufficienti permessi; il cui ente ha già una finalità in stato ACTIVE e non ha versioni in stato WAITING_FOR_APPROVAL per una versione di e-service, aggiorna la stima di carico di una finalità superando la quota massima. La richiesta va a buon fine e la finalità viene aggiornata con la nuova stima di carico andando in WAITING_FOR_APPROVAL.

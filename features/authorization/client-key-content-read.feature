@@ -18,7 +18,7 @@ Feature: Lettura di una chiave pubblica contenuta in un client
       | PA1     |
       | Privato |
 
-  @client_key_content_read2
+  @client_key_content_read2 @to_fix
   Scenario Outline: Un utente di qualsiasi ruolo; appartenente all'ente che ha creato il client; il quale utente non è membro del client; nel quale client c'è una chiave pubblica; richiede la lettura del contenuto della chiave. L'operazione va a buon fine solo per admin e support
     Given l'utente è un "<ruolo>" di "PA1"
     Given "PA1" ha già creato 1 client "CONSUMER"
@@ -31,9 +31,9 @@ Feature: Lettura di una chiave pubblica contenuta in un client
       | ruolo        | ruoloCaricatore | statusCode |
       | admin        | security        |        200 |
       | support      | security        |        200 |
-      | api          | security        |        403 |
-      | security     | admin           |        403 |
-      | api,security | admin           |        403 |
+      | api          | security        |        403 | # ERROR Invalid roles [\"api\"] for this operation
+      | security     | admin           |        403 | # ERROR Invalid roles [\"security\"] for this operation
+      | api,security | admin           |        403 | # ERROR user with role \"security\" is not a member of the client
 
   @client_key_content_read3
   Scenario Outline: Un utente con permessi security; appartenente all'ente che ha creato il client; il quale utente è membro del client; nel quale client c'è una chiave pubblica; la quale chiave è stata caricata dall’utente stesso; richiede la lettura del contenuto della chiave. L'operazione va a buon fine

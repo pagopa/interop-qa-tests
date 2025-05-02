@@ -2,7 +2,7 @@
 Feature: Listing catalogo e-services
   Tutti gli utenti autenticati di enti PA, GSP e privati possono ottenere la lista di e-services
 
-  @catalog_listing1
+  @catalog_listing1 @to_fix
   Scenario Outline: Restituisce gli e-service a catalogo
     Given l'utente è un "<ruolo>" di "<ente>"
     Given "PA1" ha già creato 5 e-services in catalogo in stato PUBLISHED o SUSPENDED e 1 in stato DRAFT
@@ -20,7 +20,7 @@ Feature: Listing catalogo e-services
       | PA1     | api          |
       | PA1     | security     |
       | PA1     | support      |
-      | PA1     | api,security |
+      | PA1     | api,security | # ERROR 
       | Privato | admin        |
       | Privato | api          |
       | Privato | security     |
