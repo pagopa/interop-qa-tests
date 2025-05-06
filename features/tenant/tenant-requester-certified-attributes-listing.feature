@@ -3,7 +3,7 @@ Feature: Listing attributi certificati assegnati dall'ente certificatore
   Tutti gli utenti autorizzati di enti certificatori possono leggere la lista degli attributi certificati assegnati.
   Ai fini dei test solo PA2 e GSP2 sono certificatori, la quale qualifica non può essere assegnata durante la loro esecuzione.
 
-  @tenant_requester_certified_attributes_listing1 @to_fix # Invalid roles for this operation
+  @tenant_requester_certified_attributes_listing1
   Scenario Outline: A fronte di una richiesta di listing di attributi certificati, la richiesta va buon fine solo se il richiedente è un ente certificatore
     Given l'utente è un "<ruolo>" di "<ente>"
     When l'utente richiede una operazione di listing senza paginazione degli attributi certificati assegnati

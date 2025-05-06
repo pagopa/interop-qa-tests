@@ -42,8 +42,8 @@ Feature: Lettura client singolo
     When l'utente richiede una operazione di lettura di quel client
     Then si ottiene status code 200
 
-  @client_read4 @to_fix # expected 200 - actual 400
-  Scenario Outline: Un utente security legge un client di un ente al quale è stato associato, ma del quale non è membro. Ottiene un errore
+  @client_read4
+  Scenario Outline: Un utente security legge un client di un ente al quale è stato associato, ma del quale non è membro. La richiesta va a buon fine
     Given l'utente è un "security" di "PA1"
     Given "PA1" ha già creato 1 client "CONSUMER"
     When l'utente richiede una operazione di lettura di quel client

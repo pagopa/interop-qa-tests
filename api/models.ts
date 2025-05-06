@@ -128,11 +128,6 @@ export interface UpdateEServiceTemplateInstanceSeed {
   isSignalHubEnabled?: boolean;
   isConsumerDelegable?: boolean;
   isClientAccessDelegable?: boolean;
-  /**
-   * @minLength 5
-   * @maxLength 60
-   */
-  instanceLabel?: string;
 }
 
 export interface EServiceSeed {
@@ -297,6 +292,8 @@ export interface Client {
   /** @format date-time */
   createdAt: string;
   consumer: CompactOrganization;
+  /** Contains some details about user */
+  admin?: CompactUser;
   name: string;
   purposes: ClientPurpose[];
   description?: string;
@@ -453,7 +450,6 @@ export interface EServiceTemplateRef {
   /** @format uuid */
   templateVersionId?: string;
   templateName: string;
-  instanceLabel?: string;
   templateInterface?: EServiceDoc;
   interfaceMetadata?: TemplateInstanceInterfaceMetadata;
   isNewTemplateVersionAvailable?: boolean;
@@ -1711,11 +1707,6 @@ export interface EServiceTemplateSeed {
 }
 
 export interface InstanceEServiceSeed {
-  /**
-   * @minLength 5
-   * @maxLength 60
-   */
-  instanceLabel?: string;
   isSignalHubEnabled?: boolean;
   isConsumerDelegable?: boolean;
   isClientAccessDelegable?: boolean;
@@ -1762,7 +1753,6 @@ export interface EServiceTemplateInstance {
   producerName: string;
   latestDescriptor?: CompactDescriptor;
   descriptors: CompactDescriptor[];
-  instanceLabel?: string;
 }
 
 export interface EServiceTemplateInstances {
