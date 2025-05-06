@@ -305,18 +305,20 @@ jobs:
         if: ${{ always() && inputs.purgeDynamoDBTables }}
         env:
           AWS_REGION: ${{ secrets.AWS_REGION}}
+          PLATFORM_STATES_TABLE_NAME: ${{ vars.PLATFORM_STATES_TABLE_NAME }}
+          TOKEN_GENERATION_TABLE_NAME: ${{ vars.TOKEN_GENERATION_TABLE_NAME }}
         run: |
           set -euo pipefail
           
-          echo "Starting ${{ vars.platformStatesTableName }} DynamoDB table purge..."
-          ./scripts/purge-dynamodb-tables.sh  "${{ vars.platformStatesTableName }}"
-            echo "${{ vars.platformStatesTableName }} table purged successfully"
+          echo "Starting ${PLATFORM_STATES_TABLE_NAME} DynamoDB table purge..."
+          ./scripts/purge-dynamodb-tables.sh  "${PLATFORM_STATES_TABLE_NAME}"
+          echo "${PLATFORM_STATES_TABLE_NAME} table purged successfully"
             
-          echo "Starting ${{ vars.tokenGenStatesTableName }} DynamoDB table purge..."
-          ./scripts/purge-dynamodb-tables.sh  "${{ vars.tokenGenStatesTableName }}"
-            echo "${{ vars.tokenGenStatesTableName }} DynamoDB tables purged successfully"
+          echo "Starting ${TOKEN_GENERATION_TABLE_NAME} DynamoDB table purge..."
+          ./scripts/purge-dynamodb-tables.sh  "${TOKEN_GENERATION_TABLE_NAME}"
+          echo "${TOKEN_GENERATION_TABLE_NAME} DynamoDB tables purged successfully"
             
-            echo "DynamoDB tables purged successfully" 
+          echo "DynamoDB tables purged successfully"
             
       - name: Restore Dump
         id: db_dump_restore
