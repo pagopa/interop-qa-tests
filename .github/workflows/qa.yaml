@@ -307,11 +307,14 @@ jobs:
           AWS_REGION: ${{ secrets.AWS_REGION}}
         run: |
           set -euo pipefail
-        
-          echo "Starting DynamoDB tables purge..."
-          ./scripts/purge-dynamodb-tables.sh \
-          "${{ vars.platformStatesTableName }}" \
-          "${{ vars.tokenGenStatesTableName }}"
+          
+          echo "Starting ${{ vars.platformStatesTableName }} DynamoDB table purge..."
+          ./scripts/purge-dynamodb-tables.sh  "${{ vars.platformStatesTableName }}"
+            echo "${{ vars.platformStatesTableName }} table purged successfully"
+            
+          echo "Starting ${{ vars.tokenGenStatesTableName }} DynamoDB table purge..."
+          ./scripts/purge-dynamodb-tables.sh  "${{ vars.tokenGenStatesTableName }}"
+            echo "${{ vars.tokenGenStatesTableName }} DynamoDB tables purged successfully"
             
             echo "DynamoDB tables purged successfully" 
             
