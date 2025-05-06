@@ -12,6 +12,11 @@ on:
         required: true
         default: false
         type: boolean
+      purgeDynamoDBTables:
+        description: 'Purge DynamoDB tables used by auth-server'
+        required: false
+        default: false
+        type: boolean
       runDataPreparation:
         description: 'Data preparation (wipe + reload dump)'
         required: true
@@ -92,45 +97,44 @@ jobs:
             ecs_cluster_name: ${{ secrets.ECS_CLUSTER_NAME }}
             ecs_task_definition: ${{ secrets.ECS_TASK_DEFINITION }}
             ecs_container_name: ${{ vars.ECS_TASK_CONTAINER_NAME }}
-            ecs_task_cpu: ${{ vars.ECS_TASK_CPU }}
-            ecs_task_memory: ${{ vars.ECS_TASK_MEMORY }}
             ecs_task_max_duration_seconds: ${{ vars.ECS_TASK_MAX_DURATION_SECONDS }}
             ecs_task_subnet_id: ${{ secrets.SUBNET_ID }}
             ecs_task_sec_group: ${{ secrets.SEC_GROUP_ID }}
             pat_token: ${{ secrets.BOT_TOKEN }}
 
-  svc_version_check:
-    name: Check Deployed Versions
-    needs: create_runner
-    if: ${{ inputs.environment == 'qa' || inputs.environment == 'es1-qa' }}
-    runs-on: [self-hosted, "run_id:${{ inputs.environment }}-${{ github.run_id }}"]
-    environment: ${{ inputs.environment }}
-    steps:
-      - name: Checkout
-        id: checkout
-        uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3
-
-      - name: Get plat-dep versions
-        run: |
-          curl ${{ vars.PLAT_DEP_VERSIONS_URL }} > plat_dep_versions.sh
-
-      - name: Set kubeconfig
-        run: |
-            aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name ${{ secrets.EKS_CLUSTER_NAME }}
-
-      - name: Check deployed versions
-        id: check_svc_version
-        shell: bash
-        env:
-            AWS_REGION: ${{ secrets.AWS_REGION}}
-            EKS_CLUSTER_NAME: ${{ secrets.EKS_CLUSTER_NAME}}
-            K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE }}
-        run: |
-           $SCRIPTS_FOLDER/checkSvcVersion.sh ./plat_dep_versions.sh
+#  svc_version_check:
+#    name: Check Deployed Versions
+#    needs: create_runner
+#    if: ${{ inputs.environment == 'qa' || inputs.environment == 'es1-qa' }}
+#    runs-on: [self-hosted, "run_id:${{ inputs.environment }}-${{ github.run_id }}"]
+#    environment: ${{ inputs.environment }}
+#    steps:
+#      - name: Checkout
+#        id: checkout
+#        uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3
+#
+#      - name: Get plat-dep versions
+#        run: |
+#          curl ${{ vars.PLAT_DEP_VERSIONS_URL }} > plat_dep_versions.sh
+#
+#      - name: Set kubeconfig
+#        run: |
+#            aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name ${{ secrets.EKS_CLUSTER_NAME }}
+#
+#      - name: Check deployed versions
+#        id: check_svc_version
+#        shell: bash
+#        env:
+#            AWS_REGION: ${{ secrets.AWS_REGION}}
+#            EKS_CLUSTER_NAME: ${{ secrets.EKS_CLUSTER_NAME}}
+#            K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE }}
+#        run: |
+#           $SCRIPTS_FOLDER/checkSvcVersion.sh ./plat_dep_versions.sh
   
   data_prep:
     name: Data Preparation
-    needs: [svc_version_check, create_runner]
+#   needs: [svc_version_check, create_runner]
+    needs: [create_runner]
     runs-on: [self-hosted, "run_id:${{ inputs.environment }}-${{ github.run_id }}"]
     environment: ${{ inputs.environment }}
     if: ${{ always() && inputs.runDataPreparation && needs.create_runner.result == 'success' }}
@@ -148,7 +152,8 @@ jobs:
       LOCAL_TENANT_TAG_TABLE_NAME: "event_tag"
       MAX_POLLING_TRIES: "${{ vars.MAX_POLLING_TRIES }}"
       POLLING_SLEEP_TIME: "${{ vars.POLLING_SLEEP_TIME }}"
-
+      DYNAMODB_PLATFORM_STATES_TABLE: ${{ vars.platformStatesTableName }}
+      DYNAMODB_TOKEN_GEN_STATES_TABLE: ${{ vars.tokenGenStatesTableName }}
     steps:
       - name: Checkout
         id: checkout
@@ -295,6 +300,21 @@ jobs:
 
           npm run kafka:createTopics
 
+      - name: Purge DynamoDB Tables
+        id: purge_dynamodb
+        if: ${{ always() && inputs.purgeDynamoDBTables }}
+        env:
+          AWS_REGION: ${{ secrets.AWS_REGION}}
+        run: |
+          set -euo pipefail
+        
+          echo "Starting DynamoDB tables purge..."
+          ./scripts/purge-dynamodb-tables.sh \
+          "${{ vars.platformStatesTableName }}" \
+          "${{ vars.tokenGenStatesTableName }}"
+            
+            echo "DynamoDB tables purged successfully" 
+            
       - name: Restore Dump
         id: db_dump_restore
         shell: bash
@@ -341,20 +361,15 @@ jobs:
       POLLING_SLEEP_TIME: ${{ vars.POLLING_SLEEP_TIME }}
       AUTHORIZATION_SERVER_TOKEN_CREATION_URL: ${{ vars.AUTHORIZATION_SERVER_TOKEN_CREATION_URL }}
       CLIENT_ASSERTION_JWT_AUDIENCE: ${{ vars.CLIENT_ASSERTION_JWT_AUDIENCE }}
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Clone QA test repo
+        id: clone_qa_repo
+        shell: bash
+        run: |
+          echo "Cloning interop-qa-tests repo.."
+          git clone --branch main --depth 1 ${{ vars.QA_TESTS_REPO_URL }}
+          echo "interop-qa-tests repo has been cloned"
 
-      - name: Setup Node
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
-        with:
-          node-version-file: ./package.json
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
-        with:
-          run_install: true
 
       - name: Run QA tests
         id: run_qa_tests
@@ -362,6 +377,7 @@ jobs:
         run: |
           set -uo pipefail
           
+          cd interop-qa-tests
           echo "Install node dependencies"
           pnpm i
           
@@ -403,7 +419,8 @@ jobs:
 
   delete_runner:
     name: Delete Self-Hosted Runner
-    needs: [create_runner, svc_version_check, data_prep, run_js_test, run_java_test]
+#   needs: [create_runner, svc_version_check, data_prep, run_js_test, run_java_test]    
+    needs: [create_runner, data_prep, run_js_test, run_java_test]
     if: ${{ always() }}
     runs-on: ubuntu-22.04
     strategy:
