@@ -2,12 +2,12 @@
 Feature: Listing e-service con richieste di fruizione attive lato erogatore
   Tutti gli utenti autorizzati di enti PA e GSP possono ottenere la lista degli e-service con la quale hanno almeno una richiesta di fruizione attiva
 
-  @agreement_e_service_producer_listing1 @wait_for_fix @IMN-333 @to_fix # expected 1 actual 0
+  @agreement_e_service_producer_listing1 @wait_for_fix @PIN-6779
   Scenario Outline: Restituisce gli e-service per i quali l’erogatore ha almeno una richiesta di fruizione in stato NON DRAFT da parte dei fruitori
     Given l'utente è un "<ruolo>" di "<ente>"
-    Given "<ente>" ha già creato un e-service in stato "PUBLISHED" con approvazione "AUTOMATIC"
+    Given "<ente>" ha già creato uno specifico e-service in stato "PUBLISHED" con approvazione "AUTOMATIC"
     Given "GSP" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given "<ente>" ha già creato un e-service in stato "PUBLISHED" con approvazione "AUTOMATIC"
+    Given "<ente>" ha già creato un altro specifico e-service in stato "PUBLISHED" con approvazione "AUTOMATIC"
     Given "PA1" ha una richiesta di fruizione in stato "DRAFT" per quell'e-service
     When l'utente richiede una operazione di listing degli e-services che hanno una richiesta di fruizione attiva
     Then si ottiene status code 200 e la lista di 1 e-service

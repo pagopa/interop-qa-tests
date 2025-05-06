@@ -91,6 +91,7 @@ const RISK_ANALYSIS_DATA: Record<
       checkedExistenceMereCorrectnessInteropCatalogue: ["true"],
       usesThirdPartyData: ["NO"],
       declarationConfirmGDPR: ["true"],
+      personalDataTypes: ["WITH_NON_IDENTIFYING_DATA"],
     },
   },
 };

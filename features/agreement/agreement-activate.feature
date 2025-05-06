@@ -2,7 +2,7 @@
 Feature: Attivazione richiesta di fruizione
   Tutti gli utenti autorizzati di enti PA e GSP possono attivare una richiesta di fruizione
 
-  @agreement_activate1 @wait_for_fix @to_fix
+  @agreement_activate1
   Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fruitore, la quale è in stato PENDING (prima attivazione), con tutti gli attributi richiesti certificati, tutti gli attributi richiesti dichiarati dal fruitore, e tutti gli attributi richiesti verificati dall’erogatore, alla richiesta di attivazione da parte di un utente con sufficienti permessi dell’ente erogatore, va a buon fine
     Given l'utente è un "<ruolo>" di "<enteErogatore>"
     Given "<enteCertificatore>" ha creato un attributo certificato e lo ha assegnato a "<enteFruitore>"
@@ -16,16 +16,16 @@ Feature: Attivazione richiesta di fruizione
 
     Examples: 
       | enteFruitore | enteCertificatore | enteErogatore | ruolo        | risultato |
-      | PA1          | PA2               | GSP           | admin        |       200 |  # ERROR
-      | PA1          | PA2               | GSP           | api          |       403 |  # ERROR
-      | PA1          | PA2               | GSP           | security     |       403 |  # ERROR
-      | PA1          | PA2               | GSP           | support      |       403 |  # ERROR
-      | PA1          | PA2               | GSP           | api,security |       403 |  # ERROR
-      | GSP          | PA2               | PA1           | admin        |       200 |  # ERROR
+      | PA1          | PA2               | GSP           | admin        |       200 |
+      | PA1          | PA2               | GSP           | api          |       403 |
+      | PA1          | PA2               | GSP           | security     |       403 |
+      | PA1          | PA2               | GSP           | support      |       403 |
+      | PA1          | PA2               | GSP           | api,security |       403 |
+      | GSP          | PA2               | PA1           | admin        |       200 |
       | GSP          | PA2               | PA1           | api          |       403 |
       | GSP          | PA2               | PA1           | security     |       403 |
-      | GSP          | PA2               | PA1           | support      |       403 |  # ERROR
-      | GSP          | PA2               | PA1           | api,security |       403 |  # ERROR
+      | GSP          | PA2               | PA1           | support      |       403 |
+      | GSP          | PA2               | PA1           | api,security |       403 |
 
   @agreement_activate2 @no-parallel
   Scenario Outline: Per una richiesta di fruizione precedentemente creata da un fruitore, la quale è in stato SUSPENDED (riattivazione), con tutti gli attributi richiesti certificati, tutti gli attributi richiesti dichiarati dal fruitore, e tutti gli attributi richiesti verificati dall’erogatore, alla richiesta di attivazione da parte di un utente con sufficienti permessi dell’ente erogatore, va a buon fine.

@@ -2,12 +2,12 @@
 Feature: Listing catalogo e-services
   Tutti gli utenti autenticati di enti PA, GSP e privati possono ottenere la lista di e-services
 
-  @catalog_listing1 @to_fix
+  @catalog_listing1
   Scenario Outline: Restituisce gli e-service a catalogo
     Given l'utente è un "<ruolo>" di "<ente>"
-    Given "PA1" ha già creato 5 e-services in catalogo in stato PUBLISHED o SUSPENDED e 1 in stato DRAFT
+    Given "PA1" ha già creato 3 e-services in catalogo in stato PUBLISHED o SUSPENDED e 1 in stato DRAFT
     When l'utente richiede una operazione di listing sul catalogo
-    Then si ottiene status code 200 e la lista di 5 e-services
+    Then si ottiene status code 200 e la lista di 3 e-services
 
     Examples: 
       | ente    | ruolo        |
@@ -20,7 +20,7 @@ Feature: Listing catalogo e-services
       | PA1     | api          |
       | PA1     | security     |
       | PA1     | support      |
-      | PA1     | api,security | # ERROR 
+      | PA1     | api,security |
       | Privato | admin        |
       | Privato | api          |
       | Privato | security     |
