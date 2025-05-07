@@ -386,7 +386,6 @@ jobs:
         run: |
           set -uo pipefail
           
-          cd interop-qa-tests
           echo "Install node dependencies"
           pnpm i
           
