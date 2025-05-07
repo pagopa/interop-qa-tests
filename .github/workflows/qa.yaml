@@ -110,7 +110,7 @@ jobs:
 
       - name: Get plat-dep versions
         run: |
-          curl ${{ vars.PLAT_DEP_VERSIONS_URL }} > plat_dep_versions.sh
+          curl ${{ vars.PLAT_DEP_VERSIONS_URL }} -o images.yaml
 
       - name: Set kubeconfig
         run: |
@@ -124,7 +124,7 @@ jobs:
             EKS_CLUSTER_NAME: ${{ secrets.EKS_CLUSTER_NAME}}
             K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE }}
         run: |
-           $SCRIPTS_FOLDER/checkSvcVersion.sh ./plat_dep_versions.sh
+           $SCRIPTS_FOLDER/checkSvcVersion.sh images.yaml
   
   data_prep:
     name: Data Preparation
