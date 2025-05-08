@@ -27,9 +27,9 @@ while read -r NAME IMAGE; do
   # retrieve expected tag from YAML using yq; empty if not found
   EXPECTED=$(yq e ".images.microservices.\"$TRANSFORMED\".tag // \"\"" "$file")
 
-  # warn and skip if service is not listed in the YAML
+  # warn and skip if service is not listed in the YAML images file
   if [[ -z "$EXPECTED" ]]; then
-    echo "::warning::WARNING - $NAME current version $CURRENT_VERSION not in list"
+    echo "::warning::WARNING - $NAME current deployed version $CURRENT_VERSION not in list"
     continue
   fi
 
