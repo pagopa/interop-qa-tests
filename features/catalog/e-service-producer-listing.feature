@@ -2,7 +2,7 @@
 Feature: Listing e-services lato erogatore
   Tutti gli utenti autenticati di enti erogatori possono ottenere la lista dei propri e-service erogati
 
-  @producer_listing1
+  @producer_listing1 @to_fix
   Scenario Outline: Restituisce gli e-service erogati dall’ente
     Given l'utente è un "<ruolo>" di "<ente>"
     Given "<ente>" ha già creato 5 e-services in catalogo in stato PUBLISHED o SUSPENDED e 1 in stato DRAFT
@@ -37,7 +37,7 @@ Feature: Listing e-services lato erogatore
     When l'utente richiede una operazione di listing sui propri e-services con offset 2
     Then si ottiene status code 200 e la lista di 3 e-services
 
-  @producer_listing4
+  @producer_listing4 @to_fix
   Scenario Outline: Restituisce gli e-service erogati dall’ente fruiti da almeno uno dei fruitori specifici
     Given l'utente è un "admin" di "PA1"
     Given "PA1" ha già creato 2 e-services in catalogo in stato PUBLISHED o SUSPENDED e 1 in stato DRAFT

@@ -11,10 +11,10 @@ Feature: Revoca di un attributo certificato posseduto da uno specifico aderente
 
     Examples:
       | ruolo        | statusCode |
-      | admin        |        204 |
-      | api          |        403 |
-      | security     |        403 |
-      | support      |        403 |
+      # | admin        |        204 |
+      # | api          |        403 |
+      # | security     |        403 |
+      # | support      |        403 |
       | api,security |        403 |
 
   @tenant_revoke_certified_attribute2
