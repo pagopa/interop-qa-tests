@@ -20,7 +20,7 @@ Feature: Cancellazione delle chiavi di un client
       | Privato | admin    |        204 |
       | Privato | security |        204 |
 
-  @client_key_delete2 @wait_for_fix @PIN-6778
+  @client_key_delete2
   Scenario Outline: Un utente con sufficienti permessi (admin o security); appartenente all'ente che ha creato il client; il quale utente è membro del client; nel quale client c'è una chiave pubblica caricata da un altro utente con qualsiasi livello di permesso autorizzato a caricare una chiave (admin o security); richiede la cancellazione della chiave. L'operazione va a buon fine solo per admin.
     Given l'utente è un "<ruoloCancellatore>" di "PA1"
     Given "PA1" ha già creato 1 client "CONSUMER"
@@ -37,7 +37,7 @@ Feature: Cancellazione delle chiavi di un client
       | security          | admin           |        403 |
       | security          | api,security    |        403 |
 
-  @client_key_delete3 @wait_for_fix @PIN-6778
+  @client_key_delete3
   Scenario Outline: Un utente con sufficienti permessi (admin o security); appartenente all'ente che ha creato il client; il quale utente non è membro del client; nel quale client c'è una chiave pubblica caricata da lui stesso richiede la cancellazione della chiave. L'operazione va a buon fine solo per admin.
     Given l'utente è un "<ruolo>" di "PA1"
     Given "PA1" ha già creato 1 client "CONSUMER"
@@ -52,7 +52,7 @@ Feature: Cancellazione delle chiavi di un client
       | admin    |        204 |
       | security |        403 |
 
-  @client_key_delete4 @wait_for_fix @PIN-6778
+  @client_key_delete4
   Scenario Outline: Un utente con sufficienti permessi (admin o security); appartenente all'ente che ha creato il client; il quale utente non è membro del client; nel quale client c'è una chiave pubblica caricata da un altro utente con qualsiasi livello di permesso autorizzato a caricare una chiave (admin o security); richiede la cancellazione della chiave. L'operazione va a buon fine solo per admin.
     Given l'utente è un "<ruoloCancellatore>" di "PA1"
     Given "PA1" ha già creato 1 client "CONSUMER"
