@@ -38,7 +38,7 @@ on:
         required: false
         default: main
         type: string
-      skip_svc_version_check:
+      strictVersionCheck:
         description: 'Set to "true" to skip the version-check step'
         required: false
         default: false
@@ -122,7 +122,7 @@ jobs:
             aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name ${{ secrets.EKS_CLUSTER_NAME }}
 
       - name: Check deployed versions
-        if: ${{ inputs.skip_svc_version_check != 'true' }}
+        if: ${{ inputs.strictVersionCheck != 'true' }}
         id: check_svc_version
         shell: bash
         env:
