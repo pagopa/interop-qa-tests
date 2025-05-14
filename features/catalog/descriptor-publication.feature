@@ -45,7 +45,7 @@ Feature: Pubblicazione di un descrittore
     When l'utente pubblica quel descrittore
     Then si ottiene status code 400
 
-  @descriptor_publication4 @to_fix
+  @descriptor_publication4
   Scenario Outline: Per un e-service creato in modalità "RECEIVE" che ha un solo descrittore, il quale è in stato DRAFT, con tutti i parametri richiesti inseriti e formattati correttamente, e con un’analisi del rischio compilata solo parzialmente, alla richiesta di pubblicazione, ottiene un errore
     Given l'utente è un "admin" di "PA1"
     Given "PA1" ha già creato un e-service in modalità "RECEIVE" con un descrittore in stato "DRAFT"

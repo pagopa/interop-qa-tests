@@ -90,7 +90,7 @@ const RISK_ANALYSIS_DATA: Record<
       purposePursuit: ["MERE_CORRECTNESS"],
       checkedExistenceMereCorrectnessInteropCatalogue: ["true"],
       usesThirdPartyData: ["NO"],
-      declarationConfirmGDPR: ["true"],
+      // declarationConfirmGDPR: ["true"],
       personalDataTypes: ["WITH_NON_IDENTIFYING_DATA"],
     },
   },
