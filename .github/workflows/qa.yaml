@@ -38,6 +38,11 @@ on:
         required: false
         default: main
         type: string
+      strictVersionCheck:
+        description: 'Set to "true" to skip the version-check step'
+        required: false
+        default: false
+        type: boolean
 
 
 defaults:
@@ -100,7 +105,7 @@ jobs:
   svc_version_check:
     name: Check Deployed Versions
     needs: create_runner
-    if: ${{ inputs.environment == 'qa' || inputs.environment == 'es1-qa' }}
+    if: ${{ inputs.strictVersionCheck != 'true' }}
     runs-on: [self-hosted, "run_id:${{ inputs.environment }}-${{ github.run_id }}"]
     environment: ${{ inputs.environment }}
     steps:
@@ -110,7 +115,7 @@ jobs:
 
       - name: Get plat-dep versions
         run: |
-          curl ${{ vars.PLAT_DEP_VERSIONS_URL }} > plat_dep_versions.sh
+          curl ${{ vars.PLAT_DEP_VERSIONS_URL }} -o images.yaml
 
       - name: Set kubeconfig
         run: |
@@ -124,7 +129,7 @@ jobs:
             EKS_CLUSTER_NAME: ${{ secrets.EKS_CLUSTER_NAME}}
             K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE }}
         run: |
-           $SCRIPTS_FOLDER/checkSvcVersion.sh ./plat_dep_versions.sh
+           $SCRIPTS_FOLDER/checkSvcVersion.sh images.yaml
   
   data_prep:
     name: Data Preparation
