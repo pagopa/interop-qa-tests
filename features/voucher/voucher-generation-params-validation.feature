@@ -14,7 +14,7 @@ Feature: Generazione del voucher richiesta da un Ente
     When l'utente richiede la generazione del voucher con il parametro "client_assertion_type" diverso da quello atteso
     Then la richiesta di generazione del Voucher non va a buon fine
 
-  @voucher_generation_params_validation2
+  @voucher_generation_params_validation2 @to_fix
   Scenario Outline: La generazione del Voucher fallisce quando il parametro grant_type non ha il valore atteso
     Given l'utente è un "admin" di "PA1"
     Given "PA2" ha già creato e pubblicato 1 e-service

@@ -11,6 +11,20 @@ import {
 import { apiClient } from "../../../api";
 
 When(
+  "l'utente richiede una operazione di listing senza paginazione degli attributi certificati assegnati",
+  async function () {
+    assertContextSchema(this, {
+      token: z.string(),
+    });
+
+    this.response = await apiClient.tenants.getRequesterCertifiedAttributes(
+      { limit: 50, offset: 0 },
+      getAuthorizationHeader(this.token)
+    );
+  }
+);
+
+When(
   "l'utente richiede una operazione di listing degli attributi certificati assegnati",
   async function () {
     assertContextSchema(this, {

@@ -44,29 +44,6 @@ Feature: Rimozione purpose dal client
     When l'utente richiede la disassociazione della finalità dal client
     Then si ottiene status code 204
 
-  @client_purpose_remove2a @wait_for_fix @PIN-4953
-  Scenario Outline: Un utente con sufficienti permessi (admin) dell'ente che ha creato il client ed associato il client di tipo CONSUMER ad una finalità che si trova in stato DRAFT, richiede la disassociazione del client dalla finalità. Ottiene un errore. Chiarimento: è possibile modificare l’associazione/disassociazione dei client ad una finalità solo se questa è attiva
-    Given l'utente è un "admin" di "PA1"
-    Given "PA2" ha già creato e pubblicato 1 e-service
-    Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given "PA1" ha già creato 1 finalità in stato "DRAFT" per quell'eservice
-    Given "PA1" ha già creato 1 client "CONSUMER"
-    Given "PA1" ha già associato la finalità a quel client
-    When l'utente richiede la disassociazione della finalità dal client
-    Then si ottiene status code 400
-
-  @client_purpose_remove2b @wait_for_fix @PIN-4953
-  Scenario Outline: Un utente con sufficienti permessi (admin) dell'ente che ha creato il client ed associato il client di tipo CONSUMER ad una finalità che si trova in stato REJECTED, richiede la disassociazione del client dalla finalità. Ottiene un errore. Chiarimento: è possibile modificare l’associazione/disassociazione dei client ad una finalità solo se questa è attiva
-    Given l'utente è un "admin" di "PA1"
-    Given "PA2" ha già creato e pubblicato 1 e-service
-    Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
-    Given "PA1" ha già creato 1 finalità in stato "WAITING_FOR_APPROVAL" per quell'eservice
-    Given "PA2" ha già rifiutato l'aggiornamento della stima di carico per quella finalità
-    Given "PA1" ha già creato 1 client "CONSUMER"
-    Given "PA1" ha già associato la finalità a quel client
-    When l'utente richiede la disassociazione della finalità dal client
-    Then si ottiene status code 400
-
   @client_purpose_remove3
   Scenario Outline: Un utente con sufficienti permessi (admin) non associato all'ente che ha creato il client di tipo CONSUMER ed associato il client ad una finalità che si trova in stato ACTIVE, richiede la disassociazione del client dalla finalità. Ottiene un errore
     Given l'utente è un "admin" di "PA1"

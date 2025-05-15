@@ -5,12 +5,63 @@ import {
   TenantType,
   assertContextSchema,
   getAuthorizationHeader,
+  getOrganizationId,
   getToken,
   makePolling,
 } from "../../../utils/commons";
 import { apiClient } from "../../../api";
-import { PurposeVersionState } from "../../../api/models";
 import { dataPreparationService } from "../../../services/data-preparation.service";
+import { PurposeVersionState } from "../../../api/models";
+
+Given(
+  "{string} ha già creato un'altra finalità per quell'eservice superando i limiti di carico di quell'e-service",
+  async function (tenantType: TenantType) {
+    assertContextSchema(this, {
+      eserviceId: z.string(),
+    });
+
+    const token = await getToken(tenantType);
+    const consumerId = getOrganizationId(tenantType);
+    const { riskAnalysisForm } = await dataPreparationService.getRiskAnalysis({
+      completed: true,
+      tenantType,
+    });
+
+    const { purposeId, waitingForApprovalVersionId } =
+      await dataPreparationService.createPurposeWithGivenState({
+        token,
+        testSeed: this.TEST_SEED,
+        eserviceMode: "DELIVER",
+        payload: {
+          eserviceId: this.eserviceId,
+          consumerId,
+          riskAnalysisForm,
+          dailyCalls: 999999,
+        },
+        purposeState: "WAITING_FOR_APPROVAL",
+      });
+    this.otherPurposeId = purposeId;
+    this.otherWaitingForApprovalVersionId = waitingForApprovalVersionId;
+  }
+);
+
+Given(
+  "{string} ha già approvato la nuova richiesta di aggiornamento della stima di carico",
+  async function (tenantType: TenantType) {
+    assertContextSchema(this, {
+      otherPurposeId: z.string(),
+      otherWaitingForApprovalVersionId: z.string(),
+    });
+
+    const token = await getToken(tenantType);
+
+    await dataPreparationService.activatePurposeVersion(
+      token,
+      this.otherPurposeId,
+      this.otherWaitingForApprovalVersionId
+    );
+  }
+);
 
 Given(
   "{string} ha già creato e pubblicato un e-service con una soglia di carico tale da gestire una sola chiamata",

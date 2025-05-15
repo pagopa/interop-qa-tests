@@ -52,14 +52,14 @@ Feature: Sospensione di una finalità
       | ACTIVE        |
       | SUSPENDED     |
 
-  @purpose_suspend4a @wait_for_fix @IMN-404
+  @purpose_suspend4a
   Scenario Outline: Per una finalità precedentemente creata da un fruitore, la quale è in stato WAITING_FOR_APPROVAL, DRAFT o ARCHIVED, alla richiesta di sospensione da parte di un utente con sufficienti permessi, ottiene un errore
     Given l'utente è un "admin" di "PA1"
     Given "PA2" ha già creato e pubblicato 1 e-service
     Given "PA1" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     Given "PA1" ha già creato 1 finalità in stato "<statoFinalita>" per quell'eservice
     When l'utente sospende quella finalità in stato "<statoFinalita>"
-    Then si ottiene status code 403
+    Then si ottiene status code 400
 
     Examples: 
       | statoFinalita        |
@@ -67,7 +67,7 @@ Feature: Sospensione di una finalità
       | DRAFT                |
       | ARCHIVED             |
 
-  @purpose_suspend4b @fixed_in_node
+  @purpose_suspend4b
   Scenario Outline: Per una finalità precedentemente creata da un fruitore, la quale è in stato REJECTED, alla richiesta di sospensione da parte di un utente con sufficienti permessi, ottiene un errore
     Given l'utente è un "admin" di "PA1"
     Given "PA2" ha già creato e pubblicato 1 e-service

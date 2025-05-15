@@ -38,7 +38,7 @@ Feature: Listing chiavi client
       | admin        |
       | support      |
 
-  @client_keys_listing3 @wait_for_fix @PIN-5006
+  @client_keys_listing3
   Scenario Outline: Un utente api, security o api/security; appartenente all'ente che ha creato il client; il quale utente non è membro del client; richiede l’elenco delle chiavi caricate per il client. L’operazione non va a buon fine
     Given l'utente è un "<ruolo>" di "PA1"
     Given "PA1" ha già creato 1 client "CONSUMER"

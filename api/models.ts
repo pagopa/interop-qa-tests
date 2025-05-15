@@ -85,6 +85,10 @@ export interface ValidationOption {
   maxLength?: number;
 }
 
+export interface HasCertifiedAttributes {
+  hasCertifiedAttributes: boolean;
+}
+
 export interface HideOption {
   id: string;
   value: string;
@@ -116,6 +120,14 @@ export interface UpdateEServiceSeed {
   /** Risk Analysis Mode */
   mode: EServiceMode;
   isSignalHubEnabled?: boolean;
+  isConsumerDelegable?: boolean;
+  isClientAccessDelegable?: boolean;
+}
+
+export interface UpdateEServiceTemplateInstanceSeed {
+  isSignalHubEnabled?: boolean;
+  isConsumerDelegable?: boolean;
+  isClientAccessDelegable?: boolean;
 }
 
 export interface EServiceSeed {
@@ -126,6 +138,8 @@ export interface EServiceSeed {
   /** Risk Analysis Mode */
   mode: EServiceMode;
   isSignalHubEnabled?: boolean;
+  isConsumerDelegable?: boolean;
+  isClientAccessDelegable?: boolean;
 }
 
 export interface UpdateEServiceDescriptorQuotas {
@@ -134,6 +148,21 @@ export interface UpdateEServiceDescriptorQuotas {
    * @min 0
    */
   voucherLifespan: number;
+  /**
+   * maximum number of daily calls that this descriptor can afford.
+   * @format int32
+   * @min 0
+   */
+  dailyCallsPerConsumer: number;
+  /**
+   * total daily calls available for this e-service.
+   * @format int32
+   * @min 0
+   */
+  dailyCallsTotal: number;
+}
+
+export interface UpdateEServiceTemplateInstanceDescriptorQuotas {
   /**
    * maximum number of daily calls that this descriptor can afford.
    * @format int32
@@ -172,13 +201,42 @@ export interface UpdateEServiceDescriptorSeed {
   attributes: DescriptorAttributesSeed;
 }
 
+export interface UpdateEServiceDescriptorTemplateInstanceSeed {
+  audience: string[];
+  /**
+   * maximum number of daily calls that this descriptor can afford.
+   * @format int32
+   */
+  dailyCallsPerConsumer: number;
+  /**
+   * total daily calls available for this e-service.
+   * @format int32
+   */
+  dailyCallsTotal: number;
+  /**
+   * EService Descriptor policy for new Agreements approval.
+   * AUTOMATIC - the agreement will be automatically approved if Consumer attributes are met
+   * MANUAL - the Producer must approve every agreement for this Descriptor.
+   */
+  agreementApprovalPolicy: AgreementApprovalPolicy;
+}
+
 export interface Mail {
   address: string;
   description?: string;
 }
 
-export interface EServiceDescriptionSeed {
+export interface EServiceDescriptionUpdateSeed {
   description: string;
+}
+
+export interface EServiceDelegationFlagsUpdateSeed {
+  isConsumerDelegable: boolean;
+  isClientAccessDelegable: boolean;
+}
+
+export interface EServiceNameUpdateSeed {
+  name: string;
 }
 
 export interface RejectDelegatedEServiceDescriptorSeed {
@@ -234,6 +292,8 @@ export interface Client {
   /** @format date-time */
   createdAt: string;
   consumer: CompactOrganization;
+  /** Contains some details about user */
+  admin?: CompactUser;
   name: string;
   purposes: ClientPurpose[];
   description?: string;
@@ -266,11 +326,19 @@ export interface CatalogDescriptorEService {
   descriptors: CompactDescriptor[];
   agreement?: CompactAgreement;
   isMine: boolean;
+  /**
+   * True in case:
+   *   - the requester has the certified attributes required to consume the eservice, or
+   *   - the requester is the delegated consumer for the eservice and
+   *     the delegator has the certified attributes required to consume the eservice
+   */
   hasCertifiedAttributes: boolean;
   isSubscribed: boolean;
   activeDescriptor?: CompactDescriptor;
   mail?: Mail;
   isSignalHubEnabled?: boolean;
+  isConsumerDelegable?: boolean;
+  isClientAccessDelegable?: boolean;
 }
 
 export interface ProducerEServiceDetails {
@@ -284,6 +352,8 @@ export interface ProducerEServiceDetails {
   mode: EServiceMode;
   riskAnalysis: EServiceRiskAnalysis[];
   isSignalHubEnabled?: boolean;
+  isConsumerDelegable?: boolean;
+  isClientAccessDelegable?: boolean;
 }
 
 /** Risk Analysis Mode */
@@ -335,7 +405,18 @@ export interface ProducerEServiceDescriptor {
   agreementApprovalPolicy: AgreementApprovalPolicy;
   eservice: ProducerDescriptorEService;
   attributes: DescriptorAttributes;
+  /** @format date-time */
+  publishedAt?: string;
+  /** @format date-time */
+  deprecatedAt?: string;
+  /** @format date-time */
+  archivedAt?: string;
+  /** @format date-time */
+  suspendedAt?: string;
   rejectionReasons?: DescriptorRejectionReason[];
+  serverUrls?: string[];
+  templateRef?: EServiceTemplateRef;
+  delegation?: DelegationWithCompactTenants;
 }
 
 export interface ProducerDescriptorEService {
@@ -343,6 +424,7 @@ export interface ProducerDescriptorEService {
   id: string;
   name: string;
   description: string;
+  producer: ProducerDescriptorEServiceProducer;
   /** EService Descriptor State */
   technology: EServiceTechnology;
   /** Risk Analysis Mode */
@@ -352,6 +434,25 @@ export interface ProducerDescriptorEService {
   draftDescriptor?: CompactDescriptor;
   mail?: Mail;
   isSignalHubEnabled?: boolean;
+  isConsumerDelegable?: boolean;
+  isClientAccessDelegable?: boolean;
+}
+
+export interface ProducerDescriptorEServiceProducer {
+  /** @format uuid */
+  id: string;
+  tenantKind?: TenantKind;
+}
+
+export interface EServiceTemplateRef {
+  /** @format uuid */
+  templateId: string;
+  /** @format uuid */
+  templateVersionId?: string;
+  templateName: string;
+  templateInterface?: EServiceDoc;
+  interfaceMetadata?: TemplateInstanceInterfaceMetadata;
+  isNewTemplateVersionAvailable?: boolean;
 }
 
 export interface EServiceDoc {
@@ -360,6 +461,7 @@ export interface EServiceDoc {
   name: string;
   contentType: string;
   prettyName: string;
+  checksum: string;
 }
 
 export interface UpdateEServiceDescriptorDocumentSeed {
@@ -384,6 +486,11 @@ export interface Agreement {
   id: string;
   /** @format uuid */
   descriptorId: string;
+  delegation?: {
+    /** @format uuid */
+    id: string;
+    delegate: CompactOrganization;
+  };
   producer: CompactOrganization;
   consumer: Tenant;
   eservice: AgreementsEService;
@@ -421,6 +528,8 @@ export interface AgreementPayload {
   eserviceId: string;
   /** @format uuid */
   descriptorId: string;
+  /** @format uuid */
+  delegationId?: string;
 }
 
 /** contains the information for agreement update. */
@@ -451,7 +560,6 @@ export interface CatalogEService {
   producer: CompactOrganization;
   agreement?: CompactAgreement;
   isMine: boolean;
-  hasCertifiedAttributes: boolean;
   activeDescriptor?: CompactDescriptor;
 }
 
@@ -474,6 +582,7 @@ export interface AgreementListEntry {
   suspendedByProducer?: boolean;
   suspendedByPlatform?: boolean;
   descriptor: CompactDescriptor;
+  delegation?: DelegationWithCompactTenants;
 }
 
 export interface CompactAttribute {
@@ -497,6 +606,33 @@ export interface CompactDescriptor {
   state: EServiceDescriptorState;
   version: string;
   audience: string[];
+  /** @format uuid */
+  templateVersionId?: string;
+}
+
+export interface TemplateInstanceInterfaceRESTSeed {
+  contactName: string;
+  /** @format email */
+  contactEmail: string;
+  /** @format uri */
+  contactUrl?: string;
+  /** @format uri */
+  termsAndConditionsUrl?: string;
+  serverUrls: string[];
+}
+
+export interface TemplateInstanceInterfaceSOAPSeed {
+  serverUrls: string[];
+}
+
+export interface TemplateInstanceInterfaceMetadata {
+  contactName?: string;
+  /** @format email */
+  contactEmail?: string;
+  /** @format uri */
+  contactUrl?: string;
+  /** @format uri */
+  termsAndConditionsUrl?: string;
 }
 
 export interface CompactEService {
@@ -504,6 +640,11 @@ export interface CompactEService {
   id: string;
   name: string;
   producer: CompactOrganization;
+}
+
+export interface CompactEServices {
+  results: CompactEService[];
+  pagination: Pagination;
 }
 
 export interface CompactPurposeEService {
@@ -641,6 +782,9 @@ export interface ProducerEService {
   mode: EServiceMode;
   activeDescriptor?: CompactProducerDescriptor;
   draftDescriptor?: CompactProducerDescriptor;
+  delegation?: DelegationWithCompactTenants;
+  isTemplateInstance: boolean;
+  isNewTemplateVersionAvailable?: boolean;
 }
 
 export interface ProducerEServices {
@@ -698,6 +842,7 @@ export interface Purpose {
    * @format int32
    */
   dailyCallsTotal: number;
+  delegation?: DelegationWithCompactTenants;
 }
 
 export interface PurposeAdditionDetailsSeed {
@@ -706,8 +851,6 @@ export interface PurposeAdditionDetailsSeed {
 }
 
 export type CompactUsers = CompactUser[];
-
-export type KeysSeed = KeySeed[];
 
 /** Models the seed for a public key to be persisted */
 export interface KeySeed {
@@ -782,14 +925,8 @@ export interface ProducerKeychain {
   createdAt: string;
   producer: CompactOrganization;
   name: string;
-  eservices: ProducerKeychainEService[];
+  eservices: CompactEService[];
   description: string;
-}
-
-export interface ProducerKeychainEService {
-  /** @format uuid */
-  id: string;
-  name: string;
 }
 
 export interface EServiceAdditionDetailsSeed {
@@ -827,6 +964,13 @@ export interface ReversePurposeUpdateContent {
 export interface Purposes {
   results: Purpose[];
   pagination: Pagination;
+}
+
+export interface DelegationWithCompactTenants {
+  /** @format uuid */
+  id: string;
+  delegate: CompactOrganization;
+  delegator: CompactOrganization;
 }
 
 /** business representation of a purpose version */
@@ -1116,7 +1260,7 @@ export interface Tenants {
   pagination: Pagination;
 }
 
-export type TenantFeatureType = "PERSISTENT_CERTIFIER" | "DELEGATED_PRODUCER";
+export type TenantFeatureType = "PERSISTENT_CERTIFIER" | "DELEGATED_PRODUCER" | "DELEGATED_CONSUMER";
 
 export type TenantFeature =
   | {
@@ -1126,6 +1270,10 @@ export type TenantFeature =
   | {
       /** Delegated producer Tenant Feature */
       delegatedProducer?: DelegatedProducer;
+    }
+  | {
+      /** Delegated consumer Tenant Feature */
+      delegatedConsumer?: DelegatedConsumer;
     };
 
 /** Certifier Tenant Feature */
@@ -1135,6 +1283,12 @@ export interface Certifier {
 
 /** Delegated producer Tenant Feature */
 export interface DelegatedProducer {
+  /** @format date-time */
+  availabilityTimestamp: string;
+}
+
+/** Delegated consumer Tenant Feature */
+export interface DelegatedConsumer {
   /** @format date-time */
   availabilityTimestamp: string;
 }
@@ -1152,6 +1306,7 @@ export interface Tenant {
   id: string;
   /** @format uuid */
   selfcareId?: string;
+  kind?: TenantKind;
   externalId: ExternalId;
   features: TenantFeature[];
   /** @format date-time */
@@ -1183,11 +1338,15 @@ export interface DeclaredTenantAttribute {
   assignmentTimestamp: string;
   /** @format date-time */
   revocationTimestamp?: string;
+  /** @format uuid */
+  delegationId?: string;
 }
 
 export interface DeclaredTenantAttributeSeed {
   /** @format uuid */
   id: string;
+  /** @format uuid */
+  delegationId?: string;
 }
 
 export interface UpdateVerifiedTenantAttributeSeed {
@@ -1202,6 +1361,11 @@ export interface VerifiedTenantAttributeSeed {
   agreementId: string;
   /** @format date-time */
   expirationDate?: string;
+}
+
+export interface TenantDelegatedFeaturesFlagsUpdateSeed {
+  isDelegatedConsumerFeatureEnabled: boolean;
+  isDelegatedProducerFeatureEnabled: boolean;
 }
 
 export interface CertifiedTenantAttribute {
@@ -1310,6 +1474,7 @@ export interface CompactUser {
 
 export interface PublicKeys {
   keys: PublicKey[];
+  pagination?: Pagination;
 }
 
 export interface CertifiedTenantAttributeSeed {
@@ -1329,6 +1494,11 @@ export interface DelegationTenant {
   name: string;
 }
 
+export interface DelegationTenants {
+  results: DelegationTenant[];
+  pagination: Pagination;
+}
+
 export interface DelegationEService {
   /** @format uuid */
   id: string;
@@ -1343,13 +1513,15 @@ export interface DelegationEService {
 export interface Delegation {
   /** @format uuid */
   id: string;
-  eservice: DelegationEService;
+  eservice?: DelegationEService;
   delegate: DelegationTenant;
   delegator: DelegationTenant;
   activationContract?: Document;
   revocationContract?: Document;
   /** @format date-time */
-  submittedAt?: string;
+  createdAt: string;
+  /** @format date-time */
+  updatedAt?: string;
   rejectionReason?: string;
   /** Delegation State */
   state: DelegationState;
@@ -1383,6 +1555,238 @@ export interface DelegationSeed {
 
 export interface RejectDelegationPayload {
   rejectionReason: string;
+}
+
+export interface EServiceTemplateNameUpdateSeed {
+  name: string;
+}
+
+export interface EServiceTemplateDescriptionUpdateSeed {
+  description: string;
+}
+
+export interface EServiceTemplateIntendedTargetUpdateSeed {
+  intendedTarget: string;
+}
+
+/** EService Descriptor State */
+export type EServiceTemplateVersionState = "DRAFT" | "PUBLISHED" | "DEPRECATED" | "SUSPENDED";
+
+export interface CompactEServiceTemplateVersion {
+  /** @format uuid */
+  id: string;
+  /** @format int32 */
+  version: number;
+  /** EService Descriptor State */
+  state: EServiceTemplateVersionState;
+}
+
+export interface EServiceTemplateDetails {
+  /** @format uuid */
+  id: string;
+  creator: CompactOrganization;
+  name: string;
+  intendedTarget: string;
+  description: string;
+  /** EService Descriptor State */
+  technology: EServiceTechnology;
+  versions: CompactEServiceTemplateVersion[];
+  riskAnalysis: EServiceRiskAnalysis[];
+  /** Risk Analysis Mode */
+  mode: EServiceMode;
+  isSignalHubEnabled?: boolean;
+  draftVersion?: CompactEServiceTemplateVersion;
+}
+
+export interface EServiceTemplateVersionDetails {
+  /** @format uuid */
+  id: string;
+  /** @format int32 */
+  version: number;
+  description?: string;
+  /** @format int32 */
+  voucherLifespan: number;
+  /**
+   * maximum number of daily calls that this descriptor can afford per consumer.
+   * @format int32
+   * @min 1
+   */
+  dailyCallsPerConsumer?: number;
+  /**
+   * total daily calls available for this e-service.
+   * @format int32
+   * @min 1
+   */
+  dailyCallsTotal?: number;
+  interface?: EServiceDoc;
+  docs: EServiceDoc[];
+  /** EService Descriptor State */
+  state: EServiceTemplateVersionState;
+  /**
+   * EService Descriptor policy for new Agreements approval.
+   * AUTOMATIC - the agreement will be automatically approved if Consumer attributes are met
+   * MANUAL - the Producer must approve every agreement for this Descriptor.
+   */
+  agreementApprovalPolicy?: AgreementApprovalPolicy;
+  attributes: DescriptorAttributes;
+  eserviceTemplate: EServiceTemplateDetails;
+}
+
+export interface EServiceTemplateVersionQuotasUpdateSeed {
+  /**
+   * @format int32
+   * @min 60
+   * @max 86400
+   */
+  voucherLifespan: number;
+  /**
+   * @format int32
+   * @min 1
+   */
+  dailyCallsPerConsumer?: number;
+  /**
+   * @format int32
+   * @min 1
+   */
+  dailyCallsTotal?: number;
+}
+
+/** contains the id of the created resource with the versionId */
+export interface CreatedEServiceTemplateVersion {
+  /** @format uuid */
+  id: string;
+  /** @format uuid */
+  versionId: string;
+}
+
+export interface UpdateEServiceTemplateSeed {
+  /**
+   * @minLength 5
+   * @maxLength 60
+   */
+  name: string;
+  /**
+   * @minLength 10
+   * @maxLength 250
+   */
+  intendedTarget: string;
+  /**
+   * @minLength 10
+   * @maxLength 250
+   */
+  description: string;
+  /** EService Descriptor State */
+  technology: EServiceTechnology;
+  /** Risk Analysis Mode */
+  mode: EServiceMode;
+  isSignalHubEnabled?: boolean;
+}
+
+export interface EServiceTemplateSeed {
+  /**
+   * @minLength 5
+   * @maxLength 60
+   */
+  name: string;
+  /**
+   * @minLength 10
+   * @maxLength 250
+   */
+  intendedTarget: string;
+  /**
+   * @minLength 10
+   * @maxLength 250
+   */
+  description: string;
+  /** EService Descriptor State */
+  technology: EServiceTechnology;
+  /** Risk Analysis Mode */
+  mode: EServiceMode;
+  version?: VersionSeedForEServiceTemplateCreation;
+  isSignalHubEnabled?: boolean;
+}
+
+export interface InstanceEServiceSeed {
+  isSignalHubEnabled?: boolean;
+  isConsumerDelegable?: boolean;
+  isClientAccessDelegable?: boolean;
+}
+
+export interface VersionSeedForEServiceTemplateCreation {
+  /**
+   * @minLength 10
+   * @maxLength 250
+   */
+  description?: string;
+  /**
+   * @format int32
+   * @min 60
+   * @max 86400
+   */
+  voucherLifespan: number;
+  /**
+   * maximum number of daily calls that this descriptor can afford.
+   * @format int32
+   * @min 1
+   */
+  dailyCallsPerConsumer?: number;
+  /**
+   * total daily calls available for this e-service.
+   * @format int32
+   * @min 1
+   */
+  dailyCallsTotal?: number;
+  /**
+   * EService Descriptor policy for new Agreements approval.
+   * AUTOMATIC - the agreement will be automatically approved if Consumer attributes are met
+   * MANUAL - the Producer must approve every agreement for this Descriptor.
+   */
+  agreementApprovalPolicy?: AgreementApprovalPolicy;
+}
+
+export interface EServiceTemplateInstance {
+  /** @format uuid */
+  id: string;
+  name: string;
+  /** @format uuid */
+  producerId: string;
+  producerName: string;
+  latestDescriptor?: CompactDescriptor;
+  descriptors: CompactDescriptor[];
+}
+
+export interface EServiceTemplateInstances {
+  results: EServiceTemplateInstance[];
+  pagination: Pagination;
+}
+
+export interface CatalogEServiceTemplate {
+  /** @format uuid */
+  id: string;
+  name: string;
+  description: string;
+  creator: CompactOrganization;
+  publishedVersion: CompactEServiceTemplateVersion;
+}
+
+export interface ProducerEServiceTemplate {
+  /** @format uuid */
+  id: string;
+  name: string;
+  /** Risk Analysis Mode */
+  mode: EServiceMode;
+  activeVersion?: CompactEServiceTemplateVersion;
+  draftVersion?: CompactEServiceTemplateVersion;
+}
+
+export interface CatalogEServiceTemplates {
+  results: CatalogEServiceTemplate[];
+  pagination: Pagination;
+}
+
+export interface ProducerEServiceTemplates {
+  results: ProducerEServiceTemplate[];
+  pagination: Pagination;
 }
 
 export interface Problem {
@@ -1421,6 +1825,59 @@ export interface Problem {
   errors: ProblemError[];
 }
 
+export interface UpdateEServiceTemplateVersionSeed {
+  /**
+   * @minLength 10
+   * @maxLength 250
+   */
+  description?: string;
+  /**
+   * @format int32
+   * @min 60
+   * @max 86400
+   */
+  voucherLifespan: number;
+  /**
+   * maximum number of daily calls that this descriptor can afford.
+   * @format int32
+   * @min 1
+   */
+  dailyCallsPerConsumer?: number;
+  /**
+   * total daily calls available for this e-service.
+   * @format int32
+   * @min 1
+   */
+  dailyCallsTotal?: number;
+  /**
+   * EService Descriptor policy for new Agreements approval.
+   * AUTOMATIC - the agreement will be automatically approved if Consumer attributes are met
+   * MANUAL - the Producer must approve every agreement for this Descriptor.
+   */
+  agreementApprovalPolicy?: AgreementApprovalPolicy;
+  attributes: EServiceTemplateAttributesSeed;
+}
+
+export interface EServiceTemplateAttributesSeed {
+  certified: EServiceTemplateVersionAttributeSeed[][];
+  declared: EServiceTemplateVersionAttributeSeed[][];
+  verified: EServiceTemplateVersionAttributeSeed[][];
+}
+
+export interface EServiceTemplateVersionAttributeSeed {
+  /** @format uuid */
+  id: string;
+  explicitAttributeVerification: boolean;
+}
+
+export interface UpdateEServiceTemplateVersionDocumentSeed {
+  /**
+   * @minLength 5
+   * @maxLength 60
+   */
+  prettyName: string;
+}
+
 export interface ProblemError {
   /**
    * Internal code of the error
@@ -1439,7 +1896,7 @@ export interface ProblemError {
   detail: string;
 }
 
-export interface GetAgreementsParams {
+export interface GetConsumerAgreementsParams {
   /**
    * @format int32
    * @min 0
@@ -1462,6 +1919,32 @@ export interface GetAgreementsParams {
    */
   producersIds?: string[];
   /**
+   * comma separated sequence of agreement states to filter the response with
+   * @default []
+   */
+  states?: AgreementState[];
+  /** @default false */
+  showOnlyUpgradeable?: boolean;
+}
+
+export interface GetProducerAgreementsParams {
+  /**
+   * @format int32
+   * @min 0
+   */
+  offset: number;
+  /**
+   * @format int32
+   * @min 1
+   * @max 50
+   */
+  limit: number;
+  /**
+   * comma separated sequence of eservices IDs
+   * @default []
+   */
+  eservicesIds?: string[];
+  /**
    * comma separated sequence of consumers IDs
    * @default []
    */
@@ -1475,7 +1958,7 @@ export interface GetAgreementsParams {
   showOnlyUpgradeable?: boolean;
 }
 
-export interface GetAgreementProducersParams {
+export interface GetAgreementsProducersParams {
   /** Query to filter Producers by name */
   q?: string;
   /**
@@ -1491,7 +1974,7 @@ export interface GetAgreementProducersParams {
   limit: number;
 }
 
-export interface GetAgreementConsumersParams {
+export interface GetAgreementsConsumersParams {
   /** Query to filter Consumers by name */
   q?: string;
   /**
@@ -1539,6 +2022,8 @@ export interface GetEServicesCatalogParams {
   agreementStates?: AgreementState[];
   /** EService Mode filter */
   mode?: EServiceMode;
+  /** EService isConsumerDelegable filter */
+  isConsumerDelegable?: boolean;
   /**
    * @format int32
    * @min 0
@@ -1549,6 +2034,24 @@ export interface GetEServicesCatalogParams {
    * @min 1
    * @max 50
    */
+  limit: number;
+}
+
+export interface GetConsumerDelegatorsParams {
+  q?: string;
+  /** @default [] */
+  eserviceIds?: string[];
+  /** @format int32 */
+  offset: number;
+  /** @format int32 */
+  limit: number;
+}
+
+export interface GetConsumerDelegatorsWithAgreementsParams {
+  q?: string;
+  /** @format int32 */
+  offset: number;
+  /** @format int32 */
   limit: number;
 }
 
@@ -1577,6 +2080,32 @@ export interface CreateEServiceDocumentPayload {
 
 export interface GetImportEservicePresignedUrlParams {
   fileName: string;
+}
+
+export interface GetEServiceTemplateInstancesParams {
+  /** Query to filter by producer name */
+  producerName?: string;
+  /**
+   * comma separated sequence of instance states
+   * @default []
+   */
+  states?: EServiceDescriptorState[];
+  /**
+   * @format int32
+   * @min 0
+   */
+  offset: number;
+  /**
+   * @format int32
+   * @min 1
+   * @max 50
+   */
+  limit: number;
+  /**
+   * the eservice template id
+   * @format uuid
+   */
+  templateId: string;
 }
 
 export interface GetProducersParams {
@@ -1610,14 +2139,9 @@ export interface GetProducerEServicesParams {
   limit: number;
 }
 
-export interface GetAgreementEServiceProducersParams {
+export interface GetAgreementsProducerEServicesParams {
   /** Query to filter EServices by name */
   q?: string;
-  /**
-   * comma separated sequence of states
-   * @default []
-   */
-  states?: AgreementState[];
   /**
    * @format int32
    * @min 0
@@ -1631,7 +2155,7 @@ export interface GetAgreementEServiceProducersParams {
   limit: number;
 }
 
-export interface GetAgreementEServiceConsumersParams {
+export interface GetAgreementsConsumerEServicesParams {
   /** Query to filter EServices by name */
   q?: string;
   /**
@@ -1694,11 +2218,6 @@ export interface GetProducerPurposesParams {
    */
   consumersIds?: string[];
   /**
-   * comma separated sequence of producers IDs
-   * @default []
-   */
-  producersIds?: string[];
-  /**
    * comma separated sequence of states
    * @default []
    */
@@ -1723,11 +2242,6 @@ export interface GetConsumerPurposesParams {
    * @default []
    */
   eservicesIds?: string[];
-  /**
-   * comma separated sequence of consumers IDs
-   * @default []
-   */
-  consumersIds?: string[];
   /**
    * comma separated sequence of producers IDs
    * @default []
@@ -1820,10 +2334,25 @@ export interface GetClientKeysParams {
    */
   userIds?: string[];
   /**
+   * @format int32
+   * @min 0
+   */
+  offset: number;
+  /**
+   * @format int32
+   * @min 1
+   * @max 50
+   */
+  limit: number;
+  /**
    * ID of Client
    * @format uuid
    */
   clientId: string;
+}
+
+export interface RetrieveLatestRiskAnalysisConfigurationParams {
+  tenantKind?: TenantKind;
 }
 
 export interface RetrieveRiskAnalysisConfigurationByVersionParams {
@@ -1914,16 +2443,92 @@ export interface GetDelegationsParams {
   eserviceIds?: string[];
 }
 
-export namespace Agreements {
+export interface GetConsumerDelegatedEservicesParams {
+  /** @format uuid */
+  delegatorId: string;
+  q?: string;
+  /** @format int32 */
+  offset: number;
+  /** @format int32 */
+  limit: number;
+}
+
+export interface GetEServiceTemplatesCatalogParams {
+  /** Query to filter EService template by name */
+  q?: string;
   /**
-   * @description retrieves a list of agreements
+   * comma separated sequence of creators IDs
+   * @default []
+   */
+  creatorsIds?: string[];
+  /**
+   * @format int32
+   * @min 0
+   */
+  offset: number;
+  /**
+   * @format int32
+   * @min 1
+   * @max 50
+   */
+  limit: number;
+}
+
+export interface GetCreatorEServiceTemplatesParams {
+  /** Query to filter EServices templates by name */
+  q?: string;
+  /**
+   * @format int32
+   * @min 0
+   */
+  offset: number;
+  /**
+   * @format int32
+   * @min 1
+   * @max 50
+   */
+  limit: number;
+}
+
+export interface GetEServiceTemplateCreatorsParams {
+  /** Query to filter creators by name */
+  q?: string;
+  /**
+   * @format int32
+   * @min 0
+   */
+  offset: number;
+  /**
+   * @format int32
+   * @min 1
+   * @max 50
+   */
+  limit: number;
+}
+
+export interface CreateEServiceTemplateDocumentPayload {
+  /** Document Type */
+  kind: "INTERFACE" | "DOCUMENT";
+  prettyName: string;
+  /** @format binary */
+  doc: File;
+}
+
+export interface IsEServiceNameAvailableParams {
+  /** the e-service name to check for */
+  name: string;
+}
+
+export namespace Consumers {
+  /**
+   * @description retrieves a list of consumer agreements
    * @tags agreements
-   * @name GetAgreements
-   * @summary retrieves a list of agreements
-   * @request GET:/agreements
+   * @name GetConsumerAgreements
+   * @summary retrieves a list of consumer agreements
+   * @request GET:/consumers/agreements
    * @secure
    */
-  export namespace GetAgreements {
+  export namespace GetConsumerAgreements {
     export type RequestParams = {};
     export type RequestQuery = {
       /**
@@ -1948,11 +2553,6 @@ export namespace Agreements {
        */
       producersIds?: string[];
       /**
-       * comma separated sequence of consumers IDs
-       * @default []
-       */
-      consumersIds?: string[];
-      /**
        * comma separated sequence of agreement states to filter the response with
        * @default []
        */
@@ -1961,494 +2561,51 @@ export namespace Agreements {
       showOnlyUpgradeable?: boolean;
     };
     export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = Agreements;
   }
   /**
-   * @description creates the agreement between the involved parties.
-   * @tags agreements
-   * @name CreateAgreement
-   * @summary Agreement Creation
-   * @request POST:/agreements
+   * @description Retrieve requester's delegators
+   * @tags consumerDelegations
+   * @name GetConsumerDelegators
+   * @request GET:/consumers/delegations/delegators
    * @secure
    */
-  export namespace CreateAgreement {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = AgreementPayload;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
-    export type ResponseBody = CreatedResource;
-  }
-  /**
-   * @description Retrieves Tenants that are producers with existing Agreements
-   * @tags agreements
-   * @name GetAgreementProducers
-   * @summary Retrieves Tenants that are producers with existing Agreements
-   * @request GET:/agreements/filter/producers
-   * @secure
-   */
-  export namespace GetAgreementProducers {
+  export namespace GetConsumerDelegators {
     export type RequestParams = {};
     export type RequestQuery = {
-      /** Query to filter Producers by name */
       q?: string;
-      /**
-       * @format int32
-       * @min 0
-       */
+      /** @default [] */
+      eserviceIds?: string[];
+      /** @format int32 */
       offset: number;
-      /**
-       * @format int32
-       * @min 1
-       * @max 50
-       */
+      /** @format int32 */
       limit: number;
     };
     export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
-    export type ResponseBody = CompactOrganizations;
+    export type RequestHeaders = {};
+    export type ResponseBody = DelegationTenants;
   }
   /**
-   * @description Retrieves Tenants that are consumers with existing Agreements
-   * @tags agreements
-   * @name GetAgreementConsumers
-   * @summary Retrieves Tenants that are consumers with existing Agreements
-   * @request GET:/agreements/filter/consumers
+   * @description Retrieve requester's delegators with active agreements
+   * @tags consumerDelegations
+   * @name GetConsumerDelegatorsWithAgreements
+   * @request GET:/consumers/delegations/delegatorsWithAgreements
    * @secure
    */
-  export namespace GetAgreementConsumers {
+  export namespace GetConsumerDelegatorsWithAgreements {
     export type RequestParams = {};
     export type RequestQuery = {
-      /** Query to filter Consumers by name */
       q?: string;
-      /**
-       * @format int32
-       * @min 0
-       */
+      /** @format int32 */
       offset: number;
-      /**
-       * @format int32
-       * @min 1
-       * @max 50
-       */
+      /** @format int32 */
       limit: number;
     };
     export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
-    export type ResponseBody = CompactOrganizations;
+    export type RequestHeaders = {};
+    export type ResponseBody = DelegationTenants;
   }
-  /**
-   * @description returns an agreement for a given agreementId
-   * @tags agreements
-   * @name GetAgreementById
-   * @summary retrieves an agreement
-   * @request GET:/agreements/{agreementId}
-   * @secure
-   */
-  export namespace GetAgreementById {
-    export type RequestParams = {
-      /**
-       * The identifier of the agreement
-       * @format uuid
-       */
-      agreementId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
-    export type ResponseBody = Agreement;
-  }
-  /**
-   * No description
-   * @tags agreements
-   * @name DeleteAgreement
-   * @summary Delete an agreement. This operation is valid only for agreements in DRAFT or MISSING_CERTIFIED_ATTRIBUTES
-   * @request DELETE:/agreements/{agreementId}
-   * @secure
-   */
-  export namespace DeleteAgreement {
-    export type RequestParams = {
-      /**
-       * The identifier of the agreement
-       * @format uuid
-       */
-      agreementId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
-    export type ResponseBody = void;
-  }
-  /**
-   * @description returns the updated agreement
-   * @tags agreements
-   * @name ActivateAgreement
-   * @summary Activate an agreement
-   * @request POST:/agreements/{agreementId}/activate
-   * @secure
-   */
-  export namespace ActivateAgreement {
-    export type RequestParams = {
-      /**
-       * The identifier of the agreement
-       * @format uuid
-       */
-      agreementId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
-    export type ResponseBody = Agreement;
-  }
-  /**
-   * @description returns the created agreement
-   * @tags agreements
-   * @name CloneAgreement
-   * @summary Clone a rejected agreement
-   * @request POST:/agreements/{agreementId}/clone
-   * @secure
-   */
-  export namespace CloneAgreement {
-    export type RequestParams = {
-      /**
-       * The identifier of the agreement
-       * @format uuid
-       */
-      agreementId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
-    export type ResponseBody = CreatedResource;
-  }
-  /**
-   * @description Add a consumer Document to an Agreement
-   * @tags agreements
-   * @name AddAgreementConsumerDocument
-   * @summary Add a consumer Document to an Agreement
-   * @request POST:/agreements/{agreementId}/consumer-documents
-   * @secure
-   */
-  export namespace AddAgreementConsumerDocument {
-    export type RequestParams = {
-      /** @format uuid */
-      agreementId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = AddAgreementConsumerDocumentPayload;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
-    export type ResponseBody = File;
-  }
-  /**
-   * @description Retrieve a consumer Document of an Agreement
-   * @tags agreements
-   * @name GetAgreementConsumerDocument
-   * @summary Retrieve a consumer Document of an Agreement
-   * @request GET:/agreements/{agreementId}/consumer-documents/{documentId}
-   * @secure
-   */
-  export namespace GetAgreementConsumerDocument {
-    export type RequestParams = {
-      /** @format uuid */
-      agreementId: string;
-      /** @format uuid */
-      documentId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
-    export type ResponseBody = File;
-  }
-  /**
-   * @description Remove a consumer Document from an Agreement
-   * @tags agreements
-   * @name RemoveAgreementConsumerDocument
-   * @summary Remove a consumer Document from an Agreement
-   * @request DELETE:/agreements/{agreementId}/consumer-documents/{documentId}
-   * @secure
-   */
-  export namespace RemoveAgreementConsumerDocument {
-    export type RequestParams = {
-      /** @format uuid */
-      agreementId: string;
-      /** @format uuid */
-      documentId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
-    export type ResponseBody = void;
-  }
-  /**
-   * @description returns the agreement contract for a given agreementId
-   * @tags agreements
-   * @name GetAgreementContract
-   * @summary retrieves the agreement contract
-   * @request GET:/agreements/{agreementId}/contract
-   * @secure
-   */
-  export namespace GetAgreementContract {
-    export type RequestParams = {
-      /**
-       * The identifier of the agreement
-       * @format uuid
-       */
-      agreementId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
-    export type ResponseBody = File;
-  }
-  /**
-   * @description returns the updated agreement
-   * @tags agreements
-   * @name SubmitAgreement
-   * @summary Submit an agreement
-   * @request POST:/agreements/{agreementId}/submit
-   * @secure
-   */
-  export namespace SubmitAgreement {
-    export type RequestParams = {
-      /**
-       * The identifier of the agreement
-       * @format uuid
-       */
-      agreementId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = AgreementSubmissionPayload;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
-    export type ResponseBody = Agreement;
-  }
-  /**
-   * @description returns the updated agreement
-   * @tags agreements
-   * @name SuspendAgreement
-   * @summary Suspend an agreement
-   * @request POST:/agreements/{agreementId}/suspend
-   * @secure
-   */
-  export namespace SuspendAgreement {
-    export type RequestParams = {
-      /**
-       * The identifier of the agreement
-       * @format uuid
-       */
-      agreementId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
-    export type ResponseBody = Agreement;
-  }
-  /**
-   * @description returns the updated agreement
-   * @tags agreements
-   * @name RejectAgreement
-   * @summary Reject an agreement
-   * @request POST:/agreements/{agreementId}/reject
-   * @secure
-   */
-  export namespace RejectAgreement {
-    export type RequestParams = {
-      /**
-       * The identifier of the agreement
-       * @format uuid
-       */
-      agreementId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = AgreementRejectionPayload;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
-    export type ResponseBody = Agreement;
-  }
-  /**
-   * @description returns the updated agreement
-   * @tags agreements
-   * @name ArchiveAgreement
-   * @summary Archive an agreement
-   * @request POST:/agreements/{agreementId}/archive
-   * @secure
-   */
-  export namespace ArchiveAgreement {
-    export type RequestParams = {
-      /**
-       * The identifier of the agreement
-       * @format uuid
-       */
-      agreementId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
-    export type ResponseBody = void;
-  }
-  /**
-   * @description update agreement fields.
-   * @tags agreements
-   * @name UpdateAgreement
-   * @summary update an agreement in draft state.
-   * @request POST:/agreements/{agreementId}/update
-   * @secure
-   */
-  export namespace UpdateAgreement {
-    export type RequestParams = {
-      /**
-       * The identifier of the agreement to update
-       * @format uuid
-       */
-      agreementId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = AgreementUpdatePayload;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
-    export type ResponseBody = Agreement;
-  }
-  /**
-   * @description returns the updated agreement
-   * @tags agreements
-   * @name UpgradeAgreement
-   * @summary Upgrade an agreement
-   * @request POST:/agreements/{agreementId}/upgrade
-   * @secure
-   */
-  export namespace UpgradeAgreement {
-    export type RequestParams = {
-      /**
-       * The identifier of the agreement
-       * @format uuid
-       */
-      agreementId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
-    export type ResponseBody = Agreement;
-  }
-}
-
-export namespace Catalog {
-  /**
-   * @description Retrieves EServices catalog
-   * @tags eservices
-   * @name GetEServicesCatalog
-   * @summary Retrieves EServices catalog
-   * @request GET:/catalog
-   * @secure
-   */
-  export namespace GetEServicesCatalog {
-    export type RequestParams = {};
-    export type RequestQuery = {
-      /** Query to filter EServices by name */
-      q?: string;
-      /**
-       * comma separated sequence of producers IDs
-       * @default []
-       */
-      producersIds?: string[];
-      /**
-       * comma separated sequence of attribute IDs
-       * @default []
-       */
-      attributesIds?: string[];
-      /**
-       * comma separated sequence of states
-       * @default []
-       */
-      states?: EServiceDescriptorState[];
-      /**
-       * comma separated sequence of agreement states to filter the response with
-       * @default []
-       */
-      agreementStates?: AgreementState[];
-      /** EService Mode filter */
-      mode?: EServiceMode;
-      /**
-       * @format int32
-       * @min 0
-       */
-      offset: number;
-      /**
-       * @format int32
-       * @min 1
-       * @max 50
-       */
-      limit: number;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
-    export type ResponseBody = CatalogEServices;
-  }
-  /**
-   * @description Retrieves the catalog eservice descriptor corresponding to the id
-   * @tags eservices
-   * @name GetCatalogEServiceDescriptor
-   * @summary Retrieves the catalog eservice descriptor corresponding to the id
-   * @request GET:/catalog/eservices/{eserviceId}/descriptor/{descriptorId}
-   * @secure
-   */
-  export namespace GetCatalogEServiceDescriptor {
-    export type RequestParams = {
-      /**
-       * The internal identifier of the eservice
-       * @format uuid
-       */
-      eserviceId: string;
-      /**
-       * the descriptor id
-       * @format uuid
-       */
-      descriptorId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
-    export type ResponseBody = CatalogEServiceDescriptor;
-  }
-}
-
-export namespace Consumers {
   /**
    * @description Retrieve Tenants that are subscribed to at least one EService
    * @tags tenants
@@ -2473,20 +2630,18 @@ export namespace Consumers {
       limit: number;
     };
     export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = CompactOrganizations;
   }
   /**
    * @description Retrieves eservices for consumers in agreements
    * @tags agreements
-   * @name GetAgreementEServiceConsumers
+   * @name GetAgreementsConsumerEServices
    * @summary Retrieves eservices for consumers in agreements
    * @request GET:/consumers/agreements/eservices
    * @secure
    */
-  export namespace GetAgreementEServiceConsumers {
+  export namespace GetAgreementsConsumerEServices {
     export type RequestParams = {};
     export type RequestQuery = {
       /** Query to filter EServices by name */
@@ -2504,690 +2659,195 @@ export namespace Consumers {
       limit: number;
     };
     export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = CompactEServicesLight;
   }
-}
-
-export namespace Eservices {
   /**
-   * No description
-   * @tags eservices
-   * @name CreateEService
-   * @summary Create a new EService
-   * @request POST:/eservices
+   * @description Retrieve Purposes from the consumer perspective
+   * @tags purposes
+   * @name GetConsumerPurposes
+   * @request GET:/consumers/purposes
    * @secure
    */
-  export namespace CreateEService {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = EServiceSeed;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
-    export type ResponseBody = CreatedEServiceDescriptor;
-  }
-  /**
-   * No description
-   * @tags eservices
-   * @name GetEServiceConsumers
-   * @summary Retrieve Consumers for an EService
-   * @request GET:/eservices/{eServiceId}/consumers
-   * @secure
-   */
-  export namespace GetEServiceConsumers {
-    export type RequestParams = {
-      /**
-       * The E-Service id
-       * @format uuid
-       */
-      eServiceId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
-    export type ResponseBody = File;
-  }
-  /**
-   * No description
-   * @tags eservices
-   * @name DeleteDraft
-   * @summary Deletes a draft descriptor or an eservice if empty
-   * @request DELETE:/eservices/{eServiceId}/descriptors/{descriptorId}
-   * @secure
-   */
-  export namespace DeleteDraft {
-    export type RequestParams = {
-      /**
-       * The E-Service Id
-       * @format uuid
-       */
-      eServiceId: string;
-      /**
-       * The Descriptor Id
-       * @format uuid
-       */
-      descriptorId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
-    export type ResponseBody = void;
-  }
-  /**
-   * No description
-   * @tags eservices
-   * @name UpdateDraftDescriptor
-   * @summary Updates a draft descriptor
-   * @request PUT:/eservices/{eServiceId}/descriptors/{descriptorId}
-   * @secure
-   */
-  export namespace UpdateDraftDescriptor {
-    export type RequestParams = {
-      /**
-       * The E-Service id
-       * @format uuid
-       */
-      eServiceId: string;
-      /**
-       * The Descriptor Id
-       * @format uuid
-       */
-      descriptorId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = UpdateEServiceDescriptorSeed;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
-    export type ResponseBody = CreatedResource;
-  }
-  /**
-   * No description
-   * @tags eservices
-   * @name CreateDescriptor
-   * @summary Adds a descriptor to the specified e-service
-   * @request POST:/eservices/{eServiceId}/descriptors
-   * @secure
-   */
-  export namespace CreateDescriptor {
-    export type RequestParams = {
-      /**
-       * The E-Service id
-       * @format uuid
-       */
-      eServiceId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
-    export type ResponseBody = CreatedResource;
-  }
-  /**
-   * No description
-   * @tags eservices
-   * @name ActivateDescriptor
-   * @summary Activate the selected descriptor.
-   * @request POST:/eservices/{eServiceId}/descriptors/{descriptorId}/activate
-   * @secure
-   */
-  export namespace ActivateDescriptor {
-    export type RequestParams = {
-      /**
-       * the eservice id
-       * @format uuid
-       */
-      eServiceId: string;
-      /**
-       * the descriptor Id
-       * @format uuid
-       */
-      descriptorId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
-    export type ResponseBody = void;
-  }
-  /**
-   * No description
-   * @tags eservices
-   * @name UpdateDescriptor
-   * @summary Publish the selected descriptor.
-   * @request POST:/eservices/{eServiceId}/descriptors/{descriptorId}/update
-   * @secure
-   */
-  export namespace UpdateDescriptor {
-    export type RequestParams = {
-      /**
-       * the eservice id
-       * @format uuid
-       */
-      eServiceId: string;
-      /**
-       * the descriptor Id
-       * @format uuid
-       */
-      descriptorId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = UpdateEServiceDescriptorQuotas;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
-    export type ResponseBody = CreatedResource;
-  }
-  /**
-   * No description
-   * @tags eservices
-   * @name PublishDescriptor
-   * @summary Publish the selected descriptor.
-   * @request POST:/eservices/{eServiceId}/descriptors/{descriptorId}/publish
-   * @secure
-   */
-  export namespace PublishDescriptor {
-    export type RequestParams = {
-      /**
-       * the eservice id
-       * @format uuid
-       */
-      eServiceId: string;
-      /**
-       * the descriptor Id
-       * @format uuid
-       */
-      descriptorId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
-    export type ResponseBody = void;
-  }
-  /**
-   * No description
-   * @tags eservices
-   * @name SuspendDescriptor
-   * @summary Suspend the selected descriptor.
-   * @request POST:/eservices/{eServiceId}/descriptors/{descriptorId}/suspend
-   * @secure
-   */
-  export namespace SuspendDescriptor {
-    export type RequestParams = {
-      /**
-       * the eservice id
-       * @format uuid
-       */
-      eServiceId: string;
-      /**
-       * the descriptor Id
-       * @format uuid
-       */
-      descriptorId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
-    export type ResponseBody = void;
-  }
-  /**
-   * No description
-   * @tags eservices
-   * @name CreateEServiceDocument
-   * @summary Add new e-service document
-   * @request POST:/eservices/{eServiceId}/descriptors/{descriptorId}/documents
-   * @secure
-   */
-  export namespace CreateEServiceDocument {
-    export type RequestParams = {
-      /**
-       * the eservice id
-       * @format uuid
-       */
-      eServiceId: string;
-      /**
-       * the descriptor Id
-       * @format uuid
-       */
-      descriptorId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = CreateEServiceDocumentPayload;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
-    export type ResponseBody = CreatedResource;
-  }
-  /**
-   * No description
-   * @tags eservices
-   * @name DeleteEServiceDocumentById
-   * @summary Deletes an e-service document
-   * @request DELETE:/eservices/{eServiceId}/descriptors/{descriptorId}/documents/{documentId}
-   * @secure
-   */
-  export namespace DeleteEServiceDocumentById {
-    export type RequestParams = {
-      /**
-       * the eservice id
-       * @format uuid
-       */
-      eServiceId: string;
-      /**
-       * the descriptor Id
-       * @format uuid
-       */
-      descriptorId: string;
-      /**
-       * the document id
-       * @format uuid
-       */
-      documentId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
-    export type ResponseBody = void;
-  }
-  /**
-   * No description
-   * @tags eservices
-   * @name GetEServiceDocumentById
-   * @summary Get an e-service document
-   * @request GET:/eservices/{eServiceId}/descriptors/{descriptorId}/documents/{documentId}
-   * @secure
-   */
-  export namespace GetEServiceDocumentById {
-    export type RequestParams = {
-      /** the eservice id */
-      eServiceId: string;
-      /** the descriptor Id */
-      descriptorId: string;
-      /** the document id */
-      documentId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
-    export type ResponseBody = File;
-  }
-  /**
-   * No description
-   * @tags eservices
-   * @name CloneEServiceByDescriptor
-   * @summary Clones the selected descriptor.
-   * @request POST:/eservices/{eServiceId}/descriptors/{descriptorId}/clone
-   * @secure
-   */
-  export namespace CloneEServiceByDescriptor {
-    export type RequestParams = {
-      /**
-       * the eservice id
-       * @format uuid
-       */
-      eServiceId: string;
-      /**
-       * the descriptor Id
-       * @format uuid
-       */
-      descriptorId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
-    export type ResponseBody = CreatedEServiceDescriptor;
-  }
-  /**
-   * No description
-   * @tags eservices
-   * @name UpdateEServiceDocumentById
-   * @summary Updates an e-service document
-   * @request POST:/eservices/{eServiceId}/descriptors/{descriptorId}/documents/{documentId}/update
-   * @secure
-   */
-  export namespace UpdateEServiceDocumentById {
-    export type RequestParams = {
-      /**
-       * the eservice id
-       * @format uuid
-       */
-      eServiceId: string;
-      /**
-       * the descriptor Id
-       * @format uuid
-       */
-      descriptorId: string;
-      /**
-       * the document id
-       * @format uuid
-       */
-      documentId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = UpdateEServiceDescriptorDocumentSeed;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
-    export type ResponseBody = EServiceDoc;
-  }
-  /**
-   * No description
-   * @tags eservices
-   * @name DeleteEService
-   * @summary Deletes an e-service
-   * @request DELETE:/eservices/{eServiceId}
-   * @secure
-   */
-  export namespace DeleteEService {
-    export type RequestParams = {
-      /**
-       * the eservice id
-       * @format uuid
-       */
-      eServiceId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
-    export type ResponseBody = void;
-  }
-  /**
-   * No description
-   * @tags eservices
-   * @name UpdateEServiceById
-   * @summary Updates EService general information
-   * @request PUT:/eservices/{eServiceId}
-   * @secure
-   */
-  export namespace UpdateEServiceById {
-    export type RequestParams = {
-      /**
-       * The E-Service id to update
-       * @format uuid
-       */
-      eServiceId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = UpdateEServiceSeed;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
-    export type ResponseBody = CreatedResource;
-  }
-  /**
-   * No description
-   * @tags eservices
-   * @name AddRiskAnalysisToEService
-   * @summary add a risk analysis to an EService
-   * @request POST:/eservices/{eServiceId}/riskAnalysis
-   * @secure
-   */
-  export namespace AddRiskAnalysisToEService {
-    export type RequestParams = {
-      /**
-       * the eservice id
-       * @format uuid
-       */
-      eServiceId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = EServiceRiskAnalysisSeed;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
-    export type ResponseBody = void;
-  }
-  /**
-   * No description
-   * @tags eservices
-   * @name GetEServiceRiskAnalysis
-   * @summary get EService risk analysis
-   * @request GET:/eservices/{eServiceId}/riskAnalysis/{riskAnalysisId}
-   * @secure
-   */
-  export namespace GetEServiceRiskAnalysis {
-    export type RequestParams = {
-      /**
-       * the eservice id
-       * @format uuid
-       */
-      eServiceId: string;
-      /**
-       * the risk analysis id
-       * @format uuid
-       */
-      riskAnalysisId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
-    export type ResponseBody = EServiceRiskAnalysis;
-  }
-  /**
-   * No description
-   * @tags eservices
-   * @name UpdateEServiceRiskAnalysis
-   * @summary update EService risk analysis
-   * @request POST:/eservices/{eServiceId}/riskAnalysis/{riskAnalysisId}
-   * @secure
-   */
-  export namespace UpdateEServiceRiskAnalysis {
-    export type RequestParams = {
-      /**
-       * the eservice id
-       * @format uuid
-       */
-      eServiceId: string;
-      /**
-       * the risk analysis id
-       * @format uuid
-       */
-      riskAnalysisId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = EServiceRiskAnalysisSeed;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
-    export type ResponseBody = void;
-  }
-  /**
-   * No description
-   * @tags eservices
-   * @name DeleteEServiceRiskAnalysis
-   * @summary delete EService risk analysis
-   * @request DELETE:/eservices/{eServiceId}/riskAnalysis/{riskAnalysisId}
-   * @secure
-   */
-  export namespace DeleteEServiceRiskAnalysis {
-    export type RequestParams = {
-      /**
-       * the eservice id
-       * @format uuid
-       */
-      eServiceId: string;
-      /**
-       * the risk analysis id
-       * @format uuid
-       */
-      riskAnalysisId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
-    export type ResponseBody = void;
-  }
-  /**
-   * No description
-   * @tags eservices
-   * @name UpdateEServiceDescription
-   * @summary Update an e-service description
-   * @request POST:/eservices/{eServiceId}/update
-   * @secure
-   */
-  export namespace UpdateEServiceDescription {
-    export type RequestParams = {
-      /**
-       * the eservice id
-       * @format uuid
-       */
-      eServiceId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = EServiceDescriptionSeed;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
-    export type ResponseBody = CreatedResource;
-  }
-  /**
-   * No description
-   * @tags eservices
-   * @name ApproveDelegatedEServiceDescriptor
-   * @summary approve a delegated new e-service version
-   * @request POST:/eservices/{eServiceId}/descriptors/{descriptorId}/approve
-   * @secure
-   */
-  export namespace ApproveDelegatedEServiceDescriptor {
-    export type RequestParams = {
-      /**
-       * the eservice id
-       * @format uuid
-       */
-      eServiceId: string;
-      /**
-       * the descriptor id
-       * @format uuid
-       */
-      descriptorId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
-    export type ResponseBody = CreatedResource;
-  }
-  /**
-   * No description
-   * @tags eservices
-   * @name RejectDelegatedEServiceDescriptor
-   * @summary reject a delegated new e-service version
-   * @request POST:/eservices/{eServiceId}/descriptors/{descriptorId}/reject
-   * @secure
-   */
-  export namespace RejectDelegatedEServiceDescriptor {
-    export type RequestParams = {
-      /**
-       * the eservice id
-       * @format uuid
-       */
-      eServiceId: string;
-      /**
-       * the descriptor id
-       * @format uuid
-       */
-      descriptorId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = RejectDelegatedEServiceDescriptorSeed;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
-    export type ResponseBody = CreatedResource;
-  }
-}
-
-export namespace Export {
-  /**
-   * No description
-   * @tags eservices
-   * @name ExportEServiceDescriptor
-   * @summary Export EService descriptor
-   * @request GET:/export/eservices/{eserviceId}/descriptors/{descriptorId}
-   * @secure
-   */
-  export namespace ExportEServiceDescriptor {
-    export type RequestParams = {
-      /** @format uuid */
-      eserviceId: string;
-      /** @format uuid */
-      descriptorId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
-    export type ResponseBody = FileResource;
-  }
-}
-
-export namespace Import {
-  /**
-   * No description
-   * @tags eservices
-   * @name GetImportEservicePresignedUrl
-   * @summary Get presigned URL
-   * @request GET:/import/eservices/presignedUrl
-   * @secure
-   */
-  export namespace GetImportEservicePresignedUrl {
+  export namespace GetConsumerPurposes {
     export type RequestParams = {};
     export type RequestQuery = {
-      fileName: string;
+      q?: string;
+      /**
+       * comma separated sequence of EService IDs
+       * @default []
+       */
+      eservicesIds?: string[];
+      /**
+       * comma separated sequence of producers IDs
+       * @default []
+       */
+      producersIds?: string[];
+      /**
+       * comma separated sequence of states
+       * @default []
+       */
+      states?: PurposeVersionState[];
+      /**
+       * @format int32
+       * @min 0
+       */
+      offset: number;
+      /**
+       * @format int32
+       * @min 1
+       * @max 50
+       */
+      limit: number;
     };
     export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
-    export type ResponseBody = PresignedUrl;
+    export type RequestHeaders = {};
+    export type ResponseBody = Purposes;
   }
   /**
-   * No description
-   * @tags eservices
-   * @name ImportEService
-   * @summary Import EService
-   * @request POST:/import/eservices
+   * @description Retrieve requester's delegated eservices
+   * @tags consumerDelegations
+   * @name GetConsumerDelegatedEservices
+   * @request GET:/consumers/delegations/eservices
    * @secure
    */
-  export namespace ImportEService {
+  export namespace GetConsumerDelegatedEservices {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      /** @format uuid */
+      delegatorId: string;
+      q?: string;
+      /** @format int32 */
+      offset: number;
+      /** @format int32 */
+      limit: number;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = CompactEServices;
+  }
+  /**
+   * @description creates a consumer delegation
+   * @tags consumerDelegations
+   * @name CreateConsumerDelegation
+   * @summary Consumer delegation creation
+   * @request POST:/consumers/delegations
+   * @secure
+   */
+  export namespace CreateConsumerDelegation {
     export type RequestParams = {};
     export type RequestQuery = {};
-    export type RequestBody = FileResource;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
+    export type RequestBody = DelegationSeed;
+    export type RequestHeaders = {};
+    export type ResponseBody = CreatedResource;
+  }
+  /**
+   * @description Approves a consumer delegation
+   * @tags consumerDelegations
+   * @name ApproveConsumerDelegation
+   * @summary Approves a consumer delegation
+   * @request POST:/consumers/delegations/{delegationId}/approve
+   * @secure
+   */
+  export namespace ApproveConsumerDelegation {
+    export type RequestParams = {
+      /**
+       * The identifier of the delegation
+       * @format uuid
+       */
+      delegationId: string;
     };
-    export type ResponseBody = CreatedEServiceDescriptor;
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = void;
+  }
+  /**
+   * @description Rejects a consumer delegation
+   * @tags consumerDelegations
+   * @name RejectConsumerDelegation
+   * @summary Rejects a consumer delegation
+   * @request POST:/consumers/delegations/{delegationId}/reject
+   * @secure
+   */
+  export namespace RejectConsumerDelegation {
+    export type RequestParams = {
+      /**
+       * The identifier of the delegation
+       * @format uuid
+       */
+      delegationId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = RejectDelegationPayload;
+    export type RequestHeaders = {};
+    export type ResponseBody = void;
+  }
+  /**
+   * @description Revokes a consumer delegation
+   * @tags consumerDelegations
+   * @name RevokeConsumerDelegation
+   * @summary Revokes a consumer delegation
+   * @request DELETE:/consumers/delegations/{delegationId}
+   * @secure
+   */
+  export namespace RevokeConsumerDelegation {
+    export type RequestParams = {
+      /** The delegation id */
+      delegationId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = void;
   }
 }
 
 export namespace Producers {
+  /**
+   * @description retrieves a list of producers agreements
+   * @tags agreements
+   * @name GetProducerAgreements
+   * @summary retrieves a list of producers agreements
+   * @request GET:/producers/agreements
+   * @secure
+   */
+  export namespace GetProducerAgreements {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      /**
+       * @format int32
+       * @min 0
+       */
+      offset: number;
+      /**
+       * @format int32
+       * @min 1
+       * @max 50
+       */
+      limit: number;
+      /**
+       * comma separated sequence of eservices IDs
+       * @default []
+       */
+      eservicesIds?: string[];
+      /**
+       * comma separated sequence of consumers IDs
+       * @default []
+       */
+      consumersIds?: string[];
+      /**
+       * comma separated sequence of agreement states to filter the response with
+       * @default []
+       */
+      states?: AgreementState[];
+      /** @default false */
+      showOnlyUpgradeable?: boolean;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = Agreements;
+  }
   /**
    * @description Retrieve Tenants that have published an EService
    * @tags tenants
@@ -3205,9 +2865,7 @@ export namespace Producers {
       limit: number;
     };
     export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = CompactOrganizations;
   }
   /**
@@ -3243,29 +2901,22 @@ export namespace Producers {
       limit: number;
     };
     export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = ProducerEServices;
   }
   /**
    * @description Retrieves eservices for producers in agreements
    * @tags agreements
-   * @name GetAgreementEServiceProducers
+   * @name GetAgreementsProducerEServices
    * @summary Retrieves eservices for producers in agreements
    * @request GET:/producers/agreements/eservices
    * @secure
    */
-  export namespace GetAgreementEServiceProducers {
+  export namespace GetAgreementsProducerEServices {
     export type RequestParams = {};
     export type RequestQuery = {
       /** Query to filter EServices by name */
       q?: string;
-      /**
-       * comma separated sequence of states
-       * @default []
-       */
-      states?: AgreementState[];
       /**
        * @format int32
        * @min 0
@@ -3279,9 +2930,7 @@ export namespace Producers {
       limit: number;
     };
     export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = CompactEServicesLight;
   }
   /**
@@ -3302,9 +2951,7 @@ export namespace Producers {
     };
     export type RequestQuery = {};
     export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = ProducerEServiceDetails;
   }
   /**
@@ -3330,92 +2977,525 @@ export namespace Producers {
     };
     export type RequestQuery = {};
     export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = ProducerEServiceDescriptor;
   }
-}
-
-export namespace Reverse {
   /**
-   * @description create a purposes with an EService risk analysis
+   * @description Retrieve Purposes from the producer perspective
    * @tags purposes
-   * @name CreatePurposeForReceiveEservice
-   * @summary create a purposes with an EService risk analysis
-   * @request POST:/reverse/purposes
+   * @name GetProducerPurposes
+   * @request GET:/producers/purposes
    * @secure
    */
-  export namespace CreatePurposeForReceiveEservice {
+  export namespace GetProducerPurposes {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      q?: string;
+      /**
+       * comma separated sequence of EService IDs
+       * @default []
+       */
+      eservicesIds?: string[];
+      /**
+       * comma separated sequence of consumers IDs
+       * @default []
+       */
+      consumersIds?: string[];
+      /**
+       * comma separated sequence of states
+       * @default []
+       */
+      states?: PurposeVersionState[];
+      /**
+       * @format int32
+       * @min 0
+       */
+      offset: number;
+      /**
+       * @format int32
+       * @min 1
+       * @max 50
+       */
+      limit: number;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = Purposes;
+  }
+  /**
+   * @description creates a producer delegation
+   * @tags producerDelegations
+   * @name CreateProducerDelegation
+   * @summary Producer delegation creation
+   * @request POST:/producers/delegations
+   * @secure
+   */
+  export namespace CreateProducerDelegation {
     export type RequestParams = {};
     export type RequestQuery = {};
-    export type RequestBody = PurposeEServiceSeed;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestBody = DelegationSeed;
+    export type RequestHeaders = {};
     export type ResponseBody = CreatedResource;
   }
   /**
-   * @description Updates a reverse Purpose
-   * @tags purposes
-   * @name UpdateReversePurpose
-   * @request POST:/reverse/purposes/{purposeId}
+   * @description Approves a producer delegation
+   * @tags producerDelegations
+   * @name ApproveProducerDelegation
+   * @summary Approves a producer delegation
+   * @request POST:/producers/delegations/{delegationId}/approve
    * @secure
    */
-  export namespace UpdateReversePurpose {
+  export namespace ApproveProducerDelegation {
     export type RequestParams = {
       /**
-       * the purpose id
+       * The identifier of the delegation
        * @format uuid
        */
-      purposeId: string;
+      delegationId: string;
     };
     export type RequestQuery = {};
-    export type RequestBody = ReversePurposeUpdateContent;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = void;
+  }
+  /**
+   * @description Rejects a producer delegation
+   * @tags producerDelegations
+   * @name RejectProducerDelegation
+   * @summary Rejects a producer delegation
+   * @request POST:/producers/delegations/{delegationId}/reject
+   * @secure
+   */
+  export namespace RejectProducerDelegation {
+    export type RequestParams = {
+      /**
+       * The identifier of the delegation
+       * @format uuid
+       */
+      delegationId: string;
     };
-    export type ResponseBody = PurposeVersionResource;
+    export type RequestQuery = {};
+    export type RequestBody = RejectDelegationPayload;
+    export type RequestHeaders = {};
+    export type ResponseBody = void;
+  }
+  /**
+   * @description Revokes a producer delegation
+   * @tags producerDelegations
+   * @name RevokeProducerDelegation
+   * @summary Revokes a producer delegation
+   * @request DELETE:/producers/delegations/{delegationId}
+   * @secure
+   */
+  export namespace RevokeProducerDelegation {
+    export type RequestParams = {
+      /** The delegation id */
+      delegationId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = void;
   }
 }
 
-export namespace Session {
+export namespace Agreements {
   /**
-   * @description Retrieve a session token
-   * @tags authorization
-   * @name GetSessionToken
-   * @request POST:/session/tokens
+   * @description creates the agreement between the involved parties.
+   * @tags agreements
+   * @name CreateAgreement
+   * @summary Agreement Creation
+   * @request POST:/agreements
    * @secure
    */
-  export namespace GetSessionToken {
+  export namespace CreateAgreement {
     export type RequestParams = {};
     export type RequestQuery = {};
-    export type RequestBody = IdentityToken;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
-    export type ResponseBody = SessionToken;
+    export type RequestBody = AgreementPayload;
+    export type RequestHeaders = {};
+    export type ResponseBody = CreatedResource;
   }
   /**
-   * @description Returns the generated token
-   * @tags support
-   * @name GetSaml2Token
-   * @summary Returns the generated token
-   * @request POST:/session/saml2/tokens
+   * @description Retrieves Tenants that are producers with existing Agreements
+   * @tags agreements
+   * @name GetAgreementsProducers
+   * @summary Retrieves Tenants that are producers with existing Agreements
+   * @request GET:/agreements/filter/producers
    * @secure
    */
-  export namespace GetSaml2Token {
+  export namespace GetAgreementsProducers {
     export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = SAMLTokenRequest;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
+    export type RequestQuery = {
+      /** Query to filter Producers by name */
+      q?: string;
+      /**
+       * @format int32
+       * @min 0
+       */
+      offset: number;
+      /**
+       * @format int32
+       * @min 1
+       * @max 50
+       */
+      limit: number;
     };
-    export type ResponseBody = SessionToken;
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = CompactOrganizations;
+  }
+  /**
+   * @description Retrieves Tenants that are consumers with existing Agreements
+   * @tags agreements
+   * @name GetAgreementsConsumers
+   * @summary Retrieves Tenants that are consumers with existing Agreements
+   * @request GET:/agreements/filter/consumers
+   * @secure
+   */
+  export namespace GetAgreementsConsumers {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      /** Query to filter Consumers by name */
+      q?: string;
+      /**
+       * @format int32
+       * @min 0
+       */
+      offset: number;
+      /**
+       * @format int32
+       * @min 1
+       * @max 50
+       */
+      limit: number;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = CompactOrganizations;
+  }
+  /**
+   * @description returns an agreement for a given agreementId
+   * @tags agreements
+   * @name GetAgreementById
+   * @summary retrieves an agreement
+   * @request GET:/agreements/{agreementId}
+   * @secure
+   */
+  export namespace GetAgreementById {
+    export type RequestParams = {
+      /**
+       * The identifier of the agreement
+       * @format uuid
+       */
+      agreementId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = Agreement;
+  }
+  /**
+   * No description
+   * @tags agreements
+   * @name DeleteAgreement
+   * @summary Delete an agreement
+   * @request DELETE:/agreements/{agreementId}
+   * @secure
+   */
+  export namespace DeleteAgreement {
+    export type RequestParams = {
+      /**
+       * The identifier of the agreement
+       * @format uuid
+       */
+      agreementId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = void;
+  }
+  /**
+   * @description returns the updated agreement
+   * @tags agreements
+   * @name ActivateAgreement
+   * @summary Activate an agreement
+   * @request POST:/agreements/{agreementId}/activate
+   * @secure
+   */
+  export namespace ActivateAgreement {
+    export type RequestParams = {
+      /**
+       * The identifier of the agreement
+       * @format uuid
+       */
+      agreementId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = Agreement;
+  }
+  /**
+   * @description returns the created agreement
+   * @tags agreements
+   * @name CloneAgreement
+   * @summary Clone a rejected agreement
+   * @request POST:/agreements/{agreementId}/clone
+   * @secure
+   */
+  export namespace CloneAgreement {
+    export type RequestParams = {
+      /**
+       * The identifier of the agreement
+       * @format uuid
+       */
+      agreementId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = CreatedResource;
+  }
+  /**
+   * @description Add a consumer Document to an Agreement
+   * @tags agreements
+   * @name AddAgreementConsumerDocument
+   * @summary Add a consumer Document to an Agreement
+   * @request POST:/agreements/{agreementId}/consumer-documents
+   * @secure
+   */
+  export namespace AddAgreementConsumerDocument {
+    export type RequestParams = {
+      /** @format uuid */
+      agreementId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = AddAgreementConsumerDocumentPayload;
+    export type RequestHeaders = {};
+    export type ResponseBody = File;
+  }
+  /**
+   * @description Retrieve a consumer Document of an Agreement
+   * @tags agreements
+   * @name GetAgreementConsumerDocument
+   * @summary Retrieve a consumer Document of an Agreement
+   * @request GET:/agreements/{agreementId}/consumer-documents/{documentId}
+   * @secure
+   */
+  export namespace GetAgreementConsumerDocument {
+    export type RequestParams = {
+      /** @format uuid */
+      agreementId: string;
+      /** @format uuid */
+      documentId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = File;
+  }
+  /**
+   * @description Remove a consumer Document from an Agreement
+   * @tags agreements
+   * @name RemoveAgreementConsumerDocument
+   * @summary Remove a consumer Document from an Agreement
+   * @request DELETE:/agreements/{agreementId}/consumer-documents/{documentId}
+   * @secure
+   */
+  export namespace RemoveAgreementConsumerDocument {
+    export type RequestParams = {
+      /** @format uuid */
+      agreementId: string;
+      /** @format uuid */
+      documentId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = void;
+  }
+  /**
+   * @description returns the agreement contract for a given agreementId
+   * @tags agreements
+   * @name GetAgreementContract
+   * @summary retrieves the agreement contract
+   * @request GET:/agreements/{agreementId}/contract
+   * @secure
+   */
+  export namespace GetAgreementContract {
+    export type RequestParams = {
+      /**
+       * The identifier of the agreement
+       * @format uuid
+       */
+      agreementId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = File;
+  }
+  /**
+   * @description returns the updated agreement
+   * @tags agreements
+   * @name SubmitAgreement
+   * @summary Submit an agreement
+   * @request POST:/agreements/{agreementId}/submit
+   * @secure
+   */
+  export namespace SubmitAgreement {
+    export type RequestParams = {
+      /**
+       * The identifier of the agreement
+       * @format uuid
+       */
+      agreementId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = AgreementSubmissionPayload;
+    export type RequestHeaders = {};
+    export type ResponseBody = Agreement;
+  }
+  /**
+   * @description returns the updated agreement
+   * @tags agreements
+   * @name SuspendAgreement
+   * @summary Suspend an agreement
+   * @request POST:/agreements/{agreementId}/suspend
+   * @secure
+   */
+  export namespace SuspendAgreement {
+    export type RequestParams = {
+      /**
+       * The identifier of the agreement
+       * @format uuid
+       */
+      agreementId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = Agreement;
+  }
+  /**
+   * @description returns the updated agreement
+   * @tags agreements
+   * @name RejectAgreement
+   * @summary Reject an agreement
+   * @request POST:/agreements/{agreementId}/reject
+   * @secure
+   */
+  export namespace RejectAgreement {
+    export type RequestParams = {
+      /**
+       * The identifier of the agreement
+       * @format uuid
+       */
+      agreementId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = AgreementRejectionPayload;
+    export type RequestHeaders = {};
+    export type ResponseBody = Agreement;
+  }
+  /**
+   * @description returns the updated agreement
+   * @tags agreements
+   * @name ArchiveAgreement
+   * @summary Archive an agreement
+   * @request POST:/agreements/{agreementId}/archive
+   * @secure
+   */
+  export namespace ArchiveAgreement {
+    export type RequestParams = {
+      /**
+       * The identifier of the agreement
+       * @format uuid
+       */
+      agreementId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = void;
+  }
+  /**
+   * @description update agreement fields.
+   * @tags agreements
+   * @name UpdateAgreement
+   * @summary update an agreement in draft state.
+   * @request POST:/agreements/{agreementId}/update
+   * @secure
+   */
+  export namespace UpdateAgreement {
+    export type RequestParams = {
+      /**
+       * The identifier of the agreement to update
+       * @format uuid
+       */
+      agreementId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = AgreementUpdatePayload;
+    export type RequestHeaders = {};
+    export type ResponseBody = Agreement;
+  }
+  /**
+   * @description returns the updated agreement
+   * @tags agreements
+   * @name UpgradeAgreement
+   * @summary Upgrade an agreement
+   * @request POST:/agreements/{agreementId}/upgrade
+   * @secure
+   */
+  export namespace UpgradeAgreement {
+    export type RequestParams = {
+      /**
+       * The identifier of the agreement
+       * @format uuid
+       */
+      agreementId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = Agreement;
   }
 }
 
 export namespace Tenants {
+  /**
+   * @description Verify a Tenant has required certified attributes
+   * @tags agreements
+   * @name VerifyTenantCertifiedAttributes
+   * @summary Verify a Tenant has required certified attributes
+   * @request GET:/tenants/{tenantId}/eservices/{eserviceId}/descriptors/{descriptorId}/certifiedAttributes/validate
+   * @secure
+   */
+  export namespace VerifyTenantCertifiedAttributes {
+    export type RequestParams = {
+      /**
+       * The identifier of the tenant
+       * @format uuid
+       */
+      tenantId: string;
+      /**
+       * The identifier of the e-service
+       * @format uuid
+       */
+      eserviceId: string;
+      /**
+       * The identifier of the e-service descriptor
+       * @format uuid
+       */
+      descriptorId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = HasCertifiedAttributes;
+  }
   /**
    * @description Return ok
    * @tags selfcare
@@ -3447,9 +3527,7 @@ export namespace Tenants {
       query?: string;
     };
     export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = Users;
   }
   /**
@@ -3476,9 +3554,7 @@ export namespace Tenants {
       limit: number;
     };
     export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = RequesterCertifiedAttributes;
   }
   /**
@@ -3576,9 +3652,7 @@ export namespace Tenants {
     };
     export type RequestQuery = {};
     export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = DeclaredAttributesResponse;
   }
   /**
@@ -3599,9 +3673,7 @@ export namespace Tenants {
     };
     export type RequestQuery = {};
     export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = VerifiedAttributesResponse;
   }
   /**
@@ -3622,9 +3694,7 @@ export namespace Tenants {
     };
     export type RequestQuery = {};
     export type RequestBody = VerifiedTenantAttributeSeed;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = void;
   }
   /**
@@ -3721,9 +3791,7 @@ export namespace Tenants {
     };
     export type RequestQuery = {};
     export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = Tenant;
   }
   /**
@@ -3744,9 +3812,7 @@ export namespace Tenants {
     };
     export type RequestQuery = {};
     export type RequestBody = MailSeed;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = void;
   }
   /**
@@ -3769,9 +3835,7 @@ export namespace Tenants {
     };
     export type RequestQuery = {};
     export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = void;
   }
   /**
@@ -3798,21 +3862,200 @@ export namespace Tenants {
       limit: number;
     };
     export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = Tenants;
   }
   /**
    * No description
    * @tags tenants
-   * @name AssignTenantDelegatedProducerFeature
-   * @summary Assign delegated producer feature to tenant caller
-   * @request POST:/tenants/delegatedProducer
+   * @name UpdateTenantDelegatedFeatures
+   * @summary Update delegated producer and consumer feature to tenant caller
+   * @request POST:/tenants/delegatedFeatures/update
    * @secure
    */
-  export namespace AssignTenantDelegatedProducerFeature {
+  export namespace UpdateTenantDelegatedFeatures {
     export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = TenantDelegatedFeaturesFlagsUpdateSeed;
+    export type RequestHeaders = {};
+    export type ResponseBody = void;
+  }
+}
+
+export namespace Catalog {
+  /**
+   * @description Retrieves EServices catalog
+   * @tags eservices
+   * @name GetEServicesCatalog
+   * @summary Retrieves EServices catalog
+   * @request GET:/catalog
+   * @secure
+   */
+  export namespace GetEServicesCatalog {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      /** Query to filter EServices by name */
+      q?: string;
+      /**
+       * comma separated sequence of producers IDs
+       * @default []
+       */
+      producersIds?: string[];
+      /**
+       * comma separated sequence of attribute IDs
+       * @default []
+       */
+      attributesIds?: string[];
+      /**
+       * comma separated sequence of states
+       * @default []
+       */
+      states?: EServiceDescriptorState[];
+      /**
+       * comma separated sequence of agreement states to filter the response with
+       * @default []
+       */
+      agreementStates?: AgreementState[];
+      /** EService Mode filter */
+      mode?: EServiceMode;
+      /** EService isConsumerDelegable filter */
+      isConsumerDelegable?: boolean;
+      /**
+       * @format int32
+       * @min 0
+       */
+      offset: number;
+      /**
+       * @format int32
+       * @min 1
+       * @max 50
+       */
+      limit: number;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = CatalogEServices;
+  }
+  /**
+   * @description Retrieves the catalog eservice descriptor corresponding to the id
+   * @tags eservices
+   * @name GetCatalogEServiceDescriptor
+   * @summary Retrieves the catalog eservice descriptor corresponding to the id
+   * @request GET:/catalog/eservices/{eserviceId}/descriptor/{descriptorId}
+   * @secure
+   */
+  export namespace GetCatalogEServiceDescriptor {
+    export type RequestParams = {
+      /**
+       * The internal identifier of the eservice
+       * @format uuid
+       */
+      eserviceId: string;
+      /**
+       * the descriptor id
+       * @format uuid
+       */
+      descriptorId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = CatalogEServiceDescriptor;
+  }
+  /**
+   * @description Retrieves EService templates catalog
+   * @tags eserviceTemplates
+   * @name GetEServiceTemplatesCatalog
+   * @summary Retrieves EService templates catalog
+   * @request GET:/catalog/eservices/templates
+   * @secure
+   */
+  export namespace GetEServiceTemplatesCatalog {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      /** Query to filter EService template by name */
+      q?: string;
+      /**
+       * comma separated sequence of creators IDs
+       * @default []
+       */
+      creatorsIds?: string[];
+      /**
+       * @format int32
+       * @min 0
+       */
+      offset: number;
+      /**
+       * @format int32
+       * @min 1
+       * @max 50
+       */
+      limit: number;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = CatalogEServiceTemplates;
+  }
+}
+
+export namespace Eservices {
+  /**
+   * No description
+   * @tags eservices
+   * @name CreateEService
+   * @summary Create a new EService
+   * @request POST:/eservices
+   * @secure
+   */
+  export namespace CreateEService {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = EServiceSeed;
+    export type RequestHeaders = {};
+    export type ResponseBody = CreatedEServiceDescriptor;
+  }
+  /**
+   * No description
+   * @tags eservices
+   * @name GetEServiceConsumers
+   * @summary Retrieve Consumers for an EService
+   * @request GET:/eservices/{eServiceId}/consumers
+   * @secure
+   */
+  export namespace GetEServiceConsumers {
+    export type RequestParams = {
+      /**
+       * The E-Service id
+       * @format uuid
+       */
+      eServiceId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = File;
+  }
+  /**
+   * No description
+   * @tags eservices
+   * @name DeleteDraft
+   * @summary Deletes a draft descriptor or an eservice if empty
+   * @request DELETE:/eservices/{eServiceId}/descriptors/{descriptorId}
+   * @secure
+   */
+  export namespace DeleteDraft {
+    export type RequestParams = {
+      /**
+       * The E-Service Id
+       * @format uuid
+       */
+      eServiceId: string;
+      /**
+       * The Descriptor Id
+       * @format uuid
+       */
+      descriptorId: string;
+    };
     export type RequestQuery = {};
     export type RequestBody = never;
     export type RequestHeaders = {};
@@ -3820,18 +4063,1498 @@ export namespace Tenants {
   }
   /**
    * No description
-   * @tags tenants
-   * @name DeleteTenantDelegatedProducerFeature
-   * @summary Delete delegated producer feature to tenant caller
-   * @request DELETE:/tenants/delegatedProducer
+   * @tags eservices
+   * @name UpdateDraftDescriptor
+   * @summary Updates a draft descriptor
+   * @request PUT:/eservices/{eServiceId}/descriptors/{descriptorId}
    * @secure
    */
-  export namespace DeleteTenantDelegatedProducerFeature {
-    export type RequestParams = {};
+  export namespace UpdateDraftDescriptor {
+    export type RequestParams = {
+      /**
+       * The E-Service id
+       * @format uuid
+       */
+      eServiceId: string;
+      /**
+       * The Descriptor Id
+       * @format uuid
+       */
+      descriptorId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = UpdateEServiceDescriptorSeed;
+    export type RequestHeaders = {};
+    export type ResponseBody = CreatedResource;
+  }
+  /**
+   * No description
+   * @tags eservices
+   * @name CreateDescriptor
+   * @summary Adds a descriptor to the specified e-service
+   * @request POST:/eservices/{eServiceId}/descriptors
+   * @secure
+   */
+  export namespace CreateDescriptor {
+    export type RequestParams = {
+      /**
+       * The E-Service id
+       * @format uuid
+       */
+      eServiceId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = CreatedResource;
+  }
+  /**
+   * No description
+   * @tags eservices
+   * @name ActivateDescriptor
+   * @summary Activate the selected descriptor.
+   * @request POST:/eservices/{eServiceId}/descriptors/{descriptorId}/activate
+   * @secure
+   */
+  export namespace ActivateDescriptor {
+    export type RequestParams = {
+      /**
+       * the eservice id
+       * @format uuid
+       */
+      eServiceId: string;
+      /**
+       * the descriptor Id
+       * @format uuid
+       */
+      descriptorId: string;
+    };
     export type RequestQuery = {};
     export type RequestBody = never;
     export type RequestHeaders = {};
     export type ResponseBody = void;
+  }
+  /**
+   * No description
+   * @tags eservices
+   * @name UpdateDescriptor
+   * @summary Publish the selected descriptor.
+   * @request POST:/eservices/{eServiceId}/descriptors/{descriptorId}/update
+   * @secure
+   */
+  export namespace UpdateDescriptor {
+    export type RequestParams = {
+      /**
+       * the eservice id
+       * @format uuid
+       */
+      eServiceId: string;
+      /**
+       * the descriptor Id
+       * @format uuid
+       */
+      descriptorId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = UpdateEServiceDescriptorQuotas;
+    export type RequestHeaders = {};
+    export type ResponseBody = CreatedResource;
+  }
+  /**
+   * No description
+   * @tags eservices
+   * @name PublishDescriptor
+   * @summary Publish the selected descriptor.
+   * @request POST:/eservices/{eServiceId}/descriptors/{descriptorId}/publish
+   * @secure
+   */
+  export namespace PublishDescriptor {
+    export type RequestParams = {
+      /**
+       * the eservice id
+       * @format uuid
+       */
+      eServiceId: string;
+      /**
+       * the descriptor Id
+       * @format uuid
+       */
+      descriptorId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = void;
+  }
+  /**
+   * No description
+   * @tags eservices
+   * @name SuspendDescriptor
+   * @summary Suspend the selected descriptor.
+   * @request POST:/eservices/{eServiceId}/descriptors/{descriptorId}/suspend
+   * @secure
+   */
+  export namespace SuspendDescriptor {
+    export type RequestParams = {
+      /**
+       * the eservice id
+       * @format uuid
+       */
+      eServiceId: string;
+      /**
+       * the descriptor Id
+       * @format uuid
+       */
+      descriptorId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = void;
+  }
+  /**
+   * No description
+   * @tags eservices
+   * @name CreateEServiceDocument
+   * @summary Add new e-service document
+   * @request POST:/eservices/{eServiceId}/descriptors/{descriptorId}/documents
+   * @secure
+   */
+  export namespace CreateEServiceDocument {
+    export type RequestParams = {
+      /**
+       * the eservice id
+       * @format uuid
+       */
+      eServiceId: string;
+      /**
+       * the descriptor Id
+       * @format uuid
+       */
+      descriptorId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = CreateEServiceDocumentPayload;
+    export type RequestHeaders = {};
+    export type ResponseBody = CreatedResource;
+  }
+  /**
+   * No description
+   * @tags eservices
+   * @name DeleteEServiceDocumentById
+   * @summary Deletes an e-service document
+   * @request DELETE:/eservices/{eServiceId}/descriptors/{descriptorId}/documents/{documentId}
+   * @secure
+   */
+  export namespace DeleteEServiceDocumentById {
+    export type RequestParams = {
+      /**
+       * the eservice id
+       * @format uuid
+       */
+      eServiceId: string;
+      /**
+       * the descriptor Id
+       * @format uuid
+       */
+      descriptorId: string;
+      /**
+       * the document id
+       * @format uuid
+       */
+      documentId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = void;
+  }
+  /**
+   * No description
+   * @tags eservices
+   * @name GetEServiceDocumentById
+   * @summary Get an e-service document
+   * @request GET:/eservices/{eServiceId}/descriptors/{descriptorId}/documents/{documentId}
+   * @secure
+   */
+  export namespace GetEServiceDocumentById {
+    export type RequestParams = {
+      /** the eservice id */
+      eServiceId: string;
+      /** the descriptor Id */
+      descriptorId: string;
+      /** the document id */
+      documentId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = File;
+  }
+  /**
+   * No description
+   * @tags eservices
+   * @name CloneEServiceByDescriptor
+   * @summary Clones the selected descriptor.
+   * @request POST:/eservices/{eServiceId}/descriptors/{descriptorId}/clone
+   * @secure
+   */
+  export namespace CloneEServiceByDescriptor {
+    export type RequestParams = {
+      /**
+       * the eservice id
+       * @format uuid
+       */
+      eServiceId: string;
+      /**
+       * the descriptor Id
+       * @format uuid
+       */
+      descriptorId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = CreatedEServiceDescriptor;
+  }
+  /**
+   * No description
+   * @tags eservices
+   * @name UpdateEServiceDocumentById
+   * @summary Updates an e-service document
+   * @request POST:/eservices/{eServiceId}/descriptors/{descriptorId}/documents/{documentId}/update
+   * @secure
+   */
+  export namespace UpdateEServiceDocumentById {
+    export type RequestParams = {
+      /**
+       * the eservice id
+       * @format uuid
+       */
+      eServiceId: string;
+      /**
+       * the descriptor Id
+       * @format uuid
+       */
+      descriptorId: string;
+      /**
+       * the document id
+       * @format uuid
+       */
+      documentId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = UpdateEServiceDescriptorDocumentSeed;
+    export type RequestHeaders = {};
+    export type ResponseBody = EServiceDoc;
+  }
+  /**
+   * No description
+   * @tags eservices
+   * @name DeleteEService
+   * @summary Deletes an e-service
+   * @request DELETE:/eservices/{eServiceId}
+   * @secure
+   */
+  export namespace DeleteEService {
+    export type RequestParams = {
+      /**
+       * the eservice id
+       * @format uuid
+       */
+      eServiceId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = void;
+  }
+  /**
+   * No description
+   * @tags eservices
+   * @name UpdateEServiceById
+   * @summary Updates EService general information
+   * @request PUT:/eservices/{eServiceId}
+   * @secure
+   */
+  export namespace UpdateEServiceById {
+    export type RequestParams = {
+      /**
+       * The E-Service id to update
+       * @format uuid
+       */
+      eServiceId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = UpdateEServiceSeed;
+    export type RequestHeaders = {};
+    export type ResponseBody = CreatedResource;
+  }
+  /**
+   * No description
+   * @tags eservices
+   * @name AddRiskAnalysisToEService
+   * @summary add a risk analysis to an EService
+   * @request POST:/eservices/{eServiceId}/riskAnalysis
+   * @secure
+   */
+  export namespace AddRiskAnalysisToEService {
+    export type RequestParams = {
+      /**
+       * the eservice id
+       * @format uuid
+       */
+      eServiceId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = EServiceRiskAnalysisSeed;
+    export type RequestHeaders = {};
+    export type ResponseBody = void;
+  }
+  /**
+   * No description
+   * @tags eservices
+   * @name GetEServiceRiskAnalysis
+   * @summary get EService risk analysis
+   * @request GET:/eservices/{eServiceId}/riskAnalysis/{riskAnalysisId}
+   * @secure
+   */
+  export namespace GetEServiceRiskAnalysis {
+    export type RequestParams = {
+      /**
+       * the eservice id
+       * @format uuid
+       */
+      eServiceId: string;
+      /**
+       * the risk analysis id
+       * @format uuid
+       */
+      riskAnalysisId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = EServiceRiskAnalysis;
+  }
+  /**
+   * No description
+   * @tags eservices
+   * @name UpdateEServiceRiskAnalysis
+   * @summary update EService risk analysis
+   * @request POST:/eservices/{eServiceId}/riskAnalysis/{riskAnalysisId}
+   * @secure
+   */
+  export namespace UpdateEServiceRiskAnalysis {
+    export type RequestParams = {
+      /**
+       * the eservice id
+       * @format uuid
+       */
+      eServiceId: string;
+      /**
+       * the risk analysis id
+       * @format uuid
+       */
+      riskAnalysisId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = EServiceRiskAnalysisSeed;
+    export type RequestHeaders = {};
+    export type ResponseBody = void;
+  }
+  /**
+   * No description
+   * @tags eservices
+   * @name DeleteEServiceRiskAnalysis
+   * @summary delete EService risk analysis
+   * @request DELETE:/eservices/{eServiceId}/riskAnalysis/{riskAnalysisId}
+   * @secure
+   */
+  export namespace DeleteEServiceRiskAnalysis {
+    export type RequestParams = {
+      /**
+       * the eservice id
+       * @format uuid
+       */
+      eServiceId: string;
+      /**
+       * the risk analysis id
+       * @format uuid
+       */
+      riskAnalysisId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = void;
+  }
+  /**
+   * No description
+   * @tags eservices
+   * @name UpdateEServiceDescription
+   * @summary Update an e-service description
+   * @request POST:/eservices/{eServiceId}/description/update
+   * @secure
+   */
+  export namespace UpdateEServiceDescription {
+    export type RequestParams = {
+      /**
+       * the eservice id
+       * @format uuid
+       */
+      eServiceId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = EServiceDescriptionUpdateSeed;
+    export type RequestHeaders = {};
+    export type ResponseBody = CreatedResource;
+  }
+  /**
+   * No description
+   * @tags eservices
+   * @name UpdateEServiceDelegationFlags
+   * @summary Update an e-service delegation flags
+   * @request POST:/eservices/{eServiceId}/delegationFlags/update
+   * @secure
+   */
+  export namespace UpdateEServiceDelegationFlags {
+    export type RequestParams = {
+      /**
+       * the eservice id
+       * @format uuid
+       */
+      eServiceId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = EServiceDelegationFlagsUpdateSeed;
+    export type RequestHeaders = {};
+    export type ResponseBody = CreatedResource;
+  }
+  /**
+   * No description
+   * @tags eservices
+   * @name UpdateEServiceName
+   * @summary Update an e-service name
+   * @request POST:/eservices/{eServiceId}/name/update
+   * @secure
+   */
+  export namespace UpdateEServiceName {
+    export type RequestParams = {
+      /**
+       * the eservice id
+       * @format uuid
+       */
+      eServiceId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = EServiceNameUpdateSeed;
+    export type RequestHeaders = {};
+    export type ResponseBody = void;
+  }
+  /**
+   * No description
+   * @tags eservices
+   * @name UpdateDescriptorAttributes
+   * @summary Update e-service published descriptor attributes
+   * @request POST:/eservices/{eServiceId}/descriptors/{descriptorId}/attributes/update
+   * @secure
+   */
+  export namespace UpdateDescriptorAttributes {
+    export type RequestParams = {
+      /**
+       * the eservice id
+       * @format uuid
+       */
+      eServiceId: string;
+      /**
+       * the descriptor id
+       * @format uuid
+       */
+      descriptorId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = DescriptorAttributesSeed;
+    export type RequestHeaders = {};
+    export type ResponseBody = CreatedResource;
+  }
+  /**
+   * No description
+   * @tags eservices
+   * @name ApproveDelegatedEServiceDescriptor
+   * @summary approve a delegated new e-service version
+   * @request POST:/eservices/{eServiceId}/descriptors/{descriptorId}/approve
+   * @secure
+   */
+  export namespace ApproveDelegatedEServiceDescriptor {
+    export type RequestParams = {
+      /**
+       * the eservice id
+       * @format uuid
+       */
+      eServiceId: string;
+      /**
+       * the descriptor id
+       * @format uuid
+       */
+      descriptorId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = CreatedResource;
+  }
+  /**
+   * No description
+   * @tags eservices
+   * @name RejectDelegatedEServiceDescriptor
+   * @summary reject a delegated new e-service version
+   * @request POST:/eservices/{eServiceId}/descriptors/{descriptorId}/reject
+   * @secure
+   */
+  export namespace RejectDelegatedEServiceDescriptor {
+    export type RequestParams = {
+      /**
+       * the eservice id
+       * @format uuid
+       */
+      eServiceId: string;
+      /**
+       * the descriptor id
+       * @format uuid
+       */
+      descriptorId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = RejectDelegatedEServiceDescriptorSeed;
+    export type RequestHeaders = {};
+    export type ResponseBody = CreatedResource;
+  }
+  /**
+   * No description
+   * @tags eserviceTemplates
+   * @name CreateEServiceTemplate
+   * @summary Create a new e-service template
+   * @request POST:/eservices/templates
+   * @secure
+   */
+  export namespace CreateEServiceTemplate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = EServiceTemplateSeed;
+    export type RequestHeaders = {};
+    export type ResponseBody = CreatedEServiceTemplateVersion;
+  }
+  /**
+   * No description
+   * @tags eserviceTemplates
+   * @name UpdateEServiceTemplate
+   * @summary Updates a draft e-service template general information
+   * @request POST:/eservices/templates/{eServiceTemplateId}
+   * @secure
+   */
+  export namespace UpdateEServiceTemplate {
+    export type RequestParams = {
+      /**
+       * The E-Service id to retrieve
+       * @format uuid
+       */
+      eServiceTemplateId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = UpdateEServiceTemplateSeed;
+    export type RequestHeaders = {};
+    export type ResponseBody = void;
+  }
+  /**
+   * No description
+   * @tags eserviceTemplates
+   * @name GetEServiceTemplate
+   * @summary Retrieve e-service template
+   * @request GET:/eservices/templates/{eServiceTemplateId}
+   * @secure
+   */
+  export namespace GetEServiceTemplate {
+    export type RequestParams = {
+      /**
+       * The E-Service id to retrieve
+       * @format uuid
+       */
+      eServiceTemplateId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = EServiceTemplateDetails;
+  }
+  /**
+   * No description
+   * @tags eserviceTemplates
+   * @name SuspendEServiceTemplateVersion
+   * @summary Suspend the selected eservice template version.
+   * @request POST:/eservices/templates/{eServiceTemplateId}/versions/{eServiceTemplateVersionId}/suspend
+   * @secure
+   */
+  export namespace SuspendEServiceTemplateVersion {
+    export type RequestParams = {
+      /**
+       * the eservice template id
+       * @format uuid
+       */
+      eServiceTemplateId: string;
+      /**
+       * the eservice template version id
+       * @format uuid
+       */
+      eServiceTemplateVersionId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = void;
+  }
+  /**
+   * No description
+   * @tags eserviceTemplates
+   * @name PublishEServiceTemplateVersion
+   * @summary Publish the selected eservice template version.
+   * @request POST:/eservices/templates/{eServiceTemplateId}/versions/{eServiceTemplateVersionId}/publish
+   * @secure
+   */
+  export namespace PublishEServiceTemplateVersion {
+    export type RequestParams = {
+      /**
+       * the eservice template id
+       * @format uuid
+       */
+      eServiceTemplateId: string;
+      /**
+       * the eservice template version id
+       * @format uuid
+       */
+      eServiceTemplateVersionId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = void;
+  }
+  /**
+   * No description
+   * @tags eserviceTemplates
+   * @name ActivateEServiceTemplateVersion
+   * @summary Activate the selected eservice template version.
+   * @request POST:/eservices/templates/{eServiceTemplateId}/versions/{eServiceTemplateVersionId}/activate
+   * @secure
+   */
+  export namespace ActivateEServiceTemplateVersion {
+    export type RequestParams = {
+      /**
+       * the eservice template id
+       * @format uuid
+       */
+      eServiceTemplateId: string;
+      /**
+       * the eservice template version id
+       * @format uuid
+       */
+      eServiceTemplateVersionId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = void;
+  }
+  /**
+   * No description
+   * @tags eserviceTemplates
+   * @name UpdateEServiceTemplateName
+   * @summary Update an e-service template name
+   * @request POST:/eservices/templates/{eServiceTemplateId}/name/update
+   * @secure
+   */
+  export namespace UpdateEServiceTemplateName {
+    export type RequestParams = {
+      /**
+       * the eservice template id
+       * @format uuid
+       */
+      eServiceTemplateId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = EServiceTemplateNameUpdateSeed;
+    export type RequestHeaders = {};
+    export type ResponseBody = void;
+  }
+  /**
+   * No description
+   * @tags eserviceTemplates
+   * @name UpdateEServiceTemplateIntendedTarget
+   * @summary Update an e-service template intended target description
+   * @request POST:/eservices/templates/{eServiceTemplateId}/intendedTarget/update
+   * @secure
+   */
+  export namespace UpdateEServiceTemplateIntendedTarget {
+    export type RequestParams = {
+      /**
+       * the eservice template id
+       * @format uuid
+       */
+      eServiceTemplateId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = EServiceTemplateIntendedTargetUpdateSeed;
+    export type RequestHeaders = {};
+    export type ResponseBody = void;
+  }
+  /**
+   * No description
+   * @tags eserviceTemplates
+   * @name UpdateEServiceTemplateDescription
+   * @summary Update an e-service template e-service description
+   * @request POST:/eservices/templates/{eServiceTemplateId}/description/update
+   * @secure
+   */
+  export namespace UpdateEServiceTemplateDescription {
+    export type RequestParams = {
+      /**
+       * the eservice template id
+       * @format uuid
+       */
+      eServiceTemplateId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = EServiceTemplateDescriptionUpdateSeed;
+    export type RequestHeaders = {};
+    export type ResponseBody = void;
+  }
+  /**
+   * @description Retrieves a eservice template version corresponding to the id
+   * @tags eserviceTemplates
+   * @name GetEServiceTemplateVersion
+   * @summary Retrieves a eservice template version corresponding to the id
+   * @request GET:/eservices/templates/{eServiceTemplateId}/versions/{eServiceTemplateVersionId}
+   * @secure
+   */
+  export namespace GetEServiceTemplateVersion {
+    export type RequestParams = {
+      /**
+       * The internal identifier of the eservice template
+       * @format uuid
+       */
+      eServiceTemplateId: string;
+      /**
+       * the eservice template version id
+       * @format uuid
+       */
+      eServiceTemplateVersionId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = EServiceTemplateVersionDetails;
+  }
+  /**
+   * No description
+   * @tags eserviceTemplates
+   * @name UpdateDraftTemplateVersion
+   * @summary Updates a draft template version
+   * @request POST:/eservices/templates/{eServiceTemplateId}/versions/{eServiceTemplateVersionId}
+   * @secure
+   */
+  export namespace UpdateDraftTemplateVersion {
+    export type RequestParams = {
+      /**
+       * The internal identifier of the eservice template
+       * @format uuid
+       */
+      eServiceTemplateId: string;
+      /**
+       * the eservice template version id
+       * @format uuid
+       */
+      eServiceTemplateVersionId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = UpdateEServiceTemplateVersionSeed;
+    export type RequestHeaders = {};
+    export type ResponseBody = void;
+  }
+  /**
+   * No description
+   * @tags eserviceTemplates
+   * @name DeleteDraftTemplateVersion
+   * @summary Delete a draft template version
+   * @request DELETE:/eservices/templates/{eServiceTemplateId}/versions/{eServiceTemplateVersionId}
+   * @secure
+   */
+  export namespace DeleteDraftTemplateVersion {
+    export type RequestParams = {
+      /**
+       * The internal identifier of the eservice template
+       * @format uuid
+       */
+      eServiceTemplateId: string;
+      /**
+       * the eservice template version id
+       * @format uuid
+       */
+      eServiceTemplateVersionId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = void;
+  }
+  /**
+   * No description
+   * @tags eserviceTemplates
+   * @name UpdateTemplateVersionQuotas
+   * @summary Update the quotas of the selecter template version
+   * @request POST:/eservices/templates/{eServiceTemplateId}/versions/{eServiceTemplateVersionId}/quotas/update
+   * @secure
+   */
+  export namespace UpdateTemplateVersionQuotas {
+    export type RequestParams = {
+      /**
+       * the eservice template id
+       * @format uuid
+       */
+      eServiceTemplateId: string;
+      /**
+       * the template version Id
+       * @format uuid
+       */
+      eServiceTemplateVersionId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = EServiceTemplateVersionQuotasUpdateSeed;
+    export type RequestHeaders = {};
+    export type ResponseBody = void;
+  }
+  /**
+   * No description
+   * @tags eserviceTemplates
+   * @name CreateEServiceTemplateRiskAnalysis
+   * @summary Create an e-service template risk analysis
+   * @request POST:/eservices/templates/{eServiceTemplateId}/riskAnalysis
+   * @secure
+   */
+  export namespace CreateEServiceTemplateRiskAnalysis {
+    export type RequestParams = {
+      /**
+       * the eservice template id
+       * @format uuid
+       */
+      eServiceTemplateId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = EServiceRiskAnalysisSeed;
+    export type RequestHeaders = {};
+    export type ResponseBody = void;
+  }
+  /**
+   * No description
+   * @tags eserviceTemplates
+   * @name UpdateEServiceTemplateRiskAnalysis
+   * @summary Update an e-service template risk analysis
+   * @request POST:/eservices/templates/{eServiceTemplateId}/riskAnalysis/{riskAnalysisId}
+   * @secure
+   */
+  export namespace UpdateEServiceTemplateRiskAnalysis {
+    export type RequestParams = {
+      /**
+       * the eservice template id
+       * @format uuid
+       */
+      eServiceTemplateId: string;
+      /**
+       * the eservice template id
+       * @format uuid
+       */
+      riskAnalysisId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = EServiceRiskAnalysisSeed;
+    export type RequestHeaders = {};
+    export type ResponseBody = void;
+  }
+  /**
+   * No description
+   * @tags eserviceTemplates
+   * @name DeleteEServiceTemplateRiskAnalysis
+   * @summary Delete an e-service template risk analysis
+   * @request DELETE:/eservices/templates/{eServiceTemplateId}/riskAnalysis/{riskAnalysisId}
+   * @secure
+   */
+  export namespace DeleteEServiceTemplateRiskAnalysis {
+    export type RequestParams = {
+      /**
+       * the eservice template id
+       * @format uuid
+       */
+      eServiceTemplateId: string;
+      /**
+       * the eservice template id
+       * @format uuid
+       */
+      riskAnalysisId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = void;
+  }
+  /**
+   * No description
+   * @tags eserviceTemplates
+   * @name UpdateEServiceTemplateVersionAttributes
+   * @summary Update e-service template published version attributes
+   * @request POST:/eservices/templates/{eServiceTemplateId}/versions/{eServiceTemplateVersionId}/attributes/update
+   * @secure
+   */
+  export namespace UpdateEServiceTemplateVersionAttributes {
+    export type RequestParams = {
+      /**
+       * the eservice template id
+       * @format uuid
+       */
+      eServiceTemplateId: string;
+      /**
+       * the eservice template version id
+       * @format uuid
+       */
+      eServiceTemplateVersionId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = DescriptorAttributesSeed;
+    export type RequestHeaders = {};
+    export type ResponseBody = CreatedResource;
+  }
+  /**
+   * @description Retrieves Tenants that are producers of published e-service templates
+   * @tags eserviceTemplates
+   * @name GetEServiceTemplateCreators
+   * @summary Retrieves Tenants that are creators of published e-service templates
+   * @request GET:/eservices/templates/filter/creators
+   * @secure
+   */
+  export namespace GetEServiceTemplateCreators {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      /** Query to filter creators by name */
+      q?: string;
+      /**
+       * @format int32
+       * @min 0
+       */
+      offset: number;
+      /**
+       * @format int32
+       * @min 1
+       * @max 50
+       */
+      limit: number;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = CompactOrganizations;
+  }
+  /**
+   * No description
+   * @tags eserviceTemplates
+   * @name CreateEServiceTemplateVersion
+   * @summary Adds a new version to the specified e-service template
+   * @request POST:/eservices/templates/{eServiceTemplateId}/versions
+   * @secure
+   */
+  export namespace CreateEServiceTemplateVersion {
+    export type RequestParams = {
+      /**
+       * The E-Service template id
+       * @format uuid
+       */
+      eServiceTemplateId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = CreatedResource;
+  }
+  /**
+   * No description
+   * @tags eserviceTemplates
+   * @name CreateEServiceTemplateDocument
+   * @summary Add new e-service template document
+   * @request POST:/eservices/templates/{eServiceTemplateId}/versions/{eServiceTemplateVersionId}/documents
+   * @secure
+   */
+  export namespace CreateEServiceTemplateDocument {
+    export type RequestParams = {
+      /**
+       * the eservice template id
+       * @format uuid
+       */
+      eServiceTemplateId: string;
+      /**
+       * the version Id
+       * @format uuid
+       */
+      eServiceTemplateVersionId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = CreateEServiceTemplateDocumentPayload;
+    export type RequestHeaders = {};
+    export type ResponseBody = CreatedResource;
+  }
+  /**
+   * No description
+   * @tags eserviceTemplates
+   * @name GetEServiceTemplateDocumentById
+   * @summary Get an e-service template document
+   * @request GET:/eservices/templates/{eServiceTemplateId}/versions/{eServiceTemplateVersionId}/documents/{documentId}
+   * @secure
+   */
+  export namespace GetEServiceTemplateDocumentById {
+    export type RequestParams = {
+      /**
+       * the eService template id
+       * @format uuid
+       */
+      eServiceTemplateId: string;
+      /**
+       * the template version Id
+       * @format uuid
+       */
+      eServiceTemplateVersionId: string;
+      /**
+       * the document id
+       * @format uuid
+       */
+      documentId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = File;
+  }
+  /**
+   * No description
+   * @tags eserviceTemplates
+   * @name DeleteEServiceTemplateDocumentById
+   * @summary Deletes an e-service template document
+   * @request DELETE:/eservices/templates/{eServiceTemplateId}/versions/{eServiceTemplateVersionId}/documents/{documentId}
+   * @secure
+   */
+  export namespace DeleteEServiceTemplateDocumentById {
+    export type RequestParams = {
+      /**
+       * the eService template id
+       * @format uuid
+       */
+      eServiceTemplateId: string;
+      /**
+       * the template version Id
+       * @format uuid
+       */
+      eServiceTemplateVersionId: string;
+      /**
+       * the document id
+       * @format uuid
+       */
+      documentId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = void;
+  }
+  /**
+   * No description
+   * @tags eserviceTemplates
+   * @name UpdateEServiceTemplateDocumentById
+   * @summary Updates an e-service template document
+   * @request POST:/eservices/templates/{eServiceTemplateId}/versions/{eServiceTemplateVersionId}/documents/{documentId}/update
+   * @secure
+   */
+  export namespace UpdateEServiceTemplateDocumentById {
+    export type RequestParams = {
+      /**
+       * the eservice template id
+       * @format uuid
+       */
+      eServiceTemplateId: string;
+      /**
+       * the version Id
+       * @format uuid
+       */
+      eServiceTemplateVersionId: string;
+      /**
+       * the document id
+       * @format uuid
+       */
+      documentId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = UpdateEServiceTemplateVersionDocumentSeed;
+    export type RequestHeaders = {};
+    export type ResponseBody = void;
+  }
+  /**
+   * No description
+   * @tags eservices
+   * @name IsEServiceNameAvailable
+   * @summary Check if the e-service name is available
+   * @request GET:/eservices/names/availability
+   * @secure
+   */
+  export namespace IsEServiceNameAvailable {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      /** the e-service name to check for */
+      name: string;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = boolean;
+  }
+}
+
+export namespace Templates {
+  /**
+   * No description
+   * @tags eservices
+   * @name UpdateDraftDescriptorTemplateInstance
+   * @summary Updates an eservice template instance draft descriptor
+   * @request POST:/templates/eservices/{eServiceId}/descriptors/{descriptorId}
+   * @secure
+   */
+  export namespace UpdateDraftDescriptorTemplateInstance {
+    export type RequestParams = {
+      /**
+       * The E-Service id
+       * @format uuid
+       */
+      eServiceId: string;
+      /**
+       * The Descriptor Id
+       * @format uuid
+       */
+      descriptorId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = UpdateEServiceDescriptorTemplateInstanceSeed;
+    export type RequestHeaders = {};
+    export type ResponseBody = CreatedResource;
+  }
+  /**
+   * No description
+   * @tags eservices
+   * @name UpdateTemplateInstanceDescriptor
+   * @summary Update the selected template instance descriptor.
+   * @request POST:/templates/eservices/{eServiceId}/descriptors/{descriptorId}/update
+   * @secure
+   */
+  export namespace UpdateTemplateInstanceDescriptor {
+    export type RequestParams = {
+      /**
+       * the eservice id
+       * @format uuid
+       */
+      eServiceId: string;
+      /**
+       * the descriptor Id
+       * @format uuid
+       */
+      descriptorId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = UpdateEServiceTemplateInstanceDescriptorQuotas;
+    export type RequestHeaders = {};
+    export type ResponseBody = CreatedResource;
+  }
+  /**
+   * No description
+   * @tags eservices
+   * @name AddEServiceTemplateInstanceInterfaceRest
+   * @summary Add EService template instance interface for REST protocol
+   * @request POST:/templates/eservices/{eServiceId}/descriptors/{descriptorId}/interface/rest
+   * @secure
+   */
+  export namespace AddEServiceTemplateInstanceInterfaceRest {
+    export type RequestParams = {
+      /**
+       * the eservice id
+       * @format uuid
+       */
+      eServiceId: string;
+      /**
+       * the eservice descriptor id
+       * @format uuid
+       */
+      descriptorId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = TemplateInstanceInterfaceRESTSeed;
+    export type RequestHeaders = {};
+    export type ResponseBody = CreatedResource;
+  }
+  /**
+   * No description
+   * @tags eservices
+   * @name AddEServiceTemplateInstanceInterfaceSoap
+   * @summary Add EService template instance interface for SOAP protocol
+   * @request POST:/templates/eservices/{eServiceId}/descriptors/{descriptorId}/interface/soap
+   * @secure
+   */
+  export namespace AddEServiceTemplateInstanceInterfaceSoap {
+    export type RequestParams = {
+      /**
+       * the eservice id
+       * @format uuid
+       */
+      eServiceId: string;
+      /**
+       * the eservice descriptor id
+       * @format uuid
+       */
+      descriptorId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = TemplateInstanceInterfaceSOAPSeed;
+    export type RequestHeaders = {};
+    export type ResponseBody = CreatedResource;
+  }
+  /**
+   * No description
+   * @tags eservices
+   * @name UpdateEServiceTemplateInstanceById
+   * @summary Updates EService template instance general information
+   * @request POST:/templates/eservices/{eServiceId}
+   * @secure
+   */
+  export namespace UpdateEServiceTemplateInstanceById {
+    export type RequestParams = {
+      /**
+       * The E-Service id to update
+       * @format uuid
+       */
+      eServiceId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = UpdateEServiceTemplateInstanceSeed;
+    export type RequestHeaders = {};
+    export type ResponseBody = CreatedResource;
+  }
+  /**
+   * No description
+   * @tags eservices
+   * @name UpgradeEServiceInstance
+   * @summary Upgrade an instance of a template
+   * @request POST:/templates/eservices/{eServiceId}/upgrade
+   * @secure
+   */
+  export namespace UpgradeEServiceInstance {
+    export type RequestParams = {
+      /**
+       * the eservice id
+       * @format uuid
+       */
+      eServiceId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = CreatedResource;
+  }
+  /**
+   * @description Retrieves EService template instances
+   * @tags eservices
+   * @name GetEServiceTemplateInstances
+   * @summary Retrieves EService template instances
+   * @request GET:/templates/{templateId}/eservices
+   * @secure
+   */
+  export namespace GetEServiceTemplateInstances {
+    export type RequestParams = {
+      /**
+       * the eservice template id
+       * @format uuid
+       */
+      templateId: string;
+    };
+    export type RequestQuery = {
+      /** Query to filter by producer name */
+      producerName?: string;
+      /**
+       * comma separated sequence of instance states
+       * @default []
+       */
+      states?: EServiceDescriptorState[];
+      /**
+       * @format int32
+       * @min 0
+       */
+      offset: number;
+      /**
+       * @format int32
+       * @min 1
+       * @max 50
+       */
+      limit: number;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = EServiceTemplateInstances;
+  }
+  /**
+   * No description
+   * @tags eservices
+   * @name CreateEServiceInstanceFromTemplate
+   * @summary Create a new e-service instance from a template
+   * @request POST:/templates/{templateId}/eservices
+   * @secure
+   */
+  export namespace CreateEServiceInstanceFromTemplate {
+    export type RequestParams = {
+      /**
+       * The template id to create the e-service from
+       * @format uuid
+       */
+      templateId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = InstanceEServiceSeed;
+    export type RequestHeaders = {};
+    export type ResponseBody = CreatedResource;
+  }
+}
+
+export namespace Export {
+  /**
+   * No description
+   * @tags eservices
+   * @name ExportEServiceDescriptor
+   * @summary Export EService descriptor
+   * @request GET:/export/eservices/{eserviceId}/descriptors/{descriptorId}
+   * @secure
+   */
+  export namespace ExportEServiceDescriptor {
+    export type RequestParams = {
+      /** @format uuid */
+      eserviceId: string;
+      /** @format uuid */
+      descriptorId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = FileResource;
+  }
+}
+
+export namespace Import {
+  /**
+   * No description
+   * @tags eservices
+   * @name GetImportEservicePresignedUrl
+   * @summary Get presigned URL
+   * @request GET:/import/eservices/presignedUrl
+   * @secure
+   */
+  export namespace GetImportEservicePresignedUrl {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      fileName: string;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = PresignedUrl;
+  }
+  /**
+   * No description
+   * @tags eservices
+   * @name ImportEService
+   * @summary Import EService
+   * @request POST:/import/eservices
+   * @secure
+   */
+  export namespace ImportEService {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = FileResource;
+    export type RequestHeaders = {};
+    export type ResponseBody = CreatedEServiceDescriptor;
+  }
+}
+
+export namespace Reverse {
+  /**
+   * @description create a purposes with an EService risk analysis
+   * @tags purposes
+   * @name CreatePurposeForReceiveEservice
+   * @summary create a purposes with an EService risk analysis
+   * @request POST:/reverse/purposes
+   * @secure
+   */
+  export namespace CreatePurposeForReceiveEservice {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = PurposeEServiceSeed;
+    export type RequestHeaders = {};
+    export type ResponseBody = CreatedResource;
+  }
+  /**
+   * @description Updates a reverse Purpose
+   * @tags purposes
+   * @name UpdateReversePurpose
+   * @request POST:/reverse/purposes/{purposeId}
+   * @secure
+   */
+  export namespace UpdateReversePurpose {
+    export type RequestParams = {
+      /**
+       * the purpose id
+       * @format uuid
+       */
+      purposeId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = ReversePurposeUpdateContent;
+    export type RequestHeaders = {};
+    export type ResponseBody = PurposeVersionResource;
+  }
+}
+
+export namespace Session {
+  /**
+   * @description Retrieve a session token
+   * @tags authorization
+   * @name GetSessionToken
+   * @request POST:/session/tokens
+   * @secure
+   */
+  export namespace GetSessionToken {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = IdentityToken;
+    export type RequestHeaders = {};
+    export type ResponseBody = SessionToken;
+  }
+  /**
+   * @description Returns the generated token
+   * @tags support
+   * @name GetSaml2Token
+   * @summary Returns the generated token
+   * @request POST:/session/saml2/tokens
+   * @secure
+   */
+  export namespace GetSaml2Token {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = SAMLTokenRequest;
+    export type RequestHeaders = {};
+    export type ResponseBody = SessionToken;
   }
 }
 
@@ -3848,9 +5571,7 @@ export namespace Tools {
     export type RequestParams = {};
     export type RequestQuery = {};
     export type RequestBody = AccessTokenRequest;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = TokenGenerationValidationResult;
   }
 }
@@ -3891,9 +5612,7 @@ export namespace Purposes {
     export type RequestParams = {};
     export type RequestQuery = {};
     export type RequestBody = PurposeSeed;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = CreatedResource;
   }
   /**
@@ -3911,9 +5630,7 @@ export namespace Purposes {
     };
     export type RequestQuery = {};
     export type RequestBody = PurposeCloneSeed;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = PurposeVersionResource;
   }
   /**
@@ -3933,9 +5650,7 @@ export namespace Purposes {
     };
     export type RequestQuery = {};
     export type RequestBody = PurposeVersionSeed;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = PurposeVersionResource;
   }
   /**
@@ -3966,9 +5681,7 @@ export namespace Purposes {
     };
     export type RequestQuery = {};
     export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = File;
   }
   /**
@@ -3988,9 +5701,7 @@ export namespace Purposes {
     };
     export type RequestQuery = {};
     export type RequestBody = RejectPurposeVersionPayload;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = void;
   }
   /**
@@ -4010,9 +5721,7 @@ export namespace Purposes {
     };
     export type RequestQuery = {};
     export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = PurposeVersionResource;
   }
   /**
@@ -4032,9 +5741,7 @@ export namespace Purposes {
     };
     export type RequestQuery = {};
     export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = PurposeVersionResource;
   }
   /**
@@ -4054,9 +5761,7 @@ export namespace Purposes {
     };
     export type RequestQuery = {};
     export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = PurposeVersionResource;
   }
   /**
@@ -4076,9 +5781,7 @@ export namespace Purposes {
     };
     export type RequestQuery = {};
     export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = Purpose;
   }
   /**
@@ -4098,9 +5801,7 @@ export namespace Purposes {
     };
     export type RequestQuery = {};
     export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = void;
   }
   /**
@@ -4120,9 +5821,7 @@ export namespace Purposes {
     };
     export type RequestQuery = {};
     export type RequestBody = PurposeUpdateContent;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = PurposeVersionResource;
   }
   /**
@@ -4142,9 +5841,7 @@ export namespace Purposes {
     };
     export type RequestQuery = {};
     export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = void;
   }
   /**
@@ -4156,11 +5853,11 @@ export namespace Purposes {
    */
   export namespace RetrieveLatestRiskAnalysisConfiguration {
     export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
+    export type RequestQuery = {
+      tenantKind?: TenantKind;
     };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
     export type ResponseBody = RiskAnalysisFormConfig;
   }
   /**
@@ -4179,197 +5876,8 @@ export namespace Purposes {
       eserviceId: string;
     };
     export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = RiskAnalysisFormConfig;
-  }
-}
-
-export namespace Producer {
-  /**
-   * @description Retrieve Purposes from the producer prospective
-   * @tags purposes
-   * @name GetProducerPurposes
-   * @request GET:/producer/purposes
-   * @secure
-   */
-  export namespace GetProducerPurposes {
-    export type RequestParams = {};
-    export type RequestQuery = {
-      q?: string;
-      /**
-       * comma separated sequence of EService IDs
-       * @default []
-       */
-      eservicesIds?: string[];
-      /**
-       * comma separated sequence of consumers IDs
-       * @default []
-       */
-      consumersIds?: string[];
-      /**
-       * comma separated sequence of producers IDs
-       * @default []
-       */
-      producersIds?: string[];
-      /**
-       * comma separated sequence of states
-       * @default []
-       */
-      states?: PurposeVersionState[];
-      /**
-       * @format int32
-       * @min 0
-       */
-      offset: number;
-      /**
-       * @format int32
-       * @min 1
-       * @max 50
-       */
-      limit: number;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
-    export type ResponseBody = Purposes;
-  }
-  /**
-   * @description creates the producer delegation
-   * @tags producerDelegations
-   * @name CreateProducerDelegation
-   * @summary Producer delegation creation
-   * @request POST:/producer/delegations
-   * @secure
-   */
-  export namespace CreateProducerDelegation {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = DelegationSeed;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
-    export type ResponseBody = CreatedResource;
-  }
-  /**
-   * @description Approves a producer delegation
-   * @tags producerDelegations
-   * @name ApproveDelegation
-   * @summary Approves a producer delegation
-   * @request POST:/producer/delegations/{delegationId}/approve
-   * @secure
-   */
-  export namespace ApproveDelegation {
-    export type RequestParams = {
-      /**
-       * The identifier of the delegation
-       * @format uuid
-       */
-      delegationId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
-    export type ResponseBody = void;
-  }
-  /**
-   * @description Rejects a producer delegation
-   * @tags producerDelegations
-   * @name RejectDelegation
-   * @summary Rejects a producer delegation
-   * @request POST:/producer/delegations/{delegationId}/reject
-   * @secure
-   */
-  export namespace RejectDelegation {
-    export type RequestParams = {
-      /**
-       * The identifier of the delegation
-       * @format uuid
-       */
-      delegationId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = RejectDelegationPayload;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
-    export type ResponseBody = void;
-  }
-  /**
-   * @description Revokes a producer delegation
-   * @tags producerDelegations
-   * @name RevokeProducerDelegation
-   * @summary Revokes a producer delegation
-   * @request DELETE:/producer/delegations/{delegationId}
-   * @secure
-   */
-  export namespace RevokeProducerDelegation {
-    export type RequestParams = {
-      /** The delegation id */
-      delegationId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
-    export type ResponseBody = void;
-  }
-}
-
-export namespace Consumer {
-  /**
-   * @description Retrieve Purposes from the consumer prospective
-   * @tags purposes
-   * @name GetConsumerPurposes
-   * @request GET:/consumer/purposes
-   * @secure
-   */
-  export namespace GetConsumerPurposes {
-    export type RequestParams = {};
-    export type RequestQuery = {
-      q?: string;
-      /**
-       * comma separated sequence of EService IDs
-       * @default []
-       */
-      eservicesIds?: string[];
-      /**
-       * comma separated sequence of consumers IDs
-       * @default []
-       */
-      consumersIds?: string[];
-      /**
-       * comma separated sequence of producers IDs
-       * @default []
-       */
-      producersIds?: string[];
-      /**
-       * comma separated sequence of states
-       * @default []
-       */
-      states?: PurposeVersionState[];
-      /**
-       * @format int32
-       * @min 0
-       */
-      offset: number;
-      /**
-       * @format int32
-       * @min 1
-       * @max 50
-       */
-      limit: number;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
-    export type ResponseBody = Purposes;
   }
 }
 
@@ -4386,9 +5894,7 @@ export namespace CertifiedAttributes {
     export type RequestParams = {};
     export type RequestQuery = {};
     export type RequestBody = CertifiedAttributeSeed;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = Attribute;
   }
 }
@@ -4406,9 +5912,7 @@ export namespace VerifiedAttributes {
     export type RequestParams = {};
     export type RequestQuery = {};
     export type RequestBody = AttributeSeed;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = Attribute;
   }
 }
@@ -4426,9 +5930,7 @@ export namespace DeclaredAttributes {
     export type RequestParams = {};
     export type RequestQuery = {};
     export type RequestBody = AttributeSeed;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = Attribute;
   }
 }
@@ -4458,9 +5960,7 @@ export namespace Attributes {
       kinds: AttributeKind[];
     };
     export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = Attributes;
   }
   /**
@@ -4481,9 +5981,7 @@ export namespace Attributes {
     };
     export type RequestQuery = {};
     export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = Attribute;
   }
   /**
@@ -4503,9 +6001,7 @@ export namespace Attributes {
     };
     export type RequestQuery = {};
     export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = Attribute;
   }
 }
@@ -4544,9 +6040,7 @@ export namespace Clients {
       limit: number;
     };
     export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = CompactClients;
   }
   /**
@@ -4567,9 +6061,7 @@ export namespace Clients {
     };
     export type RequestQuery = {};
     export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = Client;
   }
   /**
@@ -4590,9 +6082,7 @@ export namespace Clients {
     };
     export type RequestQuery = {};
     export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = void;
   }
   /**
@@ -4618,9 +6108,7 @@ export namespace Clients {
     };
     export type RequestQuery = {};
     export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = void;
   }
   /**
@@ -4643,9 +6131,7 @@ export namespace Clients {
     };
     export type RequestQuery = {};
     export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = PublicKey;
   }
   /**
@@ -4668,9 +6154,7 @@ export namespace Clients {
     };
     export type RequestQuery = {};
     export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = void;
   }
   /**
@@ -4696,9 +6180,7 @@ export namespace Clients {
     };
     export type RequestQuery = {};
     export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = void;
   }
   /**
@@ -4719,9 +6201,7 @@ export namespace Clients {
     };
     export type RequestQuery = {};
     export type RequestBody = PurposeAdditionDetailsSeed;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = void;
   }
   /**
@@ -4742,9 +6222,7 @@ export namespace Clients {
     };
     export type RequestQuery = {};
     export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = CompactUsers;
   }
   /**
@@ -4765,20 +6243,18 @@ export namespace Clients {
     };
     export type RequestQuery = {};
     export type RequestBody = AddUsersToClientPayload;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = CreatedResource;
   }
   /**
    * @description Creates one or more keys for the corresponding client.
    * @tags clients
-   * @name CreateKeys
+   * @name CreateKey
    * @summary Create Keys for the specific clientId.
    * @request POST:/clients/{clientId}/keys
    * @secure
    */
-  export namespace CreateKeys {
+  export namespace CreateKey {
     export type RequestParams = {
       /**
        * ID of client that the added keys MUST belong to
@@ -4787,10 +6263,8 @@ export namespace Clients {
       clientId: string;
     };
     export type RequestQuery = {};
-    export type RequestBody = KeysSeed;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestBody = KeySeed;
+    export type RequestHeaders = {};
     export type ResponseBody = void;
   }
   /**
@@ -4815,11 +6289,20 @@ export namespace Clients {
        * @default []
        */
       userIds?: string[];
+      /**
+       * @format int32
+       * @min 0
+       */
+      offset: number;
+      /**
+       * @format int32
+       * @min 1
+       * @max 50
+       */
+      limit: number;
     };
     export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = PublicKeys;
   }
   /**
@@ -4842,9 +6325,7 @@ export namespace Clients {
     };
     export type RequestQuery = {};
     export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = EncodedClientKey;
   }
 }
@@ -4895,9 +6376,7 @@ export namespace ClientsConsumer {
     export type RequestParams = {};
     export type RequestQuery = {};
     export type RequestBody = ClientSeed;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = CreatedResource;
   }
 }
@@ -4915,9 +6394,7 @@ export namespace ClientsApi {
     export type RequestParams = {};
     export type RequestQuery = {};
     export type RequestBody = ClientSeed;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = CreatedResource;
   }
 }
@@ -4937,9 +6414,7 @@ export namespace User {
     };
     export type RequestQuery = {};
     export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = PrivacyNotice;
   }
   /**
@@ -4956,9 +6431,7 @@ export namespace User {
     };
     export type RequestQuery = {};
     export type RequestBody = PrivacyNoticeSeed;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = void;
   }
 }
@@ -4978,9 +6451,7 @@ export namespace PrivacyNotices {
     };
     export type RequestQuery = {};
     export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = File;
   }
 }
@@ -5014,9 +6485,7 @@ export namespace ProducerKeychains {
     export type RequestParams = {};
     export type RequestQuery = {};
     export type RequestBody = ProducerKeychainSeed;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = CreatedResource;
   }
   /**
@@ -5060,9 +6529,7 @@ export namespace ProducerKeychains {
       limit: number;
     };
     export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = CompactProducerKeychains;
   }
   /**
@@ -5080,9 +6547,7 @@ export namespace ProducerKeychains {
     };
     export type RequestQuery = {};
     export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = ProducerKeychain;
   }
   /**
@@ -5100,9 +6565,7 @@ export namespace ProducerKeychains {
     };
     export type RequestQuery = {};
     export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = void;
   }
   /**
@@ -5123,9 +6586,7 @@ export namespace ProducerKeychains {
     };
     export type RequestQuery = {};
     export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = CompactUsers;
   }
   /**
@@ -5146,9 +6607,7 @@ export namespace ProducerKeychains {
     };
     export type RequestQuery = {};
     export type RequestBody = AddProducerKeychainUsersPayload;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = void;
   }
   /**
@@ -5174,9 +6633,7 @@ export namespace ProducerKeychains {
     };
     export type RequestQuery = {};
     export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = void;
   }
   /**
@@ -5197,9 +6654,7 @@ export namespace ProducerKeychains {
     };
     export type RequestQuery = {};
     export type RequestBody = KeySeed;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = void;
   }
   /**
@@ -5226,9 +6681,7 @@ export namespace ProducerKeychains {
       userIds?: string[];
     };
     export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = PublicKeys;
   }
   /**
@@ -5251,9 +6704,7 @@ export namespace ProducerKeychains {
     };
     export type RequestQuery = {};
     export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = PublicKey;
   }
   /**
@@ -5276,9 +6727,7 @@ export namespace ProducerKeychains {
     };
     export type RequestQuery = {};
     export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = void;
   }
   /**
@@ -5299,9 +6748,7 @@ export namespace ProducerKeychains {
     };
     export type RequestQuery = {};
     export type RequestBody = EServiceAdditionDetailsSeed;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = void;
   }
   /**
@@ -5327,9 +6774,7 @@ export namespace ProducerKeychains {
     };
     export type RequestQuery = {};
     export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = void;
   }
   /**
@@ -5352,9 +6797,7 @@ export namespace ProducerKeychains {
     };
     export type RequestQuery = {};
     export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = EncodedClientKey;
   }
 }
@@ -5403,9 +6846,7 @@ export namespace Delegations {
       eserviceIds?: string[];
     };
     export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = CompactDelegations;
   }
   /**
@@ -5423,9 +6864,7 @@ export namespace Delegations {
     };
     export type RequestQuery = {};
     export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = Delegation;
   }
   /**
@@ -5445,10 +6884,40 @@ export namespace Delegations {
     };
     export type RequestQuery = {};
     export type RequestBody = never;
-    export type RequestHeaders = {
-      "X-Correlation-Id": string;
-    };
+    export type RequestHeaders = {};
     export type ResponseBody = File;
+  }
+}
+
+export namespace Creators {
+  /**
+   * @description Retrieves Creator EService templates
+   * @tags eserviceTemplates
+   * @name GetCreatorEServiceTemplates
+   * @summary Retrieves Creator EService templates
+   * @request GET:/creators/eservices/templates
+   * @secure
+   */
+  export namespace GetCreatorEServiceTemplates {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      /** Query to filter EServices templates by name */
+      q?: string;
+      /**
+       * @format int32
+       * @min 0
+       */
+      offset: number;
+      /**
+       * @format int32
+       * @min 1
+       * @max 50
+       */
+      limit: number;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = ProducerEServiceTemplates;
   }
 }
 
@@ -5613,19 +7082,19 @@ export class HttpClient<SecurityDataType = unknown> {
  * Interop BFF implementation
  */
 export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
-  agreements = {
+  consumers = {
     /**
-     * @description retrieves a list of agreements
+     * @description retrieves a list of consumer agreements
      *
      * @tags agreements
-     * @name GetAgreements
-     * @summary retrieves a list of agreements
-     * @request GET:/agreements
+     * @name GetConsumerAgreements
+     * @summary retrieves a list of consumer agreements
+     * @request GET:/consumers/agreements
      * @secure
      */
-    getAgreements: (query: GetAgreementsParams, params: RequestParams = {}) =>
+    getConsumerAgreements: (query: GetConsumerAgreementsParams, params: RequestParams = {}) =>
       this.request<Agreements, Problem>({
-        path: `/agreements`,
+        path: `/consumers/agreements`,
         method: "GET",
         query: query,
         secure: true,
@@ -5633,6 +7102,395 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         ...params,
       }),
 
+    /**
+     * @description Retrieve requester's delegators
+     *
+     * @tags consumerDelegations
+     * @name GetConsumerDelegators
+     * @request GET:/consumers/delegations/delegators
+     * @secure
+     */
+    getConsumerDelegators: (query: GetConsumerDelegatorsParams, params: RequestParams = {}) =>
+      this.request<DelegationTenants, Problem>({
+        path: `/consumers/delegations/delegators`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Retrieve requester's delegators with active agreements
+     *
+     * @tags consumerDelegations
+     * @name GetConsumerDelegatorsWithAgreements
+     * @request GET:/consumers/delegations/delegatorsWithAgreements
+     * @secure
+     */
+    getConsumerDelegatorsWithAgreements: (
+      query: GetConsumerDelegatorsWithAgreementsParams,
+      params: RequestParams = {},
+    ) =>
+      this.request<DelegationTenants, Problem>({
+        path: `/consumers/delegations/delegatorsWithAgreements`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Retrieve Tenants that are subscribed to at least one EService
+     *
+     * @tags tenants
+     * @name GetConsumers
+     * @request GET:/consumers
+     * @secure
+     */
+    getConsumers: (query: GetConsumersParams, params: RequestParams = {}) =>
+      this.request<CompactOrganizations, Problem>({
+        path: `/consumers`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Retrieves eservices for consumers in agreements
+     *
+     * @tags agreements
+     * @name GetAgreementsConsumerEServices
+     * @summary Retrieves eservices for consumers in agreements
+     * @request GET:/consumers/agreements/eservices
+     * @secure
+     */
+    getAgreementsConsumerEServices: (query: GetAgreementsConsumerEServicesParams, params: RequestParams = {}) =>
+      this.request<CompactEServicesLight, Problem>({
+        path: `/consumers/agreements/eservices`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Retrieve Purposes from the consumer perspective
+     *
+     * @tags purposes
+     * @name GetConsumerPurposes
+     * @request GET:/consumers/purposes
+     * @secure
+     */
+    getConsumerPurposes: (query: GetConsumerPurposesParams, params: RequestParams = {}) =>
+      this.request<Purposes, Problem>({
+        path: `/consumers/purposes`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Retrieve requester's delegated eservices
+     *
+     * @tags consumerDelegations
+     * @name GetConsumerDelegatedEservices
+     * @request GET:/consumers/delegations/eservices
+     * @secure
+     */
+    getConsumerDelegatedEservices: (query: GetConsumerDelegatedEservicesParams, params: RequestParams = {}) =>
+      this.request<CompactEServices, Problem>({
+        path: `/consumers/delegations/eservices`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description creates a consumer delegation
+     *
+     * @tags consumerDelegations
+     * @name CreateConsumerDelegation
+     * @summary Consumer delegation creation
+     * @request POST:/consumers/delegations
+     * @secure
+     */
+    createConsumerDelegation: (data: DelegationSeed, params: RequestParams = {}) =>
+      this.request<CreatedResource, Problem>({
+        path: `/consumers/delegations`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Approves a consumer delegation
+     *
+     * @tags consumerDelegations
+     * @name ApproveConsumerDelegation
+     * @summary Approves a consumer delegation
+     * @request POST:/consumers/delegations/{delegationId}/approve
+     * @secure
+     */
+    approveConsumerDelegation: (delegationId: string, params: RequestParams = {}) =>
+      this.request<void, Problem>({
+        path: `/consumers/delegations/${delegationId}/approve`,
+        method: "POST",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Rejects a consumer delegation
+     *
+     * @tags consumerDelegations
+     * @name RejectConsumerDelegation
+     * @summary Rejects a consumer delegation
+     * @request POST:/consumers/delegations/{delegationId}/reject
+     * @secure
+     */
+    rejectConsumerDelegation: (delegationId: string, data: RejectDelegationPayload, params: RequestParams = {}) =>
+      this.request<void, Problem>({
+        path: `/consumers/delegations/${delegationId}/reject`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * @description Revokes a consumer delegation
+     *
+     * @tags consumerDelegations
+     * @name RevokeConsumerDelegation
+     * @summary Revokes a consumer delegation
+     * @request DELETE:/consumers/delegations/{delegationId}
+     * @secure
+     */
+    revokeConsumerDelegation: (delegationId: string, params: RequestParams = {}) =>
+      this.request<void, Problem>({
+        path: `/consumers/delegations/${delegationId}`,
+        method: "DELETE",
+        secure: true,
+        ...params,
+      }),
+  };
+  producers = {
+    /**
+     * @description retrieves a list of producers agreements
+     *
+     * @tags agreements
+     * @name GetProducerAgreements
+     * @summary retrieves a list of producers agreements
+     * @request GET:/producers/agreements
+     * @secure
+     */
+    getProducerAgreements: (query: GetProducerAgreementsParams, params: RequestParams = {}) =>
+      this.request<Agreements, Problem>({
+        path: `/producers/agreements`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Retrieve Tenants that have published an EService
+     *
+     * @tags tenants
+     * @name GetProducers
+     * @request GET:/producers
+     * @secure
+     */
+    getProducers: (query: GetProducersParams, params: RequestParams = {}) =>
+      this.request<CompactOrganizations, Problem>({
+        path: `/producers`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Retrieves Producer EServices
+     *
+     * @tags eservices
+     * @name GetProducerEServices
+     * @summary Retrieves Producer EServices
+     * @request GET:/producers/eservices
+     * @secure
+     */
+    getProducerEServices: (query: GetProducerEServicesParams, params: RequestParams = {}) =>
+      this.request<ProducerEServices, Problem>({
+        path: `/producers/eservices`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Retrieves eservices for producers in agreements
+     *
+     * @tags agreements
+     * @name GetAgreementsProducerEServices
+     * @summary Retrieves eservices for producers in agreements
+     * @request GET:/producers/agreements/eservices
+     * @secure
+     */
+    getAgreementsProducerEServices: (query: GetAgreementsProducerEServicesParams, params: RequestParams = {}) =>
+      this.request<CompactEServicesLight, Problem>({
+        path: `/producers/agreements/eservices`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Retrieves a producer eservice corresponding to the id
+     *
+     * @tags eservices
+     * @name GetProducerEServiceDetails
+     * @summary Retrieves a producer eservice corresponding to the id
+     * @request GET:/producers/eservices/{eserviceId}
+     * @secure
+     */
+    getProducerEServiceDetails: (eserviceId: string, params: RequestParams = {}) =>
+      this.request<ProducerEServiceDetails, Problem>({
+        path: `/producers/eservices/${eserviceId}`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Retrieves a producer eservice descriptor corresponding to the id
+     *
+     * @tags eservices
+     * @name GetProducerEServiceDescriptor
+     * @summary Retrieves a producer eservice descriptor corresponding to the id
+     * @request GET:/producers/eservices/{eserviceId}/descriptors/{descriptorId}
+     * @secure
+     */
+    getProducerEServiceDescriptor: (eserviceId: string, descriptorId: string, params: RequestParams = {}) =>
+      this.request<ProducerEServiceDescriptor, Problem>({
+        path: `/producers/eservices/${eserviceId}/descriptors/${descriptorId}`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Retrieve Purposes from the producer perspective
+     *
+     * @tags purposes
+     * @name GetProducerPurposes
+     * @request GET:/producers/purposes
+     * @secure
+     */
+    getProducerPurposes: (query: GetProducerPurposesParams, params: RequestParams = {}) =>
+      this.request<Purposes, Problem>({
+        path: `/producers/purposes`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description creates a producer delegation
+     *
+     * @tags producerDelegations
+     * @name CreateProducerDelegation
+     * @summary Producer delegation creation
+     * @request POST:/producers/delegations
+     * @secure
+     */
+    createProducerDelegation: (data: DelegationSeed, params: RequestParams = {}) =>
+      this.request<CreatedResource, Problem>({
+        path: `/producers/delegations`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Approves a producer delegation
+     *
+     * @tags producerDelegations
+     * @name ApproveProducerDelegation
+     * @summary Approves a producer delegation
+     * @request POST:/producers/delegations/{delegationId}/approve
+     * @secure
+     */
+    approveProducerDelegation: (delegationId: string, params: RequestParams = {}) =>
+      this.request<void, Problem>({
+        path: `/producers/delegations/${delegationId}/approve`,
+        method: "POST",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Rejects a producer delegation
+     *
+     * @tags producerDelegations
+     * @name RejectProducerDelegation
+     * @summary Rejects a producer delegation
+     * @request POST:/producers/delegations/{delegationId}/reject
+     * @secure
+     */
+    rejectProducerDelegation: (delegationId: string, data: RejectDelegationPayload, params: RequestParams = {}) =>
+      this.request<void, Problem>({
+        path: `/producers/delegations/${delegationId}/reject`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * @description Revokes a producer delegation
+     *
+     * @tags producerDelegations
+     * @name RevokeProducerDelegation
+     * @summary Revokes a producer delegation
+     * @request DELETE:/producers/delegations/{delegationId}
+     * @secure
+     */
+    revokeProducerDelegation: (delegationId: string, params: RequestParams = {}) =>
+      this.request<void, Problem>({
+        path: `/producers/delegations/${delegationId}`,
+        method: "DELETE",
+        secure: true,
+        ...params,
+      }),
+  };
+  agreements = {
     /**
      * @description creates the agreement between the involved parties.
      *
@@ -5657,12 +7515,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @description Retrieves Tenants that are producers with existing Agreements
      *
      * @tags agreements
-     * @name GetAgreementProducers
+     * @name GetAgreementsProducers
      * @summary Retrieves Tenants that are producers with existing Agreements
      * @request GET:/agreements/filter/producers
      * @secure
      */
-    getAgreementProducers: (query: GetAgreementProducersParams, params: RequestParams = {}) =>
+    getAgreementsProducers: (query: GetAgreementsProducersParams, params: RequestParams = {}) =>
       this.request<CompactOrganizations, Problem>({
         path: `/agreements/filter/producers`,
         method: "GET",
@@ -5676,12 +7534,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @description Retrieves Tenants that are consumers with existing Agreements
      *
      * @tags agreements
-     * @name GetAgreementConsumers
+     * @name GetAgreementsConsumers
      * @summary Retrieves Tenants that are consumers with existing Agreements
      * @request GET:/agreements/filter/consumers
      * @secure
      */
-    getAgreementConsumers: (query: GetAgreementConsumersParams, params: RequestParams = {}) =>
+    getAgreementsConsumers: (query: GetAgreementsConsumersParams, params: RequestParams = {}) =>
       this.request<CompactOrganizations, Problem>({
         path: `/agreements/filter/consumers`,
         method: "GET",
@@ -5714,7 +7572,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      *
      * @tags agreements
      * @name DeleteAgreement
-     * @summary Delete an agreement. This operation is valid only for agreements in DRAFT or MISSING_CERTIFIED_ATTRIBUTES
+     * @summary Delete an agreement
      * @request DELETE:/agreements/{agreementId}
      * @secure
      */
@@ -5949,6 +7807,349 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         ...params,
       }),
   };
+  tenants = {
+    /**
+     * @description Verify a Tenant has required certified attributes
+     *
+     * @tags agreements
+     * @name VerifyTenantCertifiedAttributes
+     * @summary Verify a Tenant has required certified attributes
+     * @request GET:/tenants/{tenantId}/eservices/{eserviceId}/descriptors/{descriptorId}/certifiedAttributes/validate
+     * @secure
+     */
+    verifyTenantCertifiedAttributes: (
+      tenantId: string,
+      eserviceId: string,
+      descriptorId: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<HasCertifiedAttributes, Problem>({
+        path: `/tenants/${tenantId}/eservices/${eserviceId}/descriptors/${descriptorId}/certifiedAttributes/validate`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Return ok
+     *
+     * @tags selfcare
+     * @name GetInstitutionUsers
+     * @summary returns the users related to the institution
+     * @request GET:/tenants/{tenantId}/users
+     * @secure
+     */
+    getInstitutionUsers: ({ tenantId, ...query }: GetInstitutionUsersParams, params: RequestParams = {}) =>
+      this.request<Users, Problem>({
+        path: `/tenants/${tenantId}/users`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Retrieve the certified attributes
+     *
+     * @tags tenants
+     * @name GetRequesterCertifiedAttributes
+     * @summary Gets the certified attributes of the requester
+     * @request GET:/tenants/attributes/certified
+     * @secure
+     */
+    getRequesterCertifiedAttributes: (query: GetRequesterCertifiedAttributesParams, params: RequestParams = {}) =>
+      this.request<RequesterCertifiedAttributes, Problem>({
+        path: `/tenants/attributes/certified`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Gets certified attributes for institution using internal institution id
+     *
+     * @tags tenants
+     * @name GetCertifiedAttributes
+     * @summary Gets the certified attributes of an institution using internal institution id
+     * @request GET:/tenants/{tenantId}/attributes/certified
+     * @secure
+     */
+    getCertifiedAttributes: (tenantId: string, params: RequestParams = {}) =>
+      this.request<CertifiedAttributesResponse, Problem>({
+        path: `/tenants/${tenantId}/attributes/certified`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Add a certified attribute to a Tenant by the requester Tenant
+     *
+     * @tags tenants
+     * @name AddCertifiedAttribute
+     * @request POST:/tenants/{tenantId}/attributes/certified
+     * @secure
+     */
+    addCertifiedAttribute: (tenantId: string, data: CertifiedTenantAttributeSeed, params: RequestParams = {}) =>
+      this.request<void, Problem>({
+        path: `/tenants/${tenantId}/attributes/certified`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * @description Adds the declared attribute to the Institution
+     *
+     * @tags tenants
+     * @name AddDeclaredAttribute
+     * @summary Adds the declared attribute to the Institution
+     * @request POST:/tenants/attributes/declared
+     * @secure
+     */
+    addDeclaredAttribute: (data: DeclaredTenantAttributeSeed, params: RequestParams = {}) =>
+      this.request<void, Problem>({
+        path: `/tenants/attributes/declared`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * @description Revokes the declared attribute to the Institution
+     *
+     * @tags tenants
+     * @name RevokeDeclaredAttribute
+     * @summary Revokes the declared attribute to the Institution
+     * @request DELETE:/tenants/attributes/declared/{attributeId}
+     * @secure
+     */
+    revokeDeclaredAttribute: (attributeId: string, params: RequestParams = {}) =>
+      this.request<void, Problem>({
+        path: `/tenants/attributes/declared/${attributeId}`,
+        method: "DELETE",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Gets declared attributes for institution using internal institution id
+     *
+     * @tags tenants
+     * @name GetDeclaredAttributes
+     * @summary Gets the declared attributes of an institution using internal institution id
+     * @request GET:/tenants/{tenantId}/attributes/declared
+     * @secure
+     */
+    getDeclaredAttributes: (tenantId: string, params: RequestParams = {}) =>
+      this.request<DeclaredAttributesResponse, Problem>({
+        path: `/tenants/${tenantId}/attributes/declared`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Gets verified attributes for institution using internal institution id
+     *
+     * @tags tenants
+     * @name GetVerifiedAttributes
+     * @summary Gets the verified attributes of an institution using internal institution id
+     * @request GET:/tenants/{tenantId}/attributes/verified
+     * @secure
+     */
+    getVerifiedAttributes: (tenantId: string, params: RequestParams = {}) =>
+      this.request<VerifiedAttributesResponse, Problem>({
+        path: `/tenants/${tenantId}/attributes/verified`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Adds the verified attribute to the Institution
+     *
+     * @tags tenants
+     * @name VerifyVerifiedAttribute
+     * @summary Adds the verified attribute to the Institution
+     * @request POST:/tenants/{tenantId}/attributes/verified
+     * @secure
+     */
+    verifyVerifiedAttribute: (tenantId: string, data: VerifiedTenantAttributeSeed, params: RequestParams = {}) =>
+      this.request<void, Problem>({
+        path: `/tenants/${tenantId}/attributes/verified`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * @description Revoke a certified attribute to a Tenant by the requester Tenant
+     *
+     * @tags tenants
+     * @name RevokeCertifiedAttribute
+     * @request DELETE:/tenants/{tenantId}/attributes/certified/{attributeId}
+     * @secure
+     */
+    revokeCertifiedAttribute: (tenantId: string, attributeId: string, params: RequestParams = {}) =>
+      this.request<void, Problem>({
+        path: `/tenants/${tenantId}/attributes/certified/${attributeId}`,
+        method: "DELETE",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Update expirationDate for Verified Attribute of Tenant
+     *
+     * @tags tenants
+     * @name UpdateVerifiedAttribute
+     * @summary Update expirationDate for Verified Attribute of Tenant
+     * @request POST:/tenants/{tenantId}/attributes/verified/{attributeId}
+     * @secure
+     */
+    updateVerifiedAttribute: (
+      tenantId: string,
+      attributeId: string,
+      data: UpdateVerifiedTenantAttributeSeed,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, Problem>({
+        path: `/tenants/${tenantId}/attributes/verified/${attributeId}`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * @description Revoke a Verified attribute to a Tenant by the requester Tenant
+     *
+     * @tags tenants
+     * @name RevokeVerifiedAttribute
+     * @request DELETE:/tenants/{tenantId}/attributes/verified/{attributeId}
+     * @secure
+     */
+    revokeVerifiedAttribute: (
+      tenantId: string,
+      attributeId: string,
+      data: RevokeVerifiedAttributePayload,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, Problem>({
+        path: `/tenants/${tenantId}/attributes/verified/${attributeId}`,
+        method: "DELETE",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * @description Gets institution using internal institution id
+     *
+     * @tags tenants
+     * @name GetTenant
+     * @summary Gets the corresponding institution using internal institution id
+     * @request GET:/tenants/{tenantId}
+     * @secure
+     */
+    getTenant: (tenantId: string, params: RequestParams = {}) =>
+      this.request<Tenant, Problem>({
+        path: `/tenants/${tenantId}`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags tenants
+     * @name AddTenantMail
+     * @summary Add a tenant mail
+     * @request POST:/tenants/{tenantId}/mails
+     * @secure
+     */
+    addTenantMail: (tenantId: string, data: MailSeed, params: RequestParams = {}) =>
+      this.request<void, Problem>({
+        path: `/tenants/${tenantId}/mails`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags tenants
+     * @name DeleteTenantMail
+     * @summary Delete a tenant mail
+     * @request DELETE:/tenants/{tenantId}/mails/{mailId}
+     * @secure
+     */
+    deleteTenantMail: (tenantId: string, mailId: string, params: RequestParams = {}) =>
+      this.request<void, Problem>({
+        path: `/tenants/${tenantId}/mails/${mailId}`,
+        method: "DELETE",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Retrieve Tenants by name
+     *
+     * @tags tenants
+     * @name GetTenants
+     * @request GET:/tenants
+     * @secure
+     */
+    getTenants: (query: GetTenantsParams, params: RequestParams = {}) =>
+      this.request<Tenants, Problem>({
+        path: `/tenants`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags tenants
+     * @name UpdateTenantDelegatedFeatures
+     * @summary Update delegated producer and consumer feature to tenant caller
+     * @request POST:/tenants/delegatedFeatures/update
+     * @secure
+     */
+    updateTenantDelegatedFeatures: (data: TenantDelegatedFeaturesFlagsUpdateSeed, params: RequestParams = {}) =>
+      this.request<void, Problem>({
+        path: `/tenants/delegatedFeatures/update`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+  };
   catalog = {
     /**
      * @description Retrieves EServices catalog
@@ -5986,38 +8187,19 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         format: "json",
         ...params,
       }),
-  };
-  consumers = {
-    /**
-     * @description Retrieve Tenants that are subscribed to at least one EService
-     *
-     * @tags tenants
-     * @name GetConsumers
-     * @request GET:/consumers
-     * @secure
-     */
-    getConsumers: (query: GetConsumersParams, params: RequestParams = {}) =>
-      this.request<CompactOrganizations, Problem>({
-        path: `/consumers`,
-        method: "GET",
-        query: query,
-        secure: true,
-        format: "json",
-        ...params,
-      }),
 
     /**
-     * @description Retrieves eservices for consumers in agreements
+     * @description Retrieves EService templates catalog
      *
-     * @tags agreements
-     * @name GetAgreementEServiceConsumers
-     * @summary Retrieves eservices for consumers in agreements
-     * @request GET:/consumers/agreements/eservices
+     * @tags eserviceTemplates
+     * @name GetEServiceTemplatesCatalog
+     * @summary Retrieves EService templates catalog
+     * @request GET:/catalog/eservices/templates
      * @secure
      */
-    getAgreementEServiceConsumers: (query: GetAgreementEServiceConsumersParams, params: RequestParams = {}) =>
-      this.request<CompactEServicesLight, Problem>({
-        path: `/consumers/agreements/eservices`,
+    getEServiceTemplatesCatalog: (query: GetEServiceTemplatesCatalogParams, params: RequestParams = {}) =>
+      this.request<CatalogEServiceTemplates, Problem>({
+        path: `/catalog/eservices/templates`,
         method: "GET",
         query: query,
         secure: true,
@@ -6433,12 +8615,80 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @tags eservices
      * @name UpdateEServiceDescription
      * @summary Update an e-service description
-     * @request POST:/eservices/{eServiceId}/update
+     * @request POST:/eservices/{eServiceId}/description/update
      * @secure
      */
-    updateEServiceDescription: (eServiceId: string, data: EServiceDescriptionSeed, params: RequestParams = {}) =>
+    updateEServiceDescription: (eServiceId: string, data: EServiceDescriptionUpdateSeed, params: RequestParams = {}) =>
       this.request<CreatedResource, Problem>({
-        path: `/eservices/${eServiceId}/update`,
+        path: `/eservices/${eServiceId}/description/update`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags eservices
+     * @name UpdateEServiceDelegationFlags
+     * @summary Update an e-service delegation flags
+     * @request POST:/eservices/{eServiceId}/delegationFlags/update
+     * @secure
+     */
+    updateEServiceDelegationFlags: (
+      eServiceId: string,
+      data: EServiceDelegationFlagsUpdateSeed,
+      params: RequestParams = {},
+    ) =>
+      this.request<CreatedResource, Problem>({
+        path: `/eservices/${eServiceId}/delegationFlags/update`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags eservices
+     * @name UpdateEServiceName
+     * @summary Update an e-service name
+     * @request POST:/eservices/{eServiceId}/name/update
+     * @secure
+     */
+    updateEServiceName: (eServiceId: string, data: EServiceNameUpdateSeed, params: RequestParams = {}) =>
+      this.request<void, Problem>({
+        path: `/eservices/${eServiceId}/name/update`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags eservices
+     * @name UpdateDescriptorAttributes
+     * @summary Update e-service published descriptor attributes
+     * @request POST:/eservices/{eServiceId}/descriptors/{descriptorId}/attributes/update
+     * @secure
+     */
+    updateDescriptorAttributes: (
+      eServiceId: string,
+      descriptorId: string,
+      data: DescriptorAttributesSeed,
+      params: RequestParams = {},
+    ) =>
+      this.request<CreatedResource, Problem>({
+        path: `/eservices/${eServiceId}/descriptors/${descriptorId}/attributes/update`,
         method: "POST",
         body: data,
         secure: true,
@@ -6482,6 +8732,718 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     ) =>
       this.request<CreatedResource, Problem>({
         path: `/eservices/${eServiceId}/descriptors/${descriptorId}/reject`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags eserviceTemplates
+     * @name CreateEServiceTemplate
+     * @summary Create a new e-service template
+     * @request POST:/eservices/templates
+     * @secure
+     */
+    createEServiceTemplate: (data: EServiceTemplateSeed, params: RequestParams = {}) =>
+      this.request<CreatedEServiceTemplateVersion, Problem>({
+        path: `/eservices/templates`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags eserviceTemplates
+     * @name UpdateEServiceTemplate
+     * @summary Updates a draft e-service template general information
+     * @request POST:/eservices/templates/{eServiceTemplateId}
+     * @secure
+     */
+    updateEServiceTemplate: (
+      eServiceTemplateId: string,
+      data: UpdateEServiceTemplateSeed,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, Problem>({
+        path: `/eservices/templates/${eServiceTemplateId}`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags eserviceTemplates
+     * @name GetEServiceTemplate
+     * @summary Retrieve e-service template
+     * @request GET:/eservices/templates/{eServiceTemplateId}
+     * @secure
+     */
+    getEServiceTemplate: (eServiceTemplateId: string, params: RequestParams = {}) =>
+      this.request<EServiceTemplateDetails, Problem>({
+        path: `/eservices/templates/${eServiceTemplateId}`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags eserviceTemplates
+     * @name SuspendEServiceTemplateVersion
+     * @summary Suspend the selected eservice template version.
+     * @request POST:/eservices/templates/{eServiceTemplateId}/versions/{eServiceTemplateVersionId}/suspend
+     * @secure
+     */
+    suspendEServiceTemplateVersion: (
+      eServiceTemplateId: string,
+      eServiceTemplateVersionId: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, Problem>({
+        path: `/eservices/templates/${eServiceTemplateId}/versions/${eServiceTemplateVersionId}/suspend`,
+        method: "POST",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags eserviceTemplates
+     * @name PublishEServiceTemplateVersion
+     * @summary Publish the selected eservice template version.
+     * @request POST:/eservices/templates/{eServiceTemplateId}/versions/{eServiceTemplateVersionId}/publish
+     * @secure
+     */
+    publishEServiceTemplateVersion: (
+      eServiceTemplateId: string,
+      eServiceTemplateVersionId: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, Problem>({
+        path: `/eservices/templates/${eServiceTemplateId}/versions/${eServiceTemplateVersionId}/publish`,
+        method: "POST",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags eserviceTemplates
+     * @name ActivateEServiceTemplateVersion
+     * @summary Activate the selected eservice template version.
+     * @request POST:/eservices/templates/{eServiceTemplateId}/versions/{eServiceTemplateVersionId}/activate
+     * @secure
+     */
+    activateEServiceTemplateVersion: (
+      eServiceTemplateId: string,
+      eServiceTemplateVersionId: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, Problem>({
+        path: `/eservices/templates/${eServiceTemplateId}/versions/${eServiceTemplateVersionId}/activate`,
+        method: "POST",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags eserviceTemplates
+     * @name UpdateEServiceTemplateName
+     * @summary Update an e-service template name
+     * @request POST:/eservices/templates/{eServiceTemplateId}/name/update
+     * @secure
+     */
+    updateEServiceTemplateName: (
+      eServiceTemplateId: string,
+      data: EServiceTemplateNameUpdateSeed,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, Problem>({
+        path: `/eservices/templates/${eServiceTemplateId}/name/update`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags eserviceTemplates
+     * @name UpdateEServiceTemplateIntendedTarget
+     * @summary Update an e-service template intended target description
+     * @request POST:/eservices/templates/{eServiceTemplateId}/intendedTarget/update
+     * @secure
+     */
+    updateEServiceTemplateIntendedTarget: (
+      eServiceTemplateId: string,
+      data: EServiceTemplateIntendedTargetUpdateSeed,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, Problem>({
+        path: `/eservices/templates/${eServiceTemplateId}/intendedTarget/update`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags eserviceTemplates
+     * @name UpdateEServiceTemplateDescription
+     * @summary Update an e-service template e-service description
+     * @request POST:/eservices/templates/{eServiceTemplateId}/description/update
+     * @secure
+     */
+    updateEServiceTemplateDescription: (
+      eServiceTemplateId: string,
+      data: EServiceTemplateDescriptionUpdateSeed,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, Problem>({
+        path: `/eservices/templates/${eServiceTemplateId}/description/update`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * @description Retrieves a eservice template version corresponding to the id
+     *
+     * @tags eserviceTemplates
+     * @name GetEServiceTemplateVersion
+     * @summary Retrieves a eservice template version corresponding to the id
+     * @request GET:/eservices/templates/{eServiceTemplateId}/versions/{eServiceTemplateVersionId}
+     * @secure
+     */
+    getEServiceTemplateVersion: (
+      eServiceTemplateId: string,
+      eServiceTemplateVersionId: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<EServiceTemplateVersionDetails, Problem>({
+        path: `/eservices/templates/${eServiceTemplateId}/versions/${eServiceTemplateVersionId}`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags eserviceTemplates
+     * @name UpdateDraftTemplateVersion
+     * @summary Updates a draft template version
+     * @request POST:/eservices/templates/{eServiceTemplateId}/versions/{eServiceTemplateVersionId}
+     * @secure
+     */
+    updateDraftTemplateVersion: (
+      eServiceTemplateId: string,
+      eServiceTemplateVersionId: string,
+      data: UpdateEServiceTemplateVersionSeed,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, Problem>({
+        path: `/eservices/templates/${eServiceTemplateId}/versions/${eServiceTemplateVersionId}`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags eserviceTemplates
+     * @name DeleteDraftTemplateVersion
+     * @summary Delete a draft template version
+     * @request DELETE:/eservices/templates/{eServiceTemplateId}/versions/{eServiceTemplateVersionId}
+     * @secure
+     */
+    deleteDraftTemplateVersion: (
+      eServiceTemplateId: string,
+      eServiceTemplateVersionId: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, Problem>({
+        path: `/eservices/templates/${eServiceTemplateId}/versions/${eServiceTemplateVersionId}`,
+        method: "DELETE",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags eserviceTemplates
+     * @name UpdateTemplateVersionQuotas
+     * @summary Update the quotas of the selecter template version
+     * @request POST:/eservices/templates/{eServiceTemplateId}/versions/{eServiceTemplateVersionId}/quotas/update
+     * @secure
+     */
+    updateTemplateVersionQuotas: (
+      eServiceTemplateId: string,
+      eServiceTemplateVersionId: string,
+      data: EServiceTemplateVersionQuotasUpdateSeed,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, Problem>({
+        path: `/eservices/templates/${eServiceTemplateId}/versions/${eServiceTemplateVersionId}/quotas/update`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags eserviceTemplates
+     * @name CreateEServiceTemplateRiskAnalysis
+     * @summary Create an e-service template risk analysis
+     * @request POST:/eservices/templates/{eServiceTemplateId}/riskAnalysis
+     * @secure
+     */
+    createEServiceTemplateRiskAnalysis: (
+      eServiceTemplateId: string,
+      data: EServiceRiskAnalysisSeed,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, Problem>({
+        path: `/eservices/templates/${eServiceTemplateId}/riskAnalysis`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags eserviceTemplates
+     * @name UpdateEServiceTemplateRiskAnalysis
+     * @summary Update an e-service template risk analysis
+     * @request POST:/eservices/templates/{eServiceTemplateId}/riskAnalysis/{riskAnalysisId}
+     * @secure
+     */
+    updateEServiceTemplateRiskAnalysis: (
+      eServiceTemplateId: string,
+      riskAnalysisId: string,
+      data: EServiceRiskAnalysisSeed,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, Problem>({
+        path: `/eservices/templates/${eServiceTemplateId}/riskAnalysis/${riskAnalysisId}`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags eserviceTemplates
+     * @name DeleteEServiceTemplateRiskAnalysis
+     * @summary Delete an e-service template risk analysis
+     * @request DELETE:/eservices/templates/{eServiceTemplateId}/riskAnalysis/{riskAnalysisId}
+     * @secure
+     */
+    deleteEServiceTemplateRiskAnalysis: (
+      eServiceTemplateId: string,
+      riskAnalysisId: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, Problem>({
+        path: `/eservices/templates/${eServiceTemplateId}/riskAnalysis/${riskAnalysisId}`,
+        method: "DELETE",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags eserviceTemplates
+     * @name UpdateEServiceTemplateVersionAttributes
+     * @summary Update e-service template published version attributes
+     * @request POST:/eservices/templates/{eServiceTemplateId}/versions/{eServiceTemplateVersionId}/attributes/update
+     * @secure
+     */
+    updateEServiceTemplateVersionAttributes: (
+      eServiceTemplateId: string,
+      eServiceTemplateVersionId: string,
+      data: DescriptorAttributesSeed,
+      params: RequestParams = {},
+    ) =>
+      this.request<CreatedResource, Problem>({
+        path: `/eservices/templates/${eServiceTemplateId}/versions/${eServiceTemplateVersionId}/attributes/update`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Retrieves Tenants that are producers of published e-service templates
+     *
+     * @tags eserviceTemplates
+     * @name GetEServiceTemplateCreators
+     * @summary Retrieves Tenants that are creators of published e-service templates
+     * @request GET:/eservices/templates/filter/creators
+     * @secure
+     */
+    getEServiceTemplateCreators: (query: GetEServiceTemplateCreatorsParams, params: RequestParams = {}) =>
+      this.request<CompactOrganizations, Problem>({
+        path: `/eservices/templates/filter/creators`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags eserviceTemplates
+     * @name CreateEServiceTemplateVersion
+     * @summary Adds a new version to the specified e-service template
+     * @request POST:/eservices/templates/{eServiceTemplateId}/versions
+     * @secure
+     */
+    createEServiceTemplateVersion: (eServiceTemplateId: string, params: RequestParams = {}) =>
+      this.request<CreatedResource, Problem>({
+        path: `/eservices/templates/${eServiceTemplateId}/versions`,
+        method: "POST",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags eserviceTemplates
+     * @name CreateEServiceTemplateDocument
+     * @summary Add new e-service template document
+     * @request POST:/eservices/templates/{eServiceTemplateId}/versions/{eServiceTemplateVersionId}/documents
+     * @secure
+     */
+    createEServiceTemplateDocument: (
+      eServiceTemplateId: string,
+      eServiceTemplateVersionId: string,
+      data: CreateEServiceTemplateDocumentPayload,
+      params: RequestParams = {},
+    ) =>
+      this.request<CreatedResource, Problem>({
+        path: `/eservices/templates/${eServiceTemplateId}/versions/${eServiceTemplateVersionId}/documents`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.FormData,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags eserviceTemplates
+     * @name GetEServiceTemplateDocumentById
+     * @summary Get an e-service template document
+     * @request GET:/eservices/templates/{eServiceTemplateId}/versions/{eServiceTemplateVersionId}/documents/{documentId}
+     * @secure
+     */
+    getEServiceTemplateDocumentById: (
+      eServiceTemplateId: string,
+      eServiceTemplateVersionId: string,
+      documentId: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<File, Problem>({
+        path: `/eservices/templates/${eServiceTemplateId}/versions/${eServiceTemplateVersionId}/documents/${documentId}`,
+        method: "GET",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags eserviceTemplates
+     * @name DeleteEServiceTemplateDocumentById
+     * @summary Deletes an e-service template document
+     * @request DELETE:/eservices/templates/{eServiceTemplateId}/versions/{eServiceTemplateVersionId}/documents/{documentId}
+     * @secure
+     */
+    deleteEServiceTemplateDocumentById: (
+      eServiceTemplateId: string,
+      eServiceTemplateVersionId: string,
+      documentId: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, Problem>({
+        path: `/eservices/templates/${eServiceTemplateId}/versions/${eServiceTemplateVersionId}/documents/${documentId}`,
+        method: "DELETE",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags eserviceTemplates
+     * @name UpdateEServiceTemplateDocumentById
+     * @summary Updates an e-service template document
+     * @request POST:/eservices/templates/{eServiceTemplateId}/versions/{eServiceTemplateVersionId}/documents/{documentId}/update
+     * @secure
+     */
+    updateEServiceTemplateDocumentById: (
+      eServiceTemplateId: string,
+      eServiceTemplateVersionId: string,
+      documentId: string,
+      data: UpdateEServiceTemplateVersionDocumentSeed,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, Problem>({
+        path: `/eservices/templates/${eServiceTemplateId}/versions/${eServiceTemplateVersionId}/documents/${documentId}/update`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags eservices
+     * @name IsEServiceNameAvailable
+     * @summary Check if the e-service name is available
+     * @request GET:/eservices/names/availability
+     * @secure
+     */
+    isEServiceNameAvailable: (query: IsEServiceNameAvailableParams, params: RequestParams = {}) =>
+      this.request<boolean, Problem>({
+        path: `/eservices/names/availability`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+  };
+  templates = {
+    /**
+     * No description
+     *
+     * @tags eservices
+     * @name UpdateDraftDescriptorTemplateInstance
+     * @summary Updates an eservice template instance draft descriptor
+     * @request POST:/templates/eservices/{eServiceId}/descriptors/{descriptorId}
+     * @secure
+     */
+    updateDraftDescriptorTemplateInstance: (
+      eServiceId: string,
+      descriptorId: string,
+      data: UpdateEServiceDescriptorTemplateInstanceSeed,
+      params: RequestParams = {},
+    ) =>
+      this.request<CreatedResource, Problem>({
+        path: `/templates/eservices/${eServiceId}/descriptors/${descriptorId}`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags eservices
+     * @name UpdateTemplateInstanceDescriptor
+     * @summary Update the selected template instance descriptor.
+     * @request POST:/templates/eservices/{eServiceId}/descriptors/{descriptorId}/update
+     * @secure
+     */
+    updateTemplateInstanceDescriptor: (
+      eServiceId: string,
+      descriptorId: string,
+      data: UpdateEServiceTemplateInstanceDescriptorQuotas,
+      params: RequestParams = {},
+    ) =>
+      this.request<CreatedResource, Problem>({
+        path: `/templates/eservices/${eServiceId}/descriptors/${descriptorId}/update`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags eservices
+     * @name AddEServiceTemplateInstanceInterfaceRest
+     * @summary Add EService template instance interface for REST protocol
+     * @request POST:/templates/eservices/{eServiceId}/descriptors/{descriptorId}/interface/rest
+     * @secure
+     */
+    addEServiceTemplateInstanceInterfaceRest: (
+      eServiceId: string,
+      descriptorId: string,
+      data: TemplateInstanceInterfaceRESTSeed,
+      params: RequestParams = {},
+    ) =>
+      this.request<CreatedResource, Problem>({
+        path: `/templates/eservices/${eServiceId}/descriptors/${descriptorId}/interface/rest`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags eservices
+     * @name AddEServiceTemplateInstanceInterfaceSoap
+     * @summary Add EService template instance interface for SOAP protocol
+     * @request POST:/templates/eservices/{eServiceId}/descriptors/{descriptorId}/interface/soap
+     * @secure
+     */
+    addEServiceTemplateInstanceInterfaceSoap: (
+      eServiceId: string,
+      descriptorId: string,
+      data: TemplateInstanceInterfaceSOAPSeed,
+      params: RequestParams = {},
+    ) =>
+      this.request<CreatedResource, Problem>({
+        path: `/templates/eservices/${eServiceId}/descriptors/${descriptorId}/interface/soap`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags eservices
+     * @name UpdateEServiceTemplateInstanceById
+     * @summary Updates EService template instance general information
+     * @request POST:/templates/eservices/{eServiceId}
+     * @secure
+     */
+    updateEServiceTemplateInstanceById: (
+      eServiceId: string,
+      data: UpdateEServiceTemplateInstanceSeed,
+      params: RequestParams = {},
+    ) =>
+      this.request<CreatedResource, Problem>({
+        path: `/templates/eservices/${eServiceId}`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags eservices
+     * @name UpgradeEServiceInstance
+     * @summary Upgrade an instance of a template
+     * @request POST:/templates/eservices/{eServiceId}/upgrade
+     * @secure
+     */
+    upgradeEServiceInstance: (eServiceId: string, params: RequestParams = {}) =>
+      this.request<CreatedResource, Problem>({
+        path: `/templates/eservices/${eServiceId}/upgrade`,
+        method: "POST",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Retrieves EService template instances
+     *
+     * @tags eservices
+     * @name GetEServiceTemplateInstances
+     * @summary Retrieves EService template instances
+     * @request GET:/templates/{templateId}/eservices
+     * @secure
+     */
+    getEServiceTemplateInstances: (
+      { templateId, ...query }: GetEServiceTemplateInstancesParams,
+      params: RequestParams = {},
+    ) =>
+      this.request<EServiceTemplateInstances, Problem>({
+        path: `/templates/${templateId}/eservices`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags eservices
+     * @name CreateEServiceInstanceFromTemplate
+     * @summary Create a new e-service instance from a template
+     * @request POST:/templates/{templateId}/eservices
+     * @secure
+     */
+    createEServiceInstanceFromTemplate: (templateId: string, data: InstanceEServiceSeed, params: RequestParams = {}) =>
+      this.request<CreatedResource, Problem>({
+        path: `/templates/${templateId}/eservices`,
         method: "POST",
         body: data,
         secure: true,
@@ -6549,99 +9511,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         ...params,
       }),
   };
-  producers = {
-    /**
-     * @description Retrieve Tenants that have published an EService
-     *
-     * @tags tenants
-     * @name GetProducers
-     * @request GET:/producers
-     * @secure
-     */
-    getProducers: (query: GetProducersParams, params: RequestParams = {}) =>
-      this.request<CompactOrganizations, Problem>({
-        path: `/producers`,
-        method: "GET",
-        query: query,
-        secure: true,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * @description Retrieves Producer EServices
-     *
-     * @tags eservices
-     * @name GetProducerEServices
-     * @summary Retrieves Producer EServices
-     * @request GET:/producers/eservices
-     * @secure
-     */
-    getProducerEServices: (query: GetProducerEServicesParams, params: RequestParams = {}) =>
-      this.request<ProducerEServices, Problem>({
-        path: `/producers/eservices`,
-        method: "GET",
-        query: query,
-        secure: true,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * @description Retrieves eservices for producers in agreements
-     *
-     * @tags agreements
-     * @name GetAgreementEServiceProducers
-     * @summary Retrieves eservices for producers in agreements
-     * @request GET:/producers/agreements/eservices
-     * @secure
-     */
-    getAgreementEServiceProducers: (query: GetAgreementEServiceProducersParams, params: RequestParams = {}) =>
-      this.request<CompactEServicesLight, Problem>({
-        path: `/producers/agreements/eservices`,
-        method: "GET",
-        query: query,
-        secure: true,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * @description Retrieves a producer eservice corresponding to the id
-     *
-     * @tags eservices
-     * @name GetProducerEServiceDetails
-     * @summary Retrieves a producer eservice corresponding to the id
-     * @request GET:/producers/eservices/{eserviceId}
-     * @secure
-     */
-    getProducerEServiceDetails: (eserviceId: string, params: RequestParams = {}) =>
-      this.request<ProducerEServiceDetails, Problem>({
-        path: `/producers/eservices/${eserviceId}`,
-        method: "GET",
-        secure: true,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * @description Retrieves a producer eservice descriptor corresponding to the id
-     *
-     * @tags eservices
-     * @name GetProducerEServiceDescriptor
-     * @summary Retrieves a producer eservice descriptor corresponding to the id
-     * @request GET:/producers/eservices/{eserviceId}/descriptors/{descriptorId}
-     * @secure
-     */
-    getProducerEServiceDescriptor: (eserviceId: string, descriptorId: string, params: RequestParams = {}) =>
-      this.request<ProducerEServiceDescriptor, Problem>({
-        path: `/producers/eservices/${eserviceId}/descriptors/${descriptorId}`,
-        method: "GET",
-        secure: true,
-        format: "json",
-        ...params,
-      }),
-  };
   reverse = {
     /**
      * @description create a purposes with an EService risk analysis
@@ -6692,7 +9561,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @secure
      */
     getSessionToken: (data: IdentityToken, params: RequestParams = {}) =>
-      this.request<SessionToken, any>({
+      this.request<SessionToken, Problem>({
         path: `/session/tokens`,
         method: "POST",
         body: data,
@@ -6719,341 +9588,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         secure: true,
         type: ContentType.Json,
         format: "json",
-        ...params,
-      }),
-  };
-  tenants = {
-    /**
-     * @description Return ok
-     *
-     * @tags selfcare
-     * @name GetInstitutionUsers
-     * @summary returns the users related to the institution
-     * @request GET:/tenants/{tenantId}/users
-     * @secure
-     */
-    getInstitutionUsers: ({ tenantId, ...query }: GetInstitutionUsersParams, params: RequestParams = {}) =>
-      this.request<Users, Problem>({
-        path: `/tenants/${tenantId}/users`,
-        method: "GET",
-        query: query,
-        secure: true,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * @description Retrieve the certified attributes
-     *
-     * @tags tenants
-     * @name GetRequesterCertifiedAttributes
-     * @summary Gets the certified attributes of the requester
-     * @request GET:/tenants/attributes/certified
-     * @secure
-     */
-    getRequesterCertifiedAttributes: (query: GetRequesterCertifiedAttributesParams, params: RequestParams = {}) =>
-      this.request<RequesterCertifiedAttributes, Problem>({
-        path: `/tenants/attributes/certified`,
-        method: "GET",
-        query: query,
-        secure: true,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * @description Gets certified attributes for institution using internal institution id
-     *
-     * @tags tenants
-     * @name GetCertifiedAttributes
-     * @summary Gets the certified attributes of an institution using internal institution id
-     * @request GET:/tenants/{tenantId}/attributes/certified
-     * @secure
-     */
-    getCertifiedAttributes: (tenantId: string, params: RequestParams = {}) =>
-      this.request<CertifiedAttributesResponse, Problem>({
-        path: `/tenants/${tenantId}/attributes/certified`,
-        method: "GET",
-        secure: true,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * @description Add a certified attribute to a Tenant by the requester Tenant
-     *
-     * @tags tenants
-     * @name AddCertifiedAttribute
-     * @request POST:/tenants/{tenantId}/attributes/certified
-     * @secure
-     */
-    addCertifiedAttribute: (tenantId: string, data: CertifiedTenantAttributeSeed, params: RequestParams = {}) =>
-      this.request<void, Problem>({
-        path: `/tenants/${tenantId}/attributes/certified`,
-        method: "POST",
-        body: data,
-        secure: true,
-        type: ContentType.Json,
-        ...params,
-      }),
-
-    /**
-     * @description Adds the declared attribute to the Institution
-     *
-     * @tags tenants
-     * @name AddDeclaredAttribute
-     * @summary Adds the declared attribute to the Institution
-     * @request POST:/tenants/attributes/declared
-     * @secure
-     */
-    addDeclaredAttribute: (data: DeclaredTenantAttributeSeed, params: RequestParams = {}) =>
-      this.request<void, Problem>({
-        path: `/tenants/attributes/declared`,
-        method: "POST",
-        body: data,
-        secure: true,
-        type: ContentType.Json,
-        ...params,
-      }),
-
-    /**
-     * @description Revokes the declared attribute to the Institution
-     *
-     * @tags tenants
-     * @name RevokeDeclaredAttribute
-     * @summary Revokes the declared attribute to the Institution
-     * @request DELETE:/tenants/attributes/declared/{attributeId}
-     * @secure
-     */
-    revokeDeclaredAttribute: (attributeId: string, params: RequestParams = {}) =>
-      this.request<void, Problem>({
-        path: `/tenants/attributes/declared/${attributeId}`,
-        method: "DELETE",
-        secure: true,
-        ...params,
-      }),
-
-    /**
-     * @description Gets declared attributes for institution using internal institution id
-     *
-     * @tags tenants
-     * @name GetDeclaredAttributes
-     * @summary Gets the declared attributes of an institution using internal institution id
-     * @request GET:/tenants/{tenantId}/attributes/declared
-     * @secure
-     */
-    getDeclaredAttributes: (tenantId: string, params: RequestParams = {}) =>
-      this.request<DeclaredAttributesResponse, Problem>({
-        path: `/tenants/${tenantId}/attributes/declared`,
-        method: "GET",
-        secure: true,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * @description Gets verified attributes for institution using internal institution id
-     *
-     * @tags tenants
-     * @name GetVerifiedAttributes
-     * @summary Gets the verified attributes of an institution using internal institution id
-     * @request GET:/tenants/{tenantId}/attributes/verified
-     * @secure
-     */
-    getVerifiedAttributes: (tenantId: string, params: RequestParams = {}) =>
-      this.request<VerifiedAttributesResponse, Problem>({
-        path: `/tenants/${tenantId}/attributes/verified`,
-        method: "GET",
-        secure: true,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * @description Adds the verified attribute to the Institution
-     *
-     * @tags tenants
-     * @name VerifyVerifiedAttribute
-     * @summary Adds the verified attribute to the Institution
-     * @request POST:/tenants/{tenantId}/attributes/verified
-     * @secure
-     */
-    verifyVerifiedAttribute: (tenantId: string, data: VerifiedTenantAttributeSeed, params: RequestParams = {}) =>
-      this.request<void, Problem>({
-        path: `/tenants/${tenantId}/attributes/verified`,
-        method: "POST",
-        body: data,
-        secure: true,
-        type: ContentType.Json,
-        ...params,
-      }),
-
-    /**
-     * @description Revoke a certified attribute to a Tenant by the requester Tenant
-     *
-     * @tags tenants
-     * @name RevokeCertifiedAttribute
-     * @request DELETE:/tenants/{tenantId}/attributes/certified/{attributeId}
-     * @secure
-     */
-    revokeCertifiedAttribute: (tenantId: string, attributeId: string, params: RequestParams = {}) =>
-      this.request<void, Problem>({
-        path: `/tenants/${tenantId}/attributes/certified/${attributeId}`,
-        method: "DELETE",
-        secure: true,
-        ...params,
-      }),
-
-    /**
-     * @description Update expirationDate for Verified Attribute of Tenant
-     *
-     * @tags tenants
-     * @name UpdateVerifiedAttribute
-     * @summary Update expirationDate for Verified Attribute of Tenant
-     * @request POST:/tenants/{tenantId}/attributes/verified/{attributeId}
-     * @secure
-     */
-    updateVerifiedAttribute: (
-      tenantId: string,
-      attributeId: string,
-      data: UpdateVerifiedTenantAttributeSeed,
-      params: RequestParams = {},
-    ) =>
-      this.request<void, Problem>({
-        path: `/tenants/${tenantId}/attributes/verified/${attributeId}`,
-        method: "POST",
-        body: data,
-        secure: true,
-        type: ContentType.Json,
-        ...params,
-      }),
-
-    /**
-     * @description Revoke a Verified attribute to a Tenant by the requester Tenant
-     *
-     * @tags tenants
-     * @name RevokeVerifiedAttribute
-     * @request DELETE:/tenants/{tenantId}/attributes/verified/{attributeId}
-     * @secure
-     */
-    revokeVerifiedAttribute: (
-      tenantId: string,
-      attributeId: string,
-      data: RevokeVerifiedAttributePayload,
-      params: RequestParams = {},
-    ) =>
-      this.request<void, Problem>({
-        path: `/tenants/${tenantId}/attributes/verified/${attributeId}`,
-        method: "DELETE",
-        body: data,
-        secure: true,
-        type: ContentType.Json,
-        ...params,
-      }),
-
-    /**
-     * @description Gets institution using internal institution id
-     *
-     * @tags tenants
-     * @name GetTenant
-     * @summary Gets the corresponding institution using internal institution id
-     * @request GET:/tenants/{tenantId}
-     * @secure
-     */
-    getTenant: (tenantId: string, params: RequestParams = {}) =>
-      this.request<Tenant, Problem>({
-        path: `/tenants/${tenantId}`,
-        method: "GET",
-        secure: true,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags tenants
-     * @name AddTenantMail
-     * @summary Add a tenant mail
-     * @request POST:/tenants/{tenantId}/mails
-     * @secure
-     */
-    addTenantMail: (tenantId: string, data: MailSeed, params: RequestParams = {}) =>
-      this.request<void, Problem>({
-        path: `/tenants/${tenantId}/mails`,
-        method: "POST",
-        body: data,
-        secure: true,
-        type: ContentType.Json,
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags tenants
-     * @name DeleteTenantMail
-     * @summary Delete a tenant mail
-     * @request DELETE:/tenants/{tenantId}/mails/{mailId}
-     * @secure
-     */
-    deleteTenantMail: (tenantId: string, mailId: string, params: RequestParams = {}) =>
-      this.request<void, Problem>({
-        path: `/tenants/${tenantId}/mails/${mailId}`,
-        method: "DELETE",
-        secure: true,
-        ...params,
-      }),
-
-    /**
-     * @description Retrieve Tenants by name
-     *
-     * @tags tenants
-     * @name GetTenants
-     * @request GET:/tenants
-     * @secure
-     */
-    getTenants: (query: GetTenantsParams, params: RequestParams = {}) =>
-      this.request<Tenants, Problem>({
-        path: `/tenants`,
-        method: "GET",
-        query: query,
-        secure: true,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags tenants
-     * @name AssignTenantDelegatedProducerFeature
-     * @summary Assign delegated producer feature to tenant caller
-     * @request POST:/tenants/delegatedProducer
-     * @secure
-     */
-    assignTenantDelegatedProducerFeature: (params: RequestParams = {}) =>
-      this.request<void, Problem>({
-        path: `/tenants/delegatedProducer`,
-        method: "POST",
-        secure: true,
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags tenants
-     * @name DeleteTenantDelegatedProducerFeature
-     * @summary Delete delegated producer feature to tenant caller
-     * @request DELETE:/tenants/delegatedProducer
-     * @secure
-     */
-    deleteTenantDelegatedProducerFeature: (params: RequestParams = {}) =>
-      this.request<void, Problem>({
-        path: `/tenants/delegatedProducer`,
-        method: "DELETE",
-        secure: true,
         ...params,
       }),
   };
@@ -7328,10 +9862,14 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request GET:/purposes/riskAnalysis/latest
      * @secure
      */
-    retrieveLatestRiskAnalysisConfiguration: (params: RequestParams = {}) =>
+    retrieveLatestRiskAnalysisConfiguration: (
+      query: RetrieveLatestRiskAnalysisConfigurationParams,
+      params: RequestParams = {},
+    ) =>
       this.request<RiskAnalysisFormConfig, Problem>({
         path: `/purposes/riskAnalysis/latest`,
         method: "GET",
+        query: query,
         secure: true,
         format: "json",
         ...params,
@@ -7351,117 +9889,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     ) =>
       this.request<RiskAnalysisFormConfig, Problem>({
         path: `/purposes/riskAnalysis/version/${riskAnalysisVersion}`,
-        method: "GET",
-        query: query,
-        secure: true,
-        format: "json",
-        ...params,
-      }),
-  };
-  producer = {
-    /**
-     * @description Retrieve Purposes from the producer prospective
-     *
-     * @tags purposes
-     * @name GetProducerPurposes
-     * @request GET:/producer/purposes
-     * @secure
-     */
-    getProducerPurposes: (query: GetProducerPurposesParams, params: RequestParams = {}) =>
-      this.request<Purposes, Problem>({
-        path: `/producer/purposes`,
-        method: "GET",
-        query: query,
-        secure: true,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * @description creates the producer delegation
-     *
-     * @tags producerDelegations
-     * @name CreateProducerDelegation
-     * @summary Producer delegation creation
-     * @request POST:/producer/delegations
-     * @secure
-     */
-    createProducerDelegation: (data: DelegationSeed, params: RequestParams = {}) =>
-      this.request<CreatedResource, Problem>({
-        path: `/producer/delegations`,
-        method: "POST",
-        body: data,
-        secure: true,
-        type: ContentType.Json,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * @description Approves a producer delegation
-     *
-     * @tags producerDelegations
-     * @name ApproveDelegation
-     * @summary Approves a producer delegation
-     * @request POST:/producer/delegations/{delegationId}/approve
-     * @secure
-     */
-    approveDelegation: (delegationId: string, params: RequestParams = {}) =>
-      this.request<void, Problem>({
-        path: `/producer/delegations/${delegationId}/approve`,
-        method: "POST",
-        secure: true,
-        ...params,
-      }),
-
-    /**
-     * @description Rejects a producer delegation
-     *
-     * @tags producerDelegations
-     * @name RejectDelegation
-     * @summary Rejects a producer delegation
-     * @request POST:/producer/delegations/{delegationId}/reject
-     * @secure
-     */
-    rejectDelegation: (delegationId: string, data: RejectDelegationPayload, params: RequestParams = {}) =>
-      this.request<void, Problem>({
-        path: `/producer/delegations/${delegationId}/reject`,
-        method: "POST",
-        body: data,
-        secure: true,
-        type: ContentType.Json,
-        ...params,
-      }),
-
-    /**
-     * @description Revokes a producer delegation
-     *
-     * @tags producerDelegations
-     * @name RevokeProducerDelegation
-     * @summary Revokes a producer delegation
-     * @request DELETE:/producer/delegations/{delegationId}
-     * @secure
-     */
-    revokeProducerDelegation: (delegationId: string, params: RequestParams = {}) =>
-      this.request<void, Problem>({
-        path: `/producer/delegations/${delegationId}`,
-        method: "DELETE",
-        secure: true,
-        ...params,
-      }),
-  };
-  consumer = {
-    /**
-     * @description Retrieve Purposes from the consumer prospective
-     *
-     * @tags purposes
-     * @name GetConsumerPurposes
-     * @request GET:/consumer/purposes
-     * @secure
-     */
-    getConsumerPurposes: (query: GetConsumerPurposesParams, params: RequestParams = {}) =>
-      this.request<Purposes, Problem>({
-        path: `/consumer/purposes`,
         method: "GET",
         query: query,
         secure: true,
@@ -7773,12 +10200,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @description Creates one or more keys for the corresponding client.
      *
      * @tags clients
-     * @name CreateKeys
+     * @name CreateKey
      * @summary Create Keys for the specific clientId.
      * @request POST:/clients/{clientId}/keys
      * @secure
      */
-    createKeys: (clientId: string, data: KeysSeed, params: RequestParams = {}) =>
+    createKey: (clientId: string, data: KeySeed, params: RequestParams = {}) =>
       this.request<void, Problem>({
         path: `/clients/${clientId}/keys`,
         method: "POST",
@@ -8290,6 +10717,26 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         path: `/delegations/${delegationId}/contracts/${contractId}`,
         method: "GET",
         secure: true,
+        ...params,
+      }),
+  };
+  creators = {
+    /**
+     * @description Retrieves Creator EService templates
+     *
+     * @tags eserviceTemplates
+     * @name GetCreatorEServiceTemplates
+     * @summary Retrieves Creator EService templates
+     * @request GET:/creators/eservices/templates
+     * @secure
+     */
+    getCreatorEServiceTemplates: (query: GetCreatorEServiceTemplatesParams, params: RequestParams = {}) =>
+      this.request<ProducerEServiceTemplates, Problem>({
+        path: `/creators/eservices/templates`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
         ...params,
       }),
   };

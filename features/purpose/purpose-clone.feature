@@ -52,7 +52,7 @@ Feature: Clonazione di una finalità
     Examples: 
       | statoFinalita | status |
       | DRAFT         |  409   |
-      | ARCHIVED      |  200   |
+      | ARCHIVED      |  409   |
 
   @purpose_clone3
   Scenario Outline: Un utente con sufficienti permessi (admin); il cui ente ha già una finalità in stato WAITING_FOR_APPROVAL, ACTIVE, o SUSPENDED per una versione di e-service, il quale ha mode = DELIVER, clona una finalità. La richiesta va a buon fine. Spiega: visto che ci sono problemi legati all’analisi del rischio in erogazione inversa, non è possibile clonare una finalità che faccia riferimento a un e-service in erogazione inversa.

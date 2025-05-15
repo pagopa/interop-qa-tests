@@ -1,5 +1,5 @@
 import "../configs/env";
-import { createReadStream, readFileSync } from "fs";
+import { readFileSync } from "fs";
 import crypto, { JsonWebKey, KeyObject, randomUUID } from "crypto";
 import { z } from "zod";
 import axios, { type AxiosResponse } from "axios";
@@ -196,7 +196,7 @@ export async function uploadFile(
   const response = await axios({
     method: "put",
     url: fileUrl,
-    data: createReadStream(zipFilePath),
+    data: readFileSync(zipFilePath),
     headers: {
       "Content-Type": "application/zip",
     },

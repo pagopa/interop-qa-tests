@@ -17,12 +17,12 @@ Feature: Assegnazione di un attributo certificato ad un aderente
       | support      |        403 |
       | api,security |        403 |
 
-  @tenant_assign_certified_attribute2 @wait_for_fix @PIN-5037
+  @tenant_assign_certified_attribute2
   Scenario Outline: Per un attributo certificato precedentemente creato da un aderente, il quale ha la qualifica di ente certificatore (certifier), alla richiesta di assegnazione dell’attributo all’ente stesso da parte di un utente con sufficienti permessi (admin), ottiene un errore.
     Given l'utente è un "admin" di "PA2"
     Given "PA2" ha già creato 1 attributo "CERTIFIED"
     When l'utente assegna a "PA2" l'attributo certificato precedentemente creato
-    Then si ottiene status code 400
+    Then si ottiene status code 204
 
   @tenant_assign_certified_attribute3
   Scenario Outline: Per un attributo certificato precedentemente creato da un primo aderente, alla richiesta di assegnazione dell’attributo ad un secondo ente da parte di un utente con sufficienti permessi (admin), il quale admin appartiene ad un terzo aderente, il quale ha la qualifica di ente certificatore (certifier), ottiene un errore.

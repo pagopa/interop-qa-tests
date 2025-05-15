@@ -1,4 +1,4 @@
-@tenant_e_service_consumers_listing @PIN-5022
+@tenant_e_service_consumers_listing
 Feature: Listing e-service consumers
   Tutti gli utenti autenticati possono leggere la lista dei aderenti che sono iscritti ad almeno un e-service di cui sono erogatori
 

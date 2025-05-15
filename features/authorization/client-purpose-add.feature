@@ -53,7 +53,7 @@ Feature: Associazione finalità al client
     When l'utente richiede l'associazione della finalità al client
     Then si ottiene status code 403
 
-  @client_purpose_add3 @wait_for_fix @PIN-4954
+  @client_purpose_add3
   Scenario Outline: Un utente con sufficienti permessi (admin) dell'ente che ha creato il client di tipo API e attivato una finalità che si trova in stato ACTIVE, richiede l’associazione del client alla finalità. Ottiene un errore. Chiarimento: non è possibile associare client destinati al consumo dell'API Interop ad una finalità
     Given l'utente è un "admin" di "PA1"
     Given "PA2" ha già creato e pubblicato 1 e-service
