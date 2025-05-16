@@ -274,10 +274,10 @@ jobs:
         id: event_store_db_truncate
         shell: bash
         env:
-          PGUSER: ${{ github.env.EVENT_STORE_USERNAME }}
-          PGPASSWORD: ${{ github.env.EVENT_STORE_PASSWORD }}
-          PGHOST: ${{ github.env.EVENT_STORE_HOST }}
-          PGPORT: ${{ github.env.EVENT_STORE_PORT }}
+          PGUSER: ${{ env.EVENT_STORE_USERNAME }}
+          PGPASSWORD: ${{ env.EVENT_STORE_PASSWORD }}
+          PGHOST: ${{ env.EVENT_STORE_HOST }}
+          PGPORT: ${{ env.EVENT_STORE_PORT }}
           PGDATABASE: ${{ vars.EVENT_STORE_DB_NAME }}
         run: |
           $SCRIPTS_FOLDER/truncateSQLTables.sh
@@ -287,10 +287,10 @@ jobs:
         if: ${{ vars.READ_MODEL_SQL_DB_NAME != '' }}
         shell: bash
         env:
-          PGUSER: ${{ github.env.READ_MODEL_SQL_USERNAME }}
-          PGPASSWORD: ${{ github.env.READ_MODEL_SQL_PASSWORD }}
-          PGHOST: ${{ github.env.READ_MODEL_SQL_HOST }}
-          PGPORT: ${{ github.env.READ_MODEL_SQL_PORT }}
+          PGUSER: ${{ env.READ_MODEL_SQL_USERNAME }}
+          PGPASSWORD: ${{ env.READ_MODEL_SQL_PASSWORD }}
+          PGHOST: ${{ env.READ_MODEL_SQL_HOST }}
+          PGPORT: ${{ env.READ_MODEL_SQL_PORT }}
           PGDATABASE: ${{ vars.READ_MODEL_SQL_DB_NAME }}
         run: |
           $SCRIPTS_FOLDER/truncateSQLTables.sh
