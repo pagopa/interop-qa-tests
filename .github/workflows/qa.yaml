@@ -136,6 +136,8 @@ jobs:
       K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE }}
       EVENT_STORE_HOST: ${{ secrets.EVENT_STORE_HOST }}
       EVENT_STORE_DB_NAME: ${{ vars.EVENT_STORE_DB_NAME }}
+      READ_MODEL_SQL_HOST: ${{ secrets.READ_MODEL_SQL_HOST }}
+      READ_MODEL_SQL_DB_NAME: ${{ vars.READ_MODEL_SQL_DB_NAME }}
       EVENT_STORE_PORT: 5432
       LOCAL_ATTRIBUTE_REGISTRY_DUMPS: "./db_dumps/attribute_registry"
       LOCAL_ATTRIBUTE_REGISTRY_SCHEMA_NAME: "${{ vars.K8S_NAMESPACE }}_attribute_registry"
