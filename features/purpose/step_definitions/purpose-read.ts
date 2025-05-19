@@ -16,20 +16,6 @@ When("l'utente richiede la lettura della finalità", async function () {
   );
 });
 
-Then("si ottiene status code 200 ma non l'analisi del rischio", function () {
-  assertContextSchema(this, {
-    response: z.object({
-      status: z.number(),
-      data: z.object({
-        riskAnalysis: z.unknown(),
-      }),
-    }),
-  });
-
-  assert.equal(this.response.status, 200);
-  assert.equal(this.response.data.riskAnalysis, undefined);
-});
-
 Then(
   "si ottiene status code 200 ma l'analisi del rischio solo per admin",
   function () {

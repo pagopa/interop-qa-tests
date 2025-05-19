@@ -4,12 +4,6 @@
 
 set -euo pipefail
 
-export PGUSER=$EVENT_STORE_USERNAME
-export PGPASSWORD=$EVENT_STORE_PASSWORD
-export PGHOST=$EVENT_STORE_HOST
-export PGPORT=$EVENT_STORE_PORT
-export PGDATABASE=$EVENT_STORE_DB_NAME
-
 PSQL_BIN=psql
 
 echo "psql version" $($PSQL_BIN --version)

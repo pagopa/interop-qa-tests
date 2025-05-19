@@ -16,16 +16,14 @@ When(
       clientId: z.string(),
     });
 
-    this.response = await apiClient.clients.createKeys(
+    this.response = await apiClient.clients.createKey(
       this.clientId,
-      [
-        {
-          use: "SIG",
-          alg: "RS256",
-          name: `key-${this.TEST_SEED}-${getRandomInt()}`,
-          key: createBase64PublicKey(keyType),
-        },
-      ],
+      {
+        use: "SIG",
+        alg: "RS256",
+        name: `key-${this.TEST_SEED}-${getRandomInt()}`,
+        key: createBase64PublicKey(keyType),
+      },
       getAuthorizationHeader(this.token)
     );
   }
@@ -39,16 +37,14 @@ When(
       clientId: z.string(),
     });
 
-    this.response = await apiClient.clients.createKeys(
+    this.response = await apiClient.clients.createKey(
       this.clientId,
-      [
-        {
-          use: "SIG",
-          alg: "RS256",
-          name: `key-${this.TEST_SEED}-${getRandomInt()}`,
-          key: createBase64PublicKey(keyType, keyLength),
-        },
-      ],
+      {
+        use: "SIG",
+        alg: "RS256",
+        name: `key-${this.TEST_SEED}-${getRandomInt()}`,
+        key: createBase64PublicKey(keyType, keyLength),
+      },
       getAuthorizationHeader(this.token)
     );
   }
@@ -62,16 +58,14 @@ When(
       clientId: z.string(),
     });
 
-    this.response = await apiClient.clients.createKeys(
+    this.response = await apiClient.clients.createKey(
       this.clientId,
-      [
-        {
-          use: "SIG",
-          alg: "RS256",
-          name: `key-${this.TEST_SEED}-${getRandomInt()}`,
-          key: createBase64PublicKey(keyType, keyLength, false),
-        },
-      ],
+      {
+        use: "SIG",
+        alg: "RS256",
+        name: `key-${this.TEST_SEED}-${getRandomInt()}`,
+        key: createBase64PublicKey(keyType, keyLength, false),
+      },
       getAuthorizationHeader(this.token)
     );
   }
@@ -87,16 +81,14 @@ When(
       clientId: z.string(),
     });
 
-    this.response = await apiClient.clients.createKeys(
+    this.response = await apiClient.clients.createKey(
       this.clientId,
-      [
-        {
-          use: "SIG",
-          alg: "RS256",
-          name: `key-${this.TEST_SEED}-${getRandomInt()}`,
-          key: this.key,
-        },
-      ],
+      {
+        use: "SIG",
+        alg: "RS256",
+        name: `key-${this.TEST_SEED}-${getRandomInt()}`,
+        key: this.key,
+      },
       getAuthorizationHeader(this.token)
     );
   }

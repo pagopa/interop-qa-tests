@@ -12,6 +12,11 @@ on:
         required: true
         default: false
         type: boolean
+      purgeDynamoDBTables:
+        description: 'Purge DynamoDB tables used by auth-server'
+        required: false
+        default: false
+        type: boolean
       runDataPreparation:
         description: 'Data preparation (wipe + reload dump)'
         required: true
@@ -141,6 +146,8 @@ jobs:
       K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE }}
       EVENT_STORE_HOST: ${{ secrets.EVENT_STORE_HOST }}
       EVENT_STORE_DB_NAME: ${{ vars.EVENT_STORE_DB_NAME }}
+      READ_MODEL_SQL_HOST: ${{ secrets.READ_MODEL_SQL_HOST }}
+      READ_MODEL_SQL_DB_NAME: ${{ vars.READ_MODEL_SQL_DB_NAME }}
       EVENT_STORE_PORT: 5432
       LOCAL_ATTRIBUTE_REGISTRY_DUMPS: "./db_dumps/attribute_registry"
       LOCAL_ATTRIBUTE_REGISTRY_SCHEMA_NAME: "${{ vars.K8S_NAMESPACE }}_attribute_registry"
@@ -151,7 +158,8 @@ jobs:
       LOCAL_TENANT_TAG_TABLE_NAME: "event_tag"
       MAX_POLLING_TRIES: "${{ vars.MAX_POLLING_TRIES }}"
       POLLING_SLEEP_TIME: "${{ vars.POLLING_SLEEP_TIME }}"
-
+      DYNAMODB_PLATFORM_STATES_TABLE: ${{ vars.platformStatesTableName }}
+      DYNAMODB_TOKEN_GEN_STATES_TABLE: ${{ vars.tokenGenStatesTableName }}
     steps:
       - name: Checkout
         id: checkout
@@ -224,6 +232,32 @@ jobs:
             echo "EVENT_STORE_USERNAME=$EVENT_STORE_USERNAME" >> "$GITHUB_ENV"
             echo "EVENT_STORE_PASSWORD=$EVENT_STORE_PASSWORD" >> "$GITHUB_ENV"
 
+      - name: Get Read Model SQL DB Credentials
+        id: get_readmodel_sql_db_credentials
+        if: ${{ vars.READ_MODEL_SQL_DB_NAME != '' }}
+        env:
+          READ_MODEL_SQL_SECRET_ARN: ${{ secrets.EVENT_STORE_SECRET_ARN }}
+        shell: bash
+        run: |
+            set -euo pipefail
+
+            echo "Retrieving Read Model SQL credentials..."
+            
+            READ_MODEL_SQL_CREDENTIALS="$(aws secretsmanager get-secret-value --secret-id $READ_MODEL_SQL_SECRET_ARN)"
+            #echo "::add-mask::$READ_MODEL_SQL_CREDENTIALS"
+            
+            echo "Retrieve Read Model SQL username"
+            READ_MODEL_SQL_USERNAME="$(echo $READ_MODEL_SQL_CREDENTIALS | jq -r '.SecretString | fromjson | .username')"
+            echo "::add-mask::$READ_MODEL_SQL_USERNAME"
+            
+            echo "Retrieve Read Model SQL password"
+            READ_MODEL_SQL_PASSWORD="$(echo $READ_MODEL_SQL_CREDENTIALS | jq -r '.SecretString | fromjson | .password')"
+            echo "::add-mask::$READ_MODEL_SQL_PASSWORD"
+            
+            echo "Update env vars with Read Model SQL credentials"
+            echo "READ_MODEL_SQL_USERNAME=$READ_MODEL_SQL_USERNAME" >> "$GITHUB_ENV"
+            echo "READ_MODEL_SQL_PASSWORD=$READ_MODEL_SQL_PASSWORD" >> "$GITHUB_ENV"
+
       - name: Get ReadModel DB Credentials
         id: get_readmodel_db_credentials
         env:
@@ -252,8 +286,27 @@ jobs:
       - name: Truncate EventStore DB Tables
         id: event_store_db_truncate
         shell: bash
+        env:
+          PGUSER: ${{ env.EVENT_STORE_USERNAME }}
+          PGPASSWORD: ${{ env.EVENT_STORE_PASSWORD }}
+          PGHOST: ${{ env.EVENT_STORE_HOST }}
+          PGPORT: ${{ env.EVENT_STORE_PORT }}
+          PGDATABASE: ${{ vars.EVENT_STORE_DB_NAME }}
         run: |
-          $SCRIPTS_FOLDER/truncateEventStore.sh
+          $SCRIPTS_FOLDER/truncateSQLTables.sh
+
+      - name: Truncate ReadModel SQL DB Tables
+        id: read_model_sql_db_truncate
+        if: ${{ vars.READ_MODEL_SQL_DB_NAME != '' }}
+        shell: bash
+        env:
+          PGUSER: ${{ env.READ_MODEL_SQL_USERNAME }}
+          PGPASSWORD: ${{ env.READ_MODEL_SQL_PASSWORD }}
+          PGHOST: ${{ env.READ_MODEL_SQL_HOST }}
+          PGPORT: ${{ env.READ_MODEL_SQL_PORT }}
+          PGDATABASE: ${{ vars.READ_MODEL_SQL_DB_NAME }}
+        run: |
+          $SCRIPTS_FOLDER/truncateSQLTables.sh
 
       - name: Clear ReadModel Collections
         id: read_model_db_clear
@@ -298,6 +351,26 @@ jobs:
 
           npm run kafka:createTopics
 
+      - name: Purge DynamoDB Tables
+        id: purge_dynamodb
+        if: ${{ always() && inputs.purgeDynamoDBTables }}
+        env:
+          AWS_REGION: ${{ secrets.AWS_REGION}}
+          PLATFORM_STATES_TABLE_NAME: ${{ vars.PLATFORM_STATES_TABLE_NAME }}
+          TOKEN_GENERATION_TABLE_NAME: ${{ vars.TOKEN_GENERATION_TABLE_NAME }}
+        run: |
+          set -euo pipefail
+          
+          echo "Starting ${PLATFORM_STATES_TABLE_NAME} DynamoDB table purge..."
+          ./scripts/purge-dynamodb-tables.sh  "${PLATFORM_STATES_TABLE_NAME}"
+          echo "${PLATFORM_STATES_TABLE_NAME} table purged successfully"
+            
+          echo "Starting ${TOKEN_GENERATION_TABLE_NAME} DynamoDB table purge..."
+          ./scripts/purge-dynamodb-tables.sh  "${TOKEN_GENERATION_TABLE_NAME}"
+          echo "${TOKEN_GENERATION_TABLE_NAME} DynamoDB tables purged successfully"
+            
+          echo "DynamoDB tables purged successfully"
+            
       - name: Restore Dump
         id: db_dump_restore
         shell: bash
@@ -345,14 +418,18 @@ jobs:
       AUTHORIZATION_SERVER_TOKEN_CREATION_URL: ${{ vars.AUTHORIZATION_SERVER_TOKEN_CREATION_URL }}
       CLIENT_ASSERTION_JWT_AUDIENCE: ${{ vars.CLIENT_ASSERTION_JWT_AUDIENCE }}
     steps:
-      - name: Clone QA test repo
-        id: clone_qa_repo
-        shell: bash
-        run: |
-          echo "Cloning interop-qa-tests repo.."
-          git clone --branch main --depth 1 ${{ vars.QA_TESTS_REPO_URL }}
-          echo "interop-qa-tests repo has been cloned"
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: ./package.json
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+        with:
+          run_install: true
 
       - name: Run QA tests
         id: run_qa_tests
@@ -360,7 +437,6 @@ jobs:
         run: |
           set -uo pipefail
           
-          cd interop-qa-tests
           echo "Install node dependencies"
           pnpm i
           
@@ -402,7 +478,7 @@ jobs:
 
   delete_runner:
     name: Delete Self-Hosted Runner
-    needs: [create_runner, svc_version_check, data_prep, run_js_test, run_java_test]
+    needs: [create_runner, svc_version_check, data_prep, run_js_test, run_java_test]    
     if: ${{ always() }}
     runs-on: ubuntu-22.04
     strategy:
