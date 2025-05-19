@@ -30,7 +30,7 @@ Feature: Listing e-service producers
     When l'utente richiede una operazione di listing degli erogatori con limit 2
     Then si ottiene status code 200 e la lista di 2 aderenti
 
-  @tenant_e_service_producers_listing3
+  @tenant_e_service_producers_listing3 @to_check
   Scenario Outline: A fronte di più aderenti in db e una richiesta con offset, restituisce il corretto numero di risultati (scopo del test è verificare il corretto funzionamento del parametro offset)
     Given l'utente è un "admin" di "PA1"
     Given "PA1" ha già creato e pubblicato 1 e-service
@@ -39,7 +39,7 @@ Feature: Listing e-service producers
     When l'utente richiede una operazione di listing degli erogatori con offset 2
     Then si ottiene status code 200 e il giusto numero di erogatori in base all'offset richiesto
 
-  @tenant_e_service_producers_listing4
+  @tenant_e_service_producers_listing4 @to_check
   Scenario Outline: Restituisce gli aderenti che contengono la keyword "PagoPA" all'interno del nome, con ricerca case insensitive (scopo del test è verificare che funzioni il filtro q)
     Given l'utente è un "admin" di "PA1"
     Given "GSP" ha già creato e pubblicato 1 e-service
