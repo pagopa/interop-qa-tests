@@ -23,6 +23,18 @@ Feature: Lettura richiesta di fruizione
       | GSP     | security     |
       | GSP     | api,security |
       | GSP     | support      |
+  
+  @agreement_read1a
+  Scenario Outline: Per una richiesta di fruizione, la quale è in stato REJECTED, precedentemente creata da un ente diverso da quello richiedente la lettura, non va a buon fine
+    Given l'utente è un "<ruolo>" di "<ente>"
+    Given "PA1" ha già creato un e-service in stato "PUBLISHED" con approvazione "MANUAL"
+    Given "GSP" ha già creato e inviato una richiesta di fruizione per quell'e-service ed è in attesa di approvazione
+    Given "PA1" ha già rifiutato quella richiesta di fruizione
+    When l'utente richiede una operazione di lettura di quell'agreement
+    Then si ottiene status code 403
+
+    Examples: 
+      | ente    | ruolo        |
       | Privato | admin        |
       | Privato | api          |
       | Privato | security     |
@@ -60,9 +72,9 @@ Feature: Lettura richiesta di fruizione
       | GSP          | PA2               | PA1           |
 
   @agreement_read4
-  Scenario Outline: Per una richiesta di fruizione precedentemente creata dall’ente, la quale è in stato ACTIVE, alla richiesta di lettura da parte di un ente nè fruitore nè erogatore, va a buon fine
+  Scenario Outline: Per una richiesta di fruizione precedentemente creata dall’ente, la quale è in stato ACTIVE, alla richiesta di lettura da parte di un ente nè fruitore nè erogatore, non va a buon fine
     Given l'utente è un "admin" di "PA1"
     Given "GSP" ha già creato un e-service in stato "PUBLISHED" con approvazione "AUTOMATIC"
     Given "PA2" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
     When l'utente richiede una operazione di lettura di quell'agreement
-    Then si ottiene status code 200
+    Then si ottiene status code 403

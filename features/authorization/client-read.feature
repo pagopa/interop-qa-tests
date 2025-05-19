@@ -5,7 +5,7 @@ Feature: Lettura client singolo
   @client_read1
   Scenario Outline: Tutti gli utenti possono leggere un client appartenente al proprio ente. La richiesta va a buon fine
     Given l'utente è un "<ruolo>" di "<ente>"
-    Given "PA1" ha già creato 1 client "CONSUMER"
+    Given "<ente>" ha già creato 1 client "CONSUMER"
     When l'utente richiede una operazione di lettura di quel client
     Then si ottiene status code <statusCode>
 
@@ -42,12 +42,12 @@ Feature: Lettura client singolo
     When l'utente richiede una operazione di lettura di quel client
     Then si ottiene status code 200
 
-  @client_read4 @wait_for_fix @PIN-4934
-  Scenario Outline: Un utente security legge un client di un ente al quale è stato associato, ma del quale non è membro. Ottiene un errore
+  @client_read4
+  Scenario Outline: Un utente security legge un client di un ente al quale è stato associato, ma del quale non è membro. La richiesta va a buon fine
     Given l'utente è un "security" di "PA1"
     Given "PA1" ha già creato 1 client "CONSUMER"
     When l'utente richiede una operazione di lettura di quel client
-    Then si ottiene status code 400
+    Then si ottiene status code 200
 
   @client_read5
   Scenario Outline: Un utente support legge un client di un ente per il quale sta operando. La richiesta va a buon fine
@@ -64,8 +64,8 @@ Feature: Lettura client singolo
     Then si ottiene status code 403
 
   @client_read7
-  Scenario Outline: A fronte di una richiesta di lettura da parte di un ente, di un client creato da un altro ente, la richiesta va a buon fine
+  Scenario Outline: A fronte di una richiesta di lettura da parte di un ente, di un client creato da un altro ente, la richiesta non  va a buon fine
     Given l'utente è un "admin" di "PA1"
     Given "PA2" ha già creato 1 client "CONSUMER"
     When l'utente richiede una operazione di lettura di quel client
-    Then si ottiene status code 200
+    Then si ottiene status code 403

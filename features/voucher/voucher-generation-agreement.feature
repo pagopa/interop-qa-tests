@@ -119,7 +119,7 @@ Scenario Outline: La generazione del Voucher va a buon fine quando la richiesta 
     When l'utente richiede la generazione del voucher
     Then si ottiene la corretta generazione del voucher
 
-@voucher_generation_agreement8 @wait_for_fix @PIN-5405
+@voucher_generation_agreement8
 Scenario Outline: La generazione del Voucher va a buon fine quando la richiesta di fruizione attiva subisce un upgrade verso una Versione dell’EService più recente, e la richiesta rimane in attesa di approvazione
     Given l'utente è un "admin" di "PA1"
     Given "PA2" ha già creato e pubblicato 1 e-service
@@ -136,7 +136,7 @@ Scenario Outline: La generazione del Voucher va a buon fine quando la richiesta 
     When l'utente richiede la generazione del voucher 
     Then si ottiene la corretta generazione del voucher
 
-@voucher_generation_agreement9 @wait_for_fix @PIN-5405
+@voucher_generation_agreement9
 Scenario Outline: La generazione del Voucher va a buon fine quando la richiesta di fruizione attiva subisce un upgrade verso una Versione dell’EService più recente, e la richiesta passa in attesa di approvazione e poi approvata dall’erogatore
     Given l'utente è un "admin" di "PA1"
     Given "PA2" ha già creato e pubblicato 1 e-service
@@ -156,7 +156,7 @@ Scenario Outline: La generazione del Voucher va a buon fine quando la richiesta 
     When l'utente richiede la generazione del voucher
     Then si ottiene la corretta generazione del voucher
 
-@voucher_generation_agreement10 @wait_for_fix @PIN-5405
+@voucher_generation_agreement10
 Scenario Outline: La generazione del Voucher va a buon fine quando la richiesta di fruizione attiva subisce un upgrade verso una Versione dell’EService più recente, e la richiesta passa in attesa di approvazione e poi rifiutata dall’erogatore
     Given l'utente è un "admin" di "PA1"
     Given "PA2" ha già creato e pubblicato 1 e-service

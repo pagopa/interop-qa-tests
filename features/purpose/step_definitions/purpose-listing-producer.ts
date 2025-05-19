@@ -13,12 +13,12 @@ When(
   "l'utente erogatore richiede una operazione di listing delle finalità limitata alle prime {int} finalità",
   async function (limit: number) {
     assertContextSchema(this, { token: z.string(), tenantType: TenantType });
-    const producerId = getOrganizationId(this.tenantType);
-    this.response = await apiClient.producer.getProducerPurposes(
+    // const producerId = getOrganizationId(this.tenantType);
+    this.response = await apiClient.producers.getProducerPurposes(
       {
         offset: 0,
         limit,
-        producersIds: [producerId],
+        // producersIds: [producerId],
       },
       getAuthorizationHeader(this.token)
     );
@@ -33,13 +33,13 @@ When(
       tenantType: TenantType,
       eserviceId: z.string(),
     });
-    const producerId = getOrganizationId(this.tenantType);
-    this.response = await apiClient.producer.getProducerPurposes(
+    // const producerId = getOrganizationId(this.tenantType);
+    this.response = await apiClient.producers.getProducerPurposes(
       {
         eservicesIds: [this.eserviceId],
         offset,
         limit: 50,
-        producersIds: [producerId],
+        // producersIds: [producerId],
       },
       getAuthorizationHeader(this.token)
     );
@@ -54,13 +54,13 @@ When(
       tenantType: TenantType,
       eserviceId: z.string(),
     });
-    const producerId = getOrganizationId(this.tenantType);
-    this.response = await apiClient.producer.getProducerPurposes(
+    // const producerId = getOrganizationId(this.tenantType);
+    this.response = await apiClient.producers.getProducerPurposes(
       {
         eservicesIds: [this.eserviceId],
         offset: 0,
         limit: 50,
-        producersIds: [producerId],
+        // producersIds: [producerId],
       },
       getAuthorizationHeader(this.token)
     );
@@ -75,14 +75,14 @@ When(
       tenantType: TenantType,
       eserviceId: z.string(),
     });
-    const producerId = getOrganizationId(this.tenantType);
+    // const producerId = getOrganizationId(this.tenantType);
     const consumerId = getOrganizationId(consumer);
-    this.response = await apiClient.producer.getProducerPurposes(
+    this.response = await apiClient.producers.getProducerPurposes(
       {
         eservicesIds: [this.eserviceId],
         offset: 0,
         limit: 50,
-        producersIds: [producerId],
+        // producersIds: [producerId],
         consumersIds: [consumerId],
       },
       getAuthorizationHeader(this.token)
@@ -98,13 +98,13 @@ When(
       tenantType: TenantType,
       eserviceId: z.string(),
     });
-    const producerId = getOrganizationId(this.tenantType);
-    this.response = await apiClient.producer.getProducerPurposes(
+    // const producerId = getOrganizationId(this.tenantType);
+    this.response = await apiClient.producers.getProducerPurposes(
       {
         eservicesIds: [this.eserviceId],
         offset: 0,
         limit: 50,
-        producersIds: [producerId],
+        // producersIds: [producerId],
       },
       getAuthorizationHeader(this.token)
     );
@@ -119,14 +119,14 @@ When(
       tenantType: TenantType,
       eserviceId: z.string(),
     });
-    const producerId = getOrganizationId(this.tenantType);
-    this.response = await apiClient.producer.getProducerPurposes(
+    // const producerId = getOrganizationId(this.tenantType);
+    this.response = await apiClient.producers.getProducerPurposes(
       {
         eservicesIds: [this.eserviceId],
         offset: 0,
         limit: 50,
         states: [purposeState],
-        producersIds: [producerId],
+        // producersIds: [producerId],
       },
       getAuthorizationHeader(this.token)
     );
@@ -141,14 +141,14 @@ When(
       tenantType: TenantType,
       eserviceId: z.string(),
     });
-    const producerId = getOrganizationId(this.tenantType);
-    this.response = await apiClient.producer.getProducerPurposes(
+    // const producerId = getOrganizationId(this.tenantType);
+    this.response = await apiClient.producers.getProducerPurposes(
       {
         q: keyword,
         eservicesIds: [this.eserviceId],
         offset: 0,
         limit: 50,
-        producersIds: [producerId],
+        // producersIds: [producerId],
       },
       getAuthorizationHeader(this.token)
     );

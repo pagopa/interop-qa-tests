@@ -36,7 +36,7 @@ Feature: Caricamento di una chiave pubblica contenuta in un client
     When l'utente richiede il caricamento di una chiave pubblica di tipo "NON-RSA" di lunghezza 2048
     Then si ottiene status code 400
 
-  @client_key_upload4 @wait_for_fix @PIN-5143
+  @client_key_upload4
   Scenario Outline: Un utente admin; appartenente all'ente che ha creato il client; il quale utente è membro del client; richiede il caricamento di una chiave pubblica di tipo RSA, lunghezza inferiore a 2048. Ottiene un errore
     Given l'utente è un "admin" di "PA1"
     Given "PA1" ha già creato 1 client "CONSUMER"

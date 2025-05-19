@@ -7,7 +7,9 @@ import {
   assertContextSchema,
   getAuthorizationHeader,
   getOrganizationId,
+  getRandomInt,
   makePolling,
+  sleep,
 } from "../../../utils/commons";
 import { apiClient } from "../../../api";
 
@@ -15,7 +17,7 @@ Given(
   "{string} ha già inserito una mail di contatto",
   async function (tenantType: TenantType) {
     assertContextSchema(this, { token: z.string() });
-    this.email = "test@pagopa.it";
+    this.email = `${getRandomInt()}test@pagopa.it`;
     const tenantId = getOrganizationId(tenantType);
     await dataPreparationService.addEmailToTenant(this.token, tenantId, {
       address: this.email,
@@ -45,7 +47,7 @@ When(
   "l'utente richiede una operazione di aggiunta di una mail di contatto senza description",
   async function () {
     assertContextSchema(this, { token: z.string(), tenantType: TenantType });
-    this.email = `${this.TEST_SEED}@pagopa.it`;
+    this.email = `${this.TEST_SEED}${getRandomInt()}@pagopa.it`;
     const tenantId = getOrganizationId(this.tenantType);
     this.response = await apiClient.tenants.addTenantMail(
       tenantId,
@@ -62,7 +64,7 @@ When(
   "l'utente richiede una operazione di aggiornamento della mail di contatto senza description",
   async function () {
     assertContextSchema(this, { token: z.string(), tenantType: TenantType });
-    this.email = `${this.TEST_SEED}@pagopa.it`;
+    this.email = `${this.TEST_SEED}}@pagopa.it`;
     this.tenantId = getOrganizationId(this.tenantType);
     this.response = await apiClient.tenants.addTenantMail(
       this.tenantId,
@@ -122,3 +124,7 @@ Then(
     assert.equal(updatedMail, this.email);
   }
 );
+
+Then("aspetta che si aggiorni il readmodel", async function () {
+  await sleep(3000);
+});
