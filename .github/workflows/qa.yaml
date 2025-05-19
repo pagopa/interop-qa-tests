@@ -142,6 +142,8 @@ jobs:
       K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE }}
       EVENT_STORE_HOST: ${{ secrets.EVENT_STORE_HOST }}
       EVENT_STORE_DB_NAME: ${{ vars.EVENT_STORE_DB_NAME }}
+      READ_MODEL_SQL_HOST: ${{ secrets.READ_MODEL_SQL_HOST }}
+      READ_MODEL_SQL_DB_NAME: ${{ vars.READ_MODEL_SQL_DB_NAME }}
       EVENT_STORE_PORT: 5432
       LOCAL_ATTRIBUTE_REGISTRY_DUMPS: "./db_dumps/attribute_registry"
       LOCAL_ATTRIBUTE_REGISTRY_SCHEMA_NAME: "${{ vars.K8S_NAMESPACE }}_attribute_registry"
@@ -226,6 +228,32 @@ jobs:
             echo "EVENT_STORE_USERNAME=$EVENT_STORE_USERNAME" >> "$GITHUB_ENV"
             echo "EVENT_STORE_PASSWORD=$EVENT_STORE_PASSWORD" >> "$GITHUB_ENV"
 
+      - name: Get Read Model SQL DB Credentials
+        id: get_readmodel_sql_db_credentials
+        if: ${{ vars.READ_MODEL_SQL_DB_NAME != '' }}
+        env:
+          READ_MODEL_SQL_SECRET_ARN: ${{ secrets.EVENT_STORE_SECRET_ARN }}
+        shell: bash
+        run: |
+            set -euo pipefail
+
+            echo "Retrieving Read Model SQL credentials..."
+            
+            READ_MODEL_SQL_CREDENTIALS="$(aws secretsmanager get-secret-value --secret-id $READ_MODEL_SQL_SECRET_ARN)"
+            #echo "::add-mask::$READ_MODEL_SQL_CREDENTIALS"
+            
+            echo "Retrieve Read Model SQL username"
+            READ_MODEL_SQL_USERNAME="$(echo $READ_MODEL_SQL_CREDENTIALS | jq -r '.SecretString | fromjson | .username')"
+            echo "::add-mask::$READ_MODEL_SQL_USERNAME"
+            
+            echo "Retrieve Read Model SQL password"
+            READ_MODEL_SQL_PASSWORD="$(echo $READ_MODEL_SQL_CREDENTIALS | jq -r '.SecretString | fromjson | .password')"
+            echo "::add-mask::$READ_MODEL_SQL_PASSWORD"
+            
+            echo "Update env vars with Read Model SQL credentials"
+            echo "READ_MODEL_SQL_USERNAME=$READ_MODEL_SQL_USERNAME" >> "$GITHUB_ENV"
+            echo "READ_MODEL_SQL_PASSWORD=$READ_MODEL_SQL_PASSWORD" >> "$GITHUB_ENV"
+
       - name: Get ReadModel DB Credentials
         id: get_readmodel_db_credentials
         env:
@@ -254,8 +282,27 @@ jobs:
       - name: Truncate EventStore DB Tables
         id: event_store_db_truncate
         shell: bash
+        env:
+          PGUSER: ${{ env.EVENT_STORE_USERNAME }}
+          PGPASSWORD: ${{ env.EVENT_STORE_PASSWORD }}
+          PGHOST: ${{ env.EVENT_STORE_HOST }}
+          PGPORT: ${{ env.EVENT_STORE_PORT }}
+          PGDATABASE: ${{ vars.EVENT_STORE_DB_NAME }}
         run: |
-          $SCRIPTS_FOLDER/truncateEventStore.sh
+          $SCRIPTS_FOLDER/truncateSQLTables.sh
+
+      - name: Truncate ReadModel SQL DB Tables
+        id: read_model_sql_db_truncate
+        if: ${{ vars.READ_MODEL_SQL_DB_NAME != '' }}
+        shell: bash
+        env:
+          PGUSER: ${{ env.READ_MODEL_SQL_USERNAME }}
+          PGPASSWORD: ${{ env.READ_MODEL_SQL_PASSWORD }}
+          PGHOST: ${{ env.READ_MODEL_SQL_HOST }}
+          PGPORT: ${{ env.READ_MODEL_SQL_PORT }}
+          PGDATABASE: ${{ vars.READ_MODEL_SQL_DB_NAME }}
+        run: |
+          $SCRIPTS_FOLDER/truncateSQLTables.sh
 
       - name: Clear ReadModel Collections
         id: read_model_db_clear
