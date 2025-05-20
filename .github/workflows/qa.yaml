@@ -44,9 +44,9 @@ on:
         default: main
         type: string
       strictVersionCheck:
-        description: 'Set to "true" to skip the version-check step'
+        description: 'Set to "false" to disable the version-check step'
         required: false
-        default: false
+        default: true
         type: boolean
 
 
@@ -110,7 +110,7 @@ jobs:
   svc_version_check:
     name: Check Deployed Versions
     needs: create_runner
-    if: ${{ inputs.strictVersionCheck != 'true' }}
+    if: ${{ inputs.strictVersionCheck == 'true' }}
     runs-on: [self-hosted, "run_id:${{ inputs.environment }}-${{ github.run_id }}"]
     environment: ${{ inputs.environment }}
     steps:
