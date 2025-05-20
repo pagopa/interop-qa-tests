@@ -119,7 +119,7 @@ When(
 );
 
 When(
-  "l'utente crea una nuova finalità per quell'e-service con tutti i campi richiesti correttamente formattati, con un'analisi del rischio parzialmente compilata ma formattata correttamente",
+  "l'utente crea una nuova finalità per quell'e-service con tutti i campi richiesti correttamente formattati, con un'analisi del rischio parzialmente compilata",
   async function () {
     assertContextSchema(this, {
       token: z.string(),
@@ -150,7 +150,7 @@ When(
 );
 
 When(
-  "l'utente crea una nuova finalità per quell'e-service con tutti i campi richiesti correttamente formattati, con un'analisi del rischio parzialmente compilata, formattata correttamente, ma con un template datato",
+  "l'utente crea una nuova finalità per quell'e-service con tutti i campi richiesti correttamente formattati, con un'analisi del rischio correttamente compilata ma con un template datato",
   async function () {
     assertContextSchema(this, {
       token: z.string(),
@@ -160,7 +160,7 @@ When(
 
     const consumerId = getOrganizationId(this.tenantType);
     const { riskAnalysisForm } = await dataPreparationService.getRiskAnalysis({
-      completed: false,
+      completed: true,
       tenantType: this.tenantType,
     });
 
