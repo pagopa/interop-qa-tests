@@ -12,11 +12,6 @@ on:
         required: true
         default: false
         type: boolean
-      purgeDynamoDBTables:
-        description: 'Purge DynamoDB tables used by auth-server'
-        required: false
-        default: false
-        type: boolean
       runDataPreparation:
         description: 'Data preparation (wipe + reload dump)'
         required: true
@@ -347,9 +342,9 @@ jobs:
 
           npm run kafka:createTopics
 
-      - name: Purge DynamoDB Tables
+      - name: Purge Auth-Server DynamoDB Tables
         id: purge_dynamodb
-        if: ${{ always() && inputs.purgeDynamoDBTables }}
+        if: ${{ always() }}
         env:
           AWS_REGION: ${{ secrets.AWS_REGION}}
           PLATFORM_STATES_TABLE_NAME: ${{ vars.PLATFORM_STATES_TABLE_NAME }}
