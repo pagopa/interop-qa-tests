@@ -444,6 +444,10 @@ jobs:
       ENVIRONMENT: ${{ vars.ENVIRONMENT }}
       ST_VERBOSE_MODE: ${{ vars.ST_VERBOSE_MODE }}
 
+      #REDSHIFT_URL: ${{ secrets.REDSHIFT_URL }}
+      REDSHIFT_USERNAME: ${{ secrets.REDSHIFT_USERNAME }}
+      REDSHIFT_PASSWORD: ${{ secrets.REDSHIFT_PASSWORD }}
+
     steps:
       - name: Set up Maven
         uses: s4u/setup-maven-action@6d44c18d67d9e1549907b8815efa5e4dada1801b # v1.12.0
@@ -465,7 +469,7 @@ jobs:
         run: |
           set -uo pipefail
           echo "Running tests..."
-          cd ./pn-b2b-client/interop-qa-tests && mvn -Dtest=it.pagopa.pn.interop.cucumber.${{ inputs.javaTestSuite }} clean verify
+          cd ./pn-b2b-client/interop-qa-tests && mvn -Dtest=it.pagopa.pn.interop.cucumber.${{ inputs.javaTestSuite }} -Dspring.datasource.username=${{ REDSHIFT_USERNAME }} -Dspring.datasource.password=${{ REDSHIFT_PASSWORD }} clean verify
 
   delete_runner:
     name: Delete Self-Hosted Runner
