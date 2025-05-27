@@ -38,6 +38,11 @@ on:
         required: false
         default: main
         type: string
+      strictVersionCheck:
+        description: 'Set to "false" to disable the version-check step'
+        required: false
+        default: true
+        type: boolean
 
 
 defaults:
@@ -97,39 +102,38 @@ jobs:
             ecs_task_sec_group: ${{ secrets.SEC_GROUP_ID }}
             pat_token: ${{ secrets.BOT_TOKEN }}
 
-#  svc_version_check:
-#    name: Check Deployed Versions
-#    needs: create_runner
-#    if: ${{ inputs.environment == 'qa' || inputs.environment == 'es1-qa' }}
-#    runs-on: [self-hosted, "run_id:${{ inputs.environment }}-${{ github.run_id }}"]
-#    environment: ${{ inputs.environment }}
-#    steps:
-#      - name: Checkout
-#        id: checkout
-#        uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3
-#
-#      - name: Get plat-dep versions
-#        run: |
-#          curl ${{ vars.PLAT_DEP_VERSIONS_URL }} > plat_dep_versions.sh
-#
-#      - name: Set kubeconfig
-#        run: |
-#            aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name ${{ secrets.EKS_CLUSTER_NAME }}
-#
-#      - name: Check deployed versions
-#        id: check_svc_version
-#        shell: bash
-#        env:
-#            AWS_REGION: ${{ secrets.AWS_REGION}}
-#            EKS_CLUSTER_NAME: ${{ secrets.EKS_CLUSTER_NAME}}
-#            K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE }}
-#        run: |
-#           $SCRIPTS_FOLDER/checkSvcVersion.sh ./plat_dep_versions.sh
+  svc_version_check:
+    name: Check Deployed Versions
+    needs: create_runner
+    if: ${{ inputs.strictVersionCheck == 'true' }}
+    runs-on: [self-hosted, "run_id:${{ inputs.environment }}-${{ github.run_id }}"]
+    environment: ${{ inputs.environment }}
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3
+
+      - name: Get plat-dep versions
+        run: |
+          curl ${{ vars.PLAT_DEP_VERSIONS_URL }} -o images.yaml
+
+      - name: Set kubeconfig
+        run: |
+            aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name ${{ secrets.EKS_CLUSTER_NAME }}
+
+      - name: Check deployed versions
+        id: check_svc_version
+        shell: bash
+        env:
+            AWS_REGION: ${{ secrets.AWS_REGION}}
+            EKS_CLUSTER_NAME: ${{ secrets.EKS_CLUSTER_NAME}}
+            K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE }}
+        run: |
+           $SCRIPTS_FOLDER/checkSvcVersion.sh images.yaml
   
   data_prep:
     name: Data Preparation
-#   needs: [svc_version_check, create_runner]
-    needs: [create_runner]
+    needs: [svc_version_check, create_runner]
     runs-on: [self-hosted, "run_id:${{ inputs.environment }}-${{ github.run_id }}"]
     environment: ${{ inputs.environment }}
     if: ${{ always() && inputs.runDataPreparation && needs.create_runner.result == 'success' }}
@@ -188,15 +192,24 @@ jobs:
 
             echo "Delete active jobs"
             kubectl delete jobs -n $K8S_NAMESPACE --all
-                 
+            
             echo "Waiting for pods deletion"
-            ACTIVE_PODS_COUNT=$(kubectl get pods -n $K8S_NAMESPACE -o json | jq '.items | length')
+            ACTIVE_PODS_COUNT=$(
+              kubectl get pods -n "$K8S_NAMESPACE" -o json \
+                | jq '[ .items[]
+                       | select(.metadata.ownerReferences[]?.kind=="ReplicaSet")
+                     ] | length'
+            )
             while [[ $ACTIVE_PODS_COUNT -gt 0 ]]; do
               sleep 2 
-              ACTIVE_PODS_COUNT=$(kubectl get pods -n $K8S_NAMESPACE -o json | jq '.items | length')
+              ACTIVE_PODS_COUNT=$(
+                kubectl get pods -n "$K8S_NAMESPACE" -o json \
+                  | jq '[ .items[]
+                         | select(.metadata.ownerReferences[]?.kind=="ReplicaSet")
+                       ] | length'
+              )
             done
-          
-            echo "All the deployments have been scaled down to 0 replicas."
+            echo "All the deployments have been scaled down to 0 replicas."    
 
       - name: Get EventStore DB Credentials
         id: get_evtstore_db_credentials
@@ -469,8 +482,7 @@ jobs:
 
   delete_runner:
     name: Delete Self-Hosted Runner
-#   needs: [create_runner, svc_version_check, data_prep, run_js_test, run_java_test]    
-    needs: [create_runner, data_prep, run_js_test, run_java_test]
+    needs: [create_runner, svc_version_check, data_prep, run_js_test, run_java_test]    
     if: ${{ always() }}
     runs-on: ubuntu-22.04
     strategy:
