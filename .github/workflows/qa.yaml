@@ -197,15 +197,24 @@ jobs:
 
             echo "Delete active jobs"
             kubectl delete jobs -n $K8S_NAMESPACE --all
-                 
+            
             echo "Waiting for pods deletion"
-            ACTIVE_PODS_COUNT=$(kubectl get pods -n $K8S_NAMESPACE -o json | jq '.items | length')
+            ACTIVE_PODS_COUNT=$(
+              kubectl get pods -n "$K8S_NAMESPACE" -o json \
+                | jq '[ .items[]
+                       | select(.metadata.ownerReferences[]?.kind=="ReplicaSet")
+                     ] | length'
+            )
             while [[ $ACTIVE_PODS_COUNT -gt 0 ]]; do
               sleep 2 
-              ACTIVE_PODS_COUNT=$(kubectl get pods -n $K8S_NAMESPACE -o json | jq '.items | length')
+              ACTIVE_PODS_COUNT=$(
+                kubectl get pods -n "$K8S_NAMESPACE" -o json \
+                  | jq '[ .items[]
+                         | select(.metadata.ownerReferences[]?.kind=="ReplicaSet")
+                       ] | length'
+              )
             done
-          
-            echo "All the deployments have been scaled down to 0 replicas."
+            echo "All the deployments have been scaled down to 0 replicas."    
 
       - name: Get EventStore DB Credentials
         id: get_evtstore_db_credentials
