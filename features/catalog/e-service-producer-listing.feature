@@ -2,7 +2,7 @@
 Feature: Listing e-services lato erogatore
   Tutti gli utenti autenticati di enti erogatori possono ottenere la lista dei propri e-service erogati
 
-  @producer_listing1 @to_fix
+  @producer_listing1
   Scenario Outline: Restituisce gli e-service erogati dall’ente
     Given l'utente è un "<ruolo>" di "<ente>"
     Given "<ente>" ha già creato 5 e-services in catalogo in stato PUBLISHED o SUSPENDED e 1 in stato DRAFT
