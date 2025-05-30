@@ -48,7 +48,7 @@ Feature: Listing e-service consumers
     Then si ottiene status code 200 e il giusto numero di fruitori in base all'offset richiesto
 
   @tenant_e_service_consumers_listing4 @to_fix
-  Scenario Outline: Restituisce gli aderenti che cwontengono la keyword "PagoPA" all'interno del nome, con ricerca case insensitive (scopo del test è verificare che funzioni il filtro q)
+  Scenario Outline: Restituisce gli aderenti che contengono la keyword "PagoPA" all'interno del nome, con ricerca case insensitive (scopo del test è verificare che funzioni il filtro q)
     Given l'utente è un "admin" di "PA1"
     Given "PA1" ha già creato e pubblicato 1 e-service
     Given "GSP" ha una richiesta di fruizione in stato "ACTIVE" per quell'e-service
