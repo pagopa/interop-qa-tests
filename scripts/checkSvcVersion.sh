@@ -2,41 +2,37 @@
 set -euo pipefail
 
 file=$1
-declare -A svc_arr
-
-if [ -f "$file" ]
-then
-    echo "$file found."
-    
-    while IFS='=' read -r key value
-    do
-      # Skip comments / empty lines / job services 
-      if [[ $key == "#"* ]] || [[ -z $key ]] || [[ $key == "JOB"* ]]; then
-        continue;
-      fi
-     
-      #Transform key - Example "AGREEMENT_MANAGEMENT_IMAGE_VERSION" -> "agreement-management"
-      SVC_KEY_TRANSFORMED=$(echo $key|  sed 's/_IMAGE_VERSION//g' | sed 's/\_/\-/g' | tr '[:upper:]' '[:lower:]' )
-      svc_arr[$SVC_KEY_TRANSFORMED]=$(echo $value | sed 's/\"//g')
-      
-    done < "$file"
-else
-  echo "$file not found."
+# check that the images YAML file exists
+if [[ ! -f "$file" ]]; then
+  echo "Error: $file not found."
+  exit 1
 fi
 
-DEPLOYED_SERVICES=$(kubectl get deployments -n $K8S_NAMESPACE | awk '{if (NR!=1) print $1}')
 ROLLOUT_ERROR=0
 
-for CURRENT_SVC in $DEPLOYED_SERVICES
-do
-    if [[ $CURRENT_SVC == "interop-"* ]]; then
-        TRANSFORMED_CURRENT_SVC=$(echo $CURRENT_SVC | sed 's/interop-//g' | sed 's/be-//g')
+# query Kubernetes cluster for deployment names and their container images excluding headers
+kubectl get deployments -n "$K8S_NAMESPACE" --no-headers \
+  -o custom-columns=NAME:.metadata.name,IMAGE:.spec.template.spec.containers[0].image | \
+while read -r NAME IMAGE; do
 
-        if [[ ! -v svc_arr[$TRANSFORMED_CURRENT_SVC] ]]; then
-          echo  "::warning::WARNING - " $CURRENT_SVC  " currently deployed version " $SVC_VERSION " not in list"
-          continue
-        fi
-       
+  # only process deployments starting with interop-
+  [[ $NAME != interop-* ]] && continue
+
+  # extract tag from IMAGE column (after the last ':')
+  CURRENT_VERSION=${IMAGE##*:}
+
+  # strip 'interop-' and 'be-' prefixes to match YAML keys
+  TRANSFORMED=$(echo "$NAME" | sed 's/^interop-//; s/^be-//')
+
+  # retrieve expected tag from YAML using yq; empty if not found
+  EXPECTED=$(yq e ".images.microservices.\"$TRANSFORMED\".tag // \"\"" "$file")
+
+  # warn and skip if service is not listed in the YAML images file
+  if [[ -z "$EXPECTED" ]]; then
+    echo "::warning::WARNING - $NAME current deployed version $CURRENT_VERSION not in list"
+    continue
+  fi
+
         # TODO: refactor using readiness
         # kubectl rollout status --watch=false -n $K8S_NAMESPACE deployment/$CURRENT_SVC > /dev/null
         # SVC_ROLLOUT_STATUS=$?
@@ -47,15 +43,14 @@ do
         #   ROLLOUT_ERROR=1
         # fi
 
-        SVC_VERSION=$(kubectl get deployment -n $K8S_NAMESPACE $CURRENT_SVC -o jsonpath='{$.spec.template.spec.containers[:1].image}' | tr \: \\t | awk '{print $2}')
+  # compare current and expected versions
+  if [[ "$CURRENT_VERSION" != "$EXPECTED" ]]; then
+    echo "::error::ERROR - $NAME current deployed version: $CURRENT_VERSION - expected: $EXPECTED - KO"
+    ROLLOUT_ERROR=1
+  else
+    echo "INFO - $NAME current deployed version: $CURRENT_VERSION - OK"
+  fi
 
-        if [[ ${svc_arr[$TRANSFORMED_CURRENT_SVC]} != $SVC_VERSION ]]; then
-          echo "::error::ERROR - " $CURRENT_SVC " currently deployed version " $SVC_VERSION " - expected " ${svc_arr[$TRANSFORMED_CURRENT_SVC]} " - KO "
-          ROLLOUT_ERROR=1
-        else
-          echo "INFO -" $CURRENT_SVC "currently deployed version " $SVC_VERSION
-        fi
-    fi
 done
 
 exit $ROLLOUT_ERROR
