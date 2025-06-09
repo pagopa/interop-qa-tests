@@ -37,7 +37,7 @@ Feature: Listing e-service consumers
     When l'utente richiede una operazione di listing dei fruitori con limit 2
     Then si ottiene status code 200 e la lista di 2 aderenti
 
-  @tenant_e_service_consumers_listing3 @to_check
+  @tenant_e_service_consumers_listing3
   Scenario Outline: A fronte di più aderenti in db e una richiesta con offset, restituisce il corretto numero di risultati (scopo del test è verificare il corretto funzionamento del parametro offset)
     Given l'utente è un "admin" di "PA1"
     Given "PA1" ha già creato e pubblicato 1 e-service
@@ -47,7 +47,7 @@ Feature: Listing e-service consumers
     When l'utente richiede una operazione di listing dei fruitori con offset 2
     Then si ottiene status code 200 e il giusto numero di fruitori in base all'offset richiesto
 
-  @tenant_e_service_consumers_listing4 @to_check
+  @tenant_e_service_consumers_listing4 @to_fix
   Scenario Outline: Restituisce gli aderenti che contengono la keyword "PagoPA" all'interno del nome, con ricerca case insensitive (scopo del test è verificare che funzioni il filtro q)
     Given l'utente è un "admin" di "PA1"
     Given "PA1" ha già creato e pubblicato 1 e-service
