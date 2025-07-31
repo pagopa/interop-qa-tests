@@ -480,6 +480,13 @@ jobs:
           echo "Running tests..."
           cd ./pn-b2b-client/interop-qa-tests && mvn -Dtest=it.pagopa.pn.interop.cucumber.${{ inputs.javaTestSuite }} clean verify
 
+      - name: Upload Cucumber Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: cucumber-report
+          path: target/cucumber-report.html
+          retention-days: 10
+
   delete_runner:
     name: Delete Self-Hosted Runner
     needs: [create_runner, svc_version_check, data_prep, run_js_test, run_java_test]    
