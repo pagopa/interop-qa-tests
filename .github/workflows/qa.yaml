@@ -481,6 +481,7 @@ jobs:
           cd ./pn-b2b-client/interop-qa-tests && mvn -Dtest=it.pagopa.pn.interop.cucumber.${{ inputs.javaTestSuite }} clean verify
 
       - name: Upload Cucumber Report
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: cucumber-report
