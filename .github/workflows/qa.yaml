@@ -480,10 +480,10 @@ jobs:
           echo "Running tests..."
           echo "ENVIRONMENT is: ${ENVIRONMENT}"
 
-          if [[ "${ENVIRONMENT}" == *dev* ]]; then
-            SPRING_PROFILE="-Dspring.profiles.active=dev"
-          else
+          if [[ "${ENVIRONMENT}" == *qa* ]]; then
             SPRING_PROFILE="-Dspring.profiles.active=qa"
+          else
+            SPRING_PROFILE="-Dspring.profiles.active=dev"
           fi
 
           echo "Using Spring profile: ${SPRING_PROFILE}"
