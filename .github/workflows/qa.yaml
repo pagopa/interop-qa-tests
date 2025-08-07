@@ -478,7 +478,17 @@ jobs:
         run: |
           set -uo pipefail
           echo "Running tests..."
-          cd ./pn-b2b-client/interop-qa-tests && mvn -Dtest=it.pagopa.pn.interop.cucumber.${{ inputs.javaTestSuite }} clean verify
+          echo "ENVIRONMENT is: ${ENVIRONMENT}"
+
+          if [[ "${ENVIRONMENT}" == *dev* ]]; then
+            SPRING_PROFILE="-Dspring.profiles.active=dev"
+          else
+            SPRING_PROFILE="-Dspring.profiles.active=qa"
+          fi
+
+          echo "Using Spring profile: ${SPRING_PROFILE}"
+
+          cd ./pn-b2b-client/interop-qa-tests && mvn $SPRING_PROFILE -Dtest=it.pagopa.pn.interop.cucumber.${{ inputs.javaTestSuite }} clean verify
 
       - name: Upload Cucumber Report
         if: always()
