@@ -262,31 +262,6 @@ jobs:
             echo "READ_MODEL_SQL_USERNAME=$READ_MODEL_SQL_USERNAME" >> "$GITHUB_ENV"
             echo "READ_MODEL_SQL_PASSWORD=$READ_MODEL_SQL_PASSWORD" >> "$GITHUB_ENV"
 
-      - name: Get ReadModel DB Credentials
-        id: get_readmodel_db_credentials
-        env:
-          READ_MODEL_SECRET_ARN: ${{ secrets.READ_MODEL_SECRET_ARN }}
-        shell: bash
-        run: |
-            set -euo pipefail
-
-            echo "Retrieving read model credentials..."
-            
-            READ_MODEL_CREDENTIALS="$(aws secretsmanager get-secret-value --secret-id $READ_MODEL_SECRET_ARN)"
-            #echo "::add-mask::$READ_MODEL_CREDENTIALS"
-            
-            echo "Retrieve ReadModel username"
-            READ_MODEL_USERNAME="$(echo $READ_MODEL_CREDENTIALS | jq -r '.SecretString | fromjson | .username')"
-            echo "::add-mask::$READ_MODEL_USERNAME"
-
-            echo "Retrieve ReadModel password"
-            READ_MODEL_PASSWORD="$(echo $READ_MODEL_CREDENTIALS | jq -r '.SecretString | fromjson | .password')"
-            echo "::add-mask::$READ_MODEL_PASSWORD"
-            
-            echo "Update env vars with ReadModel credentials"
-            echo "READ_MODEL_USERNAME=$READ_MODEL_USERNAME" >> "$GITHUB_ENV"
-            echo "READ_MODEL_PASSWORD=$READ_MODEL_PASSWORD" >> "$GITHUB_ENV"
-
       - name: Truncate EventStore DB Tables
         id: event_store_db_truncate
         shell: bash
@@ -311,18 +286,6 @@ jobs:
           PGDATABASE: ${{ vars.READ_MODEL_SQL_DB_NAME }}
         run: |
           $SCRIPTS_FOLDER/truncateSQLTables.sh
-
-      - name: Clear ReadModel Collections
-        id: read_model_db_clear
-        shell: bash
-        env:
-          READ_MODEL_HOST: ${{ secrets.READ_MODEL_HOST }}
-          READ_MODEL_PORT: 27017
-          READ_MODEL_USERNAME: ${{ env.READ_MODEL_USERNAME }}
-          READ_MODEL_PASSWORD: ${{ env.READ_MODEL_PASSWORD }}
-          READ_MODEL_DB_NAME: ${{ vars.READ_MODEL_DB_NAME }}
-        run: |
-          $SCRIPTS_FOLDER/deleteReadModelItems.sh
 
       - name: Checkout Kafka tools
         id: kafka_tools
