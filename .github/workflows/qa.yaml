@@ -489,7 +489,15 @@ jobs:
 
           echo "Using Spring profile: ${SPRING_PROFILE}"
 
-          cd ./pn-b2b-client/interop-qa-tests && mvn $SPRING_PROFILE -Dtest=it.pagopa.pn.interop.cucumber.${{ inputs.javaTestSuite }} clean verify
+          cd ./pn-b2b-client/interop-qa-tests
+          mvn $SPRING_PROFILE -Dtest=it.pagopa.pn.interop.cucumber.${{ inputs.javaTestSuite }} clean verify > qa-tests.log 2>&1
+
+      - name: Upload QA test logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qa-tests-log
+          path: ./pn-b2b-client/interop-qa-tests/qa-tests.log
 
       - name: Upload Cucumber Report
         if: always()
