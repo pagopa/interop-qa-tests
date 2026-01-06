@@ -130,7 +130,7 @@ jobs:
             K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE }}
         run: |
            $SCRIPTS_FOLDER/checkSvcVersion.sh images.yaml
-  
+
   data_prep:
     name: Data Preparation
     needs: [svc_version_check, create_runner]
@@ -179,7 +179,7 @@ jobs:
             aws s3 cp "s3://${{ vars.DATA_PREPARATION_BUCKET }}/${{ vars.TENANT_DUMP_S3_PREFIX }}" $LOCAL_TENANT_DUMPS --recursive
             aws s3 cp "s3://${{ vars.DATA_PREPARATION_BUCKET }}/${{ vars.ATTRIBUTE_REGISTRY_DUMP_S3_PREFIX }}" $LOCAL_ATTRIBUTE_REGISTRY_DUMPS --recursive
 
-      - name: Scale service Deployments to 0
+      - name: Scale down Deployments
         id: svc_scale_to_0
         shell: bash
         run: |
@@ -187,12 +187,17 @@ jobs:
 
             aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name ${{ secrets.EKS_CLUSTER_NAME }}
 
+            for scaledobject in $(kubectl get scaledobjects -n $K8S_NAMESPACE -o jsonpath='{.items[*].metadata.name}'); do
+              echo "Pausing ScaledObject: $scaledobject"
+              kubectl annotate scaledobject $scaledobject -n $K8S_NAMESPACE autoscaling.keda.sh/paused="true" --overwrite
+            done
+
             echo "Scaling deployments to 0"
             kubectl scale deployment -n $K8S_NAMESPACE --replicas=0 --all
 
             echo "Delete active jobs"
             kubectl delete jobs -n $K8S_NAMESPACE --all
-            
+
             echo "Waiting for pods deletion"
             ACTIVE_PODS_COUNT=$(
               kubectl get pods -n "$K8S_NAMESPACE" -o json \
@@ -201,7 +206,7 @@ jobs:
                      ] | length'
             )
             while [[ $ACTIVE_PODS_COUNT -gt 0 ]]; do
-              sleep 2 
+              sleep 2
               ACTIVE_PODS_COUNT=$(
                 kubectl get pods -n "$K8S_NAMESPACE" -o json \
                   | jq '[ .items[]
@@ -209,7 +214,7 @@ jobs:
                        ] | length'
               )
             done
-            echo "All the deployments have been scaled down to 0 replicas."    
+            echo "All the deployments have been scaled down to 0 replicas."
 
       - name: Get EventStore DB Credentials
         id: get_evtstore_db_credentials
@@ -220,18 +225,18 @@ jobs:
             set -euo pipefail
 
             echo "Retrieving event store credentials..."
-            
+
             EVENT_STORE_CREDENTIALS="$(aws secretsmanager get-secret-value --secret-id $EVENT_STORE_SECRET_ARN)"
             #echo "::add-mask::$EVENT_STORE_CREDENTIALS"
-            
+
             echo "Retrieve EventStore username"
             EVENT_STORE_USERNAME="$(echo $EVENT_STORE_CREDENTIALS | jq -r '.SecretString | fromjson | .username')"
             echo "::add-mask::$EVENT_STORE_USERNAME"
-            
+
             echo "Retrieve EventStore password"
             EVENT_STORE_PASSWORD="$(echo $EVENT_STORE_CREDENTIALS | jq -r '.SecretString | fromjson | .password')"
             echo "::add-mask::$EVENT_STORE_PASSWORD"
-            
+
             echo "Update env vars with EventStore credentials"
             echo "EVENT_STORE_USERNAME=$EVENT_STORE_USERNAME" >> "$GITHUB_ENV"
             echo "EVENT_STORE_PASSWORD=$EVENT_STORE_PASSWORD" >> "$GITHUB_ENV"
@@ -246,46 +251,21 @@ jobs:
             set -euo pipefail
 
             echo "Retrieving Read Model SQL credentials..."
-            
+
             READ_MODEL_SQL_CREDENTIALS="$(aws secretsmanager get-secret-value --secret-id $READ_MODEL_SQL_SECRET_ARN)"
             #echo "::add-mask::$READ_MODEL_SQL_CREDENTIALS"
-            
+
             echo "Retrieve Read Model SQL username"
             READ_MODEL_SQL_USERNAME="$(echo $READ_MODEL_SQL_CREDENTIALS | jq -r '.SecretString | fromjson | .username')"
             echo "::add-mask::$READ_MODEL_SQL_USERNAME"
-            
+
             echo "Retrieve Read Model SQL password"
             READ_MODEL_SQL_PASSWORD="$(echo $READ_MODEL_SQL_CREDENTIALS | jq -r '.SecretString | fromjson | .password')"
             echo "::add-mask::$READ_MODEL_SQL_PASSWORD"
-            
+
             echo "Update env vars with Read Model SQL credentials"
             echo "READ_MODEL_SQL_USERNAME=$READ_MODEL_SQL_USERNAME" >> "$GITHUB_ENV"
             echo "READ_MODEL_SQL_PASSWORD=$READ_MODEL_SQL_PASSWORD" >> "$GITHUB_ENV"
-
-      - name: Get ReadModel DB Credentials
-        id: get_readmodel_db_credentials
-        env:
-          READ_MODEL_SECRET_ARN: ${{ secrets.READ_MODEL_SECRET_ARN }}
-        shell: bash
-        run: |
-            set -euo pipefail
-
-            echo "Retrieving read model credentials..."
-            
-            READ_MODEL_CREDENTIALS="$(aws secretsmanager get-secret-value --secret-id $READ_MODEL_SECRET_ARN)"
-            #echo "::add-mask::$READ_MODEL_CREDENTIALS"
-            
-            echo "Retrieve ReadModel username"
-            READ_MODEL_USERNAME="$(echo $READ_MODEL_CREDENTIALS | jq -r '.SecretString | fromjson | .username')"
-            echo "::add-mask::$READ_MODEL_USERNAME"
-
-            echo "Retrieve ReadModel password"
-            READ_MODEL_PASSWORD="$(echo $READ_MODEL_CREDENTIALS | jq -r '.SecretString | fromjson | .password')"
-            echo "::add-mask::$READ_MODEL_PASSWORD"
-            
-            echo "Update env vars with ReadModel credentials"
-            echo "READ_MODEL_USERNAME=$READ_MODEL_USERNAME" >> "$GITHUB_ENV"
-            echo "READ_MODEL_PASSWORD=$READ_MODEL_PASSWORD" >> "$GITHUB_ENV"
 
       - name: Truncate EventStore DB Tables
         id: event_store_db_truncate
@@ -311,18 +291,6 @@ jobs:
           PGDATABASE: ${{ vars.READ_MODEL_SQL_DB_NAME }}
         run: |
           $SCRIPTS_FOLDER/truncateSQLTables.sh
-
-      - name: Clear ReadModel Collections
-        id: read_model_db_clear
-        shell: bash
-        env:
-          READ_MODEL_HOST: ${{ secrets.READ_MODEL_HOST }}
-          READ_MODEL_PORT: 27017
-          READ_MODEL_USERNAME: ${{ env.READ_MODEL_USERNAME }}
-          READ_MODEL_PASSWORD: ${{ env.READ_MODEL_PASSWORD }}
-          READ_MODEL_DB_NAME: ${{ vars.READ_MODEL_DB_NAME }}
-        run: |
-          $SCRIPTS_FOLDER/deleteReadModelItems.sh
 
       - name: Checkout Kafka tools
         id: kafka_tools
@@ -364,45 +332,78 @@ jobs:
           TOKEN_GENERATION_TABLE_NAME: ${{ vars.TOKEN_GENERATION_TABLE_NAME }}
         run: |
           set -euo pipefail
-          
+
           echo "Starting ${PLATFORM_STATES_TABLE_NAME} DynamoDB table purge..."
           ./scripts/purge-dynamodb-tables.sh  "${PLATFORM_STATES_TABLE_NAME}"
           echo "${PLATFORM_STATES_TABLE_NAME} table purged successfully"
-            
+
           echo "Starting ${TOKEN_GENERATION_TABLE_NAME} DynamoDB table purge..."
           ./scripts/purge-dynamodb-tables.sh  "${TOKEN_GENERATION_TABLE_NAME}"
           echo "${TOKEN_GENERATION_TABLE_NAME} DynamoDB tables purged successfully"
-            
+
           echo "DynamoDB tables purged successfully"
-            
+
       - name: Restore Dump
         id: db_dump_restore
         shell: bash
         run: |
           $SCRIPTS_FOLDER/restoreEventStore.sh
 
-      - name: Scale service Deployments to 1
+      - name: Scale up Deployments
         id: svc_scale_to_1
         shell: bash
         run: |
           set -euo pipefail
-          
-          echo "Scaling deployments to 1 replica"
-          kubectl scale deployment -n $K8S_NAMESPACE --replicas=1 --all
 
-          PODS_NOT_READY_COUNT=$(kubectl get pods -n "$K8S_NAMESPACE" -o json | 
-          jq '[ .items[] | select(.status.phase != "Running" or ([ .status.conditions[] | select(.type == "Ready" and .state == false) ] | length ) == 1 ) ] | length')
-
-          echo "Waiting for pods readiness"
-          while [[ $PODS_NOT_READY_COUNT -gt 0 ]]; do
-            sleep 2
-           
-            PODS_NOT_READY_COUNT=$(kubectl get pods -n "$K8S_NAMESPACE" -o json | 
-              jq '[ .items[] | select(.status.phase != "Running" or ([ .status.conditions[] | select(.type == "Ready" and .state == false) ] | length ) == 1 ) ] | length')
+          for scaledobject in $(kubectl get scaledobjects -n $K8S_NAMESPACE -o jsonpath='{.items[*].metadata.name}'); do
+            echo "Resuming ScaledObject: $scaledobject"
+            kubectl annotate scaledobject $scaledobject -n $K8S_NAMESPACE autoscaling.keda.sh/paused-
           done
-        
-          echo "All the deployments have been scaled up to 1 replicas."
-  
+
+          echo "Waiting for ScaledObject polling interval (30s)"
+          sleep 35
+
+          start_time=$(date +%s)
+
+          echo "Waiting for all Deployments to be ready"
+          TIMEOUT_SECONDS=300
+          while true; do
+            deployments=$(kubectl get deployments -n $K8S_NAMESPACE -o jsonpath='{.items[*].metadata.name}')
+
+            if [ -z "$deployments" ]; then
+              echo "No deployments found in namespace $K8S_NAMESPACE, exiting"
+              exit 1
+            fi
+
+            all_ready=true
+            for deployment in $deployments; do
+              replicas_info=$(kubectl get deployment $deployment -n $K8S_NAMESPACE -o jsonpath='{.spec.replicas}{" "}{.status.readyReplicas}')
+              read -r desired ready <<< "$replicas_info"
+
+              desired=${desired:-0}
+              ready=${ready:-0}
+
+              if [ "$desired" -ne "$ready" ]; then
+                all_ready=false
+                break
+              fi
+            done
+
+            if [ "$all_ready" = true ]; then
+              echo "All deployments are ready"
+              exit 0
+            fi
+
+            current_time=$(date +%s)
+            elapsed=$((current_time - start_time))
+            if [ $elapsed -ge $TIMEOUT_SECONDS ]; then
+              echo "Timeout ${TIMEOUT_SECONDS}s elapsed"
+              exit 1
+            fi
+
+            sleep 2
+          done
+
   run_js_test:
     name: Run JavaScript Cucumber Test Suite
     if: ${{ always() && inputs.runJSTests }}
@@ -440,10 +441,10 @@ jobs:
         shell: bash
         run: |
           set -uo pipefail
-          
+
           echo "Install node dependencies"
           pnpm i
-          
+
           echo "Run test command"
           pnpm test
 
@@ -488,7 +489,15 @@ jobs:
 
           echo "Using Spring profile: ${SPRING_PROFILE}"
 
-          cd ./pn-b2b-client/interop-qa-tests && mvn $SPRING_PROFILE -Dtest=it.pagopa.pn.interop.cucumber.${{ inputs.javaTestSuite }} clean verify
+          cd ./pn-b2b-client/interop-qa-tests
+          mvn $SPRING_PROFILE -Dtest=it.pagopa.pn.interop.cucumber.${{ inputs.javaTestSuite }} clean verify > qa-tests.log 2>&1
+
+      - name: Upload QA test logs
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: qa-tests-log
+          path: ./pn-b2b-client/interop-qa-tests/qa-tests.log
 
       - name: Upload Cucumber Report
         if: always()
@@ -500,7 +509,7 @@ jobs:
 
   delete_runner:
     name: Delete Self-Hosted Runner
-    needs: [create_runner, svc_version_check, data_prep, run_js_test, run_java_test]    
+    needs: [create_runner, svc_version_check, data_prep, run_js_test, run_java_test]
     if: ${{ always() }}
     runs-on: ubuntu-22.04
     strategy:
