@@ -16,12 +16,17 @@ PSQL_BIN=psql
 
 echo "psql version" $($PSQL_BIN --version)
 
-for f in "$LOCAL_ATTRIBUTE_REGISTRY_DUMPS"/*; do 
+for f in "$LOCAL_ATTRIBUTE_REGISTRY_DUMPS"/*; do
   echo "EventStore: restoring dump $f"
   $PSQL_BIN --set ON_ERROR_STOP=on < "$f"
 done;
 
-for f in "$LOCAL_TENANT_DUMPS"/*; do 
+for f in "$LOCAL_TENANT_DUMPS"/*; do
+  echo "EventStore: restoring dump $f"
+  $PSQL_BIN --set ON_ERROR_STOP=on < "$f"
+done;
+
+for f in "$LOCAL_NOTIFICATION_CONFIG_DUMPS"/*; do
   echo "EventStore: restoring dump $f"
   $PSQL_BIN --set ON_ERROR_STOP=on < "$f"
 done;
