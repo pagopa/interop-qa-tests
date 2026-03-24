@@ -278,7 +278,7 @@ jobs:
           $SCRIPTS_FOLDER/truncateSQLTables.sh
 
       - name: Truncate InAppNotification SQL DB Tables
-        id: m2m_events_sql_db_truncate
+        id: in_app_notification_sql_db_truncate
         if: ${{ vars.IN_APP_NOTIFICATION_SQL_DB_NAME != '' }}
         shell: bash
         env:
