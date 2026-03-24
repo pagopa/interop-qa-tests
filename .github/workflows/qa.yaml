@@ -139,11 +139,8 @@ jobs:
     if: ${{ always() && inputs.runDataPreparation && needs.create_runner.result == 'success' }}
     env:
       K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE }}
-      EVENT_STORE_HOST: ${{ secrets.EVENT_STORE_HOST }}
-      EVENT_STORE_DB_NAME: ${{ vars.EVENT_STORE_DB_NAME }}
-      READ_MODEL_SQL_HOST: ${{ secrets.READ_MODEL_SQL_HOST }}
-      READ_MODEL_SQL_DB_NAME: ${{ vars.READ_MODEL_SQL_DB_NAME }}
-      EVENT_STORE_PORT: 5432
+      PLATFORM_DATA_HOST: ${{ secrets.EVENT_STORE_HOST }}
+      PLATFORM_DATA_PORT: 5432
       LOCAL_ATTRIBUTE_REGISTRY_DUMPS: "./db_dumps/attribute_registry"
       LOCAL_ATTRIBUTE_REGISTRY_TABLE_NAME: "events"
       LOCAL_TENANT_DUMPS: "./db_dumps/tenant"
@@ -217,65 +214,39 @@ jobs:
             done
             echo "All the deployments have been scaled down to 0 replicas."
 
-      - name: Get EventStore DB Credentials
-        id: get_evtstore_db_credentials
+      - name: Get Platform Data Credentials
+        id: get_platform_data_db_credentials
         env:
-          EVENT_STORE_SECRET_ARN: ${{ secrets.EVENT_STORE_SECRET_ARN }}
+          PLATFORM_DATA_SECRET_ARN: ${{ secrets.PLATFORM_DATA_SECRET_ARN }}
         shell: bash
         run: |
             set -euo pipefail
 
-            echo "Retrieving event store credentials..."
+            echo "Retrieving Platform Data credentials..."
 
-            EVENT_STORE_CREDENTIALS="$(aws secretsmanager get-secret-value --secret-id $EVENT_STORE_SECRET_ARN)"
-            #echo "::add-mask::$EVENT_STORE_CREDENTIALS"
+            PLATFORM_DATA_CREDENTIALS="$(aws secretsmanager get-secret-value --secret-id $PLATFORM_DATA_SECRET_ARN)"
+            echo "::add-mask::$PLATFORM_DATA_CREDENTIALS"
 
-            echo "Retrieve EventStore username"
-            EVENT_STORE_USERNAME="$(echo $EVENT_STORE_CREDENTIALS | jq -r '.SecretString | fromjson | .username')"
-            echo "::add-mask::$EVENT_STORE_USERNAME"
+            echo "Retrieve Platform Data username"
+            PLATFORM_DATA_USERNAME="$(jq -r '.SecretString | fromjson | .username' <<< "$PLATFORM_DATA_CREDENTIALS")"
+            echo "::add-mask::$PLATFORM_DATA_USERNAME"
 
-            echo "Retrieve EventStore password"
-            EVENT_STORE_PASSWORD="$(echo $EVENT_STORE_CREDENTIALS | jq -r '.SecretString | fromjson | .password')"
-            echo "::add-mask::$EVENT_STORE_PASSWORD"
+            echo "Retrieve Platform Data password"
+            PLATFORM_DATA_PASSWORD="$(jq -r '.SecretString | fromjson | .password' <<< "$PLATFORM_DATA_CREDENTIALS")"
+            echo "::add-mask::$PLATFORM_DATA_PASSWORD"
 
-            echo "Update env vars with EventStore credentials"
-            echo "EVENT_STORE_USERNAME=$EVENT_STORE_USERNAME" >> "$GITHUB_ENV"
-            echo "EVENT_STORE_PASSWORD=$EVENT_STORE_PASSWORD" >> "$GITHUB_ENV"
-
-      - name: Get Read Model SQL DB Credentials
-        id: get_readmodel_sql_db_credentials
-        if: ${{ vars.READ_MODEL_SQL_DB_NAME != '' }}
-        env:
-          READ_MODEL_SQL_SECRET_ARN: ${{ secrets.EVENT_STORE_SECRET_ARN }}
-        shell: bash
-        run: |
-            set -euo pipefail
-
-            echo "Retrieving Read Model SQL credentials..."
-
-            READ_MODEL_SQL_CREDENTIALS="$(aws secretsmanager get-secret-value --secret-id $READ_MODEL_SQL_SECRET_ARN)"
-            #echo "::add-mask::$READ_MODEL_SQL_CREDENTIALS"
-
-            echo "Retrieve Read Model SQL username"
-            READ_MODEL_SQL_USERNAME="$(echo $READ_MODEL_SQL_CREDENTIALS | jq -r '.SecretString | fromjson | .username')"
-            echo "::add-mask::$READ_MODEL_SQL_USERNAME"
-
-            echo "Retrieve Read Model SQL password"
-            READ_MODEL_SQL_PASSWORD="$(echo $READ_MODEL_SQL_CREDENTIALS | jq -r '.SecretString | fromjson | .password')"
-            echo "::add-mask::$READ_MODEL_SQL_PASSWORD"
-
-            echo "Update env vars with Read Model SQL credentials"
-            echo "READ_MODEL_SQL_USERNAME=$READ_MODEL_SQL_USERNAME" >> "$GITHUB_ENV"
-            echo "READ_MODEL_SQL_PASSWORD=$READ_MODEL_SQL_PASSWORD" >> "$GITHUB_ENV"
+            echo "Update env vars with Platform Data credentials"
+            echo "PLATFORM_DATA_USERNAME=$PLATFORM_DATA_USERNAME" >> "$GITHUB_ENV"
+            echo "PLATFORM_DATA_PASSWORD=$PLATFORM_DATA_PASSWORD" >> "$GITHUB_ENV"
 
       - name: Truncate EventStore DB Tables
         id: event_store_db_truncate
         shell: bash
         env:
-          PGUSER: ${{ env.EVENT_STORE_USERNAME }}
-          PGPASSWORD: ${{ env.EVENT_STORE_PASSWORD }}
-          PGHOST: ${{ env.EVENT_STORE_HOST }}
-          PGPORT: ${{ env.EVENT_STORE_PORT }}
+          PGUSER: ${{ env.PLATFORM_DATA_USERNAME }}
+          PGPASSWORD: ${{ env.PLATFORM_DATA_PASSWORD }}
+          PGHOST: ${{ env.PLATFORM_DATA_HOST }}
+          PGPORT: ${{ env.PLATFORM_DATA_PORT }}
           PGDATABASE: ${{ vars.EVENT_STORE_DB_NAME }}
         run: |
           $SCRIPTS_FOLDER/truncateSQLTables.sh
@@ -285,11 +256,37 @@ jobs:
         if: ${{ vars.READ_MODEL_SQL_DB_NAME != '' }}
         shell: bash
         env:
-          PGUSER: ${{ env.READ_MODEL_SQL_USERNAME }}
-          PGPASSWORD: ${{ env.READ_MODEL_SQL_PASSWORD }}
-          PGHOST: ${{ env.READ_MODEL_SQL_HOST }}
-          PGPORT: ${{ env.READ_MODEL_SQL_PORT }}
+          PGUSER: ${{ env.PLATFORM_DATA_SQL_USERNAME }}
+          PGPASSWORD: ${{ env.PLATFORM_DATA_SQL_PASSWORD }}
+          PGHOST: ${{ env.PLATFORM_DATA_SQL_HOST }}
+          PGPORT: ${{ env.PLATFORM_DATA_SQL_PORT }}
           PGDATABASE: ${{ vars.READ_MODEL_SQL_DB_NAME }}
+        run: |
+          $SCRIPTS_FOLDER/truncateSQLTables.sh
+
+      - name: Truncate M2MEvents SQL DB Tables
+        id: m2m_events_sql_db_truncate
+        if: ${{ vars.M2M_EVENTS_SQL_DB_NAME != '' }}
+        shell: bash
+        env:
+          PGUSER: ${{ env.PLATFORM_DATA_SQL_USERNAME }}
+          PGPASSWORD: ${{ env.PLATFORM_DATA_SQL_PASSWORD }}
+          PGHOST: ${{ env.PLATFORM_DATA_SQL_HOST }}
+          PGPORT: ${{ env.PLATFORM_DATA_SQL_PORT }}
+          PGDATABASE: ${{ vars.M2M_EVENTS_SQL_DB_NAME }}
+        run: |
+          $SCRIPTS_FOLDER/truncateSQLTables.sh
+
+      - name: Truncate InAppNotification SQL DB Tables
+        id: m2m_events_sql_db_truncate
+        if: ${{ vars.IN_APP_NOTIFICATION_SQL_DB_NAME != '' }}
+        shell: bash
+        env:
+          PGUSER: ${{ env.PLATFORM_DATA_SQL_USERNAME }}
+          PGPASSWORD: ${{ env.PLATFORM_DATA_SQL_PASSWORD }}
+          PGHOST: ${{ env.PLATFORM_DATA_SQL_HOST }}
+          PGPORT: ${{ env.PLATFORM_DATA_SQL_PORT }}
+          PGDATABASE: ${{ vars.IN_APP_NOTIFICATION_SQL_DB_NAME }}
         run: |
           $SCRIPTS_FOLDER/truncateSQLTables.sh
 
