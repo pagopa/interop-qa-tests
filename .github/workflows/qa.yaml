@@ -139,7 +139,7 @@ jobs:
     if: ${{ always() && inputs.runDataPreparation && needs.create_runner.result == 'success' }}
     env:
       K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE }}
-      PLATFORM_DATA_HOST: ${{ secrets.EVENT_STORE_HOST }}
+      PLATFORM_DATA_HOST: ${{ vars.PLATFORM_DATA_HOST }}
       PLATFORM_DATA_PORT: 5432
       LOCAL_ATTRIBUTE_REGISTRY_DUMPS: "./db_dumps/attribute_registry"
       LOCAL_ATTRIBUTE_REGISTRY_TABLE_NAME: "events"
