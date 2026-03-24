@@ -225,15 +225,12 @@ jobs:
             echo "Retrieving Platform Data credentials..."
 
             PLATFORM_DATA_CREDENTIALS="$(aws secretsmanager get-secret-value --secret-id $PLATFORM_DATA_SECRET_ARN)"
-            echo "::add-mask::$PLATFORM_DATA_CREDENTIALS"
 
             echo "Retrieve Platform Data username"
             PLATFORM_DATA_USERNAME="$(jq -r '.SecretString | fromjson | .username' <<< "$PLATFORM_DATA_CREDENTIALS")"
-            echo "::add-mask::$PLATFORM_DATA_USERNAME"
 
             echo "Retrieve Platform Data password"
             PLATFORM_DATA_PASSWORD="$(jq -r '.SecretString | fromjson | .password' <<< "$PLATFORM_DATA_CREDENTIALS")"
-            echo "::add-mask::$PLATFORM_DATA_PASSWORD"
 
             echo "Update env vars with Platform Data credentials"
             echo "PLATFORM_DATA_USERNAME=$PLATFORM_DATA_USERNAME" >> "$GITHUB_ENV"
