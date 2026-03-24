@@ -255,8 +255,8 @@ jobs:
         env:
           PGUSER: ${{ env.PLATFORM_DATA_SQL_USERNAME }}
           PGPASSWORD: ${{ env.PLATFORM_DATA_SQL_PASSWORD }}
-          PGHOST: ${{ env.PLATFORM_DATA_SQL_HOST }}
-          PGPORT: ${{ env.PLATFORM_DATA_SQL_PORT }}
+          PGHOST: ${{ env.PLATFORM_DATA_HOST }}
+          PGPORT: ${{ env.PLATFORM_DATA_PORT }}
           PGDATABASE: ${{ vars.READ_MODEL_SQL_DB_NAME }}
         run: |
           $SCRIPTS_FOLDER/truncateSQLTables.sh
@@ -268,8 +268,8 @@ jobs:
         env:
           PGUSER: ${{ env.PLATFORM_DATA_SQL_USERNAME }}
           PGPASSWORD: ${{ env.PLATFORM_DATA_SQL_PASSWORD }}
-          PGHOST: ${{ env.PLATFORM_DATA_SQL_HOST }}
-          PGPORT: ${{ env.PLATFORM_DATA_SQL_PORT }}
+          PGHOST: ${{ env.PLATFORM_DATA_HOST }}
+          PGPORT: ${{ env.PLATFORM_DATA_PORT }}
           PGDATABASE: ${{ vars.M2M_EVENTS_SQL_DB_NAME }}
         run: |
           $SCRIPTS_FOLDER/truncateSQLTables.sh
@@ -281,8 +281,8 @@ jobs:
         env:
           PGUSER: ${{ env.PLATFORM_DATA_SQL_USERNAME }}
           PGPASSWORD: ${{ env.PLATFORM_DATA_SQL_PASSWORD }}
-          PGHOST: ${{ env.PLATFORM_DATA_SQL_HOST }}
-          PGPORT: ${{ env.PLATFORM_DATA_SQL_PORT }}
+          PGHOST: ${{ env.PLATFORM_DATA_HOST }}
+          PGPORT: ${{ env.PLATFORM_DATA_PORT }}
           PGDATABASE: ${{ vars.IN_APP_NOTIFICATION_SQL_DB_NAME }}
         run: |
           $SCRIPTS_FOLDER/truncateSQLTables.sh
