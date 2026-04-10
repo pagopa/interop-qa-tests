@@ -2,7 +2,8 @@ name: QA workflow
 
 on:
   schedule:
-    - cron: '0 17 * * 1-5'  
+    - cron: '0 17 * * 1-5'
+      timezone: "Europe/Rome"
   workflow_dispatch:
     inputs:
       environment:
