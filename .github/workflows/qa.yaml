@@ -8,16 +8,17 @@ on:
       environment:
         description: 'Environment to run tests against'
         required: true
+        default: es1-qa
         type: environment
       kafkaPurgeTopics:
         description: 'Purge Kafka topics'
         required: true
-        default: false
+        default: true
         type: boolean
       runDataPreparation:
         description: 'Data preparation (wipe + reload dump)'
         required: true
-        default: false
+        default: true
         type: boolean
       runJSTests:
         description: 'Run JavaScript test suite'
@@ -28,17 +29,17 @@ on:
       runJavaTests:
         description: 'Run Java test in pn-b2b-client'
         required: true
-        default: false
+        default: true
         type: boolean
       javaTestSuite:
         description: 'Choose which Java test suite to run'
         required: false
-        default: NrtTest
+        default: NRTStandard
         type: string
       javaBranchName:
         description: 'Provide the branch name for pn-b2b-client to clone'
         required: false
-        default: main
+        default: develop
         type: string
       strictVersionCheck:
         description: 'Set to "false" to disable the version-check step'
