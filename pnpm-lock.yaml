@@ -39,7 +39,7 @@ importers:
         version: 9.0.2
       lodash:
         specifier: ^4.17.21
-        version: 4.17.23
+        version: 4.18.1
       openapi-fetch:
         specifier: ^0.8.2
         version: 0.8.2
@@ -1678,8 +1678,8 @@ packages:
   lodash@4.17.21:
     resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
 
-  lodash@4.17.23:
-    resolution: {integrity: sha512-LgVTMpQtIopCi79SJeDiP0TfWi5CNEc/L/aRdTh3yIvmZXTnheWpKjSZhnvMl8iXbC1tFg9gdHHDMLoV7CnG+w==}
+  lodash@4.18.1:
+    resolution: {integrity: sha512-dMInicTPVE8d1e5otfwmmjlxkZoUpiVLwyeTdUsi/Caj/gfzzblBcCE5sRHV/AsjuCmxWrte2TNGSYuCeCq+0Q==}
 
   long@4.0.0:
     resolution: {integrity: sha512-XsP+KhQif4bjX1kbuSiySJFNAehNxgLb6hPRGJ9QsUr8ajHkuXGdrHmFUTUUXhDwVX2R5bY4JNZEwbUiMhV+MA==}
@@ -3959,7 +3959,7 @@ snapshots:
       create-eslint-index: 1.0.0
       eslint: 8.55.0
       eslint-ast-utils: 1.1.0
-      lodash: 4.17.23
+      lodash: 4.18.1
       req-all: 0.1.0
 
   eslint-plugin-functional@4.4.1(eslint@8.55.0)(tsutils@3.21.0(typescript@5.3.3))(typescript@5.3.3):
@@ -4653,7 +4653,7 @@ snapshots:
 
   lodash@4.17.21: {}
 
-  lodash@4.17.23: {}
+  lodash@4.18.1: {}
 
   long@4.0.0: {}
 
