@@ -3,7 +3,7 @@ import { LogLevel } from "../models/types";
 
 export const DEFAULT_KAFKA_CLIENT_ID = "kafka-scripts";
 
-function normalizeEnvValues(envValue?: string): string[] {
+const normalizeEnvValues = (envValue?: string): string[] => {
   if (!envValue) {
     return [];
   }
@@ -12,7 +12,7 @@ function normalizeEnvValues(envValue?: string): string[] {
     .split(",")
     .map((value) => value.trim())
     .filter((value) => value.length > 0);
-}
+};
 
 const LogLevelSchema = z.preprocess((value) => {
   if (value === undefined || value === null || value === "") {
@@ -36,16 +36,16 @@ const LogLevelSchema = z.preprocess((value) => {
 
 export const ResetTopicsEnvSchema = z
   .object({
-    KAFKA_CLIENT_ID: z.string().optional(),
-    DOMAIN_TOPIC_PREFIX: z.string().optional(),
-    DOMAIN_TOPIC_EXCLUDE: z.string().optional(),
-    DEBEZIUM_OFFSETS_TOPIC: z.string().optional(),
-    KAFKA_BROKERS: z.string().optional(),
     AWS_REGION: z.string().optional(),
+    DEBEZIUM_OFFSETS_TOPIC: z.string().optional(),
+    DOMAIN_TOPIC_EXCLUDE: z.string().optional(),
+    DOMAIN_TOPIC_PREFIX: z.string().optional(),
     KAFKA_AUTH_MODE: z.enum(["aws-iam", "none"]).default("aws-iam"),
-    QUIET_MODE: z.string().optional().default("0"),
-    LOG_LEVEL: LogLevelSchema,
+    KAFKA_BROKERS: z.string().optional(),
+    KAFKA_CLIENT_ID: z.string().optional(),
     KAFKA_LOG_LEVEL: LogLevelSchema,
+    LOG_LEVEL: LogLevelSchema,
+    QUIET_MODE: z.string().optional().default("0"),
   })
   .superRefine((env, ctx) => {
     if (!env.DOMAIN_TOPIC_PREFIX && !env.DEBEZIUM_OFFSETS_TOPIC) {
@@ -69,24 +69,19 @@ export const ResetTopicsEnvSchema = z
         message: "Env var AWS_REGION cannot be null.",
       });
     }
-
-    if (!env.KAFKA_CLIENT_ID) {
-      env.KAFKA_CLIENT_ID = DEFAULT_KAFKA_CLIENT_ID;
-    }
   })
   .transform((env) => ({
-    kafkaClientId: env.KAFKA_CLIENT_ID,
-    includePrefixes: normalizeEnvValues(env.DOMAIN_TOPIC_PREFIX),
-    excludePrefixes: normalizeEnvValues(env.DOMAIN_TOPIC_EXCLUDE),
-    exactMatches: normalizeEnvValues(env.DEBEZIUM_OFFSETS_TOPIC),
-    brokers: normalizeEnvValues(env.KAFKA_BROKERS),
-    awsRegion: env.AWS_REGION,
     authMode: env.KAFKA_AUTH_MODE,
-    quietModeOn: env.QUIET_MODE === "1",
+    awsRegion: env.AWS_REGION,
+    brokers: normalizeEnvValues(env.KAFKA_BROKERS),
+    exactMatches: normalizeEnvValues(env.DEBEZIUM_OFFSETS_TOPIC),
+    excludePrefixes: normalizeEnvValues(env.DOMAIN_TOPIC_EXCLUDE),
+    includePrefixes: normalizeEnvValues(env.DOMAIN_TOPIC_PREFIX),
+    kafkaClientId: env.KAFKA_CLIENT_ID ?? DEFAULT_KAFKA_CLIENT_ID,
     logLevel: env.LOG_LEVEL,
-    kafkaLogLevel: env.KAFKA_LOG_LEVEL
+    kafkaLogLevel: env.KAFKA_LOG_LEVEL,
+    quietModeOn: env.QUIET_MODE === "1",
   }));
 
-  
 type ResetTopicsEnvSchema = z.infer<typeof ResetTopicsEnvSchema>;
 export const config: ResetTopicsEnvSchema = ResetTopicsEnvSchema.parse(process.env);

@@ -105,7 +105,6 @@ async function alignConsumerGroups(kafka: Kafka, admin: Admin, topics: string[])
     return;
   }
 
-  let recap = ``;
   for (const groupId of groupIds) {
     await resetConsumerGroupOffsetsToLatest(kafka, groupId, topicHighOffsetsByPartition);
     logDebug(`Checking consumer-group offset alignment for group: ${groupId}`);

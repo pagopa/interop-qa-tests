@@ -1,4 +1,3 @@
-import { config } from './../config/config';
 import { generateAuthToken } from "aws-msk-iam-sasl-signer-js";
 import { KafkaJS } from "@confluentinc/kafka-javascript";
 import { 
@@ -10,28 +9,29 @@ import {
   LogLevel,
   type ResetTopicSelectionOptions
 } from "../models/types";
+import { config } from './../config/config';
 
 
 export function createKafkaLogger(): KafkaJS.Logger {
-  let currentLogLevel = config.kafkaLogLevel
+  let currentLogLevel = config.kafkaLogLevel;
 
   const logger: KafkaJS.Logger = {
-    debug: (entry: any) => {
+    debug: (entry: unknown) => {
       if (currentLogLevel <= LogLevel.DEBUG) {
         logDebug(`[KAFKA] ${entry}`);
       }
     },
-    info: (entry: any) => {
+    info: (entry: unknown) => {
       if (currentLogLevel <= LogLevel.INFO) {
         logInfo(`[KAFKA] ${entry}`);
       }
     },
-    warn: (entry: any) => {
+    warn: (entry: unknown) => {
       if (currentLogLevel <= LogLevel.WARNING) {
         logWarning(`[KAFKA] ${entry}`);
       }
     },
-    error: (entry: any) => {
+    error: (entry: unknown) => {
       if (currentLogLevel <= LogLevel.ERROR) {
         logError(`[KAFKA] ${entry}`);
       }
