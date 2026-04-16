@@ -13,12 +13,10 @@ import {
   logInfo,
   logError,
   logDebug,
-  logWarning
+  logWarning,
 } from "./utilities/resetTopics";
 
-import { 
-  config
-} from "./config/config";
+import { config } from "./config/config";
 
 type Admin = KafkaJS.Admin;
 type Kafka = KafkaJS.Kafka;
@@ -33,7 +31,10 @@ type GroupTopicPartitionStatus = {
   aligned: boolean;
 };
 
-async function getTopicHighOffsetsByPartition(admin: Admin, topics: string[]): Promise<Map<string, Map<number, string>>> {
+async function getTopicHighOffsetsByPartition(
+  admin: Admin,
+  topics: string[]
+): Promise<Map<string, Map<number, string>>> {
   const byTopic = new Map<string, Map<number, string>>();
 
   for (const topic of topics) {
@@ -50,10 +51,17 @@ async function getTopicHighOffsetsByPartition(admin: Admin, topics: string[]): P
   return byTopic;
 }
 
-async function resetConsumerGroupOffsetsToLatest(kafka: Kafka, groupId: string, topicHighOffsetsByPartition: Map<string, Map<number, string>>): Promise<void> {
+async function resetConsumerGroupOffsetsToLatest(
+  kafka: Kafka,
+  groupId: string,
+  topicHighOffsetsByPartition: Map<string, Map<number, string>>
+): Promise<void> {
   const offsetsToCommit: TopicPartitionOffsetAndMetadata[] = [];
 
-  for (const [topic, highByPartition] of topicHighOffsetsByPartition.entries()) {
+  for (const [
+    topic,
+    highByPartition,
+  ] of topicHighOffsetsByPartition.entries()) {
     for (const [partition, offset] of highByPartition.entries()) {
       offsetsToCommit.push({
         topic,
@@ -72,23 +80,34 @@ async function resetConsumerGroupOffsetsToLatest(kafka: Kafka, groupId: string, 
     kafkaJS: {
       groupId,
       autoCommit: false,
-    }
+    },
   });
 
   try {
     await consumer.connect();
     await consumer.commitOffsets(offsetsToCommit);
-    logInfo(`Group ${groupId}: reset to latest committed on ${offsetsToCommit.length} topic-partitions.`);
+    logDebug(
+      `Group ${groupId}: reset to latest committed on ${offsetsToCommit.length} topic-partitions.`
+    );
   } finally {
     await consumer.disconnect();
   }
 }
 
-async function alignConsumerGroups(kafka: Kafka, admin: Admin, topics: string[]): Promise<void> {
-  const topicHighOffsetsByPartition: Map<string, Map<number, string>>  = await getTopicHighOffsetsByPartition(admin, topics);
+async function alignConsumerGroups(
+  kafka: Kafka,
+  admin: Admin,
+  topics: string[]
+): Promise<void> {
+  const topicHighOffsetsByPartition: Map<
+    string,
+    Map<number, string>
+  > = await getTopicHighOffsetsByPartition(admin, topics);
 
   if (!topicHighOffsetsByPartition.size) {
-    logWarning("No topic offsets available for consumer-group alignment check.");
+    logWarning(
+      "No topic offsets available for consumer-group alignment check."
+    );
     return;
   }
 
@@ -101,36 +120,69 @@ async function alignConsumerGroups(kafka: Kafka, admin: Admin, topics: string[])
   }
 
   for (const groupId of groupIds) {
-    await processConsumerGroup(kafka, admin, groupId, topicHighOffsetsByPartition);
+    await processConsumerGroup(
+      kafka,
+      admin,
+      groupId,
+      topicHighOffsetsByPartition
+    );
   }
 }
 
-async function processConsumerGroup(kafka: Kafka, admin: Admin, groupId: string, topicHighOffsetsByPartition: Map<string, Map<number, string>>): Promise<void> {
-  await resetConsumerGroupOffsetsToLatest(kafka, groupId, topicHighOffsetsByPartition);
+async function processConsumerGroup(
+  kafka: Kafka,
+  admin: Admin,
+  groupId: string,
+  topicHighOffsetsByPartition: Map<string, Map<number, string>>
+): Promise<void> {
+  await resetConsumerGroupOffsetsToLatest(
+    kafka,
+    groupId,
+    topicHighOffsetsByPartition
+  );
 
   logDebug(`Checking consumer-group offset alignment for group: ${groupId}`);
 
-  const statuses = await collectGroupStatuses(admin, groupId, topicHighOffsetsByPartition);
+  const statuses = await collectGroupStatuses(
+    admin,
+    groupId,
+    topicHighOffsetsByPartition
+  );
   const alignedCount = statuses.filter((s) => s.aligned).length;
   const totalCount = statuses.length;
   const isAligned = totalCount > 0 && alignedCount === totalCount;
 
-  logInfo(`Group ${groupId} alignment: ${alignedCount}/${totalCount} partitions aligned (${isAligned ? "OK" : "NOT_ALIGNED"})`);
+  logInfo(
+    `Group ${groupId} alignment: ${alignedCount}/${totalCount} partitions aligned (${
+      isAligned ? "OK" : "NOT_ALIGNED"
+    })`
+  );
 
   for (const status of statuses) {
-    logDebug(`Group ${groupId} - topic ${status.topic} partition ${status.partition}: group offset ${status.groupOffset}, topic high ${status.topicHigh}, aligned: ${status.aligned}`);
+    logDebug(
+      `Group ${groupId} - topic ${status.topic} partition ${status.partition}: group offset ${status.groupOffset}, topic high ${status.topicHigh}, aligned: ${status.aligned}`
+    );
   }
 
   if (!isAligned && statuses.length) {
     const notAligned = statuses.filter((s) => !s.aligned);
-    logWarning(`Group ${groupId} not aligned details: ${JSON.stringify(notAligned)}`);
+    logWarning(
+      `Group ${groupId} not aligned details: ${JSON.stringify(notAligned)}`
+    );
   }
 }
 
-async function collectGroupStatuses(admin: Admin, groupId: string, topicHighOffsetsByPartition: Map<string, Map<number, string>>): Promise<GroupTopicPartitionStatus[]> {
+async function collectGroupStatuses(
+  admin: Admin,
+  groupId: string,
+  topicHighOffsetsByPartition: Map<string, Map<number, string>>
+): Promise<GroupTopicPartitionStatus[]> {
   const statuses: GroupTopicPartitionStatus[] = [];
 
-  for (const [topic, highByPartition] of topicHighOffsetsByPartition.entries()) {
+  for (const [
+    topic,
+    highByPartition,
+  ] of topicHighOffsetsByPartition.entries()) {
     const topicOffsets = await getGroupTopicOffsets(admin, groupId, topic);
 
     if (!topicOffsets) {
@@ -140,7 +192,7 @@ async function collectGroupStatuses(admin: Admin, groupId: string, topicHighOffs
     for (const partitionInfo of topicOffsets.partitions) {
       const topicHigh = highByPartition.get(partitionInfo.partition);
       let status = null;
-      
+
       if (typeof topicHigh !== "undefined") {
         status = {
           topic,
@@ -153,12 +205,12 @@ async function collectGroupStatuses(admin: Admin, groupId: string, topicHighOffs
         status = {
           topic,
           partition: partitionInfo.partition,
-          groupOffset: partitionInfo.offset|| "",
+          groupOffset: partitionInfo.offset || "",
           topicHigh: topicHigh || "",
           aligned: false,
         };
-      } 
-      
+      }
+
       if (status) {
         statuses.push(status);
       }
@@ -168,9 +220,16 @@ async function collectGroupStatuses(admin: Admin, groupId: string, topicHighOffs
   return statuses;
 }
 
-async function getGroupTopicOffsets(admin: Admin, groupId: string, topic: string) {
+async function getGroupTopicOffsets(
+  admin: Admin,
+  groupId: string,
+  topic: string
+) {
   const offsets = await admin.fetchOffsets({ groupId, topics: [topic] });
-  return offsets.find((o) => o.topic === topic);
+  return offsets.find(
+    (o: { topic: string; partitions: KafkaJS.FetchOffsetsPartition[] }) =>
+      o.topic === topic
+  );
 }
 
 const run = async (): Promise<void> => {
@@ -178,7 +237,13 @@ const run = async (): Promise<void> => {
 
   try {
     logDebug("Setup Kafka connection.");
-    const kafka: Kafka = new KafkaJS.Kafka({ kafkaJS: buildKafkaConfig(config.authMode, config.brokers, config.awsRegion) });
+    const kafka: Kafka = new KafkaJS.Kafka({
+      kafkaJS: buildKafkaConfig(
+        config.authMode,
+        config.brokers,
+        config.awsRegion
+      ),
+    });
 
     logDebug("Connect to Kafka with admin client.");
     admin = kafka.admin();
