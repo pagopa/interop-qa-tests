@@ -32,12 +32,7 @@ const LogLevelSchema = z.preprocess((value) => {
   }
 
   return value;
-}, z.union([
-  z.literal(LogLevel.DEBUG),
-  z.literal(LogLevel.INFO),
-  z.literal(LogLevel.WARNING),
-  z.literal(LogLevel.ERROR),
-]).default(LogLevel.INFO));
+}, z.union([z.literal(LogLevel.DEBUG), z.literal(LogLevel.INFO), z.literal(LogLevel.WARNING), z.literal(LogLevel.ERROR)]).default(LogLevel.INFO));
 
 export const ResetTopicsEnvSchema = z
   .object({
@@ -89,4 +84,6 @@ export const ResetTopicsEnvSchema = z
   }));
 
 type ResetTopicsEnvSchema = z.infer<typeof ResetTopicsEnvSchema>;
-export const config: ResetTopicsEnvSchema = ResetTopicsEnvSchema.parse(process.env);
+export const config: ResetTopicsEnvSchema = ResetTopicsEnvSchema.parse(
+  process.env
+);

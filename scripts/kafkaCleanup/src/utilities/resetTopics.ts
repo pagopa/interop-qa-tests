@@ -1,16 +1,15 @@
 import { generateAuthToken } from "aws-msk-iam-sasl-signer-js";
 import { KafkaJS } from "@confluentinc/kafka-javascript";
-import { 
+import {
   Admin,
   KafkaAuthMode,
   KafkaConfig,
   PartitionOffset,
   PurgeResult,
   LogLevel,
-  type ResetTopicSelectionOptions
+  type ResetTopicSelectionOptions,
 } from "../models/types";
-import { config } from './../config/config';
-
+import { config } from "./../config/config";
 
 export function createKafkaLogger(): KafkaJS.Logger {
   let currentLogLevel = config.kafkaLogLevel;
@@ -51,12 +50,12 @@ export function createKafkaLogger(): KafkaJS.Logger {
 }
 
 export const logDebug = (message: string): void => {
-  if (!config.quietModeOn && (config.logLevel <= LogLevel.DEBUG)) {
+  if (!config.quietModeOn && config.logLevel <= LogLevel.DEBUG) {
     console.log(`[DEBUG] ${message}`);
   }
 };
 export const logInfo = (message: string): void => {
-  if (!config.quietModeOn && (config.logLevel <= LogLevel.INFO)) {
+  if (!config.quietModeOn && config.logLevel <= LogLevel.INFO) {
     console.log(`[INFO] ${message}`);
   }
 };
@@ -71,13 +70,18 @@ export const logWarning = (message: unknown): void => {
   }
 };
 
-export function buildKafkaConfig(authMode: KafkaAuthMode, brokers?: string[], clientId?: string, awsRegion?: string): KafkaConfig {
+export function buildKafkaConfig(
+  authMode: KafkaAuthMode,
+  brokers?: string[],
+  clientId?: string,
+  awsRegion?: string
+): KafkaConfig {
   if (authMode === "none") {
     return {
       clientId: clientId ?? config.kafkaClientId,
-      brokers: brokers?? config.brokers,
+      brokers: brokers ?? config.brokers,
       ssl: false,
-      logger: createKafkaLogger()
+      logger: createKafkaLogger(),
     };
   }
 
@@ -87,17 +91,22 @@ export function buildKafkaConfig(authMode: KafkaAuthMode, brokers?: string[], cl
     ssl: true,
     sasl: {
       mechanism: "oauthbearer",
-      oauthBearerProvider: () =>
-        oauthBearerTokenProvider(awsRegion as string),
+      oauthBearerProvider: () => oauthBearerTokenProvider(awsRegion as string),
     },
   };
 }
 
-export function shouldExcludeTopic(topic: string, excludePrefixes: string[]): boolean {
+export function shouldExcludeTopic(
+  topic: string,
+  excludePrefixes: string[]
+): boolean {
   return excludePrefixes.some((prefix) => topic.startsWith(prefix));
 }
 
-export function shouldResetTopic(topic: string, options: ResetTopicSelectionOptions): boolean {
+export function shouldResetTopic(
+  topic: string,
+  options: ResetTopicSelectionOptions
+): boolean {
   if (shouldExcludeTopic(topic, options.excludePrefixes)) {
     return false;
   }
@@ -109,11 +118,16 @@ export function shouldResetTopic(topic: string, options: ResetTopicSelectionOpti
   return options.exactMatches.some((exactMatch) => topic === exactMatch);
 }
 
-export function getTopicsToReset(kafkaTopics: string[], options: ResetTopicSelectionOptions): string[] {
+export function getTopicsToReset(
+  kafkaTopics: string[],
+  options: ResetTopicSelectionOptions
+): string[] {
   return kafkaTopics.filter((topic) => shouldResetTopic(topic, options));
 }
 
-export async function oauthBearerTokenProvider(region: string): Promise<KafkaJS.OauthbearerProviderResponse> {
+export async function oauthBearerTokenProvider(
+  region: string
+): Promise<KafkaJS.OauthbearerProviderResponse> {
   const authTokenResponse = await generateAuthToken({ region });
 
   return {
@@ -123,14 +137,19 @@ export async function oauthBearerTokenProvider(region: string): Promise<KafkaJS.
   };
 }
 
-export async function purgeTopics(admin: Admin, topics: string[]): Promise<PurgeResult[]> {
+export async function purgeTopics(
+  admin: Admin,
+  topics: string[]
+): Promise<PurgeResult[]> {
   const results: PurgeResult[] = [];
 
   for (const topic of topics) {
     const before = await admin.fetchTopicOffsets(topic);
     logInfo(`Topic ${topic} offsets before purge`);
-    for(const { partition, offset, high, low} of before) {
-      logInfo(`Topic ${topic} partition ${partition} - low: ${low}, high: ${high}, offset: ${offset}`);
+    for (const { partition, offset, high, low } of before) {
+      logInfo(
+        `Topic ${topic} partition ${partition} - low: ${low}, high: ${high}, offset: ${offset}`
+      );
     }
 
     const partitions: PartitionOffset[] = before
@@ -151,19 +170,21 @@ export async function purgeTopics(admin: Admin, topics: string[]): Promise<Purge
       continue;
     }
 
-    await admin.deleteTopicRecords({ topic, partitions});
+    await admin.deleteTopicRecords({ topic, partitions });
 
     const after = await admin.fetchTopicOffsets(topic);
     logInfo(`Topic ${topic} offsets after purge:`);
-    for(const { partition, offset, high, low} of after) {
-      logInfo(`Topic ${topic} partition ${partition} - low: ${low}, high: ${high}, offset: ${offset}`);
+    for (const { partition, offset, high, low } of after) {
+      logInfo(
+        `Topic ${topic} partition ${partition} - low: ${low}, high: ${high}, offset: ${offset}`
+      );
     }
 
     results.push({
       topic,
       purged: true,
       before,
-      after
+      after,
     });
   }
 
