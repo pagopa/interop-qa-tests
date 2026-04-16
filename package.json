@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "engines": {
-    "node": "^20.19"
+    "node": "^24.14"
   },
   "scripts": {
     "postinstall": "patch-package",
@@ -35,17 +35,21 @@
     "check-steps": "pnpm test -- -p validate",
     "bun:check-steps": "pnpm bun:test -p validate",
     "check-steps:usage": "pnpm check-steps --format usage",
-    "bun:check-steps:usage": "pnpm bun:check-steps --format usage"
+    "bun:check-steps:usage": "pnpm bun:check-steps --format usage",
+    "kafka:resetTopics": "tsx scripts/kafkaCleanup/src/resetTopics.ts",
+    "kafka:test:local": "tsx scripts/kafkaCleanup/test/localKafkaDataPreparation.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@aws-sdk/client-kms": "^3.474.0",
+    "@confluentinc/kafka-javascript": "^1.9.0",
     "@cucumber/cucumber": "^10.2.1",
     "@types/adm-zip": "^0.5.5",
     "@types/uuid": "^9.0.8",
     "adm-zip": "^0.5.15",
+    "aws-msk-iam-sasl-signer-js": "^1.0.3",
     "axios": "^1.6.2",
     "dotenv": "^16.3.1",
     "jsonwebtoken": "^9.0.2",
@@ -59,12 +63,13 @@
   "devDependencies": {
     "@pagopa/eslint-config": "^3.0.0",
     "@types/jsonwebtoken": "^9.0.6",
-    "@types/node": "^20.10.4",
+    "@types/node": "^24.12.2",
     "gherkin-lint": "^4.2.4",
     "openapi-typescript": "^6.7.3",
     "patch-package": "^8.0.0",
     "prettier": "^3.1.1",
     "swagger-typescript-api": "^13.0.3",
+    "tsx": "^4.21.0",
     "typescript": "^5.3.3"
   },
   "packageManager": "pnpm@9.15.4",
