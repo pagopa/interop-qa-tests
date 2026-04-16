@@ -32,7 +32,12 @@ const LogLevelSchema = z.preprocess((value) => {
   }
 
   return value;
-}, z.enum(LogLevel));
+}, z.union([
+  z.literal(LogLevel.DEBUG),
+  z.literal(LogLevel.INFO),
+  z.literal(LogLevel.WARNING),
+  z.literal(LogLevel.ERROR),
+]).default(LogLevel.INFO));
 
 export const ResetTopicsEnvSchema = z
   .object({

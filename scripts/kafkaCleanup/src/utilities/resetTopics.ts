@@ -134,8 +134,8 @@ export async function purgeTopics(admin: Admin, topics: string[]): Promise<Purge
     }
 
     const partitions: PartitionOffset[] = before
-      .filter(({ high, low }) => high !== low)
-      .map(({ partition, high }) => ({
+      .filter(({ high, low }: { high: string; low: string }) => high !== low)
+      .map(({ partition, high }: { partition: number; high: string }) => ({
         partition,
         offset: high,
       }));
