@@ -33,13 +33,14 @@ Environment variables parsed by `src/config/config.ts`:
 - `DOMAIN_TOPIC_PREFIX` (optional): comma-separated include prefixes.
 - `DOMAIN_TOPIC_EXCLUDE` (optional): comma-separated exclude prefixes.
 - `DEBEZIUM_OFFSETS_TOPIC` (optional): comma-separated exact topic names.
+- `EXACT_MATCHES_FILE_PATH` (optional): path to a file containing exact topic names to include. Supports JSON array (`["topic.a","topic.b"]`) or plain text (one topic per line, or comma-separated).
 - `QUIET_MODE`: `1` disables non-error console output.
 - `LOG_LEVEL`: app logger level (`0=DEBUG`, `1=INFO`, `2=WARNING`, `3=ERROR`).
 - `KAFKA_LOG_LEVEL`: Kafka client logger level (`0=DEBUG`, `1=INFO`, `2=WARNING`, `3=ERROR`).
 
 Validation rules:
 
-- At least one of `DOMAIN_TOPIC_PREFIX` or `DEBEZIUM_OFFSETS_TOPIC` must be set.
+- At least one of `DOMAIN_TOPIC_PREFIX`, `DEBEZIUM_OFFSETS_TOPIC`, or `EXACT_MATCHES_FILE_PATH` must be set.
 - `KAFKA_BROKERS` must be set.
 - `AWS_REGION` is mandatory in `aws-iam` mode.
 
