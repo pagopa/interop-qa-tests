@@ -119,50 +119,56 @@ export async function cleanupExistingTestGroups(
     return;
   }
 
-  const existingGroups = await admin.listGroups();
+  try {
+    await admin.connect();
 
-  const groupsToDelete = existingGroups.groups
-    .filter((group) => groups.includes(group.groupId))
-    .map((group) => group.groupId);
+    const existingGroups = await admin.listGroups();
 
-  if (!groupsToDelete.length) {
-    logInfo("No existing test groups to delete.");
-    return;
-  }
-  const startedAt = Date.now();
+    const groupsToDelete = existingGroups.groups
+      .filter((group) => groups.includes(group.groupId))
+      .map((group) => group.groupId);
 
-  while (Date.now() - startedAt < CLEANUP_TIMEOUT_MS) {
-    try {
-      await admin.deleteGroups(groupsToDelete);
-      logInfo(`Deleted existing groups: ${groupsToDelete.join(", ")}`);
+    if (!groupsToDelete.length) {
+      logInfo("No existing test groups to delete.");
       return;
-    } catch (error) {
-      if (isUnknownGroupDeleteError(error)) {
-        logInfo("Test groups already deleted or not found.");
-        return;
-      }
-
-      if (!isNonEmptyGroupDeleteError(error)) {
-        throw error;
-      }
-
-      const statusParts: string[] = await getConsumerGroupsStatus(
-        admin,
-        groupsToDelete
-      );
-
-      logWarning(
-        `Groups still non-empty, waiting for consumers to stop before delete (${statusParts.join(
-          ", "
-        )}).`
-      );
-      await sleep(CLEANUP_POLL_INTERVAL_MS);
     }
-  }
+    const startedAt = Date.now();
 
-  throw new Error(
-    `Timed out waiting to delete non-empty groups: ${groupsToDelete.join(
-      ", "
-    )}. Stop active consumers and retry.`
-  );
+    while (Date.now() - startedAt < CLEANUP_TIMEOUT_MS) {
+      try {
+        await admin.deleteGroups(groupsToDelete);
+        logInfo(`Deleted existing groups: ${groupsToDelete.join(", ")}`);
+        return;
+      } catch (error) {
+        if (isUnknownGroupDeleteError(error)) {
+          logInfo("Test groups already deleted or not found.");
+          return;
+        }
+
+        if (!isNonEmptyGroupDeleteError(error)) {
+          throw error;
+        }
+
+        const statusParts: string[] = await getConsumerGroupsStatus(
+          admin,
+          groupsToDelete
+        );
+
+        logWarning(
+          `Groups still non-empty, waiting for consumers to stop before delete (${statusParts.join(
+            ", "
+          )}).`
+        );
+        await sleep(CLEANUP_POLL_INTERVAL_MS);
+      }
+    }
+
+    throw new Error(
+      `Timed out waiting to delete non-empty groups: ${groupsToDelete.join(
+        ", "
+      )}. Stop active consumers and retry.`
+    );
+  } finally {
+    await admin.disconnect();
+  }
 }
