@@ -63,7 +63,7 @@ env:
    SCRIPTS_FOLDER: "./scripts"
 
 jobs:
-  inputs:
+  workflow_context:
     runs-on: ubuntu-22.04
     environment: ${{ github.event_name == 'schedule' && 'es1-qa' || inputs.environment }}
     outputs:
@@ -139,20 +139,20 @@ jobs:
 
   create_runner:
     name: Create Self-Hosted Runner
-    needs: inputs
+    needs: workflow_context
     runs-on: ubuntu-22.04
     strategy:
       matrix:
         index: [1]
       fail-fast: true
-    environment: ${{ needs.inputs.outputs.environment }}
+    environment: ${{ needs.workflow_context.outputs.environment }}
 
     steps:
       - name: Start GitHub Runner
         id: start_runner
         uses: pagopa/interop-github-runner-aws-create-action@main
         with:
-          environment: ${{ needs.inputs.outputs.environment }}
+          environment: ${{ needs.workflow_context.outputs.environment }}
           aws_region: ${{ secrets.AWS_REGION }}
           iam_role_arn: ${{ secrets.ECS_IAM_ROLE_ARN }}
           ecs_cluster_name: ${{ secrets.ECS_CLUSTER_NAME }}
@@ -165,10 +165,10 @@ jobs:
 
   svc_version_check:
     name: Check Deployed Versions
-    needs: [inputs, create_runner]
-    if: ${{ needs.inputs.outputs.strictVersionCheck == 'true' }}
-    runs-on: [self-hosted, "run_id:${{ needs.inputs.outputs.environment }}-${{ github.run_id }}"]
-    environment: ${{ needs.inputs.outputs.environment }}
+    needs: [workflow_context, create_runner]
+    if: ${{ needs.workflow_context.outputs.strictVersionCheck == 'true' }}
+    runs-on: [self-hosted, "run_id:${{ needs.workflow_context.outputs.environment }}-${{ github.run_id }}"]
+    environment: ${{ needs.workflow_context.outputs.environment }}
     steps:
       - name: Checkout
         id: checkout
@@ -194,10 +194,10 @@ jobs:
 
   data_prep:
     name: Data Preparation
-    needs: [inputs, svc_version_check, create_runner]
-    runs-on: [self-hosted, "run_id:${{ needs.inputs.outputs.environment }}-${{ github.run_id }}"]
-    environment: ${{ needs.inputs.outputs.environment }}
-    if: ${{ always() && needs.inputs.outputs.runDataPreparation == 'true' && needs.create_runner.result == 'success' }}
+    needs: [workflow_context, svc_version_check, create_runner]
+    runs-on: [self-hosted, "run_id:${{ needs.workflow_context.outputs.environment }}-${{ github.run_id }}"]
+    environment: ${{ needs.workflow_context.outputs.environment }}
+    if: ${{ always() && needs.workflow_context.outputs.runDataPreparation == 'true' && needs.create_runner.result == 'success' }}
     env:
       K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE }}
       PLATFORM_DATA_HOST: ${{ vars.PLATFORM_DATA_HOST }}
@@ -350,7 +350,7 @@ jobs:
 
       - name: Checkout Kafka tools
         id: kafka_tools
-        if: ${{ always() && needs.inputs.outputs.kafkaPurgeTopics == 'true' }}
+        if: ${{ always() && needs.workflow_context.outputs.kafkaPurgeTopics == 'true' }}
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
         with:
           repository: pagopa/pdnd-interop-platform-deployment
@@ -359,7 +359,7 @@ jobs:
 
       - name: Purge Kafka topics
         id: clean_kafka
-        if: ${{ always() && needs.inputs.outputs.kafkaPurgeTopics == 'true' }}
+        if: ${{ always() && needs.workflow_context.outputs.kafkaPurgeTopics == 'true' }}
         shell: bash
         working-directory: plat-dep/kafka/scripts
         env:
@@ -468,10 +468,10 @@ jobs:
 
   run_js_test:
     name: Run JavaScript Cucumber Test Suite
-    if: ${{ always() && needs.inputs.outputs.runJSTests == 'true' }}
-    needs: [inputs, data_prep, create_runner]
-    runs-on: [self-hosted, "run_id:${{ needs.inputs.outputs.environment }}-${{ github.run_id }}"]
-    environment: ${{ needs.inputs.outputs.environment }}
+    if: ${{ always() && needs.workflow_context.outputs.runJSTests == 'true' }}
+    needs: [workflow_context, data_prep, create_runner]
+    runs-on: [self-hosted, "run_id:${{ needs.workflow_context.outputs.environment }}-${{ github.run_id }}"]
+    environment: ${{ needs.workflow_context.outputs.environment }}
     env:
       ENVIRONMENT: ${{ vars.ENVIRONMENT }}
       SESSION_TOKENS_DURATION_SECONDS: ${{ vars.SESSION_TOKENS_DURATION_SECONDS }}
@@ -512,10 +512,10 @@ jobs:
 
   run_java_test:
     name: Run Java Cucumber Test Suite
-    if: ${{ always() && needs.inputs.outputs.runJSTests != 'true' && needs.inputs.outputs.runJavaTests == 'true' }}
-    needs: [inputs, create_runner, data_prep, run_js_test]
-    runs-on: [self-hosted, "run_id:${{ needs.inputs.outputs.environment }}-${{ github.run_id }}"]
-    environment: ${{ needs.inputs.outputs.environment }}
+    if: ${{ always() && needs.workflow_context.outputs.runJSTests != 'true' && needs.workflow_context.outputs.runJavaTests == 'true' }}
+    needs: [workflow_context, create_runner, data_prep, run_js_test]
+    runs-on: [self-hosted, "run_id:${{ needs.workflow_context.outputs.environment }}-${{ github.run_id }}"]
+    environment: ${{ needs.workflow_context.outputs.environment }}
     env:
       ENVIRONMENT: ${{ vars.ENVIRONMENT }}
       ST_VERBOSE_MODE: ${{ vars.ST_VERBOSE_MODE }}
@@ -532,7 +532,7 @@ jobs:
         shell: bash
         run: |
           echo "Cloning pn-b2b-client repo.."
-          git clone --depth 1 --branch ${{ needs.inputs.outputs.javaBranchName }} https://github.com/pagopa/pn-b2b-client.git
+          git clone --depth 1 --branch ${{ needs.workflow_context.outputs.javaBranchName }} https://github.com/pagopa/pn-b2b-client.git
           echo "pn-b2b-client repo has been cloned"
 
       - name: Run QA tests
@@ -552,7 +552,7 @@ jobs:
           echo "Using Spring profile: ${SPRING_PROFILE}"
 
           cd ./pn-b2b-client/interop-qa-tests
-          mvn $SPRING_PROFILE -Dtest=it.pagopa.pn.interop.cucumber.${{ needs.inputs.outputs.javaTestSuite }} clean verify > qa-tests.log 2>&1
+          mvn $SPRING_PROFILE -Dtest=it.pagopa.pn.interop.cucumber.${{ needs.workflow_context.outputs.javaTestSuite }} clean verify > qa-tests.log 2>&1
 
       - name: Upload QA test logs
         if: always()
@@ -571,21 +571,21 @@ jobs:
 
   delete_runner:
     name: Delete Self-Hosted Runner
-    needs: [inputs, create_runner, svc_version_check, data_prep, run_js_test, run_java_test]
+    needs: [workflow_context, create_runner, svc_version_check, data_prep, run_js_test, run_java_test]
     if: ${{ always() }}
     runs-on: ubuntu-22.04
     strategy:
       matrix:
         index: [1]
       fail-fast: true
-    environment: ${{ needs.inputs.outputs.environment }}
+    environment: ${{ needs.workflow_context.outputs.environment }}
 
     steps:
       - name: Stop Github Runner
         id: stop_runner
         uses: pagopa/interop-github-runner-aws-cleanup-action@main
         with:
-          environment: ${{ needs.inputs.outputs.environment }}
+          environment: ${{ needs.workflow_context.outputs.environment }}
           aws_region: ${{ secrets.AWS_REGION }}
           iam_role_arn: ${{ secrets.ECS_IAM_ROLE_ARN }}
           ecs_cluster_name: ${{ secrets.ECS_CLUSTER_NAME }}
