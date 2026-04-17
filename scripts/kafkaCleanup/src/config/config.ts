@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { z } from "zod";
 import { LogLevel } from "../models/types";
 
@@ -13,6 +15,41 @@ const normalizeEnvValues = (envValue?: string): string[] => {
     .map((value) => value.trim())
     .filter((value) => value.length > 0);
 };
+
+const parseExactMatchesFile = (filePath?: string): string[] => {
+  if (!filePath) {
+    return [];
+  }
+
+  const resolvedPath = resolve(filePath);
+  const content = readFileSync(resolvedPath, "utf8").trim();
+
+  if (!content) {
+    return [];
+  }
+
+  if (content.startsWith("[")) {
+    const parsed = JSON.parse(content);
+    if (!Array.isArray(parsed)) {
+      throw new Error(
+        `Invalid exact matches file format at ${resolvedPath}: expected JSON array of strings.`
+      );
+    }
+
+    return parsed
+      .map((value) => String(value).trim())
+      .filter((value) => value.length > 0);
+  }
+
+  return content
+    .split(/\r?\n|,/)
+    .map((value) => value.trim())
+    .filter((value) => value.length > 0);
+};
+
+const mergeUniqueValues = (...values: string[][]): string[] => [
+  ...new Set(values.flat()),
+];
 
 const LogLevelSchema = z.preprocess((value) => {
   if (value === undefined || value === null || value === "") {
@@ -40,6 +77,7 @@ export const ResetTopicsEnvSchema = z
     DEBEZIUM_OFFSETS_TOPIC: z.string().optional(),
     DOMAIN_TOPIC_EXCLUDE: z.string().optional(),
     DOMAIN_TOPIC_PREFIX: z.string().optional(),
+    EXACT_MATCHES_FILE_PATH: z.string().optional(),
     KAFKA_AUTH_MODE: z.enum(["aws-iam", "none"]).default("aws-iam"),
     KAFKA_BROKERS: z.string().optional(),
     KAFKA_CLIENT_ID: z.string().optional(),
@@ -48,11 +86,15 @@ export const ResetTopicsEnvSchema = z
     QUIET_MODE: z.string().optional().default("0"),
   })
   .superRefine((env, ctx) => {
-    if (!env.DOMAIN_TOPIC_PREFIX && !env.DEBEZIUM_OFFSETS_TOPIC) {
+    if (
+      !env.DOMAIN_TOPIC_PREFIX &&
+      !env.DEBEZIUM_OFFSETS_TOPIC &&
+      !env.EXACT_MATCHES_FILE_PATH
+    ) {
       ctx.addIssue({
         code: "custom",
         message:
-          "Env vars DOMAIN_TOPIC_PREFIX and DEBEZIUM_OFFSETS_TOPIC cannot be both null.",
+          "At least one between DOMAIN_TOPIC_PREFIX, DEBEZIUM_OFFSETS_TOPIC, and EXACT_MATCHES_FILE_PATH must be set.",
       });
     }
 
@@ -74,7 +116,10 @@ export const ResetTopicsEnvSchema = z
     authMode: env.KAFKA_AUTH_MODE,
     awsRegion: env.AWS_REGION,
     brokers: normalizeEnvValues(env.KAFKA_BROKERS),
-    exactMatches: normalizeEnvValues(env.DEBEZIUM_OFFSETS_TOPIC),
+    exactMatches: mergeUniqueValues(
+      normalizeEnvValues(env.DEBEZIUM_OFFSETS_TOPIC),
+      parseExactMatchesFile(env.EXACT_MATCHES_FILE_PATH)
+    ),
     excludePrefixes: normalizeEnvValues(env.DOMAIN_TOPIC_EXCLUDE),
     includePrefixes: normalizeEnvValues(env.DOMAIN_TOPIC_PREFIX),
     kafkaClientId: env.KAFKA_CLIENT_ID ?? DEFAULT_KAFKA_CLIENT_ID,
