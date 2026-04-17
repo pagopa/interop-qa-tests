@@ -100,9 +100,9 @@ export function buildGroupNames(
 ): string[] {
   const groupNames: string[] = [];
   for (let i = 0; i < count; i++) {
-    const uniqueSuffix = Math.random().toString(36).substring(2, 8);
+    // const uniqueSuffix = Math.random().toString(36).substring(2, 8);
     const suffixPart = suffix ? `-${suffix}` : "";
-    groupNames.push(`${prefix || "test-group"}-${uniqueSuffix}${suffixPart}`);
+    groupNames.push(`${prefix || "test-group"}-${i}${suffixPart}`);
   }
   return groupNames;
 }
