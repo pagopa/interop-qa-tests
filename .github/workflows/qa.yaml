@@ -14,12 +14,12 @@ on:
       kafkaPurgeTopics:
         description: 'Purge Kafka topics'
         required: true
-        default: true
+        default: false
         type: boolean
       runDataPreparation:
         description: 'Data preparation (wipe + reload dump)'
         required: true
-        default: true
+        default: false
         type: boolean
       runJSTests:
         description: 'Run JavaScript test suite'
@@ -30,17 +30,17 @@ on:
       runJavaTests:
         description: 'Run Java test in pn-b2b-client'
         required: true
-        default: true
+        default: false
         type: boolean
       javaTestSuite:
         description: 'Choose which Java test suite to run'
         required: false
-        default: NRTStandard
+        default: NrtTest
         type: string
       javaBranchName:
         description: 'Provide the branch name for pn-b2b-client to clone'
         required: false
-        default: develop
+        default: main
         type: string
       strictVersionCheck:
         description: 'Set to "false" to disable the version-check step'
