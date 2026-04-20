@@ -2,7 +2,7 @@ name: QA workflow
 
 on:
   schedule:
-    - cron: '0 19 * * 1-5'
+    - cron: '45 18 * * 1-5'
       timezone: "Europe/Rome"
   workflow_dispatch:
     inputs:
@@ -14,12 +14,12 @@ on:
       kafkaPurgeTopics:
         description: 'Purge Kafka topics'
         required: true
-        default: true
+        default: false
         type: boolean
       runDataPreparation:
         description: 'Data preparation (wipe + reload dump)'
         required: true
-        default: true
+        default: false
         type: boolean
       runJSTests:
         description: 'Run JavaScript test suite'
@@ -30,17 +30,17 @@ on:
       runJavaTests:
         description: 'Run Java test in pn-b2b-client'
         required: true
-        default: true
+        default: false
         type: boolean
       javaTestSuite:
         description: 'Choose which Java test suite to run'
         required: false
-        default: NRTStandard
+        default: NrtTest
         type: string
       javaBranchName:
         description: 'Provide the branch name for pn-b2b-client to clone'
         required: false
-        default: develop
+        default: main
         type: string
       strictVersionCheck:
         description: 'Set to "false" to disable the version-check step'
@@ -63,55 +63,112 @@ env:
    SCRIPTS_FOLDER: "./scripts"
 
 jobs:
-  inputs:
+  workflow_context:
     runs-on: ubuntu-22.04
-    environment: ${{ inputs.environment }}
+    environment: ${{ github.event_name == 'schedule' && 'es1-qa' || inputs.environment }}
+    outputs:
+      environment: ${{ steps.set_runtime_env.outputs.environment }}
+      kafkaPurgeTopics: ${{ steps.set_runtime_env.outputs.kafkaPurgeTopics }}
+      runDataPreparation: ${{ steps.set_runtime_env.outputs.runDataPreparation }}
+      runJSTests: ${{ steps.set_runtime_env.outputs.runJSTests }}
+      runJavaTests: ${{ steps.set_runtime_env.outputs.runJavaTests }}
+      javaTestSuite: ${{ steps.set_runtime_env.outputs.javaTestSuite }}
+      javaBranchName: ${{ steps.set_runtime_env.outputs.javaBranchName }}
+      strictVersionCheck: ${{ steps.set_runtime_env.outputs.strictVersionCheck }}
 
     steps:
+      - name: Check trigger type
+        id: check_trigger
+        run: |
+          if [[ "${{ github.event_name }}" == "schedule" ]]; then
+            echo "is_schedule=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "is_schedule=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Set runtime env
+        id: set_runtime_env
+        run: |
+          if [[ "${{ steps.check_trigger.outputs.is_schedule }}" == "true" ]]; then
+            environment="es1-qa"
+            kafkaPurgeTopics="true"
+            runDataPreparation="true"
+            runJSTests="false"
+            runJavaTests="true"
+            javaTestSuite="NRTStandard"
+            javaBranchName="develop"
+            strictVersionCheck="true"
+          else
+            environment="${{ inputs.environment }}"
+            kafkaPurgeTopics="${{ inputs.kafkaPurgeTopics }}"
+            runDataPreparation="${{ inputs.runDataPreparation }}"
+            runJSTests="${{ inputs.runJSTests }}"
+            runJavaTests="${{ inputs.runJavaTests }}"
+            javaTestSuite="${{ inputs.javaTestSuite || 'NRTStandard' }}"
+            javaBranchName="${{ inputs.javaBranchName || 'develop' }}"
+            strictVersionCheck="${{ inputs.strictVersionCheck }}"
+          fi
+
+          {
+            echo "environment=$environment"
+            echo "kafkaPurgeTopics=$kafkaPurgeTopics"
+            echo "runDataPreparation=$runDataPreparation"
+            echo "runJSTests=$runJSTests"
+            echo "runJavaTests=$runJavaTests"
+            echo "javaTestSuite=$javaTestSuite"
+            echo "javaBranchName=$javaBranchName"
+            echo "strictVersionCheck=$strictVersionCheck"
+          } >> "$GITHUB_OUTPUT"
+
       - name: Print Inputs
         id: print_inputs
         run: |
-          echo "- environment: \`${{ inputs.environment }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- trigger: \`${{ github.event_name }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- is schedule: \`${{ steps.check_trigger.outputs.is_schedule }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- environment: \`${{ steps.set_runtime_env.outputs.environment }}\`" >> $GITHUB_STEP_SUMMARY
           echo "- normalized environment: \`${{ vars.NORM_ENV }}\`" >> $GITHUB_STEP_SUMMARY
           echo "- ref: \`${{ github.ref }}\`" >> $GITHUB_STEP_SUMMARY
           echo "- plat-dep versions: \`${{ vars.PLAT_DEP_VERSIONS_URL }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- kafkaPurgeTopics: \`${{ inputs.kafkaPurgeTopics }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- runDataPreparation: \`${{ inputs.runDataPreparation }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- runJavaTests: \`${{ inputs.runJavaTests }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- javaTestSuite: \`${{ inputs.javaTestSuite || 'null' }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- javaBranchName: \`${{ inputs.javaBranchName || 'null' }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- kafkaPurgeTopics: \`${{ steps.set_runtime_env.outputs.kafkaPurgeTopics }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- runDataPreparation: \`${{ steps.set_runtime_env.outputs.runDataPreparation }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- runJSTests: \`${{ steps.set_runtime_env.outputs.runJSTests }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- runJavaTests: \`${{ steps.set_runtime_env.outputs.runJavaTests }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- javaTestSuite: \`${{ steps.set_runtime_env.outputs.javaTestSuite }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- javaBranchName: \`${{ steps.set_runtime_env.outputs.javaBranchName }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- strictVersionCheck: \`${{ steps.set_runtime_env.outputs.strictVersionCheck }}\`" >> $GITHUB_STEP_SUMMARY
 
   create_runner:
     name: Create Self-Hosted Runner
+    needs: workflow_context
     runs-on: ubuntu-22.04
     strategy:
       matrix:
         index: [1]
       fail-fast: true
-    environment: ${{ inputs.environment }}
+    environment: ${{ needs.workflow_context.outputs.environment }}
 
     steps:
       - name: Start GitHub Runner
         id: start_runner
         uses: pagopa/interop-github-runner-aws-create-action@main
         with:
-            environment: ${{ inputs.environment }}
-            aws_region: ${{ secrets.AWS_REGION }}
-            iam_role_arn: ${{ secrets.ECS_IAM_ROLE_ARN }}
-            ecs_cluster_name: ${{ secrets.ECS_CLUSTER_NAME }}
-            ecs_task_definition: ${{ secrets.ECS_TASK_DEFINITION }}
-            ecs_container_name: ${{ vars.ECS_TASK_CONTAINER_NAME }}
-            ecs_task_max_duration_seconds: ${{ vars.ECS_TASK_MAX_DURATION_SECONDS }}
-            ecs_task_subnet_id: ${{ secrets.SUBNET_ID }}
-            ecs_task_sec_group: ${{ secrets.SEC_GROUP_ID }}
-            pat_token: ${{ secrets.BOT_TOKEN }}
+          environment: ${{ needs.workflow_context.outputs.environment }}
+          aws_region: ${{ secrets.AWS_REGION }}
+          iam_role_arn: ${{ secrets.ECS_IAM_ROLE_ARN }}
+          ecs_cluster_name: ${{ secrets.ECS_CLUSTER_NAME }}
+          ecs_task_definition: ${{ secrets.ECS_TASK_DEFINITION }}
+          ecs_container_name: ${{ vars.ECS_TASK_CONTAINER_NAME }}
+          ecs_task_max_duration_seconds: ${{ vars.ECS_TASK_MAX_DURATION_SECONDS }}
+          ecs_task_subnet_id: ${{ secrets.SUBNET_ID }}
+          ecs_task_sec_group: ${{ secrets.SEC_GROUP_ID }}
+          pat_token: ${{ secrets.BOT_TOKEN }}
 
   svc_version_check:
     name: Check Deployed Versions
-    needs: create_runner
-    if: ${{ inputs.strictVersionCheck == 'true' }}
-    runs-on: [self-hosted, "run_id:${{ inputs.environment }}-${{ github.run_id }}"]
-    environment: ${{ inputs.environment }}
+    needs: [workflow_context, create_runner]
+    if: ${{ needs.workflow_context.outputs.strictVersionCheck == 'true' }}
+    runs-on: [self-hosted, "run_id:${{ needs.workflow_context.outputs.environment }}-${{ github.run_id }}"]
+    environment: ${{ needs.workflow_context.outputs.environment }}
     steps:
       - name: Checkout
         id: checkout
@@ -137,10 +194,10 @@ jobs:
 
   data_prep:
     name: Data Preparation
-    needs: [svc_version_check, create_runner]
-    runs-on: [self-hosted, "run_id:${{ inputs.environment }}-${{ github.run_id }}"]
-    environment: ${{ inputs.environment }}
-    if: ${{ always() && inputs.runDataPreparation && needs.create_runner.result == 'success' }}
+    needs: [workflow_context, svc_version_check, create_runner]
+    runs-on: [self-hosted, "run_id:${{ needs.workflow_context.outputs.environment }}-${{ github.run_id }}"]
+    environment: ${{ needs.workflow_context.outputs.environment }}
+    if: ${{ always() && needs.workflow_context.outputs.runDataPreparation == 'true' && needs.create_runner.result == 'success' }}
     env:
       K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE }}
       PLATFORM_DATA_HOST: ${{ vars.PLATFORM_DATA_HOST }}
@@ -293,7 +350,7 @@ jobs:
 
       - name: Checkout Kafka tools
         id: kafka_tools
-        if: ${{ always() && inputs.kafkaPurgeTopics }}
+        if: ${{ always() && needs.workflow_context.outputs.kafkaPurgeTopics == 'true' }}
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
         with:
           repository: pagopa/pdnd-interop-platform-deployment
@@ -302,7 +359,7 @@ jobs:
 
       - name: Purge Kafka topics
         id: clean_kafka
-        if: ${{ always() && inputs.kafkaPurgeTopics }}
+        if: ${{ always() && needs.workflow_context.outputs.kafkaPurgeTopics == 'true' }}
         shell: bash
         working-directory: plat-dep/kafka/scripts
         env:
@@ -411,10 +468,10 @@ jobs:
 
   run_js_test:
     name: Run JavaScript Cucumber Test Suite
-    if: ${{ always() && inputs.runJSTests }}
-    needs: [data_prep, create_runner]
-    runs-on: [self-hosted, "run_id:${{ inputs.environment }}-${{ github.run_id }}"]
-    environment: ${{ inputs.environment }}
+    if: ${{ always() && needs.workflow_context.outputs.runJSTests == 'true' }}
+    needs: [workflow_context, data_prep, create_runner]
+    runs-on: [self-hosted, "run_id:${{ needs.workflow_context.outputs.environment }}-${{ github.run_id }}"]
+    environment: ${{ needs.workflow_context.outputs.environment }}
     env:
       ENVIRONMENT: ${{ vars.ENVIRONMENT }}
       SESSION_TOKENS_DURATION_SECONDS: ${{ vars.SESSION_TOKENS_DURATION_SECONDS }}
@@ -455,10 +512,10 @@ jobs:
 
   run_java_test:
     name: Run Java Cucumber Test Suite
-    if: ${{ always() && !inputs.runJSTests && inputs.runJavaTests }}
-    needs: [run_js_test]
-    runs-on: [self-hosted, "run_id:${{ inputs.environment }}-${{ github.run_id }}"]
-    environment: ${{ inputs.environment }}
+    if: ${{ always() && needs.workflow_context.outputs.runJSTests != 'true' && needs.workflow_context.outputs.runJavaTests == 'true' }}
+    needs: [workflow_context, create_runner, data_prep, run_js_test]
+    runs-on: [self-hosted, "run_id:${{ needs.workflow_context.outputs.environment }}-${{ github.run_id }}"]
+    environment: ${{ needs.workflow_context.outputs.environment }}
     env:
       ENVIRONMENT: ${{ vars.ENVIRONMENT }}
       ST_VERBOSE_MODE: ${{ vars.ST_VERBOSE_MODE }}
@@ -475,7 +532,7 @@ jobs:
         shell: bash
         run: |
           echo "Cloning pn-b2b-client repo.."
-          git clone --depth 1 --branch ${{ inputs.javaBranchName }} https://github.com/pagopa/pn-b2b-client.git
+          git clone --depth 1 --branch ${{ needs.workflow_context.outputs.javaBranchName }} https://github.com/pagopa/pn-b2b-client.git
           echo "pn-b2b-client repo has been cloned"
 
       - name: Run QA tests
@@ -495,7 +552,7 @@ jobs:
           echo "Using Spring profile: ${SPRING_PROFILE}"
 
           cd ./pn-b2b-client/interop-qa-tests
-          mvn $SPRING_PROFILE -Dtest=it.pagopa.pn.interop.cucumber.${{ inputs.javaTestSuite }} clean verify > qa-tests.log 2>&1
+          mvn $SPRING_PROFILE -Dtest=it.pagopa.pn.interop.cucumber.${{ needs.workflow_context.outputs.javaTestSuite }} clean verify > qa-tests.log 2>&1
 
       - name: Upload QA test logs
         if: always()
@@ -514,22 +571,22 @@ jobs:
 
   delete_runner:
     name: Delete Self-Hosted Runner
-    needs: [create_runner, svc_version_check, data_prep, run_js_test, run_java_test]
+    needs: [workflow_context, create_runner, svc_version_check, data_prep, run_js_test, run_java_test]
     if: ${{ always() }}
     runs-on: ubuntu-22.04
     strategy:
       matrix:
         index: [1]
       fail-fast: true
-    environment: ${{ inputs.environment }}
+    environment: ${{ needs.workflow_context.outputs.environment }}
 
     steps:
       - name: Stop Github Runner
         id: stop_runner
         uses: pagopa/interop-github-runner-aws-cleanup-action@main
         with:
-            environment: ${{ inputs.environment }}
-            aws_region: ${{ secrets.AWS_REGION }}
-            iam_role_arn: ${{ secrets.ECS_IAM_ROLE_ARN }}
-            ecs_cluster_name: ${{ secrets.ECS_CLUSTER_NAME }}
-            pat_token: ${{ secrets.BOT_TOKEN }}
+          environment: ${{ needs.workflow_context.outputs.environment }}
+          aws_region: ${{ secrets.AWS_REGION }}
+          iam_role_arn: ${{ secrets.ECS_IAM_ROLE_ARN }}
+          ecs_cluster_name: ${{ secrets.ECS_CLUSTER_NAME }}
+          pat_token: ${{ secrets.BOT_TOKEN }}
