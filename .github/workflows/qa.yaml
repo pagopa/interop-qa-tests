@@ -43,7 +43,7 @@ on:
         default: main
         type: string
       strictVersionCheck:
-        description: 'Set to "false" to disable the version-check step'
+        description: 'DEPRECATED - will be removed in the future'
         required: false
         default: true
         type: boolean
@@ -97,7 +97,7 @@ jobs:
             runJavaTests="true"
             javaTestSuite="NRTStandard"
             javaBranchName="develop"
-            strictVersionCheck="true"
+            strictVersionCheck="false"
           else
             environment="${{ inputs.environment }}"
             kafkaPurgeTopics="${{ inputs.kafkaPurgeTopics }}"
