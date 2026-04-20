@@ -1,0 +1,1 @@
+event-store.att_agreement.events,event-store.att_attribute_registry.events,event-store.att_authorization.events
