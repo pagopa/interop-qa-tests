@@ -50,8 +50,8 @@ importers:
         specifier: ^10.9.2
         version: 10.9.2(@types/node@20.10.4)(typescript@5.3.3)
       uuid:
-        specifier: ^9.0.1
-        version: 9.0.1
+        specifier: ^14.0.0
+        version: 14.0.0
       zod:
         specifier: ^3.22.4
         version: 3.22.4
@@ -2401,6 +2401,10 @@ packages:
 
   util-arity@1.1.0:
     resolution: {integrity: sha512-kkyIsXKwemfSy8ZEoaIz06ApApnWsk5hQO0vLjZS6UkBiGiW++Jsyb8vSBoc0WKlffGoGs5yYy/j5pp8zckrFA==}
+
+  uuid@14.0.0:
+    resolution: {integrity: sha512-Qo+uWgilfSmAhXCMav1uYFynlQO7fMFiMVZsQqZRMIXp0O7rR7qjkj+cPvBHLgBqi960QCoo/PH2/6ZtVqKvrg==}
+    hasBin: true
 
   uuid@3.4.0:
     resolution: {integrity: sha512-HjSDRw6gZE5JMggctHBcjVak08+KEVhSIiDzFnT9S9aegmp85S/bReBVTb4QTFaRNptJ9kuYaNhnbNEOkbKb/A==}
@@ -5434,6 +5438,8 @@ snapshots:
       punycode: 2.3.1
 
   util-arity@1.1.0: {}
+
+  uuid@14.0.0: {}
 
   uuid@3.4.0: {}
 
