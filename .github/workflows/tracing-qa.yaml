@@ -162,12 +162,7 @@ jobs:
       K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE }}
       PLATFORM_DATA_HOST: ${{ vars.PLATFORM_DATA_HOST }}
       PLATFORM_DATA_PORT: 5432
-      LOCAL_ATTRIBUTE_REGISTRY_DUMPS: "./db_dumps/attribute_registry"
-      LOCAL_ATTRIBUTE_REGISTRY_TABLE_NAME: "events"
-      LOCAL_TENANT_DUMPS: "./db_dumps/tenant"
-      LOCAL_TENANT_JOURNAL_TABLE_NAME: "event_journal"
-      LOCAL_TENANT_TAG_TABLE_NAME: "event_tag"
-      LOCAL_NOTIFICATION_CONFIG_DUMPS: "./db_dumps/notification_config"
+      LOCAL_TRACING_DUMPS: "./db_dumps/tracing"
       MAX_POLLING_TRIES: "${{ vars.MAX_POLLING_TRIES }}"
       POLLING_SLEEP_TIME: "${{ vars.POLLING_SLEEP_TIME }}"
     steps:
@@ -308,7 +303,7 @@ jobs:
           PGPORT: ${{ env.PLATFORM_DATA_PORT }}
           PGDATABASE: ${{ vars.TRACING_DB_NAME }}
         run: |
-          $SCRIPTS_FOLDER/restoreEventStore.sh
+          $SCRIPTS_FOLDER/restoreTracing.sh
 
       - name: Scale up Deployments
         id: svc_scale_to_1
