@@ -1,4 +1,4 @@
-name: QA workflow
+name: Tracing QA workflow
 
 on:
   schedule:
@@ -57,7 +57,7 @@ jobs:
     environment: ${{ github.event_name == 'schedule' && 'tracing-qa' || inputs.environment }}
     outputs:
       environment: ${{ steps.set_runtime_env.outputs.environment }}
-      kafkaPurgeTopics: "false"
+      kafkaPurgeTopics: ${{ steps.set_runtime_env.outputs.kafkaPurgeTopics }}
       runDataPreparation: ${{ steps.set_runtime_env.outputs.runDataPreparation }}
       runJSTests: ${{ steps.set_runtime_env.outputs.runJSTests }}
       runJavaTests: ${{ steps.set_runtime_env.outputs.runJavaTests }}
@@ -79,7 +79,7 @@ jobs:
         run: |
           if [[ "${{ steps.check_trigger.outputs.is_schedule }}" == "true" ]]; then
             environment="tracing-qa"
-            kafkaPurgeTopics="false\"
+            kafkaPurgeTopics="false"
             runDataPreparation="true"
             runJSTests="false"
             runJavaTests="true"
@@ -322,7 +322,7 @@ jobs:
             KAFKA_BROKERS: ${{ vars.KAFKA_BROKERS }}
             TOPICS_PROPERTIES_PATH: ../topics/${{ vars.NORM_ENV }}/
         run: |
-          set -eou pipefail
+          set -euo pipefail
 
           npm ci
 
