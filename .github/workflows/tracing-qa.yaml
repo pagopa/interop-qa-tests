@@ -15,6 +15,11 @@ on:
           - tracing-dev
           - tracing-qa
           - tracing-vapt
+      kafkaPurgeTopics:
+        description: 'Purge Kafka topics'
+        required: true
+        default: false
+        type: boolean
       runDataPreparation:
         description: 'Data preparation (wipe + reload dump)'
         required: true
