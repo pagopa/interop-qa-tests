@@ -165,8 +165,6 @@ jobs:
       LOCAL_NOTIFICATION_CONFIG_DUMPS: "./db_dumps/notification_config"
       MAX_POLLING_TRIES: "${{ vars.MAX_POLLING_TRIES }}"
       POLLING_SLEEP_TIME: "${{ vars.POLLING_SLEEP_TIME }}"
-      DYNAMODB_PLATFORM_STATES_TABLE: ${{ vars.platformStatesTableName }}
-      DYNAMODB_TOKEN_GEN_STATES_TABLE: ${{ vars.tokenGenStatesTableName }}
     steps:
       - name: Checkout
         id: checkout
@@ -252,54 +250,15 @@ jobs:
             echo "PLATFORM_DATA_USERNAME=$PLATFORM_DATA_USERNAME" >> "$GITHUB_ENV"
             echo "PLATFORM_DATA_PASSWORD=$PLATFORM_DATA_PASSWORD" >> "$GITHUB_ENV"
 
-      - name: Truncate EventStore DB Tables
-        id: event_store_db_truncate
+      - name: Truncate Tracing DB Tables
+        id: tracing_db_truncate
         shell: bash
         env:
           PGUSER: ${{ env.PLATFORM_DATA_USERNAME }}
           PGPASSWORD: ${{ env.PLATFORM_DATA_PASSWORD }}
           PGHOST: ${{ env.PLATFORM_DATA_HOST }}
           PGPORT: ${{ env.PLATFORM_DATA_PORT }}
-          PGDATABASE: ${{ vars.EVENT_STORE_DB_NAME }}
-        run: |
-          $SCRIPTS_FOLDER/truncateSQLTables.sh
-
-      - name: Truncate ReadModel SQL DB Tables
-        id: read_model_sql_db_truncate
-        if: ${{ vars.READ_MODEL_SQL_DB_NAME != '' }}
-        shell: bash
-        env:
-          PGUSER: ${{ env.PLATFORM_DATA_USERNAME }}
-          PGPASSWORD: ${{ env.PLATFORM_DATA_PASSWORD }}
-          PGHOST: ${{ env.PLATFORM_DATA_HOST }}
-          PGPORT: ${{ env.PLATFORM_DATA_PORT }}
-          PGDATABASE: ${{ vars.READ_MODEL_SQL_DB_NAME }}
-        run: |
-          $SCRIPTS_FOLDER/truncateSQLTables.sh
-
-      - name: Truncate M2MEvents SQL DB Tables
-        id: m2m_events_sql_db_truncate
-        if: ${{ vars.M2M_EVENTS_SQL_DB_NAME != '' }}
-        shell: bash
-        env:
-          PGUSER: ${{ env.PLATFORM_DATA_USERNAME }}
-          PGPASSWORD: ${{ env.PLATFORM_DATA_PASSWORD }}
-          PGHOST: ${{ env.PLATFORM_DATA_HOST }}
-          PGPORT: ${{ env.PLATFORM_DATA_PORT }}
-          PGDATABASE: ${{ vars.M2M_EVENTS_SQL_DB_NAME }}
-        run: |
-          $SCRIPTS_FOLDER/truncateSQLTables.sh
-
-      - name: Truncate InAppNotification SQL DB Tables
-        id: in_app_notification_sql_db_truncate
-        if: ${{ vars.IN_APP_NOTIFICATION_SQL_DB_NAME != '' }}
-        shell: bash
-        env:
-          PGUSER: ${{ env.PLATFORM_DATA_USERNAME }}
-          PGPASSWORD: ${{ env.PLATFORM_DATA_PASSWORD }}
-          PGHOST: ${{ env.PLATFORM_DATA_HOST }}
-          PGPORT: ${{ env.PLATFORM_DATA_PORT }}
-          PGDATABASE: ${{ vars.IN_APP_NOTIFICATION_SQL_DB_NAME }}
+          PGDATABASE: ${{ vars.TRACING_DB_NAME }}
         run: |
           $SCRIPTS_FOLDER/truncateSQLTables.sh
 
@@ -334,27 +293,7 @@ jobs:
 
           npm run kafka:createTopics
 
-      - name: Purge Auth-Server DynamoDB Tables
-        id: purge_dynamodb
-        if: ${{ always() }}
-        env:
-          AWS_REGION: ${{ secrets.AWS_REGION}}
-          PLATFORM_STATES_TABLE_NAME: ${{ vars.PLATFORM_STATES_TABLE_NAME }}
-          TOKEN_GENERATION_TABLE_NAME: ${{ vars.TOKEN_GENERATION_TABLE_NAME }}
-        run: |
-          set -euo pipefail
-
-          echo "Starting ${PLATFORM_STATES_TABLE_NAME} DynamoDB table purge..."
-          ./scripts/purge-dynamodb-tables.sh  "${PLATFORM_STATES_TABLE_NAME}"
-          echo "${PLATFORM_STATES_TABLE_NAME} table purged successfully"
-
-          echo "Starting ${TOKEN_GENERATION_TABLE_NAME} DynamoDB table purge..."
-          ./scripts/purge-dynamodb-tables.sh  "${TOKEN_GENERATION_TABLE_NAME}"
-          echo "${TOKEN_GENERATION_TABLE_NAME} DynamoDB tables purged successfully"
-
-          echo "DynamoDB tables purged successfully"
-
-      - name: Restore Dump
+      - name: Restore Tracing Dump
         id: db_dump_restore
         shell: bash
         env:
@@ -362,7 +301,7 @@ jobs:
           PGPASSWORD: ${{ env.PLATFORM_DATA_PASSWORD }}
           PGHOST: ${{ env.PLATFORM_DATA_HOST }}
           PGPORT: ${{ env.PLATFORM_DATA_PORT }}
-          PGDATABASE: ${{ vars.EVENT_STORE_DB_NAME }}
+          PGDATABASE: ${{ vars.TRACING_DB_NAME }}
         run: |
           $SCRIPTS_FOLDER/restoreEventStore.sh
 
