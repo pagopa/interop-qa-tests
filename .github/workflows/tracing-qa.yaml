@@ -7,26 +7,16 @@ on:
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Environment to run tests against'
+        description: 'Environment to run tracing e2e-tests against'
         required: true
-        default: es1-qa
+        default: tracing-qa
         type: choice
         options:
-          - es1-dev
-          - es1-qa
-          - es1-vapt
-      kafkaPurgeTopics:
-        description: 'Purge Kafka topics'
-        required: true
-        default: false
-        type: boolean
+          - tracing-dev
+          - tracing-qa
+          - tracing-vapt
       runDataPreparation:
         description: 'Data preparation (wipe + reload dump)'
-        required: true
-        default: false
-        type: boolean
-      runJSTests:
-        description: 'Run JavaScript test suite'
         required: true
         default: false
         type: boolean
@@ -34,7 +24,7 @@ on:
       runJavaTests:
         description: 'Run Java test in pn-b2b-client'
         required: true
-        default: false
+        default: true
         type: boolean
       javaTestSuite:
         description: 'Choose which Java test suite to run'
@@ -46,11 +36,6 @@ on:
         required: false
         default: main
         type: string
-      strictVersionCheck:
-        description: 'strictVersionCheck - DEPRECATED - will be removed in the future'
-        required: false
-        default: false
-        type: boolean
 
 
 defaults:
@@ -69,16 +54,15 @@ env:
 jobs:
   workflow_context:
     runs-on: ubuntu-22.04
-    environment: ${{ github.event_name == 'schedule' && 'es1-qa' || inputs.environment }}
+    environment: ${{ github.event_name == 'schedule' && 'tracing-qa' || inputs.environment }}
     outputs:
       environment: ${{ steps.set_runtime_env.outputs.environment }}
-      kafkaPurgeTopics: ${{ steps.set_runtime_env.outputs.kafkaPurgeTopics }}
+      kafkaPurgeTopics: "false"
       runDataPreparation: ${{ steps.set_runtime_env.outputs.runDataPreparation }}
       runJSTests: ${{ steps.set_runtime_env.outputs.runJSTests }}
       runJavaTests: ${{ steps.set_runtime_env.outputs.runJavaTests }}
       javaTestSuite: ${{ steps.set_runtime_env.outputs.javaTestSuite }}
       javaBranchName: ${{ steps.set_runtime_env.outputs.javaBranchName }}
-      strictVersionCheck: ${{ steps.set_runtime_env.outputs.strictVersionCheck }}
 
     steps:
       - name: Check trigger type
@@ -94,23 +78,21 @@ jobs:
         id: set_runtime_env
         run: |
           if [[ "${{ steps.check_trigger.outputs.is_schedule }}" == "true" ]]; then
-            environment="es1-qa"
-            kafkaPurgeTopics="true"
+            environment="tracing-qa"
+            kafkaPurgeTopics="false\"
             runDataPreparation="true"
             runJSTests="false"
             runJavaTests="true"
             javaTestSuite="NRTStandard"
             javaBranchName="develop"
-            strictVersionCheck="false"
           else
             environment="${{ inputs.environment }}"
             kafkaPurgeTopics="${{ inputs.kafkaPurgeTopics }}"
             runDataPreparation="${{ inputs.runDataPreparation }}"
-            runJSTests="${{ inputs.runJSTests }}"
+            runJSTests="false"
             runJavaTests="${{ inputs.runJavaTests }}"
             javaTestSuite="${{ inputs.javaTestSuite || 'NRTStandard' }}"
             javaBranchName="${{ inputs.javaBranchName || 'develop' }}"
-            strictVersionCheck="${{ inputs.strictVersionCheck }}"
           fi
 
           {
@@ -121,7 +103,6 @@ jobs:
             echo "runJavaTests=$runJavaTests"
             echo "javaTestSuite=$javaTestSuite"
             echo "javaBranchName=$javaBranchName"
-            echo "strictVersionCheck=$strictVersionCheck"
           } >> "$GITHUB_OUTPUT"
 
       - name: Print Inputs
@@ -139,7 +120,6 @@ jobs:
           echo "- runJavaTests: \`${{ steps.set_runtime_env.outputs.runJavaTests }}\`" >> $GITHUB_STEP_SUMMARY
           echo "- javaTestSuite: \`${{ steps.set_runtime_env.outputs.javaTestSuite }}\`" >> $GITHUB_STEP_SUMMARY
           echo "- javaBranchName: \`${{ steps.set_runtime_env.outputs.javaBranchName }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- strictVersionCheck: \`${{ steps.set_runtime_env.outputs.strictVersionCheck }}\`" >> $GITHUB_STEP_SUMMARY
 
   create_runner:
     name: Create Self-Hosted Runner
@@ -167,38 +147,9 @@ jobs:
           ecs_task_sec_group: ${{ secrets.SEC_GROUP_ID }}
           pat_token: ${{ secrets.BOT_TOKEN }}
 
-  svc_version_check:
-    name: Check Deployed Versions
-    needs: [workflow_context, create_runner]
-    if: ${{ needs.workflow_context.outputs.strictVersionCheck == 'true' }}
-    runs-on: [self-hosted, "run_id:${{ needs.workflow_context.outputs.environment }}-${{ github.run_id }}"]
-    environment: ${{ needs.workflow_context.outputs.environment }}
-    steps:
-      - name: Checkout
-        id: checkout
-        uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3
-
-      - name: Get plat-dep versions
-        run: |
-          curl ${{ vars.PLAT_DEP_VERSIONS_URL }} -o images.yaml
-
-      - name: Set kubeconfig
-        run: |
-            aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name ${{ secrets.EKS_CLUSTER_NAME }}
-
-      - name: Check deployed versions
-        id: check_svc_version
-        shell: bash
-        env:
-            AWS_REGION: ${{ secrets.AWS_REGION}}
-            EKS_CLUSTER_NAME: ${{ secrets.EKS_CLUSTER_NAME}}
-            K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE }}
-        run: |
-           $SCRIPTS_FOLDER/checkSvcVersion.sh images.yaml
-
   data_prep:
     name: Data Preparation
-    needs: [workflow_context, svc_version_check, create_runner]
+    needs: [workflow_context, create_runner]
     runs-on: [self-hosted, "run_id:${{ needs.workflow_context.outputs.environment }}-${{ github.run_id }}"]
     environment: ${{ needs.workflow_context.outputs.environment }}
     if: ${{ always() && needs.workflow_context.outputs.runDataPreparation == 'true' && needs.create_runner.result == 'success' }}
@@ -575,7 +526,7 @@ jobs:
 
   delete_runner:
     name: Delete Self-Hosted Runner
-    needs: [workflow_context, create_runner, svc_version_check, data_prep, run_js_test, run_java_test]
+    needs: [workflow_context, create_runner, data_prep, run_js_test, run_java_test]
     if: ${{ always() }}
     runs-on: ubuntu-22.04
     strategy:
