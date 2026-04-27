@@ -43,9 +43,9 @@ on:
         default: main
         type: string
       strictVersionCheck:
-        description: 'DEPRECATED - will be removed in the future'
+        description: 'strictVersionCheck - DEPRECATED - will be removed in the future'
         required: false
-        default: true
+        default: false
         type: boolean
 
 
