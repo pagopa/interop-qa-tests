@@ -467,7 +467,7 @@ jobs:
 
   run_java_test:
     name: Run Java Cucumber Test Suite
-    if: ${{ always() && needs.workflow_context.outputs.runJSTests != 'true' && needs.workflow_context.outputs.runJavaTests == 'true' }}
+    if: ${{ always() && needs.create_runner.result == 'success' && needs.workflow_context.outputs.runJSTests != 'true' && needs.workflow_context.outputs.runJavaTests == 'true' }}
     needs: [workflow_context, create_runner, data_prep, run_js_test]
     runs-on: [self-hosted, "run_id:${{ needs.workflow_context.outputs.environment }}-${{ github.run_id }}"]
     environment: ${{ needs.workflow_context.outputs.environment }}
