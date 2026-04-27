@@ -15,11 +15,6 @@ on:
           - tracing-dev
           - tracing-qa
           - tracing-vapt
-      kafkaPurgeTopics:
-        description: 'Purge Kafka topics'
-        required: true
-        default: false
-        type: boolean
       runDataPreparation:
         description: 'Data preparation (wipe + reload dump)'
         required: true
@@ -62,7 +57,6 @@ jobs:
     environment: ${{ github.event_name == 'schedule' && 'tracing-qa' || inputs.environment }}
     outputs:
       environment: ${{ steps.set_runtime_env.outputs.environment }}
-      kafkaPurgeTopics: ${{ steps.set_runtime_env.outputs.kafkaPurgeTopics }}
       runDataPreparation: ${{ steps.set_runtime_env.outputs.runDataPreparation }}
       runJSTests: ${{ steps.set_runtime_env.outputs.runJSTests }}
       runJavaTests: ${{ steps.set_runtime_env.outputs.runJavaTests }}
@@ -84,7 +78,6 @@ jobs:
         run: |
           if [[ "${{ steps.check_trigger.outputs.is_schedule }}" == "true" ]]; then
             environment="tracing-qa"
-            kafkaPurgeTopics="false"
             runDataPreparation="true"
             runJSTests="false"
             runJavaTests="true"
@@ -92,7 +85,6 @@ jobs:
             javaBranchName="develop"
           else
             environment="${{ inputs.environment }}"
-            kafkaPurgeTopics="${{ inputs.kafkaPurgeTopics }}"
             runDataPreparation="${{ inputs.runDataPreparation }}"
             runJSTests="false"
             runJavaTests="${{ inputs.runJavaTests }}"
@@ -102,7 +94,6 @@ jobs:
 
           {
             echo "environment=$environment"
-            echo "kafkaPurgeTopics=$kafkaPurgeTopics"
             echo "runDataPreparation=$runDataPreparation"
             echo "runJSTests=$runJSTests"
             echo "runJavaTests=$runJavaTests"
@@ -119,7 +110,6 @@ jobs:
           echo "- normalized environment: \`${{ vars.NORM_ENV }}\`" >> $GITHUB_STEP_SUMMARY
           echo "- ref: \`${{ github.ref }}\`" >> $GITHUB_STEP_SUMMARY
           echo "- plat-dep versions: \`${{ vars.PLAT_DEP_VERSIONS_URL }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- kafkaPurgeTopics: \`${{ steps.set_runtime_env.outputs.kafkaPurgeTopics }}\`" >> $GITHUB_STEP_SUMMARY
           echo "- runDataPreparation: \`${{ steps.set_runtime_env.outputs.runDataPreparation }}\`" >> $GITHUB_STEP_SUMMARY
           echo "- runJSTests: \`${{ steps.set_runtime_env.outputs.runJSTests }}\`" >> $GITHUB_STEP_SUMMARY
           echo "- runJavaTests: \`${{ steps.set_runtime_env.outputs.runJavaTests }}\`" >> $GITHUB_STEP_SUMMARY
@@ -261,37 +251,6 @@ jobs:
           PGDATABASE: ${{ vars.TRACING_DB_NAME }}
         run: |
           $SCRIPTS_FOLDER/truncateSQLTables.sh
-
-      - name: Checkout Kafka tools
-        id: kafka_tools
-        if: ${{ always() && needs.workflow_context.outputs.kafkaPurgeTopics == 'true' }}
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
-        with:
-          repository: pagopa/pdnd-interop-platform-deployment
-          path: plat-dep
-          sparse-checkout: kafka
-
-      - name: Purge Kafka topics
-        id: clean_kafka
-        if: ${{ always() && needs.workflow_context.outputs.kafkaPurgeTopics == 'true' }}
-        shell: bash
-        working-directory: plat-dep/kafka/scripts
-        env:
-            AWS_REGION: ${{ secrets.AWS_REGION}}
-            KAFKA_BROKERS: ${{ vars.KAFKA_BROKERS }}
-            TOPICS_PROPERTIES_PATH: ../topics/${{ vars.NORM_ENV }}/
-        run: |
-          set -euo pipefail
-
-          npm ci
-
-          export DOMAIN_TOPIC_PREFIX="${{ vars.EVENT_STORE_DOMAIN_TOPIC_PREFIX }}"
-          npm run kafka:deleteTopics
-
-          export DOMAIN_TOPIC_PREFIX="${{ vars.OUTBOUND_DOMAIN_TOPIC_PREFIX }}"
-          npm run kafka:deleteTopics
-
-          npm run kafka:createTopics
 
       - name: Restore Tracing Dump
         id: db_dump_restore
