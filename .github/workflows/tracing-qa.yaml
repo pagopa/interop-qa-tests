@@ -66,9 +66,6 @@ name: Tracing QA workflow
 # ======================================================================================
 
 on:
-  schedule:
-    - cron: '45 18 * * 1-5'
-      timezone: "Europe/Rome"
   workflow_dispatch:
     inputs:
       environment:
@@ -146,8 +143,8 @@ jobs:
             runDataPreparation="true"
             runJSTests="false"
             runJavaTests="true"
-            javaTestSuite="NRTStandard"
-            javaBranchName="develop"
+            javaTestSuite="PLACEHOLDER"
+            javaBranchName="PLACEHOLDER"
           else
             environment="${{ inputs.environment }}"
             runDataPreparation="${{ inputs.runDataPreparation }}"
