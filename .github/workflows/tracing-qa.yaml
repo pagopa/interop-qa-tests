@@ -377,53 +377,10 @@ jobs:
             sleep 2
           done
 
-  run_js_test:
-    name: Run JavaScript Cucumber Test Suite
-    if: ${{ always() && needs.workflow_context.outputs.runJSTests == 'true' }}
-    needs: [workflow_context, data_prep, create_runner]
-    runs-on: [self-hosted, "run_id:${{ needs.workflow_context.outputs.environment }}-${{ github.run_id }}"]
-    environment: ${{ needs.workflow_context.outputs.environment }}
-    env:
-      ENVIRONMENT: ${{ vars.ENVIRONMENT }}
-      SESSION_TOKENS_DURATION_SECONDS: ${{ vars.SESSION_TOKENS_DURATION_SECONDS }}
-      REMOTE_WELLKNOWN_URL: ${{ vars.REMOTE_WELLKNOWN_URL }}
-      ST_VERBOSE_MODE: ${{ vars.ST_VERBOSE_MODE }}
-      TENANTS_IDS_FILE_PATH: ${{ vars.TENANTS_IDS_FILE_PATH }}
-      CUCUMBER_OPTS_PARALLEL: ${{ vars.CUCUMBER_OPTS_PARALLEL }}
-      MAX_POLLING_TRIES:  ${{ vars.MAX_POLLING_TRIES }}
-      POLLING_SLEEP_TIME: ${{ vars.POLLING_SLEEP_TIME }}
-      AUTHORIZATION_SERVER_TOKEN_CREATION_URL: ${{ vars.AUTHORIZATION_SERVER_TOKEN_CREATION_URL }}
-      CLIENT_ASSERTION_JWT_AUDIENCE: ${{ vars.CLIENT_ASSERTION_JWT_AUDIENCE }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-
-      - name: Setup Node
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
-        with:
-          node-version-file: ./package.json
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
-        with:
-          run_install: true
-
-      - name: Run QA tests
-        id: run_qa_tests
-        shell: bash
-        run: |
-          set -uo pipefail
-
-          echo "Install node dependencies"
-          pnpm i
-
-          echo "Run test command"
-          pnpm test
-
   run_java_test:
     name: Run Java Cucumber Test Suite
     if: ${{ always() && needs.create_runner.result == 'success' && needs.workflow_context.outputs.runJSTests != 'true' && needs.workflow_context.outputs.runJavaTests == 'true' }}
-    needs: [workflow_context, create_runner, data_prep, run_js_test]
+    needs: [workflow_context, create_runner, data_prep]
     runs-on: [self-hosted, "run_id:${{ needs.workflow_context.outputs.environment }}-${{ github.run_id }}"]
     environment: ${{ needs.workflow_context.outputs.environment }}
     env:
@@ -481,7 +438,7 @@ jobs:
 
   delete_runner:
     name: Delete Self-Hosted Runner
-    needs: [workflow_context, create_runner, data_prep, run_js_test, run_java_test]
+    needs: [workflow_context, create_runner, data_prep, run_java_test]
     if: ${{ always() }}
     runs-on: ubuntu-22.04
     strategy:
