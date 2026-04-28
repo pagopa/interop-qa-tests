@@ -1,5 +1,71 @@
 name: Tracing QA workflow
 
+# ======================================================================================
+# WORKFLOW DOCUMENTATION: TRACING QA
+# ======================================================================================
+# This workflow dynamically selects a GitHub Environment based on the 'environment' 
+# input or the cron schedule. All 'vars.*' and 'secrets.*' listed below are scoped 
+# to the selected environment in the GitHub repository settings.
+#
+# --------------------------------------------------------------------------------------
+# 1. ENVIRONMENT-SPECIFIC VARIABLES (vars)
+# --------------------------------------------------------------------------------------
+# These variables must be defined within the GitHub Environment UI.
+# Default values are not defined in this YAML but are managed in GitHub Settings.
+#
+# - K8S_NAMESPACE:                 The Kubernetes namespace for scaling and deployment ops.
+# - TRACING_STORE_HOST:            The hostname for the Tracing PostgreSQL database.
+# - TRACING_DB_NAME:               The name of the database to be truncated/restored.
+# - MAX_POLLING_TRIES:             Retry limit for K8s pod readiness and DB checks.
+# - POLLING_SLEEP_TIME:            Seconds to wait between polling attempts.
+# - DATA_PREPARATION_BUCKET:       S3 bucket name containing the database dumps.
+# - TRACING_DUMP_S3_PREFIX:         S3 path/prefix for tracing_store DB dumps.
+# - ECS_TASK_CONTAINER_NAME:       The container name used within the AWS ECS task.
+# - ECS_TASK_MAX_DURATION_SECONDS: Max lifecycle time for the ephemeral self-hosted runner.
+# - ENVIRONMENT:                   A string label passed to test suites (e.g., "dev" or "qa").
+# - REMOTE_WELLKNOWN_URL:          OIDC discovery URL for authentication tests.
+# - BFF_BASE_URL:                  The base URL for the Backend-for-Frontend service.
+# - ST_VERBOSE_MODE:               Boolean flag to enable/disable verbose test logging.
+# - TENANTS_IDS_FILE_PATH:         Path to the JSON/data file containing test tenant IDs.
+# - CLIENT_ASSERTION_JWT_AUDIENCE: The 'aud' claim required for JWT client assertions.
+# - NORM_ENV:                      A normalized environment name used for summary reporting.
+# - PLAT_DEP_VERSIONS_URL:         Reference URL for platform dependency versions.
+#
+# --------------------------------------------------------------------------------------
+# 2. ENVIRONMENT-SPECIFIC SECRETS (secrets)
+# --------------------------------------------------------------------------------------
+# - AWS_REGION:                    AWS Region for EKS, S3, and Secrets Manager.
+# - IAM_ROLE_ARN:                  The ARN of the role assumed by the ECS runner.
+# - ECS_CLUSTER_NAME:              The ECS cluster where the runner is spawned.
+# - ECS_TASK_DEFINITION:           The task definition ARN for the self-hosted runner.
+# - SUBNET_ID:                     VPC Subnet ID for the ECS task.
+# - SEC_GROUP_ID:                  VPC Security Group ID for the ECS task.
+# - BOT_TOKEN:                     GitHub PAT used to register the runner to the repo.
+# - EKS_CLUSTER_NAME:              The name of the EKS cluster for kubectl operations.
+# - TRACING_STORE_SECRET_ARN:      AWS Secrets Manager ARN for DB username/password.
+#
+# --------------------------------------------------------------------------------------
+# 3. WORKFLOW INPUTS & LOGICAL DEFAULTS
+# --------------------------------------------------------------------------------------
+# These inputs control which environment is read and the workflow behavior.
+#
+# - environment:                   Default: "tracing-qa". The GitHub Environment to use.
+# - runDataPreparation:            Default: false. Whether to wipe and reload S3 dumps.
+# - runJavaTests:                  Default: true. Whether to execute Maven/Java tests.
+# - javaTestSuite:                 Default: "NrtTest". The specific Java class to run.
+# - javaBranchName:                Default: "main". The branch of 'pn-b2b-client' to clone.
+#
+# --------------------------------------------------------------------------------------
+# 4. CROSS-ENVIRONMENT USAGE
+# --------------------------------------------------------------------------------------
+# This workflow is designed for "Environment Isolation." It does not read secrets 
+# from "other" environments simultaneously. Instead:
+# - If triggered by 'schedule': It is forced to use 'tracing-qa' settings.
+# - If triggered by 'workflow_dispatch': It uses the environment selected by the user.
+# - Repository-level secrets/vars: Used only if they are not overridden at the 
+#   Environment level.
+# ======================================================================================
+
 on:
   schedule:
     - cron: '45 18 * * 1-5'
@@ -150,8 +216,8 @@ jobs:
     if: ${{ always() && needs.workflow_context.outputs.runDataPreparation == 'true' && needs.create_runner.result == 'success' }}
     env:
       K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE }}
-      PLATFORM_DATA_HOST: ${{ vars.PLATFORM_DATA_HOST }}
-      PLATFORM_DATA_PORT: 5432
+      TRACING_STORE_HOST: ${{ vars.TRACING_STORE_HOST }}
+      TRACING_STORE_PORT: 5432
       LOCAL_TRACING_DUMPS: "./db_dumps/tracing"
       MAX_POLLING_TRIES: "${{ vars.MAX_POLLING_TRIES }}"
       POLLING_SLEEP_TIME: "${{ vars.POLLING_SLEEP_TIME }}"
@@ -166,9 +232,7 @@ jobs:
         run: |
             set -euo pipefail
 
-            mkdir -p $LOCAL_TENANT_DUMPS
-            mkdir -p $LOCAL_ATTRIBUTE_REGISTRY_DUMPS
-            mkdir -p $LOCAL_NOTIFICATION_CONFIG_DUMPS
+            mkdir -p $LOCAL_TRACING_DUMPS
 
       - name: Get dump from S3
         id: get_data_dumps
@@ -177,9 +241,7 @@ jobs:
         run: |
             set -euo pipefail
 
-            aws s3 cp "s3://${{ vars.DATA_PREPARATION_BUCKET }}/${{ vars.TENANT_DUMP_S3_PREFIX }}" $LOCAL_TENANT_DUMPS --recursive
-            aws s3 cp "s3://${{ vars.DATA_PREPARATION_BUCKET }}/${{ vars.ATTRIBUTE_REGISTRY_DUMP_S3_PREFIX }}" $LOCAL_ATTRIBUTE_REGISTRY_DUMPS --recursive
-            aws s3 cp "s3://${{ vars.DATA_PREPARATION_BUCKET }}/${{ vars.NOTIFICATION_CONFIG_DUMP_S3_PREFIX }}" $LOCAL_NOTIFICATION_CONFIG_DUMPS --recursive
+            aws s3 cp "s3://${{ vars.DATA_PREPARATION_BUCKET }}/${{ vars.TRACING_DUMP_S3_PREFIX }}" $LOCAL_TRACING_DUMPS --recursive
 
       - name: Scale down Deployments
         id: svc_scale_to_0
@@ -218,36 +280,36 @@ jobs:
             done
             echo "All the deployments have been scaled down to 0 replicas."
 
-      - name: Get Platform Data Credentials
-        id: get_platform_data_db_credentials
+      - name: Get Tracing Store Credentials
+        id: get_tracing_store_db_credentials
         env:
-          PLATFORM_DATA_SECRET_ARN: ${{ secrets.PLATFORM_DATA_SECRET_ARN }}
+          TRACING_STORE_SECRET_ARN: ${{ secrets.TRACING_STORE_SECRET_ARN }}
         shell: bash
         run: |
             set -euo pipefail
 
-            echo "Retrieving Platform Data credentials..."
+            echo "Retrieving Tracing Store credentials..."
 
-            PLATFORM_DATA_CREDENTIALS="$(aws secretsmanager get-secret-value --secret-id $PLATFORM_DATA_SECRET_ARN)"
+            TRACING_STORE_CREDENTIALS="$(aws secretsmanager get-secret-value --secret-id $TRACING_STORE_SECRET_ARN)"
 
-            echo "Retrieve Platform Data username"
-            PLATFORM_DATA_USERNAME="$(jq -r '.SecretString | fromjson | .username' <<< "$PLATFORM_DATA_CREDENTIALS")"
+            echo "Retrieve Tracing Store username"
+            TRACING_STORE_USERNAME="$(jq -r '.SecretString | fromjson | .username' <<< "$TRACING_STORE_CREDENTIALS")"
 
-            echo "Retrieve Platform Data password"
-            PLATFORM_DATA_PASSWORD="$(jq -r '.SecretString | fromjson | .password' <<< "$PLATFORM_DATA_CREDENTIALS")"
+            echo "Retrieve Tracing Store password"
+            TRACING_STORE_PASSWORD="$(jq -r '.SecretString | fromjson | .password' <<< "$TRACING_STORE_CREDENTIALS")"
 
-            echo "Update env vars with Platform Data credentials"
-            echo "PLATFORM_DATA_USERNAME=$PLATFORM_DATA_USERNAME" >> "$GITHUB_ENV"
-            echo "PLATFORM_DATA_PASSWORD=$PLATFORM_DATA_PASSWORD" >> "$GITHUB_ENV"
+            echo "Update env vars with Tracing Store credentials"
+            echo "TRACING_STORE_USERNAME=$TRACING_STORE_USERNAME" >> "$GITHUB_ENV"
+            echo "TRACING_STORE_PASSWORD=$TRACING_STORE_PASSWORD" >> "$GITHUB_ENV"
 
       - name: Truncate Tracing DB Tables
         id: tracing_db_truncate
         shell: bash
         env:
-          PGUSER: ${{ env.PLATFORM_DATA_USERNAME }}
-          PGPASSWORD: ${{ env.PLATFORM_DATA_PASSWORD }}
-          PGHOST: ${{ env.PLATFORM_DATA_HOST }}
-          PGPORT: ${{ env.PLATFORM_DATA_PORT }}
+          PGUSER: ${{ env.TRACING_STORE_USERNAME }}
+          PGPASSWORD: ${{ env.TRACING_STORE_PASSWORD }}
+          PGHOST: ${{ env.TRACING_STORE_HOST }}
+          PGPORT: ${{ env.TRACING_STORE_PORT }}
           PGDATABASE: ${{ vars.TRACING_DB_NAME }}
         run: |
           $SCRIPTS_FOLDER/truncateSQLTables.sh
@@ -256,10 +318,10 @@ jobs:
         id: db_dump_restore
         shell: bash
         env:
-          PGUSER: ${{ env.PLATFORM_DATA_USERNAME }}
-          PGPASSWORD: ${{ env.PLATFORM_DATA_PASSWORD }}
-          PGHOST: ${{ env.PLATFORM_DATA_HOST }}
-          PGPORT: ${{ env.PLATFORM_DATA_PORT }}
+          PGUSER: ${{ env.TRACING_STORE_USERNAME }}
+          PGPASSWORD: ${{ env.TRACING_STORE_PASSWORD }}
+          PGHOST: ${{ env.TRACING_STORE_HOST }}
+          PGPORT: ${{ env.TRACING_STORE_PORT }}
           PGDATABASE: ${{ vars.TRACING_DB_NAME }}
         run: |
           $SCRIPTS_FOLDER/restoreTracing.sh
