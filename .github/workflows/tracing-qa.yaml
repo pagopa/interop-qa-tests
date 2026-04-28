@@ -24,7 +24,6 @@ name: Tracing QA workflow
 # - ECS_TASK_MAX_DURATION_SECONDS: Max lifecycle time for the ephemeral self-hosted runner.
 # - ENVIRONMENT:                   A string label passed to test suites (e.g., "dev" or "qa").
 # - REMOTE_WELLKNOWN_URL:          OIDC discovery URL for authentication tests.
-# - BFF_BASE_URL:                  The base URL for the Backend-for-Frontend service.
 # - ST_VERBOSE_MODE:               Boolean flag to enable/disable verbose test logging.
 # - TENANTS_IDS_FILE_PATH:         Path to the JSON/data file containing test tenant IDs.
 # - CLIENT_ASSERTION_JWT_AUDIENCE: The 'aud' claim required for JWT client assertions.
@@ -391,7 +390,6 @@ jobs:
       ENVIRONMENT: ${{ vars.ENVIRONMENT }}
       SESSION_TOKENS_DURATION_SECONDS: ${{ vars.SESSION_TOKENS_DURATION_SECONDS }}
       REMOTE_WELLKNOWN_URL: ${{ vars.REMOTE_WELLKNOWN_URL }}
-      BFF_BASE_URL: ${{ vars.BFF_BASE_URL }}
       ST_VERBOSE_MODE: ${{ vars.ST_VERBOSE_MODE }}
       TENANTS_IDS_FILE_PATH: ${{ vars.TENANTS_IDS_FILE_PATH }}
       CUCUMBER_OPTS_PARALLEL: ${{ vars.CUCUMBER_OPTS_PARALLEL }}
