@@ -109,8 +109,6 @@ permissions:
   contents: read
 
 env:
-   skip_checkUserMembership: "true"
-   skip_failNotSelectedEnvTagRef: "true"
    SCRIPTS_FOLDER: "./scripts"
 
 jobs:
