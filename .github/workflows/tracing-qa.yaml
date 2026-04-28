@@ -34,7 +34,7 @@ name: Tracing QA workflow
 # 2. ENVIRONMENT-SPECIFIC SECRETS (secrets)
 # --------------------------------------------------------------------------------------
 # - AWS_REGION:                    AWS Region for EKS, S3, and Secrets Manager.
-# - IAM_ROLE_ARN:                  The ARN of the role assumed by the ECS runner.
+# - ECS_IAM_ROLE_ARN:              The ARN of the role assumed by the ECS runner.
 # - ECS_CLUSTER_NAME:              The ECS cluster where the runner is spawned.
 # - ECS_TASK_DEFINITION:           The task definition ARN for the self-hosted runner.
 # - SUBNET_ID:                     VPC Subnet ID for the ECS task.
@@ -426,14 +426,14 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: qa-tests-log
-          path: ./pn-b2b-client/interop-qa-tests/qa-tests.log
+          path: ./pn-b2b-client/interop-qa-tests/tracing-qa-tests.log
 
       - name: Upload Cucumber Report
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: cucumber-report
-          path: pn-b2b-client/interop-qa-tests/target/cucumber-report*
+          path: pn-b2b-client/interop-qa-tests/target/tracing-cucumber-report*
           retention-days: 10
 
   delete_runner:
