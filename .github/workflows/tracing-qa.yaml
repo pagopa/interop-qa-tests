@@ -419,7 +419,7 @@ jobs:
           echo "Using Spring profile: ${SPRING_PROFILE}"
 
           cd ./pn-b2b-client/interop-qa-tests
-          mvn $SPRING_PROFILE -Dtest=it.pagopa.pn.interop.cucumber.${{ needs.workflow_context.outputs.javaTestSuite }} clean verify > qa-tests.log 2>&1
+          mvn $SPRING_PROFILE -Dtest=it.pagopa.pn.interop.cucumber.${{ needs.workflow_context.outputs.javaTestSuite }} clean verify > tracing-qa-tests.log 2>&1
 
       - name: Upload QA test logs
         if: always()
