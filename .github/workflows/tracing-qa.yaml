@@ -148,7 +148,7 @@ jobs:
             javaBranchName="PLACEHOLDER"
           else
             environment="${{ inputs.environment }}"
-            runDataPreparation="${{ inputs.runDataPreparation }}" # Data preparation is not ready
+            runDataPreparation="${{ inputs.runDataPreparation }}"
             runJSTests="false"
             runJavaTests="${{ inputs.runJavaTests }}"
             javaTestSuite="${{ inputs.javaTestSuite || 'NRTStandard' }}"
