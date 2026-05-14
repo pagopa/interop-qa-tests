@@ -126,20 +126,34 @@ jobs:
 
       - name: Print Inputs
         id: print_inputs
+        env:
+          PRINT_INPUT_TRIGGER: ${{ github.event_name }}
+          PRINT_INPUT_IS_SCHEDULE: ${{ steps.check_trigger.outputs.is_schedule }}
+          PRINT_INPUT_ENVIRONMENT: ${{ steps.set_runtime_env.outputs.environment }}
+          PRINT_INPUT_NORMALIZED_ENVIRONMENT: ${{ vars.NORM_ENV }}
+          PRINT_INPUT_REF: ${{ github.ref }}
+          PRINT_INPUT_PLAT_DEP_VERSIONS: ${{ vars.PLAT_DEP_VERSIONS_URL }}
+          PRINT_INPUT_KAFKA_PURGE_TOPICS: ${{ steps.set_runtime_env.outputs.kafkaPurgeTopics }}
+          PRINT_INPUT_RUN_DATA_PREPARATION: ${{ steps.set_runtime_env.outputs.runDataPreparation }}
+          PRINT_INPUT_RUN_JSTESTS: ${{ steps.set_runtime_env.outputs.runJSTests }}
+          PRINT_INPUT_RUN_JAVA_TESTS: ${{ steps.set_runtime_env.outputs.runJavaTests }}
+          PRINT_INPUT_JAVA_TEST_SUITE: ${{ steps.set_runtime_env.outputs.javaTestSuite }}
+          PRINT_INPUT_JAVA_BRANCH_NAME: ${{ steps.set_runtime_env.outputs.javaBranchName }}
+          PRINT_INPUT_STRICT_VERSION_CHECK: ${{ steps.set_runtime_env.outputs.strictVersionCheck }}
         run: |
-          echo "- trigger: \`${{ github.event_name }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- is schedule: \`${{ steps.check_trigger.outputs.is_schedule }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- environment: \`${{ steps.set_runtime_env.outputs.environment }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- normalized environment: \`${{ vars.NORM_ENV }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- ref: \`${{ github.ref }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- plat-dep versions: \`${{ vars.PLAT_DEP_VERSIONS_URL }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- kafkaPurgeTopics: \`${{ steps.set_runtime_env.outputs.kafkaPurgeTopics }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- runDataPreparation: \`${{ steps.set_runtime_env.outputs.runDataPreparation }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- runJSTests: \`${{ steps.set_runtime_env.outputs.runJSTests }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- runJavaTests: \`${{ steps.set_runtime_env.outputs.runJavaTests }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- javaTestSuite: \`${{ steps.set_runtime_env.outputs.javaTestSuite }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- javaBranchName: \`${{ steps.set_runtime_env.outputs.javaBranchName }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- strictVersionCheck: \`${{ steps.set_runtime_env.outputs.strictVersionCheck }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- trigger: \`$PRINT_INPUT_TRIGGER\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- is schedule: \`$PRINT_INPUT_IS_SCHEDULE\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- environment: \`$PRINT_INPUT_ENVIRONMENT\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- normalized environment: \`$PRINT_INPUT_NORMALIZED_ENVIRONMENT\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- ref: \`$PRINT_INPUT_REF\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- plat-dep versions: \`$PRINT_INPUT_PLAT_DEP_VERSIONS\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- kafkaPurgeTopics: \`$PRINT_INPUT_KAFKA_PURGE_TOPICS\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- runDataPreparation: \`$PRINT_INPUT_RUN_DATA_PREPARATION\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- runJSTests: \`$PRINT_INPUT_RUN_JSTESTS\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- runJavaTests: \`$PRINT_INPUT_RUN_JAVA_TESTS\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- javaTestSuite: \`$PRINT_INPUT_JAVA_TEST_SUITE\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- javaBranchName: \`$PRINT_INPUT_JAVA_BRANCH_NAME\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- strictVersionCheck: \`$PRINT_INPUT_STRICT_VERSION_CHECK\`" >> "$GITHUB_STEP_SUMMARY"
 
   create_runner:
     name: Create Self-Hosted Runner
