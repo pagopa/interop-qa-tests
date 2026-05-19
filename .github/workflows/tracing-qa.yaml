@@ -94,12 +94,12 @@ on:
       javaTestSuite:
         description: 'Choose which Java test suite to run'
         required: false
-        default: NrtTest
+        default: InteropTracingTest
         type: string
       javaBranchName:
         description: 'Provide the branch name for pn-b2b-client to clone'
         required: false
-        default: main
+        default: feature/QA-13610-tracing-refactoring
         type: string
 
 
@@ -144,15 +144,15 @@ jobs:
             runDataPreparation="true"
             runJSTests="false"
             runJavaTests="true"
-            javaTestSuite="PLACEHOLDER"
-            javaBranchName="PLACEHOLDER"
+            javaTestSuite="InteropTracingTest"
+            javaBranchName="feature/QA-13610-tracing-refactoring"
           else
             environment="${{ inputs.environment }}"
             runDataPreparation="${{ inputs.runDataPreparation }}"
             runJSTests="false"
             runJavaTests="${{ inputs.runJavaTests }}"
-            javaTestSuite="${{ inputs.javaTestSuite || 'NRTStandard' }}"
-            javaBranchName="${{ inputs.javaBranchName || 'develop' }}"
+            javaTestSuite="${{ inputs.javaTestSuite || 'InteropTracingTest' }}"
+            javaBranchName="${{ inputs.javaBranchName || 'feature/QA-13610-tracing-refactoring' }}"
           fi
 
           {
@@ -328,6 +328,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+
+          # Not all environment have scaledobjects
+          kubectl scale deployment -n $K8S_NAMESPACE --replicas=1 --all
 
           for scaledobject in $(kubectl get scaledobjects -n $K8S_NAMESPACE -o jsonpath='{.items[*].metadata.name}'); do
             echo "Resuming ScaledObject: $scaledobject"
