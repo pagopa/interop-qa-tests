@@ -329,7 +329,9 @@ jobs:
         run: |
           set -euo pipefail
 
-          # Not all environment have scaledobjects
+          # Not all environments have ScaledObjects. Scale every deployment to 1 replica
+          # first so deployments without a ScaledObject are also brought back up; the
+          # resume loop below only affects deployments managed by KEDA.
           kubectl scale deployment -n $K8S_NAMESPACE --replicas=1 --all
 
           for scaledobject in $(kubectl get scaledobjects -n $K8S_NAMESPACE -o jsonpath='{.items[*].metadata.name}'); do
