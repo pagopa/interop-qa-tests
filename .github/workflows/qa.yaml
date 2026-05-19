@@ -525,25 +525,33 @@ jobs:
       ST_VERBOSE_MODE: ${{ vars.ST_VERBOSE_MODE }}
 
     steps:
-      - name: Discover tenant-process pod IP address
-        id: discover_tenant_process_pod_ip_address
+      - name: Discover tenant-process host
+        id: discover_tenant_process_host
         shell: bash
         run: |
           set -euo pipefail
 
-          echo "Discovering tenant-process pod IP address..."
+          echo "Discovering tenant-process host..."
 
           aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name ${{ secrets.EKS_CLUSTER_NAME }}
 
-          TENANT_PROCESS_POD_IP=$(kubectl get pods -n ${{ vars.K8S_NAMESPACE }} -l app.kubernetes.io/name=interop-be-tenant-process -o jsonpath='{.items[0].status.podIP}')
+          TENANT_PROCESS_IP=$(kubectl get pods -n ${{ vars.K8S_NAMESPACE }} -l app.kubernetes.io/name=interop-be-tenant-process -o jsonpath='{.items[0].status.podIP}')
+          TENANT_PROCESS_PORT=$(kubectl get pods -n ${{ vars.K8S_NAMESPACE }} -l app.kubernetes.io/name=interop-be-tenant-process -o jsonpath='{.items[0].spec.containers[0].ports[0].containerPort}')
 
-          if [[ -z "$TENANT_PROCESS_POD_IP" ]]; then
+          if [[ -z "$TENANT_PROCESS_IP" ]]; then
             echo "Unable to discover tenant-process pod IP address"
             exit 1
           fi
 
-          echo "Successfully discovered the tenant-process pod IP address: $TENANT_PROCESS_POD_IP"
-          echo "TENANT_PROCESS_POD_IP=$TENANT_PROCESS_POD_IP" >> "$GITHUB_ENV"
+          if [[ -z "$TENANT_PROCESS_PORT" ]]; then
+            echo "Unable to discover tenant-process pod port"
+            exit 1
+          fi
+
+          echo "Successfully discovered the tenant-process pod IP address: $TENANT_PROCESS_IP"
+          echo "Successfully discovered the tenant-process pod port: $TENANT_PROCESS_PORT"
+          
+          echo "TENANT_PROCESS_HOST=http://$TENANT_PROCESS_IP:$TENANT_PROCESS_PORT" >> "$GITHUB_ENV"
 
       - name: Set up Maven
         uses: s4u/setup-maven-action@6d44c18d67d9e1549907b8815efa5e4dada1801b # v1.12.0
@@ -562,6 +570,8 @@ jobs:
       - name: Run QA tests
         id: run_pn-b2b-client_tests
         shell: bash
+        env:
+          TENANT_PROCESS_HOST: "${{ github.env.TENANT_PROCESS_HOST }}"
         run: |
           set -uo pipefail
           echo "Running tests..."
