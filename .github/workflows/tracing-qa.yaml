@@ -66,6 +66,9 @@ name: Tracing QA workflow
 # ======================================================================================
 
 on:
+  #schedule:
+  #  - cron: '45 18 * * 1-5'
+  #    timezone: "Europe/Rome"
   workflow_dispatch:
     inputs:
       environment:
@@ -77,11 +80,11 @@ on:
           - tracing-dev
           - tracing-qa
           - tracing-vapt
-      #runDataPreparation: # Data Preparation is not ready
-      #  description: 'Data preparation (wipe + reload dump)'
-      #  required: true
-      #  default: false
-      #  type: boolean
+      runDataPreparation:
+        description: 'Data preparation (wipe + reload dump)'
+        required: true
+        default: false
+        type: boolean
       # The inputs below are specific for running the Java test suites defined in pn-b2b-client.
       runJavaTests:
         description: 'Run Java test in pn-b2b-client'
@@ -138,16 +141,14 @@ jobs:
         run: |
           if [[ "${{ steps.check_trigger.outputs.is_schedule }}" == "true" ]]; then
             environment="tracing-qa"
-            #runDataPreparation="true" # Data preparation is not ready
-            runDataPreparation="false"
+            runDataPreparation="true"
             runJSTests="false"
             runJavaTests="true"
             javaTestSuite="PLACEHOLDER"
             javaBranchName="PLACEHOLDER"
           else
             environment="${{ inputs.environment }}"
-            #runDataPreparation="${{ inputs.runDataPreparation }}" # Data preparation is not ready
-            runDataPreparation="false"
+            runDataPreparation="${{ inputs.runDataPreparation }}"
             runJSTests="false"
             runJavaTests="${{ inputs.runJavaTests }}"
             javaTestSuite="${{ inputs.javaTestSuite || 'NRTStandard' }}"
