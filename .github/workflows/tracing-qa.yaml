@@ -166,29 +166,29 @@ jobs:
       - name: Print Inputs
         id: print_inputs
         env:
-          PRINT_INPUT_TRIGGER: ${{ github.event_name }}
-          PRINT_INPUT_IS_SCHEDULE: ${{ steps.check_trigger.outputs.is_schedule }}
-          PRINT_INPUT_ENVIRONMENT: ${{ steps.set_runtime_env.outputs.environment }}
-          PRINT_INPUT_NORMALIZED_ENVIRONMENT: ${{ vars.NORM_ENV }}
-          PRINT_INPUT_REF: ${{ github.ref }}
-          PRINT_INPUT_PLAT_DEP_VERSIONS: ${{ vars.PLAT_DEP_VERSIONS_URL }}
-          PRINT_INPUT_RUN_DATA_PREPARATION: ${{ steps.set_runtime_env.outputs.runDataPreparation }}
-          PRINT_INPUT_RUN_JSTESTS: ${{ steps.set_runtime_env.outputs.runJSTests }}
-          PRINT_INPUT_RUN_JAVA_TESTS: ${{ steps.set_runtime_env.outputs.runJavaTests }}
-          PRINT_INPUT_JAVA_TEST_SUITE: ${{ steps.set_runtime_env.outputs.javaTestSuite }}
-          PRINT_INPUT_JAVA_BRANCH_NAME: ${{ steps.set_runtime_env.outputs.javaBranchName }}
+          INPUT_TRIGGER: ${{ github.event_name }}
+          INPUT_IS_SCHEDULE: ${{ steps.check_trigger.outputs.is_schedule }}
+          INPUT_ENVIRONMENT: ${{ steps.set_runtime_env.outputs.environment }}
+          INPUT_NORMALIZED_ENVIRONMENT: ${{ vars.NORM_ENV }}
+          INPUT_REF: ${{ github.ref }}
+          INPUT_PLAT_DEP_VERSIONS: ${{ vars.PLAT_DEP_VERSIONS_URL }}
+          INPUT_RUN_DATA_PREPARATION: ${{ steps.set_runtime_env.outputs.runDataPreparation }}
+          INPUT_RUN_JSTESTS: ${{ steps.set_runtime_env.outputs.runJSTests }}
+          INPUT_RUN_JAVA_TESTS: ${{ steps.set_runtime_env.outputs.runJavaTests }}
+          INPUT_JAVA_TEST_SUITE: ${{ steps.set_runtime_env.outputs.javaTestSuite }}
+          INPUT_JAVA_BRANCH_NAME: ${{ steps.set_runtime_env.outputs.javaBranchName }}
         run: |
-          echo "- trigger: \`$PRINT_INPUT_TRIGGER\`" >> "$GITHUB_STEP_SUMMARY"
-          echo "- is schedule: \`$PRINT_INPUT_IS_SCHEDULE\`" >> "$GITHUB_STEP_SUMMARY"
-          echo "- environment: \`$PRINT_INPUT_ENVIRONMENT\`" >> "$GITHUB_STEP_SUMMARY"
-          echo "- normalized environment: \`$PRINT_INPUT_NORMALIZED_ENVIRONMENT\`" >> "$GITHUB_STEP_SUMMARY"
-          echo "- ref: \`$PRINT_INPUT_REF\`" >> "$GITHUB_STEP_SUMMARY"
-          echo "- plat-dep versions: \`$PRINT_INPUT_PLAT_DEP_VERSIONS\`" >> "$GITHUB_STEP_SUMMARY"
-          echo "- runDataPreparation: \`$PRINT_INPUT_RUN_DATA_PREPARATION\`" >> "$GITHUB_STEP_SUMMARY"
-          echo "- runJSTests: \`$PRINT_INPUT_RUN_JSTESTS\`" >> "$GITHUB_STEP_SUMMARY"
-          echo "- runJavaTests: \`$PRINT_INPUT_RUN_JAVA_TESTS\`" >> "$GITHUB_STEP_SUMMARY"
-          echo "- javaTestSuite: \`$PRINT_INPUT_JAVA_TEST_SUITE\`" >> "$GITHUB_STEP_SUMMARY"
-          echo "- javaBranchName: \`$PRINT_INPUT_JAVA_BRANCH_NAME\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- trigger: \`$INPUT_TRIGGER\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- is schedule: \`$INPUT_IS_SCHEDULE\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- environment: \`$INPUT_ENVIRONMENT\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- normalized environment: \`$INPUT_NORMALIZED_ENVIRONMENT\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- ref: \`$INPUT_REF\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- plat-dep versions: \`$INPUT_PLAT_DEP_VERSIONS\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- runDataPreparation: \`$INPUT_RUN_DATA_PREPARATION\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- runJSTests: \`$INPUT_RUN_JSTESTS\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- runJavaTests: \`$INPUT_RUN_JAVA_TESTS\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- javaTestSuite: \`$INPUT_JAVA_TEST_SUITE\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- javaBranchName: \`$INPUT_JAVA_BRANCH_NAME\`" >> "$GITHUB_STEP_SUMMARY"
 
   create_runner:
     name: Create Self-Hosted Runner
