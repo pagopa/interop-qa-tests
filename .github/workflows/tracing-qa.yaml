@@ -166,18 +166,30 @@ jobs:
 
       - name: Print Inputs
         id: print_inputs
+        env:
+          INPUT_TRIGGER: ${{ github.event_name }}
+          INPUT_IS_SCHEDULE: ${{ steps.check_trigger.outputs.is_schedule }}
+          INPUT_ENVIRONMENT: ${{ steps.set_runtime_env.outputs.environment }}
+          INPUT_NORMALIZED_ENVIRONMENT: ${{ vars.NORM_ENV }}
+          INPUT_REF: ${{ github.ref }}
+          INPUT_PLAT_DEP_VERSIONS: ${{ vars.PLAT_DEP_VERSIONS_URL }}
+          INPUT_RUN_DATA_PREPARATION: ${{ steps.set_runtime_env.outputs.runDataPreparation }}
+          INPUT_RUN_JSTESTS: ${{ steps.set_runtime_env.outputs.runJSTests }}
+          INPUT_RUN_JAVA_TESTS: ${{ steps.set_runtime_env.outputs.runJavaTests }}
+          INPUT_JAVA_TEST_SUITE: ${{ steps.set_runtime_env.outputs.javaTestSuite }}
+          INPUT_JAVA_BRANCH_NAME: ${{ steps.set_runtime_env.outputs.javaBranchName }}
         run: |
-          echo "- trigger: \`${{ github.event_name }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- is schedule: \`${{ steps.check_trigger.outputs.is_schedule }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- environment: \`${{ steps.set_runtime_env.outputs.environment }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- normalized environment: \`${{ vars.NORM_ENV }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- ref: \`${{ github.ref }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- plat-dep versions: \`${{ vars.PLAT_DEP_VERSIONS_URL }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- runDataPreparation: \`${{ steps.set_runtime_env.outputs.runDataPreparation }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- runJSTests: \`${{ steps.set_runtime_env.outputs.runJSTests }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- runJavaTests: \`${{ steps.set_runtime_env.outputs.runJavaTests }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- javaTestSuite: \`${{ steps.set_runtime_env.outputs.javaTestSuite }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- javaBranchName: \`${{ steps.set_runtime_env.outputs.javaBranchName }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- trigger: \`$INPUT_TRIGGER\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- is schedule: \`$INPUT_IS_SCHEDULE\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- environment: \`$INPUT_ENVIRONMENT\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- normalized environment: \`$INPUT_NORMALIZED_ENVIRONMENT\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- ref: \`$INPUT_REF\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- plat-dep versions: \`$INPUT_PLAT_DEP_VERSIONS\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- runDataPreparation: \`$INPUT_RUN_DATA_PREPARATION\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- runJSTests: \`$INPUT_RUN_JSTESTS\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- runJavaTests: \`$INPUT_RUN_JAVA_TESTS\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- javaTestSuite: \`$INPUT_JAVA_TEST_SUITE\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- javaBranchName: \`$INPUT_JAVA_BRANCH_NAME\`" >> "$GITHUB_STEP_SUMMARY"
 
   create_runner:
     name: Create Self-Hosted Runner
