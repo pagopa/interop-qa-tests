@@ -564,7 +564,7 @@ jobs:
 
           echo "Successfully discovered the tenant-process pod IP address: $TENANT_PROCESS_IP"
           echo "Successfully discovered the tenant-process pod port: $TENANT_PROCESS_PORT"
-          
+
           echo "TENANT_PROCESS_HOST=http://$TENANT_PROCESS_IP:$TENANT_PROCESS_PORT" >> "$GITHUB_ENV"
 
       - name: Set up Maven
@@ -585,7 +585,7 @@ jobs:
         id: run_pn-b2b-client_tests
         shell: bash
         env:
-          TENANT_PROCESS_HOST: "${{ github.env.TENANT_PROCESS_HOST }}"
+          TENANT_PROCESS_HOST: "${{ env.TENANT_PROCESS_HOST }}"
         run: |
           set -uo pipefail
           echo "Running tests..."
