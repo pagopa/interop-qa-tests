@@ -300,6 +300,7 @@ jobs:
         shell: bash
         run: |
             set -euo pipefail
+            set +x
 
             echo "Retrieving Platform Data credentials..."
 
@@ -311,20 +312,33 @@ jobs:
             echo "Retrieve Platform Data password"
             PLATFORM_DATA_PASSWORD="$(jq -r '.SecretString | fromjson | .password' <<< "$PLATFORM_DATA_CREDENTIALS")"
 
+            PLATFORM_DATA_CREDENTIALS_DIR="$RUNNER_TEMP/platform-data"
+            PLATFORM_DATA_PASSWORD_FILE="$PLATFORM_DATA_CREDENTIALS_DIR/password"
+
+            mkdir -p "$PLATFORM_DATA_CREDENTIALS_DIR"
+            chmod 700 "$PLATFORM_DATA_CREDENTIALS_DIR"
+
+            printf '%s' "$PLATFORM_DATA_PASSWORD" > "$PLATFORM_DATA_PASSWORD_FILE"
+            chmod 600 "$PLATFORM_DATA_PASSWORD_FILE"
+
             echo "Update env vars with Platform Data credentials"
             echo "PLATFORM_DATA_USERNAME=$PLATFORM_DATA_USERNAME" >> "$GITHUB_ENV"
-            echo "PLATFORM_DATA_PASSWORD=$PLATFORM_DATA_PASSWORD" >> "$GITHUB_ENV"
+            echo "PLATFORM_DATA_PASSWORD_FILE=$PLATFORM_DATA_PASSWORD_FILE" >> "$GITHUB_ENV"
 
       - name: Truncate EventStore DB Tables
         id: event_store_db_truncate
         shell: bash
         env:
           PGUSER: ${{ env.PLATFORM_DATA_USERNAME }}
-          PGPASSWORD: ${{ env.PLATFORM_DATA_PASSWORD }}
           PGHOST: ${{ env.PLATFORM_DATA_HOST }}
           PGPORT: ${{ env.PLATFORM_DATA_PORT }}
           PGDATABASE: ${{ vars.EVENT_STORE_DB_NAME }}
         run: |
+          set -euo pipefail
+          set +x
+
+          PGPASSWORD="$(cat "$PLATFORM_DATA_PASSWORD_FILE")"
+          export PGPASSWORD
           $SCRIPTS_FOLDER/truncateSQLTables.sh
 
       - name: Truncate ReadModel SQL DB Tables
@@ -333,11 +347,15 @@ jobs:
         shell: bash
         env:
           PGUSER: ${{ env.PLATFORM_DATA_USERNAME }}
-          PGPASSWORD: ${{ env.PLATFORM_DATA_PASSWORD }}
           PGHOST: ${{ env.PLATFORM_DATA_HOST }}
           PGPORT: ${{ env.PLATFORM_DATA_PORT }}
           PGDATABASE: ${{ vars.READ_MODEL_SQL_DB_NAME }}
         run: |
+          set -euo pipefail
+          set +x
+
+          PGPASSWORD="$(cat "$PLATFORM_DATA_PASSWORD_FILE")"
+          export PGPASSWORD
           $SCRIPTS_FOLDER/truncateSQLTables.sh
 
       - name: Truncate M2MEvents SQL DB Tables
@@ -346,11 +364,15 @@ jobs:
         shell: bash
         env:
           PGUSER: ${{ env.PLATFORM_DATA_USERNAME }}
-          PGPASSWORD: ${{ env.PLATFORM_DATA_PASSWORD }}
           PGHOST: ${{ env.PLATFORM_DATA_HOST }}
           PGPORT: ${{ env.PLATFORM_DATA_PORT }}
           PGDATABASE: ${{ vars.M2M_EVENTS_SQL_DB_NAME }}
         run: |
+          set -euo pipefail
+          set +x
+
+          PGPASSWORD="$(cat "$PLATFORM_DATA_PASSWORD_FILE")"
+          export PGPASSWORD
           $SCRIPTS_FOLDER/truncateSQLTables.sh
 
       - name: Truncate InAppNotification SQL DB Tables
@@ -359,11 +381,15 @@ jobs:
         shell: bash
         env:
           PGUSER: ${{ env.PLATFORM_DATA_USERNAME }}
-          PGPASSWORD: ${{ env.PLATFORM_DATA_PASSWORD }}
           PGHOST: ${{ env.PLATFORM_DATA_HOST }}
           PGPORT: ${{ env.PLATFORM_DATA_PORT }}
           PGDATABASE: ${{ vars.IN_APP_NOTIFICATION_SQL_DB_NAME }}
         run: |
+          set -euo pipefail
+          set +x
+
+          PGPASSWORD="$(cat "$PLATFORM_DATA_PASSWORD_FILE")"
+          export PGPASSWORD
           $SCRIPTS_FOLDER/truncateSQLTables.sh
 
       - name: Checkout Kafka tools
@@ -422,12 +448,21 @@ jobs:
         shell: bash
         env:
           PGUSER: ${{ env.PLATFORM_DATA_USERNAME }}
-          PGPASSWORD: ${{ env.PLATFORM_DATA_PASSWORD }}
           PGHOST: ${{ env.PLATFORM_DATA_HOST }}
           PGPORT: ${{ env.PLATFORM_DATA_PORT }}
           PGDATABASE: ${{ vars.EVENT_STORE_DB_NAME }}
         run: |
+          set -euo pipefail
+          set +x
+
+          PGPASSWORD="$(cat "$PLATFORM_DATA_PASSWORD_FILE")"
+          export PGPASSWORD
           $SCRIPTS_FOLDER/restoreEventStore.sh
+
+      - name: Cleanup Platform Data credentials file
+        if: ${{ always() }}
+        run: |
+          rm -f "${PLATFORM_DATA_PASSWORD_FILE:-}"
 
       - name: Scale up Deployments
         id: svc_scale_to_1
