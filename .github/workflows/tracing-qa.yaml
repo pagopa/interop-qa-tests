@@ -66,9 +66,11 @@ name: Tracing QA workflow
 # ======================================================================================
 
 on:
-  schedule:
-    - cron: '45 18 * * 1-5'
-      timezone: "Europe/Rome"
+  # Commented out because github scheduling random late cause workflow start when
+  # database is shutdown for cost saving reason.
+  #schedule:
+  #  - cron: '45 18 * * 1-5'
+  #    timezone: "Europe/Rome"
   workflow_dispatch:
     inputs:
       environment:
