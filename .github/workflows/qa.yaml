@@ -484,6 +484,30 @@ jobs:
             sleep 2
           done
 
+      - name: Trigger eservice-descriptors-scheduled-archiver cronjob
+        id: trigger_eservice_descriptors_archiver
+        shell: bash
+        env:
+          CRONJOB_NAME: "eservice-descriptors-scheduled-archiver"
+          K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE }}
+          TIMEOUT_SECONDS: 300
+        run: |
+          set -euo pipefail
+
+          echo "Creating job from cronjob $CRONJOB_NAME..."
+          JOB_NAME="$CRONJOB_NAME-$(date +%s)"
+          kubectl create job --from=cronjob/${CRONJOB_NAME} -n $K8S_NAMESPACE "$JOB_NAME"
+          echo "Job $JOB_NAME created"
+
+          echo "Waiting for job $JOB_NAME to complete..."
+          kubectl wait --for=condition=complete --timeout=${TIMEOUT_SECONDS}s job/$JOB_NAME -n $K8S_NAMESPACE
+          if [ $? -ne 0 ]; then
+            echo "Timeout reached while waiting for the job $JOB_NAME to complete."
+            exit 1
+          fi
+
+          echo "Job $JOB_NAME has completed successfully"
+
   run_js_test:
     name: Run JavaScript Cucumber Test Suite
     if: ${{ always() && needs.workflow_context.outputs.runJSTests == 'true' }}
