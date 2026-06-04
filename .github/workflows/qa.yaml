@@ -494,19 +494,19 @@ jobs:
         run: |
           set -euo pipefail
 
-          echo "Creating job from cronjob $CRONJOB_NAME..."
-          JOB_NAME="$CRONJOB_NAME-$(date +%s)"
-          kubectl create job --from=cronjob/${CRONJOB_NAME} -n $K8S_NAMESPACE "$JOB_NAME"
-          echo "Job $JOB_NAME created"
+          echo "Creating job from cronjob ${CRONJOB_NAME}..."
+          JOB_NAME="${CRONJOB_NAME}-$(date +%s)"
+          kubectl create job --from=cronjob/${CRONJOB_NAME} -n ${K8S_NAMESPACE} "${JOB_NAME}"
+          echo "Job ${JOB_NAME} successfully created"
 
-          echo "Waiting for job $JOB_NAME to complete..."
-          kubectl wait --for=condition=complete --timeout=${TIMEOUT_SECONDS}s job/$JOB_NAME -n $K8S_NAMESPACE
+          echo "Waiting for job ${JOB_NAME} to complete..."
+          kubectl wait --for=condition=complete --timeout=${TIMEOUT_SECONDS}s job/${JOB_NAME} -n ${K8S_NAMESPACE}
           if [ $? -ne 0 ]; then
-            echo "Timeout reached while waiting for the job $JOB_NAME to complete."
+            echo "Job ${JOB_NAME} did not complete successfully within the ${TIMEOUT_SECONDS}s timeout period"
             exit 1
           fi
 
-          echo "Job $JOB_NAME has completed successfully"
+          echo "Job ${JOB_NAME} has completed successfully"
 
   run_js_test:
     name: Run JavaScript Cucumber Test Suite
