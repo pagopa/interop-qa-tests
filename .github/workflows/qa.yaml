@@ -490,7 +490,7 @@ jobs:
         env:
           CRONJOB_NAME: "eservice-descriptors-scheduled-archiver"
           K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE }}
-          TIMEOUT_SECONDS: 300
+          TIMEOUT_SECONDS: 120
         run: |
           set -euo pipefail
 
@@ -499,14 +499,50 @@ jobs:
           kubectl create job --from=cronjob/${CRONJOB_NAME} -n ${K8S_NAMESPACE} "${JOB_NAME}"
           echo "Job ${JOB_NAME} successfully created"
 
-          echo "Waiting for job ${JOB_NAME} to complete..."
-          kubectl wait --for=condition=complete --timeout=${TIMEOUT_SECONDS}s job/${JOB_NAME} -n ${K8S_NAMESPACE}
-          if [ $? -ne 0 ]; then
-            echo "Job ${JOB_NAME} did not complete successfully within the ${TIMEOUT_SECONDS}s timeout period"
-            exit 1
-          fi
+          echo "Waiting for job ${JOB_NAME} to create a Pod..."
+          START_TIME=$(date +%s)
+          while true; do
+            POD_NAME=$(kubectl get pods -n ${K8S_NAMESPACE} -l job-name=${JOB_NAME} -o jsonpath='{.items[0].metadata.name}')
+            if [ -n "$POD_NAME" ]; then
+              echo "Pod ${POD_NAME} created successfully"
+              break
+            fi
+            NOW=$(date +%s)
+            ELAPSED=$((NOW - START_TIME))
+            if [ $ELAPSED -ge $TIMEOUT_SECONDS ]; then
+              echo "Timeout ${TIMEOUT_SECONDS}s elapsed"
+              exit 1
+            fi
+            sleep 2
+          done
 
-          echo "Job ${JOB_NAME} has completed successfully"
+          echo "Waiting for pod ${POD_NAME} to complete..."
+          START_TIME=$(date +%s)
+          while true; do
+            EXIT_CODE=$(kubectl get pod "$POD_NAME" -n "$K8S_NAMESPACE" -o jsonpath='{.status.containerStatuses[0].state.terminated.exitCode}')
+            if [ -n "$EXIT_CODE" ]; then
+              if [ "$EXIT_CODE" -ne 0 ]; then
+                echo "Pod ${POD_NAME} failed with exit code ${EXIT_CODE}"
+                exit 1
+              else
+                echo "Pod ${POD_NAME} completed successfully"
+                break
+              fi
+            else 
+              PHASE=$(kubectl get pod "$POD_NAME" -n "$K8S_NAMESPACE" -o jsonpath='{.status.phase}')
+              if [ "$PHASE" = "Failed" ]; then
+                echo "Pod ${POD_NAME} failed"
+                exit 1
+              fi
+            fi
+            NOW=$(date +%s)
+            ELAPSED=$((NOW - START_TIME))
+            if [ $ELAPSED -ge $TIMEOUT_SECONDS ]; then
+              echo "Timeout ${TIMEOUT_SECONDS}s elapsed"
+              exit 1
+            fi
+            sleep 2
+          done
 
   run_js_test:
     name: Run JavaScript Cucumber Test Suite
