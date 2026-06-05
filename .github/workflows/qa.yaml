@@ -520,15 +520,13 @@ jobs:
           START_TIME=$(date +%s)
           while true; do
             EXIT_CODE=$(kubectl get pod "$POD_NAME" -n "$K8S_NAMESPACE" -o jsonpath='{.status.containerStatuses[0].state.terminated.exitCode}')
-            if [ -n "$EXIT_CODE" ]; then
-              if [ "$EXIT_CODE" -ne 0 ]; then
-                echo "Pod ${POD_NAME} failed with exit code ${EXIT_CODE}"
-                exit 1
-              else
-                echo "Pod ${POD_NAME} completed successfully"
-                break
-              fi
-            else 
+            if [ -n "$EXIT_CODE" ] && [ "$EXIT_CODE" -ne 0 ]; then
+              echo "Pod ${POD_NAME} failed with exit code ${EXIT_CODE}"
+              exit 1
+            elif [ -n "$EXIT_CODE" ] && [ "$EXIT_CODE" -eq 0 ]; then
+              echo "Pod ${POD_NAME} completed successfully"
+              break            
+            else
               PHASE=$(kubectl get pod "$POD_NAME" -n "$K8S_NAMESPACE" -o jsonpath='{.status.phase}')
               if [ "$PHASE" = "Failed" ]; then
                 echo "Pod ${POD_NAME} failed"
