@@ -51,6 +51,11 @@ on:
         required: false
         default: false
         type: boolean
+      triggerEserviceDescriptorsArchiverCronjob:
+        description: 'Trigger eservice-descriptors-scheduled-archiver cronjob during the data preparation phase'
+        required: true
+        default: false
+        type: boolean
 
 
 defaults:
@@ -79,6 +84,7 @@ jobs:
       javaTestSuite: ${{ steps.set_runtime_env.outputs.javaTestSuite }}
       javaBranchName: ${{ steps.set_runtime_env.outputs.javaBranchName }}
       strictVersionCheck: ${{ steps.set_runtime_env.outputs.strictVersionCheck }}
+      triggerEserviceDescriptorsArchiverCronjob: ${{ steps.set_runtime_env.outputs.triggerEserviceDescriptorsArchiverCronjob }}
 
     steps:
       - name: Check trigger type
@@ -122,6 +128,7 @@ jobs:
             echo "javaTestSuite=$javaTestSuite"
             echo "javaBranchName=$javaBranchName"
             echo "strictVersionCheck=$strictVersionCheck"
+            echo "triggerEserviceDescriptorsArchiverCronjob=${{ inputs.triggerEserviceDescriptorsArchiverCronjob }}"
           } >> "$GITHUB_OUTPUT"
 
       - name: Print Inputs
@@ -140,6 +147,7 @@ jobs:
           INPUT_JAVA_TEST_SUITE: ${{ steps.set_runtime_env.outputs.javaTestSuite }}
           INPUT_JAVA_BRANCH_NAME: ${{ steps.set_runtime_env.outputs.javaBranchName }}
           INPUT_STRICT_VERSION_CHECK: ${{ steps.set_runtime_env.outputs.strictVersionCheck }}
+          INPUT_TRIGGER_ESERVICE_DESCRIPTORS_ARCHIVER_CRONJOB: ${{ steps.set_runtime_env.outputs.triggerEserviceDescriptorsArchiverCronjob }}
         run: |
           echo "- trigger: \`$INPUT_TRIGGER\`" >> "$GITHUB_STEP_SUMMARY"
           echo "- is schedule: \`$INPUT_IS_SCHEDULE\`" >> "$GITHUB_STEP_SUMMARY"
@@ -154,6 +162,7 @@ jobs:
           echo "- javaTestSuite: \`$INPUT_JAVA_TEST_SUITE\`" >> "$GITHUB_STEP_SUMMARY"
           echo "- javaBranchName: \`$INPUT_JAVA_BRANCH_NAME\`" >> "$GITHUB_STEP_SUMMARY"
           echo "- strictVersionCheck: \`$INPUT_STRICT_VERSION_CHECK\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- triggerEserviceDescriptorsArchiverCronjob: \`$INPUT_TRIGGER_ESERVICE_DESCRIPTORS_ARCHIVER_CRONJOB\`" >> "$GITHUB_STEP_SUMMARY"
 
   create_runner:
     name: Create Self-Hosted Runner
@@ -486,6 +495,7 @@ jobs:
 
       - name: Trigger eservice-descriptors-scheduled-archiver cronjob
         id: trigger_eservice_descriptors_archiver
+        if: ${{ inputs.triggerEserviceDescriptorsArchiverCronjob }}
         shell: bash
         env:
           CRONJOB_NAME: "eservice-descriptors-scheduled-archiver"
