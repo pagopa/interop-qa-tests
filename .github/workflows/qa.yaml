@@ -51,6 +51,11 @@ on:
         required: false
         default: false
         type: boolean
+      runCronjobs:
+        description: 'Trigger cronjobs during the data preparation'
+        required: true
+        default: true
+        type: boolean
 
 
 defaults:
@@ -79,6 +84,7 @@ jobs:
       javaTestSuite: ${{ steps.set_runtime_env.outputs.javaTestSuite }}
       javaBranchName: ${{ steps.set_runtime_env.outputs.javaBranchName }}
       strictVersionCheck: ${{ steps.set_runtime_env.outputs.strictVersionCheck }}
+      runCronjobs: ${{ steps.set_runtime_env.outputs.runCronjobs }}
 
     steps:
       - name: Check trigger type
@@ -102,6 +108,7 @@ jobs:
             javaTestSuite="NRTStandard"
             javaBranchName="develop"
             strictVersionCheck="false"
+            runCronjobs="true"
           else
             environment="${{ inputs.environment }}"
             kafkaPurgeTopics="${{ inputs.kafkaPurgeTopics }}"
@@ -111,6 +118,7 @@ jobs:
             javaTestSuite="${{ inputs.javaTestSuite || 'NRTStandard' }}"
             javaBranchName="${{ inputs.javaBranchName || 'develop' }}"
             strictVersionCheck="${{ inputs.strictVersionCheck }}"
+            runCronjobs="${{ inputs.runCronjobs }}"
           fi
 
           {
@@ -122,6 +130,7 @@ jobs:
             echo "javaTestSuite=$javaTestSuite"
             echo "javaBranchName=$javaBranchName"
             echo "strictVersionCheck=$strictVersionCheck"
+            echo "runCronjobs=$runCronjobs"
           } >> "$GITHUB_OUTPUT"
 
       - name: Print Inputs
@@ -140,6 +149,7 @@ jobs:
           INPUT_JAVA_TEST_SUITE: ${{ steps.set_runtime_env.outputs.javaTestSuite }}
           INPUT_JAVA_BRANCH_NAME: ${{ steps.set_runtime_env.outputs.javaBranchName }}
           INPUT_STRICT_VERSION_CHECK: ${{ steps.set_runtime_env.outputs.strictVersionCheck }}
+          INPUT_RUN_CRONJOBS: ${{ steps.set_runtime_env.outputs.runCronjobs }}
         run: |
           echo "- trigger: \`$INPUT_TRIGGER\`" >> "$GITHUB_STEP_SUMMARY"
           echo "- is schedule: \`$INPUT_IS_SCHEDULE\`" >> "$GITHUB_STEP_SUMMARY"
@@ -154,6 +164,7 @@ jobs:
           echo "- javaTestSuite: \`$INPUT_JAVA_TEST_SUITE\`" >> "$GITHUB_STEP_SUMMARY"
           echo "- javaBranchName: \`$INPUT_JAVA_BRANCH_NAME\`" >> "$GITHUB_STEP_SUMMARY"
           echo "- strictVersionCheck: \`$INPUT_STRICT_VERSION_CHECK\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- runCronjobs: \`$INPUT_RUN_CRONJOBS\`" >> "$GITHUB_STEP_SUMMARY"
 
   create_runner:
     name: Create Self-Hosted Runner
@@ -481,6 +492,73 @@ jobs:
               exit 1
             fi
 
+            sleep 2
+          done
+
+      - name: Run eservice-descriptors-scheduled-archiver cronjob
+        id: run_eservice_descriptors_scheduled_archiver_cronjob
+        if: ${{ inputs.runCronjobs }}
+        shell: bash
+        env:
+          CRONJOB_NAME: "eservice-descriptors-scheduled-archiver"
+          K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE }}
+          TIMEOUT_SECONDS: 120
+        run: |
+          set -euo pipefail
+
+          echo "Checking if cronjob ${CRONJOB_NAME} exists..."
+          if ! kubectl get cronjob "${CRONJOB_NAME}" -n "${K8S_NAMESPACE}" &>/dev/null; then
+            echo "::warning::CronJob ${CRONJOB_NAME} not found in namespace ${K8S_NAMESPACE}. Skipping the step...."
+            echo "CronJob ${CRONJOB_NAME} not found in namespace ${K8S_NAMESPACE}. Step skipped." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          echo "CronJob ${CRONJOB_NAME} found, proceeding..."
+
+          echo "Creating job from cronjob ${CRONJOB_NAME}..."
+          JOB_NAME="${CRONJOB_NAME}-$(date +%s)"
+          kubectl create job --from=cronjob/${CRONJOB_NAME} -n ${K8S_NAMESPACE} "${JOB_NAME}"
+          echo "Job ${JOB_NAME} successfully created"
+
+          echo "Waiting for job ${JOB_NAME} to create a Pod..."
+          START_TIME=$(date +%s)
+          while true; do
+            POD_NAME=$(kubectl get pods -n ${K8S_NAMESPACE} -l job-name=${JOB_NAME} -o jsonpath='{.items[0].metadata.name}')
+            if [ -n "$POD_NAME" ]; then
+              echo "Pod ${POD_NAME} created successfully"
+              break
+            fi
+            NOW=$(date +%s)
+            ELAPSED=$((NOW - START_TIME))
+            if [ $ELAPSED -ge $TIMEOUT_SECONDS ]; then
+              echo "Timeout ${TIMEOUT_SECONDS}s elapsed"
+              exit 1
+            fi
+            sleep 2
+          done
+
+          echo "Waiting for pod ${POD_NAME} to complete..."
+          START_TIME=$(date +%s)
+          while true; do
+            EXIT_CODE=$(kubectl get pod "$POD_NAME" -n "$K8S_NAMESPACE" -o jsonpath='{.status.containerStatuses[0].state.terminated.exitCode}')
+            if [ -n "$EXIT_CODE" ] && [ "$EXIT_CODE" -ne 0 ]; then
+              echo "Pod ${POD_NAME} failed with exit code ${EXIT_CODE}"
+              exit 1
+            elif [ -n "$EXIT_CODE" ] && [ "$EXIT_CODE" -eq 0 ]; then
+              echo "Pod ${POD_NAME} completed successfully"
+              break            
+            else
+              PHASE=$(kubectl get pod "$POD_NAME" -n "$K8S_NAMESPACE" -o jsonpath='{.status.phase}')
+              if [ "$PHASE" = "Failed" ]; then
+                echo "Pod ${POD_NAME} failed"
+                exit 1
+              fi
+            fi
+            NOW=$(date +%s)
+            ELAPSED=$((NOW - START_TIME))
+            if [ $ELAPSED -ge $TIMEOUT_SECONDS ]; then
+              echo "Timeout ${TIMEOUT_SECONDS}s elapsed"
+              exit 1
+            fi
             sleep 2
           done
 
