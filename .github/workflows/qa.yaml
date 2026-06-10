@@ -54,7 +54,7 @@ on:
       runCronjobs:
         description: 'Trigger cronjobs during the data preparation'
         required: true
-        default: false
+        default: true
         type: boolean
 
 
@@ -108,6 +108,7 @@ jobs:
             javaTestSuite="NRTStandard"
             javaBranchName="develop"
             strictVersionCheck="false"
+            runCronjobs="true"
           else
             environment="${{ inputs.environment }}"
             kafkaPurgeTopics="${{ inputs.kafkaPurgeTopics }}"
@@ -117,6 +118,7 @@ jobs:
             javaTestSuite="${{ inputs.javaTestSuite || 'NRTStandard' }}"
             javaBranchName="${{ inputs.javaBranchName || 'develop' }}"
             strictVersionCheck="${{ inputs.strictVersionCheck }}"
+            runCronjobs="${{ inputs.runCronjobs }}"
           fi
 
           {
@@ -503,6 +505,14 @@ jobs:
           TIMEOUT_SECONDS: 120
         run: |
           set -euo pipefail
+
+          echo "Checking if cronjob ${CRONJOB_NAME} exists..."
+          if ! kubectl get cronjob "${CRONJOB_NAME}" -n "${K8S_NAMESPACE}" &>/dev/null; then
+            echo "::warning::CronJob ${CRONJOB_NAME} not found in namespace ${K8S_NAMESPACE}. Skipping the step...."
+            echo "CronJob ${CRONJOB_NAME} not found in namespace ${K8S_NAMESPACE}. Step skipped." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          echo "CronJob ${CRONJOB_NAME} found, proceeding..."
 
           echo "Creating job from cronjob ${CRONJOB_NAME}..."
           JOB_NAME="${CRONJOB_NAME}-$(date +%s)"
