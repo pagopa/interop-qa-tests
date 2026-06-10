@@ -502,7 +502,7 @@ jobs:
         env:
           CRONJOB_NAME: "eservice-descriptors-scheduled-archiver"
           K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE }}
-          TIMEOUT_SECONDS: 120
+          TIMEOUT_SECONDS: 180
         run: |
           set -euo pipefail
 
@@ -569,7 +569,7 @@ jobs:
         env:
           CRONJOB_NAME: "istat-certified-attributes-importer"
           K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE }}
-          TIMEOUT_SECONDS: 120
+          TIMEOUT_SECONDS: 180
         run: |
           set -euo pipefail
 
