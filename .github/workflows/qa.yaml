@@ -495,8 +495,8 @@ jobs:
             sleep 2
           done
 
-      - name: Run cronjobs
-        id: run_cronjobs
+      - name: Run eservice-descriptors-scheduled-archiver cronjob
+        id: run_eservice_descriptors_scheduled_archiver_cronjob
         if: ${{ inputs.runCronjobs }}
         shell: bash
         env:
