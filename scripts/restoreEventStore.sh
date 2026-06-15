@@ -30,3 +30,13 @@ for f in "$LOCAL_NOTIFICATION_CONFIG_DUMPS"/*; do
   echo "EventStore: restoring dump $f"
   $PSQL_BIN --set ON_ERROR_STOP=on < "$f"
 done;
+
+for f in "$LOCAL_AGREEMENT_DUMPS"/*; do
+  echo "EventStore: restoring dump $f"
+  $PSQL_BIN --set ON_ERROR_STOP=on < "$f"
+done;
+
+for f in "$LOCAL_CATALOG_DUMPS"/*; do
+  echo "EventStore: restoring dump $f"
+  $PSQL_BIN --set ON_ERROR_STOP=on < "$f"
+done;
