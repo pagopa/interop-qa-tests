@@ -383,6 +383,19 @@ jobs:
         run: |
           $SCRIPTS_FOLDER/truncateSQLTables.sh
 
+      - name: Truncate ScheduledNotification SQL DB Tables
+        id: scheduled_notification_sql_db_truncate
+        if: ${{ vars.SCHEDULED_NOTIFICATION_SQL_DB_NAME != '' }}
+        shell: bash
+        env:
+          PGUSER: ${{ env.PLATFORM_DATA_USERNAME }}
+          PGPASSWORD: ${{ env.PLATFORM_DATA_PASSWORD }}
+          PGHOST: ${{ env.PLATFORM_DATA_HOST }}
+          PGPORT: ${{ env.PLATFORM_DATA_PORT }}
+          PGDATABASE: ${{ vars.SCHEDULED_NOTIFICATION_SQL_DB_NAME }}
+        run: |
+          $SCRIPTS_FOLDER/truncateSQLTables.sh
+
       - name: Checkout Kafka tools
         id: kafka_tools
         if: ${{ always() && needs.workflow_context.outputs.kafkaPurgeTopics == 'true' }}
