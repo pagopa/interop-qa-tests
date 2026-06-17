@@ -503,7 +503,6 @@ jobs:
 
       - name: Run interop-be-eservice-descriptors-scheduled-archiver cronjob
         id: run_interop_be_eservice_descriptors_scheduled_archiver_cronjob
-        needs: [ workflow_context ]
         if: ${{ needs.workflow_context.outputs.runCronjobs == 'true' }}
         shell: bash
         env:
@@ -571,7 +570,6 @@ jobs:
 
       - name: Run interop-be-ipa-certified-attributes-importer cronjob
         id: run_interop_be_ipa_certified_attributes_importer_cronjob
-        needs: [ workflow_context ]
         if: ${{ needs.workflow_context.outputs.runCronjobs == 'true' }}
         shell: bash
         env:
@@ -639,7 +637,6 @@ jobs:
 
       - name: Run interop-be-istat-certified-attributes-importer cronjob
         id: run_interop_be_istat_certified_attributes_importer_cronjob
-        needs: [ workflow_context ]
         if: ${{ needs.workflow_context.outputs.runCronjobs == 'true' }}
         shell: bash
         env:
