@@ -98,8 +98,19 @@ jobs:
 
       - name: Set runtime env
         id: set_runtime_env
+        env:
+          INPUT_IS_SCHEDULE: ${{ steps.check_trigger.outputs.is_schedule }}
+          INPUT_ENVIRONMENT: ${{ inputs.environment }}
+          INPUT_KAFKA_PURGE_TOPICS: ${{ inputs.kafkaPurgeTopics }}
+          INPUT_RUN_DATA_PREPARATION: ${{ inputs.runDataPreparation }}
+          INPUT_RUN_JS_TESTS: ${{ inputs.runJSTests }}
+          INPUT_RUN_JAVA_TESTS: ${{ inputs.runJavaTests }}
+          INPUT_JAVA_TEST_SUITE: ${{ inputs.javaTestSuite || 'NRTStandard' }}
+          INPUT_JAVA_BRANCH_NAME: ${{ inputs.javaBranchName || 'develop' }}
+          INPUT_STRICT_VERSION_CHECK: ${{ inputs.strictVersionCheck }}
+          INPUT_RUN_CRONJOBS: ${{ inputs.runCronjobs }}
         run: |
-          if [[ "${{ steps.check_trigger.outputs.is_schedule }}" == "true" ]]; then
+          if [[ "$INPUT_IS_SCHEDULE" == "true" ]]; then
             environment="es1-qa"
             kafkaPurgeTopics="true"
             runDataPreparation="true"
@@ -110,15 +121,15 @@ jobs:
             strictVersionCheck="false"
             runCronjobs="true"
           else
-            environment="${{ inputs.environment }}"
-            kafkaPurgeTopics="${{ inputs.kafkaPurgeTopics }}"
-            runDataPreparation="${{ inputs.runDataPreparation }}"
-            runJSTests="${{ inputs.runJSTests }}"
-            runJavaTests="${{ inputs.runJavaTests }}"
-            javaTestSuite="${{ inputs.javaTestSuite || 'NRTStandard' }}"
-            javaBranchName="${{ inputs.javaBranchName || 'develop' }}"
-            strictVersionCheck="${{ inputs.strictVersionCheck }}"
-            runCronjobs="${{ inputs.runCronjobs }}"
+            environment="$INPUT_ENVIRONMENT"
+            kafkaPurgeTopics="$INPUT_KAFKA_PURGE_TOPICS"
+            runDataPreparation="$INPUT_RUN_DATA_PREPARATION"
+            runJSTests="$INPUT_RUN_JS_TESTS"
+            runJavaTests="$INPUT_RUN_JAVA_TESTS"
+            javaTestSuite="$INPUT_JAVA_TEST_SUITE"
+            javaBranchName="$INPUT_JAVA_BRANCH_NAME"
+            strictVersionCheck="$INPUT_STRICT_VERSION_CHECK"
+            runCronjobs="$INPUT_RUN_CRONJOBS"
           fi
 
           {
@@ -204,8 +215,10 @@ jobs:
         uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3
 
       - name: Get plat-dep versions
+        env:
+          PLAT_DEP_VERSIONS_URL: ${{ vars.PLAT_DEP_VERSIONS_URL }}
         run: |
-          curl ${{ vars.PLAT_DEP_VERSIONS_URL }} -o images.yaml
+          curl "$PLAT_DEP_VERSIONS_URL" -o images.yaml
 
       - name: Set kubeconfig
         run: |
@@ -264,14 +277,20 @@ jobs:
         id: get_data_dumps
         env:
             AWS_REGION: ${{ secrets.AWS_REGION}}
+            DATA_PREPARATION_BUCKET: ${{ vars.DATA_PREPARATION_BUCKET }}
+            TENANT_DUMP_S3_PREFIX: ${{ vars.TENANT_DUMP_S3_PREFIX }}
+            ATTRIBUTE_REGISTRY_DUMP_S3_PREFIX: ${{ vars.ATTRIBUTE_REGISTRY_DUMP_S3_PREFIX }}
+            NOTIFICATION_CONFIG_DUMP_S3_PREFIX: ${{ vars.NOTIFICATION_CONFIG_DUMP_S3_PREFIX }}
+            AGREEMENT_DUMP_S3_PREFIX: ${{ vars.AGREEMENT_DUMP_S3_PREFIX }}
+            CATALOG_DUMP_S3_PREFIX: ${{ vars.CATALOG_DUMP_S3_PREFIX }}
         run: |
             set -euo pipefail
 
-            aws s3 cp "s3://${{ vars.DATA_PREPARATION_BUCKET }}/${{ vars.TENANT_DUMP_S3_PREFIX }}" $LOCAL_TENANT_DUMPS --recursive
-            aws s3 cp "s3://${{ vars.DATA_PREPARATION_BUCKET }}/${{ vars.ATTRIBUTE_REGISTRY_DUMP_S3_PREFIX }}" $LOCAL_ATTRIBUTE_REGISTRY_DUMPS --recursive
-            aws s3 cp "s3://${{ vars.DATA_PREPARATION_BUCKET }}/${{ vars.NOTIFICATION_CONFIG_DUMP_S3_PREFIX }}" $LOCAL_NOTIFICATION_CONFIG_DUMPS --recursive
-            aws s3 cp "s3://${{ vars.DATA_PREPARATION_BUCKET }}/${{ vars.AGREEMENT_DUMP_S3_PREFIX }}" $LOCAL_AGREEMENT_DUMPS --recursive
-            aws s3 cp "s3://${{ vars.DATA_PREPARATION_BUCKET }}/${{ vars.CATALOG_DUMP_S3_PREFIX }}" $LOCAL_CATALOG_DUMPS --recursive
+            aws s3 cp "s3://${DATA_PREPARATION_BUCKET}/${TENANT_DUMP_S3_PREFIX}" $LOCAL_TENANT_DUMPS --recursive
+            aws s3 cp "s3://${DATA_PREPARATION_BUCKET}/${ATTRIBUTE_REGISTRY_DUMP_S3_PREFIX}" $LOCAL_ATTRIBUTE_REGISTRY_DUMPS --recursive
+            aws s3 cp "s3://${DATA_PREPARATION_BUCKET}/${NOTIFICATION_CONFIG_DUMP_S3_PREFIX}" $LOCAL_NOTIFICATION_CONFIG_DUMPS --recursive
+            aws s3 cp "s3://${DATA_PREPARATION_BUCKET}/${AGREEMENT_DUMP_S3_PREFIX}" $LOCAL_AGREEMENT_DUMPS --recursive
+            aws s3 cp "s3://${DATA_PREPARATION_BUCKET}/${CATALOG_DUMP_S3_PREFIX}" $LOCAL_CATALOG_DUMPS --recursive
 
       - name: Scale down Deployments
         id: svc_scale_to_0
@@ -414,15 +433,17 @@ jobs:
             AWS_REGION: ${{ secrets.AWS_REGION}}
             KAFKA_BROKERS: ${{ vars.KAFKA_BROKERS }}
             TOPICS_PROPERTIES_PATH: ../topics/${{ vars.NORM_ENV }}/
+            EVENT_STORE_DOMAIN_TOPIC_PREFIX: ${{ vars.EVENT_STORE_DOMAIN_TOPIC_PREFIX }}
+            OUTBOUND_DOMAIN_TOPIC_PREFIX: ${{ vars.OUTBOUND_DOMAIN_TOPIC_PREFIX }}
         run: |
           set -eou pipefail
 
           npm ci
 
-          export DOMAIN_TOPIC_PREFIX="${{ vars.EVENT_STORE_DOMAIN_TOPIC_PREFIX }}"
+          export DOMAIN_TOPIC_PREFIX="$EVENT_STORE_DOMAIN_TOPIC_PREFIX"
           npm run kafka:deleteTopics
 
-          export DOMAIN_TOPIC_PREFIX="${{ vars.OUTBOUND_DOMAIN_TOPIC_PREFIX }}"
+          export DOMAIN_TOPIC_PREFIX="$OUTBOUND_DOMAIN_TOPIC_PREFIX"
           npm run kafka:deleteTopics
 
           npm run kafka:createTopics
@@ -599,6 +620,8 @@ jobs:
       - name: Discover tenant-process host
         id: discover_tenant_process_host
         shell: bash
+        env:
+          K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE }}
         run: |
           set -euo pipefail
 
@@ -606,8 +629,8 @@ jobs:
 
           aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name ${{ secrets.EKS_CLUSTER_NAME }}
 
-          TENANT_PROCESS_IP=$(kubectl get pods -n ${{ vars.K8S_NAMESPACE }} -l app.kubernetes.io/name=interop-be-tenant-process -o jsonpath='{.items[0].status.podIP}')
-          TENANT_PROCESS_PORT=$(kubectl get pods -n ${{ vars.K8S_NAMESPACE }} -l app.kubernetes.io/name=interop-be-tenant-process -o jsonpath='{.items[0].spec.containers[0].ports[0].containerPort}')
+          TENANT_PROCESS_IP=$(kubectl get pods -n "$K8S_NAMESPACE" -l app.kubernetes.io/name=interop-be-tenant-process -o jsonpath='{.items[0].status.podIP}')
+          TENANT_PROCESS_PORT=$(kubectl get pods -n "$K8S_NAMESPACE" -l app.kubernetes.io/name=interop-be-tenant-process -o jsonpath='{.items[0].spec.containers[0].ports[0].containerPort}')
 
           if [[ -z "$TENANT_PROCESS_IP" ]]; then
             echo "Unable to discover tenant-process pod IP address"
@@ -633,9 +656,11 @@ jobs:
       - name: Clone the pn-b2b-client repo
         id: clone_pn-b2b-client
         shell: bash
+        env:
+          JAVA_BRANCH_NAME: ${{ needs.workflow_context.outputs.javaBranchName }}
         run: |
           echo "Cloning pn-b2b-client repo.."
-          git clone --depth 1 --branch ${{ needs.workflow_context.outputs.javaBranchName }} https://github.com/pagopa/pn-b2b-client.git
+          git clone --depth 1 --branch "$JAVA_BRANCH_NAME" https://github.com/pagopa/pn-b2b-client.git
           echo "pn-b2b-client repo has been cloned"
 
       - name: Run QA tests
@@ -643,6 +668,7 @@ jobs:
         shell: bash
         env:
           TENANT_PROCESS_HOST: "${{ env.TENANT_PROCESS_HOST }}"
+          JAVA_TEST_SUITE: ${{ needs.workflow_context.outputs.javaTestSuite }}
         run: |
           set -uo pipefail
           echo "Running tests..."
@@ -657,7 +683,7 @@ jobs:
           echo "Using Spring profile: ${SPRING_PROFILE}"
 
           cd ./pn-b2b-client/interop-qa-tests
-          mvn $SPRING_PROFILE -Dtest=it.pagopa.pn.interop.cucumber.${{ needs.workflow_context.outputs.javaTestSuite }} clean verify > qa-tests.log 2>&1
+          mvn $SPRING_PROFILE -Dtest="it.pagopa.pn.interop.cucumber.$JAVA_TEST_SUITE" clean verify > qa-tests.log 2>&1
 
       - name: Upload QA test logs
         if: always()
