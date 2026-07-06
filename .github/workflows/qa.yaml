@@ -517,203 +517,29 @@ jobs:
       - name: Run interop-be-eservice-descriptors-scheduled-archiver cronjob
         id: run_interop_be_eservice_descriptors_scheduled_archiver_cronjob
         if: ${{ needs.workflow_context.outputs.runCronjobs == 'true' }}
-        shell: bash
-        env:
-          CRONJOB_NAME: "interop-be-eservice-descriptors-scheduled-archiver"
-          K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE }}
-          TIMEOUT_SECONDS: 180
-        run: |
-          set -euo pipefail
-
-          echo "Checking if cronjob ${CRONJOB_NAME} exists..."
-          if ! kubectl get cronjob "${CRONJOB_NAME}" -n "${K8S_NAMESPACE}" &>/dev/null; then
-            echo "::warning::CronJob ${CRONJOB_NAME} not found in namespace ${K8S_NAMESPACE}. Skipping the step...."
-            echo "CronJob ${CRONJOB_NAME} not found in namespace ${K8S_NAMESPACE}. Step skipped." >> "$GITHUB_STEP_SUMMARY"
-            exit 0
-          fi
-          echo "CronJob ${CRONJOB_NAME} found, proceeding..."
-
-          echo "Creating job from cronjob ${CRONJOB_NAME}..."
-          JOB_NAME="${CRONJOB_NAME}-$(date +%s)"
-          kubectl create job --from=cronjob/${CRONJOB_NAME} -n ${K8S_NAMESPACE} "${JOB_NAME}"
-          echo "Job ${JOB_NAME} successfully created"
-
-          echo "Waiting for job ${JOB_NAME} to create a Pod..."
-          START_TIME=$(date +%s)
-          while true; do
-            POD_NAME=$(kubectl get pods -n ${K8S_NAMESPACE} -l job-name=${JOB_NAME} -o jsonpath='{.items[0].metadata.name}')
-            if [ -n "$POD_NAME" ]; then
-              echo "Pod ${POD_NAME} created successfully"
-              break
-            fi
-            NOW=$(date +%s)
-            ELAPSED=$((NOW - START_TIME))
-            if [ $ELAPSED -ge $TIMEOUT_SECONDS ]; then
-              echo "Timeout ${TIMEOUT_SECONDS}s elapsed"
-              exit 1
-            fi
-            sleep 2
-          done
-
-          echo "Waiting for pod ${POD_NAME} to complete..."
-          START_TIME=$(date +%s)
-          while true; do
-            EXIT_CODE=$(kubectl get pod "$POD_NAME" -n "$K8S_NAMESPACE" -o jsonpath='{.status.containerStatuses[0].state.terminated.exitCode}')
-            if [ -n "$EXIT_CODE" ] && [ "$EXIT_CODE" -ne 0 ]; then
-              echo "Pod ${POD_NAME} failed with exit code ${EXIT_CODE}"
-              exit 1
-            elif [ -n "$EXIT_CODE" ] && [ "$EXIT_CODE" -eq 0 ]; then
-              echo "Pod ${POD_NAME} completed successfully"
-              break            
-            else
-              PHASE=$(kubectl get pod "$POD_NAME" -n "$K8S_NAMESPACE" -o jsonpath='{.status.phase}')
-              if [ "$PHASE" = "Failed" ]; then
-                echo "Pod ${POD_NAME} failed"
-                exit 1
-              fi
-            fi
-            NOW=$(date +%s)
-            ELAPSED=$((NOW - START_TIME))
-            if [ $ELAPSED -ge $TIMEOUT_SECONDS ]; then
-              echo "Timeout ${TIMEOUT_SECONDS}s elapsed"
-              exit 1
-            fi
-            sleep 2
-          done
+        uses: ./.github/actions/run-k8s-cronjob
+        with:
+          cronjob_name: interop-be-eservice-descriptors-scheduled-archiver
+          k8s_namespace: ${{ vars.K8S_NAMESPACE }}
+          timeout_seconds: 180
 
       - name: Run interop-be-ipa-certified-attributes-importer cronjob
         id: run_interop_be_ipa_certified_attributes_importer_cronjob
         if: ${{ needs.workflow_context.outputs.runCronjobs == 'true' }}
-        shell: bash
-        env:
-          CRONJOB_NAME: "interop-be-ipa-certified-attributes-importer"
-          K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE }}
-          TIMEOUT_SECONDS: 180
-        run: |
-          set -euo pipefail
-
-          echo "Checking if cronjob ${CRONJOB_NAME} exists..."
-          if ! kubectl get cronjob "${CRONJOB_NAME}" -n "${K8S_NAMESPACE}" &>/dev/null; then
-            echo "::warning::CronJob ${CRONJOB_NAME} not found in namespace ${K8S_NAMESPACE}. Skipping the step...."
-            echo "CronJob ${CRONJOB_NAME} not found in namespace ${K8S_NAMESPACE}. Step skipped." >> "$GITHUB_STEP_SUMMARY"
-            exit 0
-          fi
-          echo "CronJob ${CRONJOB_NAME} found, proceeding..."
-
-          echo "Creating job from cronjob ${CRONJOB_NAME}..."
-          JOB_NAME="${CRONJOB_NAME}-$(date +%s)"
-          kubectl create job --from=cronjob/${CRONJOB_NAME} -n ${K8S_NAMESPACE} "${JOB_NAME}"
-          echo "Job ${JOB_NAME} successfully created"
-
-          echo "Waiting for job ${JOB_NAME} to create a Pod..."
-          START_TIME=$(date +%s)
-          while true; do
-            POD_NAME=$(kubectl get pods -n ${K8S_NAMESPACE} -l job-name=${JOB_NAME} -o jsonpath='{.items[0].metadata.name}')
-            if [ -n "$POD_NAME" ]; then
-              echo "Pod ${POD_NAME} created successfully"
-              break
-            fi
-            NOW=$(date +%s)
-            ELAPSED=$((NOW - START_TIME))
-            if [ $ELAPSED -ge $TIMEOUT_SECONDS ]; then
-              echo "Timeout ${TIMEOUT_SECONDS}s elapsed"
-              exit 1
-            fi
-            sleep 2
-          done
-
-          echo "Waiting for pod ${POD_NAME} to complete..."
-          START_TIME=$(date +%s)
-          while true; do
-            EXIT_CODE=$(kubectl get pod "$POD_NAME" -n "$K8S_NAMESPACE" -o jsonpath='{.status.containerStatuses[0].state.terminated.exitCode}')
-            if [ -n "$EXIT_CODE" ] && [ "$EXIT_CODE" -ne 0 ]; then
-              echo "Pod ${POD_NAME} failed with exit code ${EXIT_CODE}"
-              exit 1
-            elif [ -n "$EXIT_CODE" ] && [ "$EXIT_CODE" -eq 0 ]; then
-              echo "Pod ${POD_NAME} completed successfully"
-              break            
-            else
-              PHASE=$(kubectl get pod "$POD_NAME" -n "$K8S_NAMESPACE" -o jsonpath='{.status.phase}')
-              if [ "$PHASE" = "Failed" ]; then
-                echo "Pod ${POD_NAME} failed"
-                exit 1
-              fi
-            fi
-            NOW=$(date +%s)
-            ELAPSED=$((NOW - START_TIME))
-            if [ $ELAPSED -ge $TIMEOUT_SECONDS ]; then
-              echo "Timeout ${TIMEOUT_SECONDS}s elapsed"
-              exit 1
-            fi
-            sleep 2
-          done
+        uses: ./.github/actions/run-k8s-cronjob
+        with:
+          cronjob_name: interop-be-ipa-certified-attributes-importer
+          k8s_namespace: ${{ vars.K8S_NAMESPACE }}
+          timeout_seconds: 180
 
       - name: Run interop-be-istat-certified-attributes-importer cronjob
         id: run_interop_be_istat_certified_attributes_importer_cronjob
         if: ${{ needs.workflow_context.outputs.runCronjobs == 'true' }}
-        shell: bash
-        env:
-          CRONJOB_NAME: "interop-be-istat-certified-attributes-importer"
-          K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE }}
-          TIMEOUT_SECONDS: 180
-        run: |
-          set -euo pipefail
-
-          echo "Checking if cronjob ${CRONJOB_NAME} exists..."
-          if ! kubectl get cronjob "${CRONJOB_NAME}" -n "${K8S_NAMESPACE}" &>/dev/null; then
-            echo "::warning::CronJob ${CRONJOB_NAME} not found in namespace ${K8S_NAMESPACE}. Skipping the step...."
-            echo "CronJob ${CRONJOB_NAME} not found in namespace ${K8S_NAMESPACE}. Step skipped." >> "$GITHUB_STEP_SUMMARY"
-            exit 0
-          fi
-          echo "CronJob ${CRONJOB_NAME} found, proceeding..."
-
-          echo "Creating job from cronjob ${CRONJOB_NAME}..."
-          JOB_NAME="${CRONJOB_NAME}-$(date +%s)"
-          kubectl create job --from=cronjob/${CRONJOB_NAME} -n ${K8S_NAMESPACE} "${JOB_NAME}"
-          echo "Job ${JOB_NAME} successfully created"
-
-          echo "Waiting for job ${JOB_NAME} to create a Pod..."
-          START_TIME=$(date +%s)
-          while true; do
-            POD_NAME=$(kubectl get pods -n ${K8S_NAMESPACE} -l job-name=${JOB_NAME} -o jsonpath='{.items[0].metadata.name}')
-            if [ -n "$POD_NAME" ]; then
-              echo "Pod ${POD_NAME} created successfully"
-              break
-            fi
-            NOW=$(date +%s)
-            ELAPSED=$((NOW - START_TIME))
-            if [ $ELAPSED -ge $TIMEOUT_SECONDS ]; then
-              echo "Timeout ${TIMEOUT_SECONDS}s elapsed"
-              exit 1
-            fi
-            sleep 2
-          done
-
-          echo "Waiting for pod ${POD_NAME} to complete..."
-          START_TIME=$(date +%s)
-          while true; do
-            EXIT_CODE=$(kubectl get pod "$POD_NAME" -n "$K8S_NAMESPACE" -o jsonpath='{.status.containerStatuses[0].state.terminated.exitCode}')
-            if [ -n "$EXIT_CODE" ] && [ "$EXIT_CODE" -ne 0 ]; then
-              echo "Pod ${POD_NAME} failed with exit code ${EXIT_CODE}"
-              exit 1
-            elif [ -n "$EXIT_CODE" ] && [ "$EXIT_CODE" -eq 0 ]; then
-              echo "Pod ${POD_NAME} completed successfully"
-              break            
-            else
-              PHASE=$(kubectl get pod "$POD_NAME" -n "$K8S_NAMESPACE" -o jsonpath='{.status.phase}')
-              if [ "$PHASE" = "Failed" ]; then
-                echo "Pod ${POD_NAME} failed"
-                exit 1
-              fi
-            fi
-            NOW=$(date +%s)
-            ELAPSED=$((NOW - START_TIME))
-            if [ $ELAPSED -ge $TIMEOUT_SECONDS ]; then
-              echo "Timeout ${TIMEOUT_SECONDS}s elapsed"
-              exit 1
-            fi
-            sleep 2
-          done
+        uses: ./.github/actions/run-k8s-cronjob
+        with:
+          cronjob_name: interop-be-istat-certified-attributes-importer
+          k8s_namespace: ${{ vars.K8S_NAMESPACE }}
+          timeout_seconds: 180
 
   run_js_test:
     name: Run JavaScript Cucumber Test Suite
