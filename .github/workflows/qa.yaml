@@ -434,6 +434,8 @@ jobs:
           AWS_REGION: ${{ secrets.AWS_REGION}}
           PLATFORM_STATES_TABLE_NAME: ${{ vars.PLATFORM_STATES_TABLE_NAME }}
           TOKEN_GENERATION_TABLE_NAME: ${{ vars.TOKEN_GENERATION_TABLE_NAME }}
+          ASYNC_EXCHANGES_PRODUCER_KEYCHAIN_PLATFORM_STATES_TABLE_NAME: ${{ vars.ASYNC_EXCHANGES_PRODUCER_KEYCHAIN_PLATFORM_STATES_TABLE_NAME }}
+          ASYNC_EXCHANGES_INTERACTIONS_TABLE_NAME: ${{ vars.ASYNC_EXCHANGES_INTERACTIONS_TABLE_NAME }}
         run: |
           set -euo pipefail
 
@@ -444,6 +446,14 @@ jobs:
           echo "Starting ${TOKEN_GENERATION_TABLE_NAME} DynamoDB table purge..."
           ./scripts/purge-dynamodb-tables.sh  "${TOKEN_GENERATION_TABLE_NAME}"
           echo "${TOKEN_GENERATION_TABLE_NAME} DynamoDB tables purged successfully"
+
+          echo "Starting ${ASYNC_EXCHANGES_PRODUCER_KEYCHAIN_PLATFORM_STATES_TABLE_NAME} DynamoDB table purge..."
+          ./scripts/purge-dynamodb-tables.sh  "${ASYNC_EXCHANGES_PRODUCER_KEYCHAIN_PLATFORM_STATES_TABLE_NAME}"
+          echo "${ASYNC_EXCHANGES_PRODUCER_KEYCHAIN_PLATFORM_STATES_TABLE_NAME} table purged successfully"
+
+          echo "Starting ${ASYNC_EXCHANGES_INTERACTIONS_TABLE_NAME} DynamoDB table purge..."
+          ./scripts/purge-dynamodb-tables.sh  "${ASYNC_EXCHANGES_INTERACTIONS_TABLE_NAME}"
+          echo "${ASYNC_EXCHANGES_INTERACTIONS_TABLE_NAME} table purged successfully"
 
           echo "DynamoDB tables purged successfully"
 
