@@ -123,7 +123,6 @@ jobs:
     outputs:
       environment: ${{ steps.set_runtime_env.outputs.environment }}
       runDataPreparation: ${{ steps.set_runtime_env.outputs.runDataPreparation }}
-      runJSTests: ${{ steps.set_runtime_env.outputs.runJSTests }}
       runJavaTests: ${{ steps.set_runtime_env.outputs.runJavaTests }}
       javaTestSuite: ${{ steps.set_runtime_env.outputs.javaTestSuite }}
       javaBranchName: ${{ steps.set_runtime_env.outputs.javaBranchName }}
@@ -151,14 +150,12 @@ jobs:
           if [[ "$INPUT_IS_SCHEDULE" == "true" ]]; then
             environment="tracing-qa"
             runDataPreparation="true"
-            runJSTests="false"
             runJavaTests="true"
             javaTestSuite="InteropTracingTest"
             javaBranchName="feature/QA-13610-tracing-refactoring"
           else
             environment="$INPUT_ENVIRONMENT"
             runDataPreparation="$INPUT_RUN_DATA_PREPARATION"
-            runJSTests="false"
             runJavaTests="$INPUT_RUN_JAVA_TESTS"
             javaTestSuite="$INPUT_JAVA_TEST_SUITE"
             javaBranchName="$INPUT_JAVA_BRANCH_NAME"
@@ -167,7 +164,6 @@ jobs:
           {
             echo "environment=$environment"
             echo "runDataPreparation=$runDataPreparation"
-            echo "runJSTests=$runJSTests"
             echo "runJavaTests=$runJavaTests"
             echo "javaTestSuite=$javaTestSuite"
             echo "javaBranchName=$javaBranchName"
@@ -183,7 +179,6 @@ jobs:
           INPUT_REF: ${{ github.ref }}
           INPUT_PLAT_DEP_VERSIONS: ${{ vars.PLAT_DEP_VERSIONS_URL }}
           INPUT_RUN_DATA_PREPARATION: ${{ steps.set_runtime_env.outputs.runDataPreparation }}
-          INPUT_RUN_JSTESTS: ${{ steps.set_runtime_env.outputs.runJSTests }}
           INPUT_RUN_JAVA_TESTS: ${{ steps.set_runtime_env.outputs.runJavaTests }}
           INPUT_JAVA_TEST_SUITE: ${{ steps.set_runtime_env.outputs.javaTestSuite }}
           INPUT_JAVA_BRANCH_NAME: ${{ steps.set_runtime_env.outputs.javaBranchName }}
@@ -195,7 +190,6 @@ jobs:
           echo "- ref: \`$INPUT_REF\`" >> "$GITHUB_STEP_SUMMARY"
           echo "- plat-dep versions: \`$INPUT_PLAT_DEP_VERSIONS\`" >> "$GITHUB_STEP_SUMMARY"
           echo "- runDataPreparation: \`$INPUT_RUN_DATA_PREPARATION\`" >> "$GITHUB_STEP_SUMMARY"
-          echo "- runJSTests: \`$INPUT_RUN_JSTESTS\`" >> "$GITHUB_STEP_SUMMARY"
           echo "- runJavaTests: \`$INPUT_RUN_JAVA_TESTS\`" >> "$GITHUB_STEP_SUMMARY"
           echo "- javaTestSuite: \`$INPUT_JAVA_TEST_SUITE\`" >> "$GITHUB_STEP_SUMMARY"
           echo "- javaBranchName: \`$INPUT_JAVA_BRANCH_NAME\`" >> "$GITHUB_STEP_SUMMARY"
@@ -408,7 +402,7 @@ jobs:
 
   run_java_test:
     name: Run Java Cucumber Test Suite
-    if: ${{ always() && needs.create_runner.result == 'success' && needs.workflow_context.outputs.runJSTests != 'true' && needs.workflow_context.outputs.runJavaTests == 'true' }}
+    if: ${{ always() && needs.create_runner.result == 'success' && needs.workflow_context.outputs.runJavaTests == 'true' }}
     needs: [workflow_context, create_runner, data_prep]
     runs-on: [self-hosted, "run_id:${{ needs.workflow_context.outputs.environment }}-${{ github.run_id }}"]
     environment: ${{ needs.workflow_context.outputs.environment }}
