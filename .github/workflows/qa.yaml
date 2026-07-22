@@ -25,11 +25,6 @@ on:
         required: true
         default: false
         type: boolean
-      runJSTests:
-        description: 'Run JavaScript test suite'
-        required: true
-        default: false
-        type: boolean
       # The inputs below are specific for running the Java test suites defined in pn-b2b-client.
       runJavaTests:
         description: 'Run Java test in pn-b2b-client'
@@ -79,7 +74,6 @@ jobs:
       environment: ${{ steps.set_runtime_env.outputs.environment }}
       kafkaPurgeTopics: ${{ steps.set_runtime_env.outputs.kafkaPurgeTopics }}
       runDataPreparation: ${{ steps.set_runtime_env.outputs.runDataPreparation }}
-      runJSTests: ${{ steps.set_runtime_env.outputs.runJSTests }}
       runJavaTests: ${{ steps.set_runtime_env.outputs.runJavaTests }}
       javaTestSuite: ${{ steps.set_runtime_env.outputs.javaTestSuite }}
       javaBranchName: ${{ steps.set_runtime_env.outputs.javaBranchName }}
@@ -103,7 +97,6 @@ jobs:
           INPUT_ENVIRONMENT: ${{ inputs.environment }}
           INPUT_KAFKA_PURGE_TOPICS: ${{ inputs.kafkaPurgeTopics }}
           INPUT_RUN_DATA_PREPARATION: ${{ inputs.runDataPreparation }}
-          INPUT_RUN_JS_TESTS: ${{ inputs.runJSTests }}
           INPUT_RUN_JAVA_TESTS: ${{ inputs.runJavaTests }}
           INPUT_JAVA_TEST_SUITE: ${{ inputs.javaTestSuite || 'NRTStandard' }}
           INPUT_JAVA_BRANCH_NAME: ${{ inputs.javaBranchName || 'develop' }}
@@ -114,7 +107,6 @@ jobs:
             environment="es1-qa"
             kafkaPurgeTopics="true"
             runDataPreparation="true"
-            runJSTests="false"
             runJavaTests="true"
             javaTestSuite="NRTStandard"
             javaBranchName="develop"
@@ -124,7 +116,6 @@ jobs:
             environment="$INPUT_ENVIRONMENT"
             kafkaPurgeTopics="$INPUT_KAFKA_PURGE_TOPICS"
             runDataPreparation="$INPUT_RUN_DATA_PREPARATION"
-            runJSTests="$INPUT_RUN_JS_TESTS"
             runJavaTests="$INPUT_RUN_JAVA_TESTS"
             javaTestSuite="$INPUT_JAVA_TEST_SUITE"
             javaBranchName="$INPUT_JAVA_BRANCH_NAME"
@@ -136,7 +127,6 @@ jobs:
             echo "environment=$environment"
             echo "kafkaPurgeTopics=$kafkaPurgeTopics"
             echo "runDataPreparation=$runDataPreparation"
-            echo "runJSTests=$runJSTests"
             echo "runJavaTests=$runJavaTests"
             echo "javaTestSuite=$javaTestSuite"
             echo "javaBranchName=$javaBranchName"
@@ -155,7 +145,6 @@ jobs:
           INPUT_PLAT_DEP_VERSIONS: ${{ vars.PLAT_DEP_VERSIONS_URL }}
           INPUT_KAFKA_PURGE_TOPICS: ${{ steps.set_runtime_env.outputs.kafkaPurgeTopics }}
           INPUT_RUN_DATA_PREPARATION: ${{ steps.set_runtime_env.outputs.runDataPreparation }}
-          INPUT_RUN_JSTESTS: ${{ steps.set_runtime_env.outputs.runJSTests }}
           INPUT_RUN_JAVA_TESTS: ${{ steps.set_runtime_env.outputs.runJavaTests }}
           INPUT_JAVA_TEST_SUITE: ${{ steps.set_runtime_env.outputs.javaTestSuite }}
           INPUT_JAVA_BRANCH_NAME: ${{ steps.set_runtime_env.outputs.javaBranchName }}
@@ -170,7 +159,6 @@ jobs:
           echo "- plat-dep versions: \`$INPUT_PLAT_DEP_VERSIONS\`" >> "$GITHUB_STEP_SUMMARY"
           echo "- kafkaPurgeTopics: \`$INPUT_KAFKA_PURGE_TOPICS\`" >> "$GITHUB_STEP_SUMMARY"
           echo "- runDataPreparation: \`$INPUT_RUN_DATA_PREPARATION\`" >> "$GITHUB_STEP_SUMMARY"
-          echo "- runJSTests: \`$INPUT_RUN_JSTESTS\`" >> "$GITHUB_STEP_SUMMARY"
           echo "- runJavaTests: \`$INPUT_RUN_JAVA_TESTS\`" >> "$GITHUB_STEP_SUMMARY"
           echo "- javaTestSuite: \`$INPUT_JAVA_TEST_SUITE\`" >> "$GITHUB_STEP_SUMMARY"
           echo "- javaBranchName: \`$INPUT_JAVA_BRANCH_NAME\`" >> "$GITHUB_STEP_SUMMARY"
@@ -572,54 +560,10 @@ jobs:
           k8s_namespace: ${{ vars.K8S_NAMESPACE }}
           timeout_seconds: 180
 
-  run_js_test:
-    name: Run JavaScript Cucumber Test Suite
-    if: ${{ always() && needs.workflow_context.outputs.runJSTests == 'true' }}
-    needs: [workflow_context, data_prep, create_runner]
-    runs-on: [self-hosted, "run_id:${{ needs.workflow_context.outputs.environment }}-${{ github.run_id }}"]
-    environment: ${{ needs.workflow_context.outputs.environment }}
-    env:
-      ENVIRONMENT: ${{ vars.ENVIRONMENT }}
-      SESSION_TOKENS_DURATION_SECONDS: ${{ vars.SESSION_TOKENS_DURATION_SECONDS }}
-      REMOTE_WELLKNOWN_URL: ${{ vars.REMOTE_WELLKNOWN_URL }}
-      BFF_BASE_URL: ${{ vars.BFF_BASE_URL }}
-      ST_VERBOSE_MODE: ${{ vars.ST_VERBOSE_MODE }}
-      TENANTS_IDS_FILE_PATH: ${{ vars.TENANTS_IDS_FILE_PATH }}
-      CUCUMBER_OPTS_PARALLEL: ${{ vars.CUCUMBER_OPTS_PARALLEL }}
-      MAX_POLLING_TRIES:  ${{ vars.MAX_POLLING_TRIES }}
-      POLLING_SLEEP_TIME: ${{ vars.POLLING_SLEEP_TIME }}
-      AUTHORIZATION_SERVER_TOKEN_CREATION_URL: ${{ vars.AUTHORIZATION_SERVER_TOKEN_CREATION_URL }}
-      CLIENT_ASSERTION_JWT_AUDIENCE: ${{ vars.CLIENT_ASSERTION_JWT_AUDIENCE }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-
-      - name: Setup Node
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
-        with:
-          node-version-file: ./package.json
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
-        with:
-          run_install: true
-
-      - name: Run QA tests
-        id: run_qa_tests
-        shell: bash
-        run: |
-          set -uo pipefail
-
-          echo "Install node dependencies"
-          pnpm i
-
-          echo "Run test command"
-          pnpm test
-
   run_java_test:
     name: Run Java Cucumber Test Suite
-    if: ${{ always() && needs.workflow_context.outputs.runJSTests != 'true' && needs.workflow_context.outputs.runJavaTests == 'true' }}
-    needs: [workflow_context, create_runner, data_prep, run_js_test]
+    if: ${{ always() && needs.workflow_context.outputs.runJavaTests == 'true' }}
+    needs: [workflow_context, create_runner, data_prep]
     runs-on: [self-hosted, "run_id:${{ needs.workflow_context.outputs.environment }}-${{ github.run_id }}"]
     environment: ${{ needs.workflow_context.outputs.environment }}
     env:
@@ -712,7 +656,7 @@ jobs:
 
   delete_runner:
     name: Delete Self-Hosted Runner
-    needs: [workflow_context, create_runner, svc_version_check, data_prep, run_js_test, run_java_test]
+    needs: [workflow_context, create_runner, svc_version_check, data_prep, run_java_test]
     if: ${{ always() }}
     runs-on: ubuntu-22.04
     strategy:

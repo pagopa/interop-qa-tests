@@ -1,89 +1,17 @@
 # interop-qa-tests
 
-## ENVs
+This repository is used as a GitHub Actions trigger/orchestration layer for Interop QA operations on AWS.
 
-The following values are used to run the test suite from the local, targeting the DEV environment:
+End-to-end tests are executed from external repositories (for example `pagopa/pn-b2b-client`) through workflows defined here.
 
-```
-BFF_BASE_URL="https://selfcare.dev.interop.pagopa.it/0.0/backend-for-frontend"
-ENVIRONMENT="dev"
-REMOTE_WELLKNOWN_URL="https://www.dev.interop.pagopa.it/.well-known/jwks.json"
-SESSION_TOKENS_DURATION_SECONDS=2700
-MAX_POLLING_TRIES=50
-POLLING_SLEEP_TIME=100
-CUCUMBER_OPTS_PARALLEL=5
-```
+## What this repo does
 
-## Session tokens module
+- Orchestrates ephemeral self-hosted runners on AWS.
+- Runs optional data preparation tasks (DB restore/purge, Kubernetes scaling, cronjobs).
+- Triggers Java-based QA suites in external repositories.
+- Handles teardown/cleanup of the execution runner.
 
-The module exports `async generateSessionTokens(string)` which takes the tenants ids file path as input and
-returns a JSON object containing a valid session token for each tenant kind/role combination.
+## Main workflows
 
-Usage example:
-
-```javascript
-import { generateSessionTokens } from "./utils/session-tokens.js";
-
-const sessionTokens = await generateSessionTokens(
-  process.env.TENANTS_IDS_FILE_PATH
-);
-```
-
-Output example:
-
-```json
-{
-  "gsp": {
-    "admin": "jwt...",
-    "api": "jwt..."
-  }
-}
-```
-
-## Tags
-
-Tests are labeled with the following special tags:
-
-- `@wait_for_fix`: test bug affected, waiting for resolution, don't execute in test suite
-
-## Running test
-
-This test suite supports nodejs runtime.
-
-To run all tests:
-
-```shell
-pnpm test
-```
-
-### Test script
-
-```shell
-# Run all test, excluding test labeled with "special" tag: @wait_for_fix, @resouce_intensive
-pnpm test:ready
-```
-
-```shell
-# Run only tagged test
-pnpm test:tags "@some_useful_tag"
-```
-
-```shell
-# Run only specific module test, excluding special tag
-pnpm test:catalog
-```
-
-```shell
-# Run only test waiting for fix
-pnpm test:tags "@wait_for_fix"
-```
-
-### Validate feature file and step implementation
-
-```shell
-pnpm check-steps
-```
-
-```shell
-pnpm check-steps:usage
-```
+- `.github/workflows/qa.yaml`: QA orchestration for `es1-*` environments (data preparation + Java test handoff).
+- `.github/workflows/tracing-qa.yaml`: tracing QA orchestration for `tracing-*` environments.
