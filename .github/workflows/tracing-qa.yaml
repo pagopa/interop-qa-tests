@@ -3,8 +3,8 @@ name: Tracing QA workflow
 # ======================================================================================
 # WORKFLOW DOCUMENTATION: TRACING QA
 # ======================================================================================
-# This workflow dynamically selects a GitHub Environment based on the 'environment' 
-# input or the cron schedule. All 'vars.*' and 'secrets.*' listed below are scoped 
+# This workflow dynamically selects a GitHub Environment based on the 'environment'
+# input or the cron schedule. All 'vars.*' and 'secrets.*' listed below are scoped
 # to the selected environment in the GitHub repository settings.
 #
 # --------------------------------------------------------------------------------------
@@ -57,11 +57,11 @@ name: Tracing QA workflow
 # --------------------------------------------------------------------------------------
 # 4. CROSS-ENVIRONMENT USAGE
 # --------------------------------------------------------------------------------------
-# This workflow is designed for "Environment Isolation." It does not read secrets 
+# This workflow is designed for "Environment Isolation." It does not read secrets
 # from "other" environments simultaneously. Instead:
 # - If triggered by 'schedule': It is forced to use 'tracing-qa' settings.
 # - If triggered by 'workflow_dispatch': It uses the environment selected by the user.
-# - Repository-level secrets/vars: Used only if they are not overridden at the 
+# - Repository-level secrets/vars: Used only if they are not overridden at the
 #   Environment level.
 # ======================================================================================
 
@@ -74,7 +74,7 @@ on:
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Environment to run tracing e2e-tests against'
+        description: "Environment to run tracing e2e-tests against"
         required: true
         default: tracing-qa
         type: choice
@@ -83,38 +83,37 @@ on:
           - tracing-qa
           - tracing-vapt
       runDataPreparation:
-        description: 'Data preparation (wipe + reload dump)'
+        description: "Data preparation (wipe + reload dump)"
         required: true
         default: false
         type: boolean
       # The inputs below are specific for running the Java test suites defined in pn-b2b-client.
       runJavaTests:
-        description: 'Run Java test in pn-b2b-client'
+        description: "Run Java test in pn-b2b-client"
         required: true
         default: true
         type: boolean
       javaTestSuite:
-        description: 'Choose which Java test suite to run'
+        description: "Choose which Java test suite to run"
         required: false
         default: InteropTracingTest
         type: string
       javaBranchName:
-        description: 'Provide the branch name for pn-b2b-client to clone'
+        description: "Provide the branch name for pn-b2b-client to clone"
         required: false
         default: feature/QA-13610-tracing-refactoring
         type: string
 
-
 defaults:
-    run:
-      shell: bash
+  run:
+    shell: bash
 
 permissions:
   id-token: write
   contents: read
 
 env:
-   SCRIPTS_FOLDER: "./scripts"
+  SCRIPTS_FOLDER: "./scripts"
 
 jobs:
   workflow_context:
@@ -223,7 +222,11 @@ jobs:
   data_prep:
     name: Data Preparation
     needs: [workflow_context, create_runner]
-    runs-on: [self-hosted, "run_id:${{ needs.workflow_context.outputs.environment }}-${{ github.run_id }}"]
+    runs-on:
+      [
+        self-hosted,
+        "run_id:${{ needs.workflow_context.outputs.environment }}-${{ github.run_id }}",
+      ]
     environment: ${{ needs.workflow_context.outputs.environment }}
     if: ${{ always() && needs.workflow_context.outputs.runDataPreparation == 'true' && needs.create_runner.result == 'success' }}
     env:
@@ -242,57 +245,57 @@ jobs:
         id: mkdir_dump
         shell: bash
         run: |
-            set -euo pipefail
+          set -euo pipefail
 
-            mkdir -p $LOCAL_TRACING_DUMPS
+          mkdir -p $LOCAL_TRACING_DUMPS
 
       - name: Get dump from S3
         id: get_data_dumps
         env:
-            AWS_REGION: ${{ secrets.AWS_REGION}}
-            DATA_PREPARATION_BUCKET: ${{ vars.DATA_PREPARATION_BUCKET }}
-            TRACING_DUMP_S3_PREFIX: ${{ vars.TRACING_DUMP_S3_PREFIX }}
+          AWS_REGION: ${{ secrets.AWS_REGION}}
+          DATA_PREPARATION_BUCKET: ${{ vars.DATA_PREPARATION_BUCKET }}
+          TRACING_DUMP_S3_PREFIX: ${{ vars.TRACING_DUMP_S3_PREFIX }}
         run: |
-            set -euo pipefail
+          set -euo pipefail
 
-            aws s3 cp "s3://${DATA_PREPARATION_BUCKET}/${TRACING_DUMP_S3_PREFIX}" $LOCAL_TRACING_DUMPS --recursive
+          aws s3 cp "s3://${DATA_PREPARATION_BUCKET}/${TRACING_DUMP_S3_PREFIX}" $LOCAL_TRACING_DUMPS --recursive
 
       - name: Scale down Deployments
         id: svc_scale_to_0
         shell: bash
         run: |
-            set -euo pipefail
+          set -euo pipefail
 
-            aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name ${{ secrets.EKS_CLUSTER_NAME }}
+          aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name ${{ secrets.EKS_CLUSTER_NAME }}
 
-            for scaledobject in $(kubectl get scaledobjects -n $K8S_NAMESPACE -o jsonpath='{.items[*].metadata.name}'); do
-              echo "Pausing ScaledObject: $scaledobject"
-              kubectl annotate scaledobject $scaledobject -n $K8S_NAMESPACE autoscaling.keda.sh/paused="true" --overwrite
-            done
+          for scaledobject in $(kubectl get scaledobjects -n $K8S_NAMESPACE -o jsonpath='{.items[*].metadata.name}'); do
+            echo "Pausing ScaledObject: $scaledobject"
+            kubectl annotate scaledobject $scaledobject -n $K8S_NAMESPACE autoscaling.keda.sh/paused="true" --overwrite
+          done
 
-            echo "Scaling deployments to 0"
-            kubectl scale deployment -n $K8S_NAMESPACE --replicas=0 --all
+          echo "Scaling deployments to 0"
+          kubectl scale deployment -n $K8S_NAMESPACE --replicas=0 --all
 
-            echo "Delete active jobs"
-            kubectl delete jobs -n $K8S_NAMESPACE --all
+          echo "Delete active jobs"
+          kubectl delete jobs -n $K8S_NAMESPACE --all
 
-            echo "Waiting for pods deletion"
+          echo "Waiting for pods deletion"
+          ACTIVE_PODS_COUNT=$(
+            kubectl get pods -n "$K8S_NAMESPACE" -o json \
+              | jq '[ .items[]
+                     | select(.metadata.ownerReferences[]?.kind=="ReplicaSet")
+                   ] | length'
+          )
+          while [[ $ACTIVE_PODS_COUNT -gt 0 ]]; do
+            sleep 2
             ACTIVE_PODS_COUNT=$(
               kubectl get pods -n "$K8S_NAMESPACE" -o json \
                 | jq '[ .items[]
                        | select(.metadata.ownerReferences[]?.kind=="ReplicaSet")
                      ] | length'
             )
-            while [[ $ACTIVE_PODS_COUNT -gt 0 ]]; do
-              sleep 2
-              ACTIVE_PODS_COUNT=$(
-                kubectl get pods -n "$K8S_NAMESPACE" -o json \
-                  | jq '[ .items[]
-                         | select(.metadata.ownerReferences[]?.kind=="ReplicaSet")
-                       ] | length'
-              )
-            done
-            echo "All the deployments have been scaled down to 0 replicas."
+          done
+          echo "All the deployments have been scaled down to 0 replicas."
 
       - name: Get Tracing Store Credentials
         id: get_tracing_store_db_credentials
@@ -300,44 +303,61 @@ jobs:
           TRACING_STORE_SECRET_ARN: ${{ secrets.TRACING_STORE_SECRET_ARN }}
         shell: bash
         run: |
-            set -euo pipefail
+          set -euo pipefail
 
-            echo "Retrieving Tracing Store credentials..."
+          echo "Retrieving Tracing Store credentials..."
 
-            TRACING_STORE_CREDENTIALS="$(aws secretsmanager get-secret-value --secret-id $TRACING_STORE_SECRET_ARN)"
+          TRACING_STORE_CREDENTIALS="$(aws secretsmanager get-secret-value --secret-id $TRACING_STORE_SECRET_ARN)"
 
-            echo "Retrieve Tracing Store username"
-            TRACING_STORE_USERNAME="$(jq -r '.SecretString | fromjson | .username' <<< "$TRACING_STORE_CREDENTIALS")"
+          echo "Retrieve Tracing Store username"
+          TRACING_STORE_USERNAME="$(jq -r '.SecretString | fromjson | .username' <<< "$TRACING_STORE_CREDENTIALS")"
 
-            echo "Retrieve Tracing Store password"
-            TRACING_STORE_PASSWORD="$(jq -r '.SecretString | fromjson | .password' <<< "$TRACING_STORE_CREDENTIALS")"
+          echo "Retrieve Tracing Store password"
+          TRACING_STORE_PASSWORD="$(jq -r '.SecretString | fromjson | .password' <<< "$TRACING_STORE_CREDENTIALS")"
 
-            echo "Update env vars with Tracing Store credentials"
-            echo "TRACING_STORE_USERNAME=$TRACING_STORE_USERNAME" >> "$GITHUB_ENV"
-            echo "TRACING_STORE_PASSWORD=$TRACING_STORE_PASSWORD" >> "$GITHUB_ENV"
+          TRACING_STORE_CREDENTIALS_DIR="$GITHUB_WORKSPACE/tracing-store"
+          TRACING_STORE_USERNAME_FILE="$TRACING_STORE_CREDENTIALS_DIR/username"
+          TRACING_STORE_PASSWORD_FILE="$TRACING_STORE_CREDENTIALS_DIR/password"
+
+          mkdir -p "$TRACING_STORE_CREDENTIALS_DIR"
+          chmod 700 "$TRACING_STORE_CREDENTIALS_DIR"
+
+          printf '%s' "$TRACING_STORE_USERNAME" > "$TRACING_STORE_USERNAME_FILE"
+          printf '%s' "$TRACING_STORE_PASSWORD" > "$TRACING_STORE_PASSWORD_FILE"
+          chmod 600 "$TRACING_STORE_USERNAME_FILE" "$TRACING_STORE_PASSWORD_FILE"
+
+          echo "Update env vars with Tracing Store credentials"
+          echo "TRACING_STORE_USERNAME_FILE=$TRACING_STORE_USERNAME_FILE" >> "$GITHUB_ENV"
+          echo "TRACING_STORE_PASSWORD_FILE=$TRACING_STORE_PASSWORD_FILE" >> "$GITHUB_ENV"
 
       - name: Truncate Tracing DB Tables
         id: tracing_db_truncate
         shell: bash
         env:
-          PGUSER: ${{ env.TRACING_STORE_USERNAME }}
-          PGPASSWORD: ${{ env.TRACING_STORE_PASSWORD }}
           PGHOST: ${{ env.TRACING_STORE_HOST }}
           PGPORT: ${{ env.TRACING_STORE_PORT }}
           PGDATABASE: ${{ vars.TRACING_DB_NAME }}
         run: |
+          set -euo pipefail
+
+          PGUSER="$(cat "$TRACING_STORE_USERNAME_FILE")"
+          PGPASSWORD="$(cat "$TRACING_STORE_PASSWORD_FILE")"
+          export PGUSER PGPASSWORD
           $SCRIPTS_FOLDER/truncateSQLTables.sh
 
       - name: Restore Tracing Dump
         id: db_dump_restore
         shell: bash
         env:
-          PGUSER: ${{ env.TRACING_STORE_USERNAME }}
-          PGPASSWORD: ${{ env.TRACING_STORE_PASSWORD }}
           PGHOST: ${{ env.TRACING_STORE_HOST }}
           PGPORT: ${{ env.TRACING_STORE_PORT }}
           PGDATABASE: ${{ vars.TRACING_DB_NAME }}
         run: |
+          set -euo pipefail
+
+          PGUSER="$(cat "$TRACING_STORE_USERNAME_FILE")"
+          PGPASSWORD="$(cat "$TRACING_STORE_PASSWORD_FILE")"
+          export PGUSER PGPASSWORD
           $SCRIPTS_FOLDER/restoreTracing.sh
 
       - name: Scale up Deployments
@@ -404,7 +424,11 @@ jobs:
     name: Run Java Cucumber Test Suite
     if: ${{ always() && needs.create_runner.result == 'success' && needs.workflow_context.outputs.runJavaTests == 'true' }}
     needs: [workflow_context, create_runner, data_prep]
-    runs-on: [self-hosted, "run_id:${{ needs.workflow_context.outputs.environment }}-${{ github.run_id }}"]
+    runs-on:
+      [
+        self-hosted,
+        "run_id:${{ needs.workflow_context.outputs.environment }}-${{ github.run_id }}",
+      ]
     environment: ${{ needs.workflow_context.outputs.environment }}
     env:
       ENVIRONMENT: ${{ vars.ENVIRONMENT }}
