@@ -123,7 +123,6 @@ jobs:
     outputs:
       environment: ${{ steps.set_runtime_env.outputs.environment }}
       runDataPreparation: ${{ steps.set_runtime_env.outputs.runDataPreparation }}
-      runJSTests: ${{ steps.set_runtime_env.outputs.runJSTests }}
       runJavaTests: ${{ steps.set_runtime_env.outputs.runJavaTests }}
       javaTestSuite: ${{ steps.set_runtime_env.outputs.javaTestSuite }}
       javaBranchName: ${{ steps.set_runtime_env.outputs.javaBranchName }}
@@ -140,27 +139,31 @@ jobs:
 
       - name: Set runtime env
         id: set_runtime_env
+        env:
+          INPUT_IS_SCHEDULE: ${{ steps.check_trigger.outputs.is_schedule }}
+          INPUT_ENVIRONMENT: ${{ inputs.environment }}
+          INPUT_RUN_DATA_PREPARATION: ${{ inputs.runDataPreparation }}
+          INPUT_RUN_JAVA_TESTS: ${{ inputs.runJavaTests }}
+          INPUT_JAVA_TEST_SUITE: ${{ inputs.javaTestSuite || 'InteropTracingTest' }}
+          INPUT_JAVA_BRANCH_NAME: ${{ inputs.javaBranchName || 'feature/QA-13610-tracing-refactoring' }}
         run: |
-          if [[ "${{ steps.check_trigger.outputs.is_schedule }}" == "true" ]]; then
+          if [[ "$INPUT_IS_SCHEDULE" == "true" ]]; then
             environment="tracing-qa"
             runDataPreparation="true"
-            runJSTests="false"
             runJavaTests="true"
             javaTestSuite="InteropTracingTest"
             javaBranchName="feature/QA-13610-tracing-refactoring"
           else
-            environment="${{ inputs.environment }}"
-            runDataPreparation="${{ inputs.runDataPreparation }}"
-            runJSTests="false"
-            runJavaTests="${{ inputs.runJavaTests }}"
-            javaTestSuite="${{ inputs.javaTestSuite || 'InteropTracingTest' }}"
-            javaBranchName="${{ inputs.javaBranchName || 'feature/QA-13610-tracing-refactoring' }}"
+            environment="$INPUT_ENVIRONMENT"
+            runDataPreparation="$INPUT_RUN_DATA_PREPARATION"
+            runJavaTests="$INPUT_RUN_JAVA_TESTS"
+            javaTestSuite="$INPUT_JAVA_TEST_SUITE"
+            javaBranchName="$INPUT_JAVA_BRANCH_NAME"
           fi
 
           {
             echo "environment=$environment"
             echo "runDataPreparation=$runDataPreparation"
-            echo "runJSTests=$runJSTests"
             echo "runJavaTests=$runJavaTests"
             echo "javaTestSuite=$javaTestSuite"
             echo "javaBranchName=$javaBranchName"
@@ -176,7 +179,6 @@ jobs:
           INPUT_REF: ${{ github.ref }}
           INPUT_PLAT_DEP_VERSIONS: ${{ vars.PLAT_DEP_VERSIONS_URL }}
           INPUT_RUN_DATA_PREPARATION: ${{ steps.set_runtime_env.outputs.runDataPreparation }}
-          INPUT_RUN_JSTESTS: ${{ steps.set_runtime_env.outputs.runJSTests }}
           INPUT_RUN_JAVA_TESTS: ${{ steps.set_runtime_env.outputs.runJavaTests }}
           INPUT_JAVA_TEST_SUITE: ${{ steps.set_runtime_env.outputs.javaTestSuite }}
           INPUT_JAVA_BRANCH_NAME: ${{ steps.set_runtime_env.outputs.javaBranchName }}
@@ -188,7 +190,6 @@ jobs:
           echo "- ref: \`$INPUT_REF\`" >> "$GITHUB_STEP_SUMMARY"
           echo "- plat-dep versions: \`$INPUT_PLAT_DEP_VERSIONS\`" >> "$GITHUB_STEP_SUMMARY"
           echo "- runDataPreparation: \`$INPUT_RUN_DATA_PREPARATION\`" >> "$GITHUB_STEP_SUMMARY"
-          echo "- runJSTests: \`$INPUT_RUN_JSTESTS\`" >> "$GITHUB_STEP_SUMMARY"
           echo "- runJavaTests: \`$INPUT_RUN_JAVA_TESTS\`" >> "$GITHUB_STEP_SUMMARY"
           echo "- javaTestSuite: \`$INPUT_JAVA_TEST_SUITE\`" >> "$GITHUB_STEP_SUMMARY"
           echo "- javaBranchName: \`$INPUT_JAVA_BRANCH_NAME\`" >> "$GITHUB_STEP_SUMMARY"
@@ -249,10 +250,12 @@ jobs:
         id: get_data_dumps
         env:
             AWS_REGION: ${{ secrets.AWS_REGION}}
+            DATA_PREPARATION_BUCKET: ${{ vars.DATA_PREPARATION_BUCKET }}
+            TRACING_DUMP_S3_PREFIX: ${{ vars.TRACING_DUMP_S3_PREFIX }}
         run: |
             set -euo pipefail
 
-            aws s3 cp "s3://${{ vars.DATA_PREPARATION_BUCKET }}/${{ vars.TRACING_DUMP_S3_PREFIX }}" $LOCAL_TRACING_DUMPS --recursive
+            aws s3 cp "s3://${DATA_PREPARATION_BUCKET}/${TRACING_DUMP_S3_PREFIX}" $LOCAL_TRACING_DUMPS --recursive
 
       - name: Scale down Deployments
         id: svc_scale_to_0
@@ -399,7 +402,7 @@ jobs:
 
   run_java_test:
     name: Run Java Cucumber Test Suite
-    if: ${{ always() && needs.create_runner.result == 'success' && needs.workflow_context.outputs.runJSTests != 'true' && needs.workflow_context.outputs.runJavaTests == 'true' }}
+    if: ${{ always() && needs.create_runner.result == 'success' && needs.workflow_context.outputs.runJavaTests == 'true' }}
     needs: [workflow_context, create_runner, data_prep]
     runs-on: [self-hosted, "run_id:${{ needs.workflow_context.outputs.environment }}-${{ github.run_id }}"]
     environment: ${{ needs.workflow_context.outputs.environment }}
@@ -417,14 +420,18 @@ jobs:
       - name: Clone the pn-b2b-client repo
         id: clone_pn-b2b-client
         shell: bash
+        env:
+          JAVA_BRANCH_NAME: ${{ needs.workflow_context.outputs.javaBranchName }}
         run: |
           echo "Cloning pn-b2b-client repo.."
-          git clone --depth 1 --branch ${{ needs.workflow_context.outputs.javaBranchName }} https://github.com/pagopa/pn-b2b-client.git
+          git clone --depth 1 --branch "$JAVA_BRANCH_NAME" https://github.com/pagopa/pn-b2b-client.git
           echo "pn-b2b-client repo has been cloned"
 
       - name: Run QA tests
         id: run_pn-b2b-client_tests
         shell: bash
+        env:
+          JAVA_TEST_SUITE: ${{ needs.workflow_context.outputs.javaTestSuite }}
         run: |
           set -uo pipefail
           echo "Running tests..."
@@ -439,7 +446,7 @@ jobs:
           echo "Using Spring profile: ${SPRING_PROFILE}"
 
           cd ./pn-b2b-client/interop-qa-tests
-          mvn $SPRING_PROFILE -Dtest=it.pagopa.pn.interop.cucumber.${{ needs.workflow_context.outputs.javaTestSuite }} clean verify > tracing-qa-tests.log 2>&1
+          mvn $SPRING_PROFILE -Dtest="it.pagopa.pn.interop.cucumber.$JAVA_TEST_SUITE" clean verify > tracing-qa-tests.log 2>&1
 
       - name: Upload QA test logs
         if: always()
