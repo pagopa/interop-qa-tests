@@ -312,33 +312,55 @@ jobs:
             echo "Retrieve Tracing Store password"
             TRACING_STORE_PASSWORD="$(jq -r '.SecretString | fromjson | .password' <<< "$TRACING_STORE_CREDENTIALS")"
 
+            TRACING_STORE_CREDENTIALS_DIR="$GITHUB_WORKSPACE/tracing-store"
+            TRACING_STORE_USERNAME_FILE="$TRACING_STORE_CREDENTIALS_DIR/username"
+            TRACING_STORE_PASSWORD_FILE="$TRACING_STORE_CREDENTIALS_DIR/password"
+
+            mkdir -p "$TRACING_STORE_CREDENTIALS_DIR"
+            chmod 700 "$TRACING_STORE_CREDENTIALS_DIR"
+
+            printf '%s' "$TRACING_STORE_USERNAME" > "$TRACING_STORE_USERNAME_FILE"
+            printf '%s' "$TRACING_STORE_PASSWORD" > "$TRACING_STORE_PASSWORD_FILE"
+            chmod 600 "$TRACING_STORE_USERNAME_FILE" "$TRACING_STORE_PASSWORD_FILE"
+
             echo "Update env vars with Tracing Store credentials"
-            echo "TRACING_STORE_USERNAME=$TRACING_STORE_USERNAME" >> "$GITHUB_ENV"
-            echo "TRACING_STORE_PASSWORD=$TRACING_STORE_PASSWORD" >> "$GITHUB_ENV"
+            echo "TRACING_STORE_USERNAME_FILE=$TRACING_STORE_USERNAME_FILE" >> "$GITHUB_ENV"
+            echo "TRACING_STORE_PASSWORD_FILE=$TRACING_STORE_PASSWORD_FILE" >> "$GITHUB_ENV"
 
       - name: Truncate Tracing DB Tables
         id: tracing_db_truncate
         shell: bash
         env:
-          PGUSER: ${{ env.TRACING_STORE_USERNAME }}
-          PGPASSWORD: ${{ env.TRACING_STORE_PASSWORD }}
           PGHOST: ${{ env.TRACING_STORE_HOST }}
           PGPORT: ${{ env.TRACING_STORE_PORT }}
           PGDATABASE: ${{ vars.TRACING_DB_NAME }}
         run: |
+          set -euo pipefail
+
+          PGUSER="$(cat "$TRACING_STORE_USERNAME_FILE")"
+          PGPASSWORD="$(cat "$TRACING_STORE_PASSWORD_FILE")"
+          export PGUSER PGPASSWORD
           $SCRIPTS_FOLDER/truncateSQLTables.sh
 
       - name: Restore Tracing Dump
         id: db_dump_restore
         shell: bash
         env:
-          PGUSER: ${{ env.TRACING_STORE_USERNAME }}
-          PGPASSWORD: ${{ env.TRACING_STORE_PASSWORD }}
           PGHOST: ${{ env.TRACING_STORE_HOST }}
           PGPORT: ${{ env.TRACING_STORE_PORT }}
           PGDATABASE: ${{ vars.TRACING_DB_NAME }}
         run: |
+          set -euo pipefail
+
+          PGUSER="$(cat "$TRACING_STORE_USERNAME_FILE")"
+          PGPASSWORD="$(cat "$TRACING_STORE_PASSWORD_FILE")"
+          export PGUSER PGPASSWORD
           $SCRIPTS_FOLDER/restoreTracing.sh
+
+      - name: Cleanup Tracing Store credentials files
+        if: ${{ always() }}
+        run: |
+          rm -f "${TRACING_STORE_USERNAME_FILE:-}" "${TRACING_STORE_PASSWORD_FILE:-}"
 
       - name: Scale up Deployments
         id: svc_scale_to_1

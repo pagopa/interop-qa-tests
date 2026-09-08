@@ -418,12 +418,15 @@ jobs:
         if: ${{ vars.SCHEDULED_NOTIFICATION_SQL_DB_NAME != '' }}
         shell: bash
         env:
-          PGUSER: ${{ env.PLATFORM_DATA_USERNAME }}
-          PGPASSWORD: ${{ env.PLATFORM_DATA_PASSWORD }}
           PGHOST: ${{ env.PLATFORM_DATA_HOST }}
           PGPORT: ${{ env.PLATFORM_DATA_PORT }}
           PGDATABASE: ${{ vars.SCHEDULED_NOTIFICATION_SQL_DB_NAME }}
         run: |
+          set -euo pipefail
+
+          PGUSER="$(cat "$PLATFORM_DATA_USERNAME_FILE")"
+          PGPASSWORD="$(cat "$PLATFORM_DATA_PASSWORD_FILE")"
+          export PGUSER PGPASSWORD
           $SCRIPTS_FOLDER/truncateSQLTables.sh
 
       - name: Checkout Kafka tools
