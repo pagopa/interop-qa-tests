@@ -670,8 +670,18 @@ jobs:
 
           echo "Using Spring profile: ${SPRING_PROFILE}"
 
-          cd ./pn-b2b-client/interop-qa-tests
-          mvn $SPRING_PROFILE -Dtest="it.pagopa.pn.interop.cucumber.$JAVA_TEST_SUITE" clean verify > qa-tests.log 2>&1
+          cd ./pn-b2b-client
+
+          echo "Building common module..."
+          mvn -f common/pom.xml clean install -DskipTests
+
+          echo "Running QA test suite: ${JAVA_TEST_SUITE}"
+          cd interop-qa-tests
+
+          mvn \
+            $SPRING_PROFILE \
+            -Dtest="it.pagopa.pn.interop.cucumber.$JAVA_TEST_SUITE" \
+            clean verify > qa-tests.log 2>&1
 
       - name: Upload QA test logs
         if: always()
