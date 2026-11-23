@@ -766,6 +766,7 @@ jobs:
           if-no-files-found: error
           retention-days: 10
 
+
   dispatch_rae:
     name: Trigger RAE in pn-b2b-client
     needs: [ workflow_context, run_java_test ]
@@ -798,9 +799,16 @@ jobs:
             exit 1
           fi
 
+          if ! git check-ref-format "refs/heads/$JAVA_BRANCH_NAME"; then
+            echo "::error::Invalid Java branch: $JAVA_BRANCH_NAME"
+            exit 1
+          fi
+
+          echo "Dispatching RAE on pn-b2b-client branch: $JAVA_BRANCH_NAME"
+
           gh workflow run rae-from-interop.yaml \
             --repo pagopa/pn-b2b-client \
-            --ref develop \
+            --ref "$JAVA_BRANCH_NAME" \
             -f run_id="$GITHUB_RUN_ID" \
             -f artifact_id="$ARTIFACT_ID" \
             -f run_attempt="$REPORT_RUN_ATTEMPT" \
