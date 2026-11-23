@@ -773,7 +773,6 @@ jobs:
       ${{
         !cancelled() &&
         github.repository == 'pagopa/interop-qa-tests' &&
-        github.ref == 'refs/heads/main' &&
         needs.run_java_test.outputs.rae-artifact-id != '' &&
         (
           needs.workflow_context.outputs.environment == 'es1-qa' ||
