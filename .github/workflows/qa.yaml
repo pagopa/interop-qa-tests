@@ -600,6 +600,9 @@ jobs:
     needs: [workflow_context, create_runner, data_prep]
     runs-on: [self-hosted, "run_id:${{ needs.workflow_context.outputs.environment }}-${{ github.run_id }}"]
     environment: ${{ needs.workflow_context.outputs.environment }}
+    outputs:
+      rae-artifact-id: ${{ steps.upload_rae.outputs.artifact-id }}
+      rae-run-attempt: ${{ steps.collect_rae.outputs.run-attempt }}
     env:
       ENVIRONMENT: ${{ vars.ENVIRONMENT }}
       ST_VERBOSE_MODE: ${{ vars.ST_VERBOSE_MODE }}
@@ -658,7 +661,7 @@ jobs:
           TENANT_PROCESS_HOST: "${{ env.TENANT_PROCESS_HOST }}"
           JAVA_TEST_SUITE: ${{ needs.workflow_context.outputs.javaTestSuite }}
         run: |
-          set -uo pipefail
+          set -euo pipefail
           echo "Running tests..."
           echo "ENVIRONMENT is: ${ENVIRONMENT}"
 
@@ -674,14 +677,26 @@ jobs:
 
           echo "Building common module..."
           mvn -f common/pom.xml clean install -DskipTests
-
+          
           echo "Running QA test suite: ${JAVA_TEST_SUITE}"
           cd interop-qa-tests
-
+          
+          started_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          start=$SECONDS
+          status=0
+          
           mvn \
-            $SPRING_PROFILE \
-            -Dtest="it.pagopa.pn.interop.cucumber.$JAVA_TEST_SUITE" \
-            clean verify > qa-tests.log 2>&1
+          "$SPRING_PROFILE" \
+          "-Dtest=it.pagopa.pn.interop.cucumber.$JAVA_TEST_SUITE" \
+          clean verify > qa-tests.log 2>&1 || status=$?
+          
+          elapsed=$((SECONDS - start))
+          mkdir -p target/rae-input/rae
+          printf '{"data_ora":"%s","durata":"%02d:%02d:%02d"}\n' \
+          "$started_at" "$((elapsed / 3600))" "$((elapsed / 60 % 60))" "$((elapsed % 60))" \
+          > target/rae-input/rae/run_metadata.json
+          
+          exit "$status"
 
       - name: Upload QA test logs
         if: always()
@@ -689,14 +704,117 @@ jobs:
         with:
           name: qa-tests-log
           path: ./pn-b2b-client/interop-qa-tests/qa-tests.log
+          overwrite: true
 
       - name: Upload Cucumber Report
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: cucumber-report
-          path: pn-b2b-client/interop-qa-tests/target/cucumber-report*
+          path: pn-b2b-client/interop-qa-tests/target/*cucumber-report*
           retention-days: 10
+          overwrite: true
+
+      - name: Collect RAE reports
+        id: collect_rae
+        if: ${{ !cancelled() && (steps.run_pn-b2b-client_tests.outcome == 'success' || steps.run_pn-b2b-client_tests.outcome == 'failure') }}
+        working-directory: pn-b2b-client/interop-qa-tests
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+
+          staging=target/rae-input
+          contract=target/contract-test/report.json
+          cucumber=(target/*cucumber-report*.json target/cucumber-reports/*.json)
+
+          if ((${#cucumber[@]} == 0)) && [[ ! -f "$contract" ]]; then
+            echo "::error::No Cucumber or Contract JSON report produced; cannot generate RAE"
+            exit 1
+          fi
+
+          if [[ ! -s "$staging/rae/run_metadata.json" ]]; then
+            echo "::error::Missing Maven execution metadata; cannot generate RAE"
+            exit 1
+          fi
+
+          if ((${#cucumber[@]} > 0)); then
+            mkdir -p "$staging/cucumber-reports"
+            for report in "${cucumber[@]}"; do
+              destination="$staging/cucumber-reports/${report##*/}"
+              if [[ -e "$destination" ]]; then
+                echo "::error::Duplicate Cucumber report filename: ${report##*/}"
+                exit 1
+              fi
+              cp -- "$report" "$destination"
+            done
+          fi
+
+          if [[ -f "$contract" ]]; then
+            mkdir -p "$staging/contract-test"
+            cp -- "$contract" "$staging/contract-test/report.json"
+          fi
+
+          printf 'run-attempt=%s\n' "$GITHUB_RUN_ATTEMPT" >> "$GITHUB_OUTPUT"
+
+      - name: Upload RAE reports
+        id: upload_rae
+        if: ${{ !cancelled() && steps.collect_rae.outcome == 'success' }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: qa-test-artifacts-${{ github.run_attempt }}
+          path: pn-b2b-client/interop-qa-tests/target/rae-input/
+          if-no-files-found: error
+          retention-days: 10
+
+
+  dispatch_rae:
+    name: Trigger RAE in pn-b2b-client
+    needs: [ workflow_context, run_java_test ]
+    if: >-
+      ${{
+        !cancelled() &&
+        github.repository == 'pagopa/interop-qa-tests' &&
+        needs.run_java_test.outputs.rae-artifact-id != '' &&
+        (
+          needs.workflow_context.outputs.environment == 'es1-qa' ||
+          needs.workflow_context.outputs.environment == 'es1-dev'
+        )
+      }}
+    runs-on: ubuntu-22.04
+    permissions: { }
+    steps:
+      - name: Dispatch RAE generation
+        env:
+          GH_TOKEN: ${{ secrets.RAE_DISPATCH_TOKEN }}
+          ARTIFACT_ID: ${{ needs.run_java_test.outputs.rae-artifact-id }}
+          REPORT_RUN_ATTEMPT: ${{ needs.run_java_test.outputs.rae-run-attempt }}
+          TEST_SUITE: ${{ needs.workflow_context.outputs.javaTestSuite }}
+          TEST_ENVIRONMENT: ${{ needs.workflow_context.outputs.environment }}
+          JAVA_BRANCH_NAME: ${{ needs.workflow_context.outputs.javaBranchName }}
+        run: |
+          set -euo pipefail
+
+          if [[ -z "$GH_TOKEN" ]]; then
+            echo "::error::Missing RAE_DISPATCH_TOKEN"
+            exit 1
+          fi
+
+          if ! git check-ref-format "refs/heads/$JAVA_BRANCH_NAME"; then
+            echo "::error::Invalid Java branch: $JAVA_BRANCH_NAME"
+            exit 1
+          fi
+
+          echo "Dispatching RAE on pn-b2b-client branch: $JAVA_BRANCH_NAME"
+
+          gh workflow run rae-from-interop.yaml \
+            --repo pagopa/pn-b2b-client \
+            --ref "$JAVA_BRANCH_NAME" \
+            -f run_id="$GITHUB_RUN_ID" \
+            -f artifact_id="$ARTIFACT_ID" \
+            -f run_attempt="$REPORT_RUN_ATTEMPT" \
+            -f suite="$TEST_SUITE" \
+            -f environment="${TEST_ENVIRONMENT#es1-}" \
+            -f source_branch="$JAVA_BRANCH_NAME"
 
   delete_runner:
     name: Delete Self-Hosted Runner
